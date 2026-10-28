@@ -1,5 +1,7 @@
 # Корпус Cyberdeck (Raspberry Pi 4 + Waveshare 4,3" DSI + Rii mini X1)
 
+Полное описание проекта (железо, система, экран, питание, сборка): [CYBERDECK.md](CYBERDECK.md).
+
 Раскладушка 158 × 106 мм, высота в закрытом виде ~54 мм.
 
 ![preview](preview.png)
