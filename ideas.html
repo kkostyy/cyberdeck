@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Кибердека: карта идей</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Layout: технический паспорт устройства — схема деки сверху, затем матрица, каталог-карточки, маршрут и смета. */
+:root {
+  --bg: #EDF0EC;
+  --surface: #F8FAF6;
+  --ink: #14211D;
+  --muted: #586964;
+  --line: #C8D2CC;
+  --accent: #C66F1C;
+  --accent-soft: #F6E3CF;
+  --ok: #2E7A57;
+  --ok-soft: #DCEFE5;
+  --warn: #B83D28;
+  --warn-soft: #F7DDD6;
+  --d1: #2E7A57;
+  --d2: #C66F1C;
+  --d3: #B83D28;
+  --heat0: #F8FAF6;
+  --heat-rgb: 198, 111, 28;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1714; --surface: #16211D; --ink: #E3EBE6; --muted: #93A39C; --line: #2B3A35;
+    --accent: #EE9F4E; --accent-soft: #3A2A1A; --ok: #63C493; --ok-soft: #173327;
+    --warn: #F0806A; --warn-soft: #3B1F19; --d1: #63C493; --d2: #EE9F4E; --d3: #F0806A;
+    --heat0: #16211D; --heat-rgb: 238, 159, 78; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1714; --surface: #16211D; --ink: #E3EBE6; --muted: #93A39C; --line: #2B3A35;
+  --accent: #EE9F4E; --accent-soft: #3A2A1A; --ok: #63C493; --ok-soft: #173327;
+  --warn: #F0806A; --warn-soft: #3B1F19; --d1: #63C493; --d2: #EE9F4E; --d3: #F0806A;
+  --heat0: #16211D; --heat-rgb: 238, 159, 78; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 64px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(30px, 5vw, 50px); line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-family: var(--f-display); font-weight: 500; font-size: clamp(21px, 2.6vw, 28px); line-height: 1.15; }
+h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 17px; color: var(--muted); max-width: 62ch; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.sec-head p { color: var(--muted); max-width: 64ch; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.hero-text { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.legend-diff { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--muted); }
+.legend-diff span { display: inline-flex; gap: 6px; align-items: center; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.kpi { background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.kpi b { font-family: var(--f-display); font-weight: 500; font-size: 24px; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+
+.deck { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.deck svg { width: 100%; height: auto; display: block; }
+.deck .shell { fill: var(--surface); stroke: var(--ink); stroke-width: 1.5; }
+.deck .screen { fill: var(--ink); }
+.deck .screen-txt { fill: var(--bg); font-family: var(--f-mono); font-size: 11px; }
+.deck .key { fill: var(--bg); stroke: var(--line); stroke-width: 1; }
+.deck .port { fill: var(--muted); }
+.deck .mk circle { stroke: var(--surface); stroke-width: 2; }
+.deck .mk.ok circle { fill: var(--ok); }
+.deck .mk.warn circle { fill: var(--warn); }
+.deck .mk text { fill: #fff; font-family: var(--f-mono); font-size: 11px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.spec { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; font-size: 13.5px; }
+.spec li { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.spec .n { flex: none; width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-family: var(--f-mono); font-size: 11px; font-weight: 600; color: #fff; transform: translateY(4px); }
+.spec .ok .n { background: var(--ok); }
+.spec .warn .n { background: var(--warn); }
+.spec .warn b { color: var(--warn); }
+.spec b { font-weight: 600; }
+
+/* ---------- matrix ---------- */
+.matrix-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table.matrix { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+.matrix th, .matrix td { padding: 0; border-bottom: 1px solid var(--line); }
+.matrix tr:last-child td, .matrix tr:last-child th { border-bottom: 0; }
+.matrix thead th { font-family: var(--f-mono); font-weight: 400; font-size: 12px; color: var(--muted); padding: 10px 8px; text-align: center; }
+.matrix thead th:first-child { text-align: left; padding-left: 14px; }
+.matrix tbody th { text-align: left; font-weight: 500; }
+.matrix tbody th button { all: unset; cursor: pointer; display: flex; gap: 10px; align-items: baseline; padding: 9px 14px; width: 100%; box-sizing: border-box; }
+.matrix tbody th button:hover { color: var(--accent); }
+.matrix tbody th button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.matrix .num { font-family: var(--f-mono); font-size: 12px; color: var(--muted); width: 1.6em; }
+.matrix td button { all: unset; cursor: pointer; display: grid; place-items: center; width: 100%; height: 38px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.matrix td button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.matrix td button:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+.matrix td.zero button { color: var(--line); cursor: default; }
+.matrix td.zero button:hover { box-shadow: none; }
+.matrix td.total { font-family: var(--f-mono); text-align: center; color: var(--muted); width: 72px; }
+.bar-mini { display: flex; height: 6px; border-radius: 3px; overflow: hidden; width: 90px; margin: 0 auto; background: var(--line); }
+.bar-mini i { display: block; height: 100%; }
+
+/* ---------- catalog ---------- */
+.filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 11px; font-size: 13px; cursor: pointer; line-height: 1.4; white-space: nowrap; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .c { font-family: var(--f-mono); font-size: 11px; opacity: .65; margin-left: 4px; }
+.search { flex: 1 1 220px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 14px; color: var(--ink); }
+.count { font-family: var(--f-mono); font-size: 12px; color: var(--muted); margin-left: auto; }
+.cat-block { display: flex; flex-direction: column; gap: 12px; }
+.cat-block + .cat-block { margin-top: 36px; }
+.cat-title { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.cat-title .num { font-family: var(--f-mono); color: var(--accent); font-size: 14px; }
+.cat-title h3 { font-family: var(--f-display); font-weight: 500; font-size: 19px; }
+.note { font-size: 13.5px; background: var(--accent-soft); border-radius: var(--r); padding: 8px 12px; max-width: 80ch; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-items: start; }
+details.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-width: 0; }
+details.card[open] { border-color: var(--muted); }
+details.card.flash { animation: flash 1.4s ease-out; }
+@keyframes flash { 0% { box-shadow: 0 0 0 4px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+details.card summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+details.card summary::-webkit-details-marker { display: none; }
+.card-top { display: flex; gap: 10px; align-items: baseline; }
+.card-top .id { font-family: var(--f-mono); font-size: 12px; color: var(--muted); flex: none; }
+.card-top h3 { flex: 1; min-width: 0; }
+.stars { flex: none; font-size: 13px; letter-spacing: 1px; white-space: nowrap; }
+.stars.d1 { color: var(--d1); } .stars.d2 { color: var(--d2); } .stars.d3 { color: var(--d3); }
+.stars .off { opacity: .22; }
+.card-what { font-size: 14px; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tag { font-family: var(--f-mono); font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--muted); }
+.price { font-family: var(--f-mono); font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--ink); }
+.price.free { background: var(--ok-soft); }
+.badge-top { font-size: 11px; font-weight: 600; color: #fff; background: var(--warn); border-radius: 4px; padding: 1px 7px; }
+.more { font-size: 12.5px; color: var(--accent); font-weight: 500; }
+details.card[open] .more::after { content: " — свернуть"; }
+details.card:not([open]) .more::after { content: " →"; }
+.card-body { border-top: 1px dashed var(--line); padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.card-body dl { margin: 0; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px 12px; }
+.card-body dt { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+.card-body dd { margin: 0; min-width: 0; }
+.card-body dd.warn { color: var(--warn); font-weight: 500; }
+.card-body ul { margin: 0; padding-left: 18px; }
+.deps { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
+.idlink { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--accent); color: var(--accent); background: transparent; border-radius: 4px; padding: 1px 6px; cursor: pointer; }
+.idlink:hover { background: var(--accent); color: var(--surface); }
+.empty { padding: 32px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--r); }
+
+/* ---------- roadmap ---------- */
+.road { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; position: relative; }
+.road::before { content: ""; position: absolute; left: 4%; right: 4%; top: 19px; height: 2px; background: var(--line); }
+.stage { position: relative; padding: 0 8px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.stage .dot { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 16px; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); position: relative; z-index: 1; }
+.stage:first-child .dot { background: var(--accent); color: var(--surface); }
+.stage h3 { font-size: 15px; }
+.stage p { font-size: 13.5px; color: var(--muted); }
+.stage .ids { display: flex; flex-wrap: wrap; gap: 4px; }
+.unlock { font-size: 12.5px; border-top: 1px dashed var(--line); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.unlock span { color: var(--muted); font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+
+/* ---------- shopping ---------- */
+.shop-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 14px; }
+.total { display: flex; flex-direction: column; gap: 2px; }
+.total b { font-family: var(--f-display); font-weight: 500; font-size: 30px; font-variant-numeric: tabular-nums; }
+.total span { font-size: 13px; color: var(--muted); }
+.shop { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); overflow: hidden; }
+.shop-row { display: grid; grid-template-columns: 28px minmax(0, 1.25fr) minmax(0, 1fr) minmax(140px, 1.2fr) 74px; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.shop-row:last-child { border-bottom: 0; }
+.shop-row:hover { background: var(--bg); }
+.shop-row input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+.shop-row .nm { font-weight: 500; }
+.shop-row .why { font-size: 13.5px; color: var(--muted); }
+.shop-row .eur { font-family: var(--f-mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.range { position: relative; height: 14px; }
+.range .track { position: absolute; inset: 6px 0; background: var(--line); border-radius: 1px; }
+.range .seg { position: absolute; top: 2px; height: 10px; border-radius: 5px; background: var(--muted); opacity: .45; }
+.shop-row.on .range .seg { background: var(--accent); opacity: 1; }
+.scale { display: grid; grid-template-columns: 28px minmax(0, 1.25fr) minmax(0, 1fr) minmax(140px, 1.2fr) 74px; gap: 12px; padding: 6px 14px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); }
+.scale .ticks { position: relative; height: 14px; }
+.scale .ticks span { position: absolute; transform: translateX(-50%); }
+.scale .ticks span:first-child { transform: none; }
+.scale .ticks span:last-child { transform: translateX(-100%); }
+
+footer { color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 18px; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .road { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .road::before { left: 19px; right: auto; top: 20px; bottom: 20px; width: 2px; height: auto; }
+  .stage { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; row-gap: 6px; padding: 0; }
+  .stage > *:not(.dot) { grid-column: 2; }
+  .stage .dot { grid-row: 1 / span 4; }
+}
+@media (max-width: 640px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spec { grid-template-columns: minmax(0, 1fr); }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .shop-row, .scale { grid-template-columns: 24px minmax(0, 1fr) 70px; }
+  .shop-row .why { grid-column: 2 / 4; grid-row: 2; }
+  .shop-row .range { grid-column: 2 / 4; grid-row: 3; }
+  .scale > :nth-child(2), .scale > :nth-child(3), .scale > :nth-child(5) { display: none; }
+  .scale .ticks { grid-column: 2 / 4; }
+  .card-body dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .card-body dd { margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Raspberry Pi 4 · Arch Linux ARM · sway + serpantinum</span>
+      <h1>Кибердека: карта идей</h1>
+      <p class="lead">Что можно сделать с самодельным карманным компьютером: от батареи и SSD до радиоэфира, датчиков, локального ИИ и ретро-игр. Каждая идея самостоятельная, их можно брать по одной.</p>
+      <div class="kpis" id="kpis"></div>
+      <div class="legend-diff">
+        <span><span class="stars d1">★<span class="off">★★</span></span> пара команд</span>
+        <span><span class="stars d2">★★<span class="off">★</span></span> вечер настройки</span>
+        <span><span class="stars d3">★★★</span> выходные и больше</span>
+      </div>
+    </div>
+
+    <figure class="deck" style="margin:0">
+      <svg viewBox="0 0 520 330" role="img" aria-labelledby="deck-title">
+        <title id="deck-title">Схема деки: что работает и где слабые места</title>
+        <rect class="shell" x="70" y="12" width="380" height="190" rx="10"/>
+        <rect class="screen" x="96" y="32" width="328" height="150" rx="3"/>
+        <text class="screen-txt" x="110" y="56">$ uname -m</text>
+        <text class="screen-txt" x="110" y="74">aarch64</text>
+        <text class="screen-txt" x="110" y="92">$ ideas --count</text>
+        <text class="screen-txt" x="110" y="110" id="svg-count">61</text>
+        <text class="screen-txt" x="300" y="170">800 × 480</text>
+        <rect x="200" y="202" width="120" height="8" rx="2" class="port"/>
+        <polygon class="shell" points="62,212 458,212 494,316 26,316"/>
+        <g id="keys"></g>
+        <rect x="486" y="262" width="5" height="16" class="port" transform="rotate(-19 488 270)"/>
+        <rect x="480" y="244" width="5" height="10" class="port" transform="rotate(-19 482 249)"/>
+        <rect x="34" y="262" width="5" height="12" class="port" transform="rotate(19 36 268)"/>
+        <g class="mk ok"><circle cx="260" cy="132" r="11"/><text x="260" y="132">1</text></g>
+        <g class="mk ok"><circle cx="252" cy="296" r="11"/><text x="252" y="296">2</text></g>
+        <g class="mk ok"><circle cx="150" cy="226" r="11"/><text x="150" y="226">3</text></g>
+        <g class="mk ok"><circle cx="434" cy="24" r="11"/><text x="434" y="24">4</text></g>
+        <g class="mk warn"><circle cx="498" cy="270" r="11"/><text x="498" y="270">5</text></g>
+        <g class="mk warn"><circle cx="20" cy="268" r="11"/><text x="20" y="268">6</text></g>
+        <g class="mk warn"><circle cx="372" cy="226" r="11"/><text x="372" y="226">7</text></g>
+        <g class="mk warn"><circle cx="476" cy="226" r="11"/><text x="476" y="226">8</text></g>
+      </svg>
+      <figcaption>
+        <ul class="spec">
+          <li class="ok"><span class="n">1</span><span><b>Экран</b> 5″ DSI 800×480, сенсорный (FT5x06)</span></li>
+          <li class="ok"><span class="n">2</span><span><b>Ввод</b> мини-клавиатура с тачпадом, экранная клавиатура, жесты</span></li>
+          <li class="ok"><span class="n">3</span><span><b>Плата</b> Raspberry Pi 4 Model B, 4 ГБ</span></li>
+          <li class="ok"><span class="n">4</span><span><b>Связь</b> Wi-Fi, Bluetooth, Ethernet</span></li>
+          <li class="warn"><span class="n">5</span><span><b>Питание</b> разъём отходит, Pi внезапно выключается</span></li>
+          <li class="warn"><span class="n">6</span><span><b>Звук</b> 3,5 мм выключен в <span class="mono">/boot/config.txt</span></span></li>
+          <li class="warn"><span class="n">7</span><span><b>Хранилище</b> microSD 16 ГБ, места мало</span></li>
+          <li class="warn"><span class="n">8</span><span><b>Батарея</b> нет, только от провода</span></li>
+        </ul>
+      </figcaption>
+    </figure>
+  </header>
+
+  <!-- ===== MATRIX ===== -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Обзор</span>
+      <h2>Где сколько идей и насколько они сложные</h2>
+      <p>Строка — направление, столбец — сложность. Чем насыщеннее ячейка, тем больше идей. Нажмите на ячейку или на название, чтобы отфильтровать каталог ниже.</p>
+    </div>
+    <div class="matrix-wrap"><table class="matrix" id="matrix"></table></div>
+  </section>
+
+  <!-- ===== CATALOG ===== -->
+  <section id="catalog">
+    <div class="sec-head">
+      <span class="eyebrow">Каталог</span>
+      <h2>Все идеи с подробностями</h2>
+      <p>Карточка показывает, что это и сколько стоит. Нажмите на неё, чтобы увидеть, зачем это нужно, что купить, что настроить и на какие другие идеи она опирается.</p>
+    </div>
+    <div class="filters">
+      <div class="row" id="f-cat"></div>
+      <div class="row">
+        <span id="f-diff" class="row"></span>
+        <button class="chip" id="f-free" aria-pressed="false" type="button">Без покупок</button>
+        <input class="search" id="f-q" type="search" placeholder="Поиск: SDR, GPS, Whisper…" aria-label="Поиск по идеям">
+        <span class="count" id="f-count"></span>
+      </div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <!-- ===== ROADMAP ===== -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">План</span>
+      <h2>С чего начать: шесть этапов</h2>
+      <p>Порядок важен: первые три этапа чинят слабые места деки и дают место и питание всему остальному. Под каждым этапом указано, какие идеи он открывает.</p>
+    </div>
+    <ol class="road" id="road"></ol>
+  </section>
+
+  <!-- ===== SHOPPING ===== -->
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Смета</span>
+      <h2>Список покупок</h2>
+      <p>Отметьте, что собираетесь брать, и сумма пересчитается. Полоса показывает разброс цены от минимальной до максимальной на шкале 0–50 €. Цены ориентировочные: AliExpress и местные магазины, 2026.</p>
+    </div>
+    <div class="shop-head">
+      <div class="total"><b id="sum">0 €</b><span id="sum-note">ничего не выбрано</span></div>
+      <div class="row">
+        <button class="chip" type="button" data-preset="start">Этапы 1–3</button>
+        <button class="chip" type="button" data-preset="all">Всё</button>
+        <button class="chip" type="button" data-preset="none">Сбросить</button>
+      </div>
+    </div>
+    <div class="shop" id="shop"></div>
+  </section>
+
+  <footer>
+    Составлено по файлу <span class="mono">IDEAS.md</span> из репозитория кибердеки. Приём радио почти везде законен, передача только на разрешённых частотах и с позывным. Сканировать сети можно только свои или с разрешения владельца.
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- данные ---------- */
+  var CATS = [
+    { id: 1, t: "Сделать деку переносной" },
+    { id: 2, t: "Рабочая станция в кармане" },
+    { id: 3, t: "Радио и эфир", note: "Приём почти везде законен. Передача только на разрешённых частотах и/или с позывным (радиолюбительская лицензия)." },
+    { id: 4, t: "Сети", note: "Сканировать и анализировать только свои сети и с разрешения владельца." },
+    { id: 5, t: "Железо через GPIO и USB" },
+    { id: 6, t: "Локальный ИИ без интернета" },
+    { id: 7, t: "Камера и зрение", note: "Для всех идей раздела нужен модуль Raspberry Pi Camera v3 (~25–35 €) или любая USB-вебкамера." },
+    { id: 8, t: "Навигация и поход" },
+    { id: 9, t: "Электроника и ремонт" },
+    { id: 10, t: "Развлечения и творчество" },
+    { id: 11, t: "Дома на столе" },
+    { id: 12, t: "Обучение" }
+  ];
+
+  // d: сложность 1–3 (d2: верхняя граница, если указан диапазон); p: цена или null, если только софт
+  // f: подробности [метка, текст | массив]; deps: на какие идеи опирается
+  var IDEAS = [
+    { id: "1.1", t: "Батарея / UPS", d: 2, p: "30–50 €", top: true, tags: ["GPIO", "питание"],
+      what: "Плата бесперебойного питания с аккумуляторами 18650 или повербанк с режимом pass-through.",
+      f: [["Зачем", "Дека работает без розетки, а при отходящем контакте Pi не выключается: UPS просто подхватывает питание. Это главный апгрейд."],
+          ["Нужно", "UPS HAT для Pi 4 (Waveshare UPS HAT, Geekworm X728/X1200, PiSugar для небольших сборок) + 2 аккумулятора 18650 с защитой."],
+          ["Настроить", ["индикатор заряда на панели", "уведомление при низком заряде", "аккуратное выключение при 5 %", "автозапуск после подключения зарядки"]],
+          ["!Важно", "Pi 4 под нагрузкой берёт до 3 А. UPS нужен с выходом не меньше 3 А."]] },
+    { id: "1.2", t: "Система на USB-флешке или SSD", d: 2, p: "10–40 €", tags: ["USB"],
+      what: "Перенос всей системы с microSD на накопитель USB 3.0.",
+      f: [["Зачем", "В 3–5 раз быстрее запуск программ и установка пакетов, больше места. SD-карта перестаёт изнашиваться и не портится при выключениях."],
+          ["Нужно", "Флешка USB 3.x (SanDisk Extreme, Samsung BAR/FIT Plus, Kingston DataTraveler Max): 64 ГБ ~10–15 €. Или SSD M.2/SATA в USB-корпусе: 256 ГБ + корпус ~30–40 €."],
+          ["Как", "Тест скорости накопителя → копирование системы → загрузка с USB. SD-карта остаётся запасной."]] },
+    { id: "1.3", t: "Корпус", d: 2, d2: 3, p: "пластик", tags: ["3D-печать"],
+      what: "Напечатанный на 3D-принтере или собранный корпус под экран, клавиатуру и батарею.",
+      f: [["Идеи", "Раскладушка как у ноутбука, «чемоданчик» в стиле 80-х, наручный вариант. Готовые модели на Printables/Thingiverse по запросу «cyberdeck 5 inch DSI»."],
+          ["Плюс", "Вывести наружу USB-порты, кнопку питания и светодиод состояния."],
+          ["В репо", "Раскладушка 158 × 106 мм уже лежит в этом репозитории: base.stl, deck.stl, lid.stl, lid_cover.stl."]] },
+    { id: "1.4", t: "Кнопка питания и светодиод", d: 1, p: "~2 €", tags: ["GPIO"],
+      what: "Физическая кнопка на GPIO: короткое нажатие включает и выключает экран, долгое корректно выключает Pi. Светодиод показывает работу и запись на диск.",
+      f: [["Нужно", "Кнопка, светодиод и резистор."],
+          ["Настроить", "Оверлеи gpio-shutdown и gpio-led в /boot/config.txt."]] },
+    { id: "1.5", t: "Охлаждение", d: 1, p: "3–15 €", tags: ["GPIO"],
+      what: "Радиатор или вентилятор.",
+      f: [["Зачем", "В простое сейчас ~65 °C. При сборках и видео Pi упирается в 80 °C и сбрасывает частоту."],
+          ["Нужно", "Радиаторы ~3 €, корпус-радиатор (Argon, Flirc) или вентилятор 30 мм ~5–15 €."],
+          ["Настроить", "Вентилятор можно включать по температуре через оверлей gpio-fan."]] },
+    { id: "1.6", t: "Энергосбережение", d: 1, p: null, tags: ["софт"], deps: ["1.1"],
+      what: "Режим «экономия» в один клик: ниже частота, без живых обоев, приглушённый экран, выключенный Bluetooth.",
+      f: [["Зачем", "+30–50 % времени работы от батареи."]] },
+
+    { id: "2.1", t: "Программирование где угодно", d: 1, p: null, tags: ["софт"],
+      what: "Писать код прямо на деке: всё нужное для этого уже стоит.",
+      f: [["Уже есть", "Claude (claude-desk), VS Code, .NET 10, ASP.NET Core."],
+          ["Добавить", "Python с виртуальными окружениями, Node.js, Rust, Go, Git + GitHub CLI, Docker/Podman для маленьких сервисов."],
+          ["Идея", "«Карманный стенд»: писать веб-API на ASP.NET и сразу открывать его с телефона по Wi-Fi."]] },
+    { id: "2.2", t: "Терминал для серверов", d: 1, p: null, tags: ["софт"],
+      what: "SSH к другим машинам, tmux, mosh и хранилище ключей.",
+      f: [["Зачем", "Дека как пульт для домашнего сервера, VPS, роутера."],
+          ["Детали", ["tmux: сессии не рвутся при обрыве связи", "mosh: SSH, который переживает смену сети"]]] },
+    { id: "2.3", t: "Офлайн-база знаний", d: 1, p: null, tags: ["софт"], deps: ["1.2"],
+      what: "Kiwix: вся Википедия, Stack Overflow, Wiktionary, медицинские справочники без интернета.",
+      f: [["Размер", "Русская Википедия без картинок ~10 ГБ, английская с картинками ~100 ГБ. Нужен накопитель побольше."]] },
+    { id: "2.4", t: "Заметки и личная база знаний", d: 1, p: null, tags: ["софт"],
+      what: "Markdown-заметки в стиле Obsidian/Zettelkasten с синхронизацией через git с телефоном и ПК.",
+      f: [["Плюс", "Ежедневник, список дел, календарь (CalDAV: синхронизация с Google/Nextcloud)."]] },
+    { id: "2.5", t: "Удалённый рабочий стол к ПК", d: 1, p: null, tags: ["софт", "Wi-Fi"],
+      what: "Подключаться с деки к домашнему компьютеру по RDP, VNC или RustDesk: дека как тонкий клиент к мощной машине.", f: [] },
+    { id: "2.6", t: "Менеджер паролей", d: 1, p: null, tags: ["софт"],
+      what: "KeePassXC с базой, которая синхронизируется с телефоном (KeePassDX). Полностью офлайн.", f: [] },
+
+    { id: "3.1", t: "SDR-приёмник", d: 2, p: "30–40 €", tags: ["USB"],
+      what: "USB-свисток RTL-SDR превращает деку в радиоприёмник от 24 МГц до 1,7 ГГц.",
+      f: [["Что ловить", ["FM/AM-радио, авиадиспетчеры (118–137 МГц), морской канал",
+                         "ADS-B: самолёты вокруг на карте в реальном времени (dump1090/readsb); данные можно отдавать во Flightradar24 и получить бесплатный бизнес-аккаунт",
+                         "метеоспутники NOAA/Meteor: снимки Земли из космоса (нужна антенна V-диполь)",
+                         "rtl_433: показания беспроводных термометров, метеостанций, датчиков вокруг",
+                         "спектр эфира «водопадом» (SDR++, GQRX)"]],
+          ["Нужно", "RTL-SDR Blog V4 + антенны из комплекта."]] },
+    { id: "3.2", t: "Meshtastic / LoRa", d: 2, p: "25–40 €", tags: ["USB", "BT"],
+      what: "Текстовая связь без интернета и сотовой сети: 1–5 км в городе, 10+ км на открытой местности. Сообщения идут по цепочке устройств (mesh).",
+      f: [["Нужно", "Плата LoRa 868 МГц (Европа): Heltec V3, LilyGO T-Beam (с GPS), RAK WisBlock. Подключается к деке по USB или Bluetooth."],
+          ["Идея", "Дека как базовая станция сети Meshtastic с большим экраном и клавиатурой. Сообщения приходят, даже когда телефон выключен."]] },
+    { id: "3.3", t: "Отслеживание спутников", d: 2, p: null, tags: ["софт"], deps: ["3.1"],
+      what: "Gpredict показывает, когда над вами пролетает МКС и другие спутники.",
+      f: [["С SDR", "Принимать SSTV-картинки с МКС (во время событий ARISS) и телеметрию."]] },
+    { id: "3.4", t: "Цифровые радиолюбительские режимы", d: 3, p: "трансивер", tags: ["USB", "лицензия"],
+      what: "FT8 (связь через весь мир при мощности в несколько ватт), APRS (позиция и короткие сообщения), Winlink (e-mail через радио).",
+      f: [["Нужно", "Трансивер + звуковой интерфейс (Digirig). Дека работает компьютером станции."],
+          ["!Важно", "Для передачи нужна радиолюбительская лицензия."]] },
+
+    { id: "4.1", t: "Анализ Wi-Fi и Bluetooth", d: 1, p: null, tags: ["Wi-Fi", "BT"],
+      what: "Какие сети вокруг, на каких каналах, уровень сигнала, загрузка каналов. Список BLE-устройств поблизости.",
+      f: [["Зачем", "Выбрать лучший канал для своего роутера."]] },
+    { id: "4.2", t: "Сетевая аптечка", d: 1, p: null, tags: ["софт"],
+      what: "Проверка домашней сети: какие устройства подключены, какая скорость, что идёт по сети.",
+      f: [["Инструменты", ["nmap: устройства в сети", "iperf3: скорость между устройствами", "тест скорости интернета", "Wireshark: просмотр трафика", "DNS-диагностика"]]] },
+    { id: "4.3", t: "Дорожный роутер", d: 2, p: "15–25 €", tags: ["USB", "Wi-Fi"], deps: ["4.4"],
+      what: "Один Wi-Fi-модуль подключается к сети отеля или кафе, второй раздаёт вашу защищённую сеть для телефона и ноутбука. Весь трафик идёт через VPN.",
+      f: [["Нужно", "USB Wi-Fi-адаптер с режимом AP (чипы MediaTek MT7612U/MT7921AU)."]] },
+    { id: "4.4", t: "Личный VPN / Tailscale", d: 1, p: null, tags: ["софт"],
+      what: "WireGuard или Tailscale: доступ к деке из любой точки мира, а с деки к домашней сети, без проброса портов.", f: [] },
+    { id: "4.5", t: "Учебная лаборатория по безопасности", d: 2, p: null, tags: ["софт"],
+      what: "CTF-задачи, TryHackMe/HackTheBox через VPN, свои виртуальные «мишени»: учиться защите сетей легально.", f: [] },
+
+    { id: "5.1", t: "Датчики окружения", d: 1, p: "5–40 €", tags: ["I²C"],
+      what: "Температура, влажность, давление (BME280), CO₂ (SCD40), качество воздуха и пыль (PMS5003), освещённость.",
+      f: [["Результат", "Показания на панели, графики за сутки и неделю, уведомление «пора проветрить»."],
+          ["Нужно", "Датчики по 5–40 € каждый, подключение по I²C."]] },
+    { id: "5.2", t: "Реле, свет, моторы", d: 2, p: "по проекту", tags: ["GPIO"],
+      what: "Включать лампы и приборы через реле, управлять LED-лентами, сервоприводами, шаговыми моторами. Простые роботы и автоматизация.",
+      f: [["!Важно", "Осторожно с 230 В."]] },
+    { id: "5.3", t: "Программатор микроконтроллеров", d: 1, p: null, tags: ["USB"],
+      what: "Прошивать Arduino, ESP32, ESP8266, Raspberry Pi Pico прямо с деки (arduino-cli, PlatformIO, esptool).",
+      f: [["Идея", "Собрать на ESP32 беспроводные датчики, которые шлют данные на деку."]] },
+    { id: "5.4", t: "ИК-пульт", d: 1, p: "~3 €", tags: ["GPIO"],
+      what: "Универсальный пульт для телевизора, кондиционера, проектора (LIRC) с кнопками на экране деки.",
+      f: [["Нужно", "ИК-светодиод + ИК-приёмник."]] },
+    { id: "5.5", t: "NFC / RFID", d: 2, p: "5–8 €", tags: ["I²C"],
+      what: "Считыватель PN532: читать свои карты и метки, запускать действия меткой, хранить данные визиток.", f: [] },
+    { id: "5.6", t: "Bluetooth-датчики (BLE)", d: 1, p: "~5 € / шт.", tags: ["BT"],
+      what: "Читать дешёвые BLE-термометры (Xiaomi LYWSD03MMC) по всей квартире без проводов.", f: [] },
+    { id: "5.7", t: "Маленький дополнительный экран", d: 2, p: "OLED / e-ink", tags: ["I²C"],
+      what: "OLED 0,96″ или e-ink на корпусе: время, заряд, IP, уведомления. Видно даже при выключенном основном экране.", f: [] },
+
+    { id: "6.1", t: "Небольшая языковая модель", d: 2, p: null, tags: ["софт"], deps: ["1.2", "1.5"],
+      what: "llama.cpp с моделями на 0,5–3 млрд параметров (Qwen, Llama, Gemma в квантизации Q4). Отвечает офлайн, медленно, несколько слов в секунду.",
+      f: [["Нужно", "1–3 ГБ места на модель, лучше SSD."],
+          ["Идея", "Офлайн-помощник в claude-desk, когда нет интернета."]] },
+    { id: "6.2", t: "Распознавание речи", d: 2, p: "5–15 €", tags: ["USB"],
+      what: "Whisper (tiny/base) или Vosk: диктовка голосом в любое поле. Офлайн, на русском.",
+      f: [["Нужно", "USB-микрофон или гарнитура."]] },
+    { id: "6.3", t: "Синтез речи", d: 1, p: null, tags: ["софт"],
+      what: "Piper TTS: естественный голос на русском офлайн. Дека зачитывает уведомления, книги, ответы Claude.", f: [] },
+    { id: "6.4", t: "Голосовой ассистент", d: 3, p: null, tags: ["софт"], deps: ["6.2", "6.3"],
+      what: "Распознавание + синтез речи + команды: «включи свет», «какая погода», «сколько места на диске». Полностью локально.", f: [] },
+
+    { id: "7.1", t: "Сканер документов и OCR", d: 1, p: "камера", tags: ["камера"],
+      what: "Сфотографировали страницу и получили PDF с распознанным текстом (Tesseract OCR, русский и английский).", f: [] },
+    { id: "7.2", t: "Таймлапсы", d: 1, p: "камера", tags: ["камера"],
+      what: "Закат, рост растений, 3D-печать в виде ускоренного видео.", f: [] },
+    { id: "7.3", t: "Датчик движения и охрана", d: 2, p: "камера", tags: ["камера"],
+      what: "Motion или Frigate: запись при движении и уведомление на телефон.", f: [] },
+    { id: "7.4", t: "QR и штрихкоды", d: 1, p: "камера", tags: ["камера"],
+      what: "Считывать QR-коды камерой (Wi-Fi, ссылки), сканировать штрихкоды для учёта вещей.", f: [] },
+    { id: "7.5", t: "Астрофотография", d: 3, p: "HQ + оптика", tags: ["камера"],
+      what: "Камера HQ с объективом или телескопом: Луна, планеты, звёздные треки.", f: [] },
+
+    { id: "8.1", t: "GPS", d: 2, p: "10–20 €", tags: ["USB", "UART"],
+      what: "Модуль u-blox NEO-M8N: координаты, скорость, высота и точное время даже без интернета.",
+      f: [["Применение", "Запись треков поездок, привязка фото к месту, логгер прогулок."]] },
+    { id: "8.2", t: "Офлайн-карты", d: 2, p: null, tags: ["софт"], deps: ["1.2"],
+      what: "Карты OpenStreetMap без интернета (GNOME Maps или Marble с офлайн-тайлами, свои MBTiles) и маршруты.", f: [] },
+    { id: "8.3", t: "Тревожный чемоданчик", d: 1, p: null, tags: ["софт"], deps: ["2.3", "8.2", "3.2"],
+      what: "Офлайн-набор: Википедия, справочник первой помощи, карты региона, инструкции по ремонту, важные документы в зашифрованном виде, Meshtastic для связи.", f: [] },
+    { id: "8.4", t: "Дорожный журнал", d: 1, p: null, tags: ["софт"], deps: ["8.1", "2.4"],
+      what: "Трек GPS + фото + заметки складываются в дневник поездки с картой.", f: [] },
+
+    { id: "9.1", t: "Логический анализатор", d: 2, p: "8–15 €", tags: ["USB"],
+      what: "8-канальный USB-анализатор + PulseView/sigrok: смотреть сигналы I²C, SPI, UART при отладке устройств.", f: [] },
+    { id: "9.2", t: "Консоль к устройствам", d: 1, p: "~3 €", tags: ["USB", "UART"],
+      what: "USB-UART адаптер (CP2102/CH340): подключаться к роутерам, приставкам, платам по последовательному порту, восстанавливать прошивки.", f: [] },
+    { id: "9.3", t: "Простой осциллограф", d: 2, p: "по выбору", tags: ["USB"],
+      what: "USB-осциллограф или звуковая карта в роли осциллографа: посмотреть форму сигнала, проверить питание.", f: [] },
+    { id: "9.4", t: "Сервер для 3D-принтера", d: 2, p: null, tags: ["софт", "USB"],
+      what: "Klipper + Mainsail или OctoPrint: управлять 3D-принтером с деки и смотреть печать через камеру.", f: [] },
+    { id: "9.5", t: "Диагностика авто", d: 2, p: "10–15 €", tags: ["BT"],
+      what: "Bluetooth-адаптер OBD-II ELM327: коды ошибок, расход, температура, обороты в реальном времени на экране деки.", f: [] },
+
+    { id: "10.1", t: "Ретро-игры", d: 1, p: "25–40 €", tags: ["BT"],
+      what: "RetroArch с эмуляторами NES, SNES, Sega, Game Boy/GBA, PS1, частично N64.",
+      f: [["Нужно", "Bluetooth-геймпад (8BitDo)."]] },
+    { id: "10.2", t: "Стриминг игр с ПК", d: 1, p: null, tags: ["Wi-Fi"],
+      what: "Moonlight: играть в тяжёлые игры с домашнего компьютера на экране деки по Wi-Fi.", f: [] },
+    { id: "10.3", t: "Музыка и видео", d: 1, p: null, tags: ["софт"],
+      what: "Музыкальный плеер, подкасты, интернет-радио, Spotify Connect (spotifyd), видео.",
+      f: [["Сначала", "Включить звук: «Настройки → Система → Звук» (разъём 3,5 мм) или Bluetooth-наушники."]] },
+    { id: "10.4", t: "Карманная музыкальная студия", d: 2, p: null, tags: ["софт", "USB"],
+      what: "Синтезаторы (Surge XT, ZynAddSubFX), трекер (MilkyTracker), драм-машина, запись с микрофона.",
+      f: [["Плюс", "С USB-MIDI-клавиатурой получается полноценный инструмент."]] },
+    { id: "10.5", t: "Читалка", d: 1, p: null, tags: ["софт"],
+      what: "Книги (FB2/EPUB/PDF), RSS-ленты, комиксы. Тёмная тема и крупный шрифт.", f: [] },
+    { id: "10.6", t: "Пиксель-арт и рисование", d: 1, p: null, tags: ["софт"],
+      what: "Сенсорный экран + Pixelorama для пиксель-арта или заметки от руки.", f: [] },
+
+    { id: "11.1", t: "Home Assistant", d: 2, p: null, tags: ["софт"],
+      what: "Центр умного дома: свет, розетки, датчики, автоматизации, панель управления на экране деки.", f: [] },
+    { id: "11.2", t: "Pi-hole / AdGuard Home", d: 1, p: null, tags: ["софт"],
+      what: "DNS-фильтр: блокировка рекламы и трекеров для всех устройств дома.", f: [] },
+    { id: "11.3", t: "Сетевая папка и бэкапы", d: 2, p: null, tags: ["софт"], deps: ["1.2"],
+      what: "Samba-шара и резервные копии телефонов и ПК (Syncthing: синхронизация без облака).", f: [] },
+    { id: "11.4", t: "Инфо-панель (киоск)", d: 1, p: null, tags: ["софт"],
+      what: "Дека на подставке показывает на весь экран погоду, календарь, курсы, состояние дома, загрузку ПК.", f: [] },
+    { id: "11.5", t: "Сервер для своих проектов", d: 2, p: null, tags: ["софт"], deps: ["4.4"],
+      what: "Держать на деке ASP.NET-API, Telegram-бота, веб-страницу с доступом через Tailscale или Cloudflare Tunnel.", f: [] },
+
+    { id: "12.1", t: "Linux и сети", d: 1, p: null, tags: ["софт"],
+      what: "Дека как полигон: изучать Linux, bash, systemd, сети, не боясь что-то сломать (есть бэкапы настроек).", f: [] },
+    { id: "12.2", t: "Программирование", d: 1, p: null, tags: ["софт"],
+      what: "C#/.NET, Python, веб, микроконтроллеры с Claude в роли наставника прямо на деке.", f: [] },
+    { id: "12.3", t: "Языки и карточки", d: 1, p: null, tags: ["софт"],
+      what: "Anki (интервальные повторения), офлайн-словари, языковые курсы.", f: [] },
+    { id: "12.4", t: "Электроника", d: 2, p: "наборы", tags: ["GPIO"],
+      what: "Наборы датчиков и макетная плата: от «мигнуть светодиодом» до своих устройств на ESP32.", f: [] }
+  ];
+
+  var ROAD = [
+    { t: "Батарея / UPS", ids: ["1.1"], why: "Убирает внезапные выключения, дека становится переносной.", un: ["1.6", "3.2", "8.1"] },
+    { t: "Перенос на USB/SSD", ids: ["1.2"], why: "Скорость и место под всё остальное.", un: ["2.3", "6.1", "8.2", "11.3"] },
+    { t: "Охлаждение", ids: ["1.5"], why: "Стабильная частота под нагрузкой.", un: ["6.1", "10.1"] },
+    { t: "SDR или Meshtastic", ids: ["3.1", "3.2"], why: "Самое «кибердечное»: эфир и связь без сети.", un: ["3.3", "8.3"] },
+    { t: "Датчики + GPS", ids: ["5.1", "8.1"], why: "Дека начинает «чувствовать» мир вокруг.", un: ["8.4", "11.4"] },
+    { t: "Локальный ИИ и голос", ids: ["6.1", "6.2", "6.3"], why: "Работа офлайн, управление голосом.", un: ["6.4"] }
+  ];
+
+  var SHOP = [
+    { k: "ups", t: "UPS HAT + 2×18650", why: "батарея, защита от выключений", a: 30, b: 50, start: true },
+    { k: "ssd", t: "USB 3.0 флешка 64 ГБ / SSD", why: "система, место", a: 10, b: 40, start: true },
+    { k: "cool", t: "Радиатор / вентилятор", why: "охлаждение", a: 3, b: 15, start: true },
+    { k: "sdr", t: "RTL-SDR Blog V4", why: "радиоприём, самолёты, спутники", a: 30, b: 40 },
+    { k: "lora", t: "LoRa 868 МГц (Heltec V3 / T-Beam)", why: "Meshtastic", a: 25, b: 40 },
+    { k: "gps", t: "GPS u-blox NEO-M8N", why: "навигация, точное время", a: 10, b: 20 },
+    { k: "env", t: "BME280 / SCD40", why: "климат в комнате, CO₂", a: 5, b: 40 },
+    { k: "cam", t: "Камера Pi v3", why: "сканер, таймлапс, охрана", a: 25, b: 35 },
+    { k: "mic", t: "USB-микрофон", why: "голосовой ввод", a: 5, b: 15 },
+    { k: "uart", t: "USB-UART + логический анализатор", why: "электроника и ремонт", a: 10, b: 20 },
+    { k: "obd", t: "ELM327 Bluetooth", why: "диагностика авто", a: 10, b: 15 },
+    { k: "pad", t: "Bluetooth-геймпад", why: "ретро-игры", a: 25, b: 40 }
+  ];
+
+  /* ---------- helpers ---------- */
+  function $(s) { return document.querySelector(s); }
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) { if (k === "class") e.className = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function catOf(i) { return +i.id.split(".")[0]; }
+  function stars(d, d2) {
+    var top = d2 || d;
+    var on = "★".repeat(d), mid = d2 ? "<span style=\"opacity:.55\">" + "★".repeat(d2 - d) + "</span>" : "", off = "★".repeat(3 - top);
+    return '<span class="stars d' + top + '" title="Сложность ' + (d2 ? d + "–" + d2 : d) + ' из 3">' + on + mid + '<span class="off">' + off + "</span></span>";
+  }
+  function byId(id) { for (var i = 0; i < IDEAS.length; i++) if (IDEAS[i].id === id) return IDEAS[i]; }
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  /* ---------- KPIs + svg ---------- */
+  (function () {
+    var free = IDEAS.filter(function (i) { return i.p === null; }).length;
+    var easy = IDEAS.filter(function (i) { return i.d === 1 && !i.d2; }).length;
+    var min = SHOP.reduce(function (s, x) { return s + x.a; }, 0), max = SHOP.reduce(function (s, x) { return s + x.b; }, 0);
+    var k = [[IDEAS.length, "идеи в " + CATS.length + " направлениях"], [easy, "делаются парой команд"], [free, "без покупок, только софт"], [min + "–" + max + " €", "весь список покупок"]];
+    $("#kpis").innerHTML = k.map(function (x) { return '<div class="kpi"><b>' + x[0] + "</b><span>" + x[1] + "</span></div>"; }).join("");
+    document.getElementById("svg-count").textContent = IDEAS.length;
+    // клавиатура в перспективе
+    var g = document.getElementById("keys"), rows = 4, out = "";
+    for (var r = 0; r < rows; r++) {
+      var y0 = 222 + r * 16, t = (y0 - 212) / 104;
+      var xl = 62 - 36 * t + 34, xr = 458 + 36 * t - 34, n = 13, w = (xr - xl) / n;
+      for (var c = 0; c < n; c++) out += '<rect class="key" x="' + (xl + c * w + 1.5).toFixed(1) + '" y="' + y0 + '" width="' + (w - 3).toFixed(1) + '" height="12" rx="2"/>';
+    }
+    out += '<rect class="key" x="214" y="290" width="92" height="20" rx="3"/>';
+    g.innerHTML = out;
+  })();
+
+  /* ---------- state ---------- */
+  var state = { cat: 0, diff: 0, free: false, q: "" };
+
+  /* ---------- matrix ---------- */
+  function renderMatrix() {
+    var maxCell = 0, grid = {};
+    CATS.forEach(function (c) {
+      grid[c.id] = [0, 0, 0];
+      IDEAS.forEach(function (i) { if (catOf(i) === c.id) grid[c.id][(i.d2 || i.d) - 1]++; });
+      grid[c.id].forEach(function (v) { if (v > maxCell) maxCell = v; });
+    });
+    var h = '<thead><tr><th scope="col">Направление</th><th scope="col">★ пара команд</th><th scope="col">★★ вечер</th><th scope="col">★★★ выходные</th><th scope="col">Всего</th><th scope="col">Доля сложности</th></tr></thead><tbody>';
+    CATS.forEach(function (c) {
+      var g = grid[c.id], tot = g[0] + g[1] + g[2];
+      h += '<tr><th scope="row"><button type="button" data-mcat="' + c.id + '"><span class="num">' + c.id + "</span>" + esc(c.t) + "</button></th>";
+      g.forEach(function (v, k) {
+        var a = v ? (0.12 + 0.75 * v / maxCell) : 0;
+        h += '<td class="' + (v ? "" : "zero") + '"><button type="button" ' + (v ? "" : 'tabindex="-1" aria-disabled="true" ') + 'data-mcat="' + c.id + '" data-mdiff="' + (k + 1) + '" style="background:' + (v ? "rgba(var(--heat-rgb)," + a.toFixed(2) + ")" : "transparent") + '" aria-label="' + esc(c.t) + ", сложность " + (k + 1) + ": " + v + '">' + (v || "·") + "</button></td>";
+      });
+      h += '<td class="total">' + tot + '</td><td><div class="bar-mini">' +
+        g.map(function (v, k) { return v ? '<i style="width:' + (100 * v / tot) + '%;background:var(--d' + (k + 1) + ')"></i>' : ""; }).join("") + "</div></td></tr>";
+    });
+    $("#matrix").innerHTML = h + "</tbody>";
+    $("#matrix").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-mcat]");
+      if (!b || b.getAttribute("aria-disabled")) return;
+      state.cat = +b.dataset.mcat; state.diff = +(b.dataset.mdiff || 0); state.free = false; state.q = ""; $("#f-q").value = "";
+      renderFilters(); renderList();
+      $("#catalog").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  /* ---------- filters ---------- */
+  function matches(i, ignoreCat) {
+    if (!ignoreCat && state.cat && catOf(i) !== state.cat) return false;
+    if (state.diff && (i.d2 || i.d) !== state.diff) return false;
+    if (state.free && i.p !== null) return false;
+    if (state.q) {
+      var hay = (i.id + " " + i.t + " " + i.what + " " + (i.tags || []).join(" ") + " " + JSON.stringify(i.f)).toLowerCase();
+      if (hay.indexOf(state.q) < 0) return false;
+    }
+    return true;
+  }
+  function renderFilters() {
+    var fc = $("#f-cat"), all = IDEAS.filter(function (i) { return matches(i, true); }).length;
+    var h = '<button class="chip" type="button" data-cat="0" aria-pressed="' + (state.cat === 0) + '">Все<span class="c">' + all + "</span></button>";
+    CATS.forEach(function (c) {
+      var n = IDEAS.filter(function (i) { return catOf(i) === c.id && matches(i, true); }).length;
+      h += '<button class="chip" type="button" data-cat="' + c.id + '" aria-pressed="' + (state.cat === c.id) + '">' + esc(c.t) + '<span class="c">' + n + "</span></button>";
+    });
+    fc.innerHTML = h;
+    var fd = $("#f-diff"), labels = ["Любая", "★", "★★", "★★★"];
+    fd.innerHTML = labels.map(function (l, k) { return '<button class="chip" type="button" data-diff="' + k + '" aria-pressed="' + (state.diff === k) + '">' + l + "</button>"; }).join("");
+    $("#f-free").setAttribute("aria-pressed", state.free);
+  }
+
+  /* ---------- catalog ---------- */
+  function card(i) {
+    var price = i.p === null ? '<span class="price free">0 € · софт</span>' : '<span class="price">' + esc(i.p) + "</span>";
+    var tags = (i.tags || []).filter(function (t) { return t !== "софт"; }).map(function (t) { return '<span class="tag">' + esc(t) + "</span>"; }).join("");
+    var body = "";
+    if (i.f.length) {
+      body += "<dl>" + i.f.map(function (r) {
+        var warn = r[0].charAt(0) === "!", lab = warn ? r[0].slice(1) : r[0];
+        var v = Array.isArray(r[1]) ? "<ul>" + r[1].map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" : esc(r[1]);
+        return "<dt>" + esc(lab) + '</dt><dd class="' + (warn ? "warn" : "") + '">' + v + "</dd>";
+      }).join("") + "</dl>";
+    }
+    var deps = i.deps || [];
+    var used = IDEAS.filter(function (x) { return (x.deps || []).indexOf(i.id) >= 0; }).map(function (x) { return x.id; });
+    if (deps.length) body += '<div class="deps">Опирается на: ' + deps.map(function (d) { return '<button type="button" class="idlink" data-go="' + d + '" title="' + esc(byId(d).t) + '">' + d + " " + esc(byId(d).t) + "</button>"; }).join("") + "</div>";
+    if (used.length) body += '<div class="deps">Нужна для: ' + used.map(function (d) { return '<button type="button" class="idlink" data-go="' + d + '" title="' + esc(byId(d).t) + '">' + d + "</button>"; }).join("") + "</div>";
+    if (!body) body = '<p style="color:var(--muted)">Подробностей в исходном списке нет: описание выше и есть вся идея.</p>';
+    return '<details class="card" id="idea-' + i.id.replace(".", "-") + '"><summary>' +
+      '<div class="card-top"><span class="id">' + i.id + "</span><h3>" + esc(i.t) + "</h3>" + stars(i.d, i.d2) + "</div>" +
+      '<p class="card-what">' + esc(i.what) + "</p>" +
+      '<div class="meta">' + (i.top ? '<span class="badge-top">главный апгрейд</span>' : "") + price + tags + '<span class="more" style="margin-left:auto">Подробнее</span></div>' +
+      '</summary><div class="card-body">' + body + "</div></details>";
+  }
+  function renderList() {
+    var list = $("#list"), h = "", total = 0;
+    CATS.forEach(function (c) {
+      var items = IDEAS.filter(function (i) { return catOf(i) === c.id && matches(i); });
+      if (!items.length) return;
+      total += items.length;
+      h += '<div class="cat-block"><div class="cat-title"><span class="num">' + String(c.id).padStart(2, "0") + "</span><h3>" + esc(c.t) + "</h3></div>" +
+        (c.note ? '<p class="note">' + esc(c.note) + "</p>" : "") +
+        '<div class="cards">' + items.map(card).join("") + "</div></div>";
+    });
+    list.innerHTML = h || '<div class="empty">Ничего не нашлось. Попробуйте другое слово или сбросьте фильтры.</div>';
+    $("#f-count").textContent = total + " из " + IDEAS.length;
+  }
+  function go(id) {
+    var i = byId(id); if (!i) return;
+    if (!matches(i)) { state.cat = 0; state.diff = 0; state.free = false; state.q = ""; $("#f-q").value = ""; renderFilters(); renderList(); }
+    var d = document.getElementById("idea-" + id.replace(".", "-"));
+    if (!d) return;
+    d.open = true;
+    d.scrollIntoView({ behavior: "smooth", block: "center" });
+    d.classList.remove("flash"); void d.offsetWidth; d.classList.add("flash");
+  }
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-go]");
+    if (t) { e.preventDefault(); go(t.dataset.go); return; }
+    var c = e.target.closest("[data-cat]");
+    if (c) { state.cat = +c.dataset.cat; renderFilters(); renderList(); return; }
+    var d = e.target.closest("[data-diff]");
+    if (d) { state.diff = +d.dataset.diff; renderFilters(); renderList(); return; }
+  });
+  $("#f-free").addEventListener("click", function () { state.free = !state.free; renderFilters(); renderList(); });
+  $("#f-q").addEventListener("input", function (e) { state.q = e.target.value.trim().toLowerCase(); renderFilters(); renderList(); });
+
+  /* ---------- roadmap ---------- */
+  $("#road").innerHTML = ROAD.map(function (s, k) {
+    return '<li class="stage"><span class="dot">' + (k + 1) + "</span><h3>" + esc(s.t) + "</h3>" +
+      '<div class="ids">' + s.ids.map(function (id) { return '<button type="button" class="idlink" data-go="' + id + '">' + id + "</button>"; }).join("") + "</div>" +
+      "<p>" + esc(s.why) + "</p>" +
+      '<div class="unlock"><span>Открывает</span>' + s.un.map(function (id) { return '<a href="#idea-' + id.replace(".", "-") + '" data-go="' + id + '">' + id + " " + esc(byId(id).t) + "</a>"; }).join("") + "</div></li>";
+  }).join("");
+
+  /* ---------- shopping ---------- */
+  var SCALE = 50, picked = {};
+  (function () {
+    var saved = store("deck-shop");
+    if (saved) { try { saved = JSON.parse(saved); } catch (e) { saved = null; } }
+    SHOP.forEach(function (s) { picked[s.k] = saved ? !!saved[s.k] : !!s.start; });
+  })();
+  function renderShop() {
+    var ticks = [0, 10, 20, 30, 40, 50].map(function (v) { return '<span style="left:' + (100 * v / SCALE) + '%">' + v + "</span>"; }).join("");
+    var h = '<div class="scale" aria-hidden="true"><span></span><span></span><span></span><div class="ticks">' + ticks + "</div><span></span></div>";
+    SHOP.forEach(function (s) {
+      var on = picked[s.k];
+      h += '<label class="shop-row' + (on ? " on" : "") + '" for="shop-' + s.k + '">' +
+        '<input type="checkbox" id="shop-' + s.k + '" data-k="' + s.k + '"' + (on ? " checked" : "") + ">" +
+        '<span class="nm">' + esc(s.t) + "</span>" +
+        '<span class="why">' + esc(s.why) + "</span>" +
+        '<span class="range" aria-hidden="true"><span class="track"></span><span class="seg" style="left:' + (100 * s.a / SCALE) + "%;width:" + Math.max(2, 100 * (s.b - s.a) / SCALE) + '%"></span></span>' +
+        '<span class="eur">' + s.a + "–" + s.b + " €</span></label>";
+    });
+    $("#shop").innerHTML = h;
+    updateSum();
+  }
+  function updateSum() {
+    var a = 0, b = 0, n = 0;
+    SHOP.forEach(function (s) { if (picked[s.k]) { a += s.a; b += s.b; n++; } });
+    $("#sum").textContent = n ? a + "–" + b + " €" : "0 €";
+    $("#sum-note").textContent = n ? "выбрано позиций: " + n + " из " + SHOP.length : "ничего не выбрано";
+    store("deck-shop", JSON.stringify(picked));
+  }
+  $("#shop").addEventListener("change", function (e) {
+    var k = e.target.dataset.k; if (!k) return;
+    picked[k] = e.target.checked;
+    e.target.closest(".shop-row").classList.toggle("on", picked[k]);
+    updateSum();
+  });
+  document.querySelectorAll("[data-preset]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var p = b.dataset.preset;
+      SHOP.forEach(function (s) { picked[s.k] = p === "all" ? true : p === "start" ? !!s.start : false; });
+      renderShop();
+    });
+  });
+
+  renderMatrix(); renderFilters(); renderList(); renderShop();
+})();
+</script>
+
+</body>
+</html>
