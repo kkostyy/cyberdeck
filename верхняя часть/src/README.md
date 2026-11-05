@@ -1,0 +1,78 @@
+# Верхняя часть кибердека — исходники модели
+
+Модель собирается скриптами на Python из размеров в `lid.py`. Чтобы поменять размер
+выреза, высоту стенок, решётку и т.п., правится параметр в начале `lid.py`, и модель
+пересобирается одной командой.
+
+## Файлы
+
+| Файл | Что делает |
+|---|---|
+| `lid.py` | Собирает крышку и рамку. Все параметры в начале файла |
+| `regions.json` | Геометрия исходной тестовой детали по слоям (база для `lid.py`) |
+| `skp_extract.py` | Достаёт треугольники из `.skp` через SketchUp 2017 API |
+| `rebuild.py` | Превращает «грязную» сетку SketchUp в замкнутое тело и пишет `regions.json` |
+| `render.py` | Рендер превью в Blender |
+| `pi_proxy.py` | Примерные блоки Pi 4B и экрана, только для превью |
+| `proba.py` | Крепление экрана (`proba v4`): карман 106.5×68.5 по центру, 4 стойки с Ø2.6; `build()` берёт `vents.py` |
+| `skp_write.py` | Записывает STL обратно в `.skp` (нормальные грани, мягкие рёбра на скруглениях; единицы и вид берёт из исходного `.skp`) |
+| `vents.py` + `regions_5.json` | Крышка из `5.skp` (`5 продув v3`): крепление экрана из `proba.py`, окна под порты Pi как в v6, зазор 0.2 под рамку, наклонные прорези в стенках 1, 3, 4 |
+| `style.py` | Дизайн под референс (`5 стиль`): рамка с гофрой как у контейнера (прорези в впадинах), кривые X-ремни, табличка «05», шильдик, болты; на крышке — линия разъёма и утопленные панели вокруг прорезей; отдельный угол-бампер (×4) |
+| `text_outline.py` + `texts.json` | Контуры надписей из шрифта (Bahnschrift) для гравировки; запускать через `py -I` |
+
+## Пересобрать STL
+
+```bash
+py -P -E D:/cyberdeck/src/lid.py D:/cyberdeck/src "D:/cyberdeck/архив/верхняя часть - крышка v6.stl" "D:/cyberdeck/архив/верхняя часть - рамка v3.stl" D:/cyberdeck/src/assembly.stl
+```
+
+Нужны пакеты: `numpy`, `shapely`, `trimesh`, `manifold3d`.
+
+Тестовая рамка под экран (размеры в начале `proba.py`):
+
+```bash
+py -P -E D:/cyberdeck/src/proba.py "D:/cyberdeck/proba v4.stl"
+```
+
+То же в SketchUp (третий аргумент — свой `.skp`, откуда взять единицы и вид камеры):
+
+```bash
+py -P -E D:/cyberdeck/src/skp_write.py "D:/cyberdeck/proba v4.stl" "D:/cyberdeck/proba v4.skp" "C:/Users/kosga/Downloads/proba na izminenie 4.skp"
+```
+
+Крышка `5` с продувом (параметры прорезей в начале `vents.py`):
+
+```bash
+py -P -E D:/cyberdeck/src/vents.py D:/cyberdeck/src/regions_5.json "D:/cyberdeck/архив/5 продув v3.stl"
+py -P -E D:/cyberdeck/src/skp_write.py "D:/cyberdeck/архив/5 продув v3.stl" "D:/cyberdeck/архив/5 продув v3.skp" "C:/Users/kosga/Downloads/5.skp"
+```
+
+Дизайн под референс (параметры в начале `style.py`; надписи — `text_outline.py`):
+
+```bash
+py -I D:/cyberdeck/src/text_outline.py C:/Windows/Fonts/bahnschrift.ttf D:/cyberdeck/src/texts.json "05=24" "CYBERDECK=6"
+py -P -E D:/cyberdeck/src/style.py "D:/cyberdeck/архив/5 продув v3.stl" D:/cyberdeck/src/texts.json "D:/cyberdeck/5 стиль"
+```
+
+`skp_write.py` умеет несколько STL сразу — каждый в свою группу, цвет после `#`:
+`skp_write.py "крышка.stl#6b6b6b,рамка.stl#9e9e99,углы.stl#731a1f" "5 стиль.skp" 5.skp`
+(рамку для сборки поднять на z+31, углы разложить по 4 углам зеркалом).
+
+## Заново из SketchUp (если поменялась тестовая деталь)
+
+```bash
+py -P -E skp_extract.py "путь/к/верхняя часть.skp" tris.npz
+py -P -E rebuild.py tris.npz solid.npz regions.json
+```
+
+## Главные параметры в `lid.py`
+
+- `USB_TOP = 30.0` — замер: от стекла экрана до верха USB.
+- `PI_X0, PI_Y0` — угол платы Pi в координатах крышки (оценка по фото, ±3 мм).
+- `MON_GROW = 1.0` — на сколько окно под экран больше 106×68 с каждой стороны.
+- `FRAME_GAP = 0.2` — зазор вокруг рамки.
+- `SLOT_W, SLOT_PITCH, ARM_W, HUB_OUT, HUB_IN` — решётка рамки.
+- `SIDE_*` — наклонные прорези выдува в стенке 1.
+
+Стенки (вид со стороны рамки): 1 — левая короткая, 2 — правая короткая (USB + Ethernet),
+3 — нижняя длинная (USB-C), 4 — верхняя длинная.
