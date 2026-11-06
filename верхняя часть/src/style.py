@@ -7,7 +7,10 @@ side with vent slots hidden in the valleys, curved X straps meeting at an off-ce
 (as in the reference: node right of and below centre, arms to three corners and the bottom
 edge), a flat "05" plate filling the right section, a riveted label plate on the ribs.
 Corner bumper: separate part, the same for all 4 corners (print 4, e.g. in another colour);
-it caps the corner over the frame and is held by the frame's corner screw (M3x10).
+it caps the corner over the frame and is held by the frame's corner screw: M3x8 socket cap
+(DIN 912) sunk below the bumper top, through bumper and frame into a heat-set insert M3x4x5
+in the lid post. Under the bumper the frame corner is thinned to 2 mm and the bumper drops a
+tongue into it, so the short screw still runs through the whole insert.
 
 Usage: style.py lid.stl texts.json out_prefix
   -> "<out_prefix> - крышка.stl", "- рамка.stl", "- угол.stl", "- сборка.stl"
@@ -46,11 +49,22 @@ LABEL_R, LABEL_Z, LABEL_TEXT, LABEL_D = 1.5, (3.0, 3.8), "CYBERDECK", 0.4
 BUMP_T = 3.0                                # bumper wall: sticks out past the lid walls and the frame
 BUMP_L = 10.0                               # along each wall from the corner (vent panels start ~11)
 BUMP_Z0 = 9.0                               # bumper skirt reaches down to here
-BUMP_C = 1.6                                # chamfer on the bumper's outer edges
+BUMP_C, BUMP_C_IN = 1.6, 0.6                # chamfer on the bumper's outer / inner top edges (inner one
+                                            # small, so the head counterbore keeps a rim)
 BUMP_GROOVE = (21.0, 1.2, 0.6)              # moulding line round the skirt: z centre, height, depth
-BUMP_GAP = 0.2                              # fit around the lid corner
-SCREW_AT, SCREW_D = (5.5, 5.5), 3.3         # frame corner screw (M3)
-HEAD_D, HEAD_SEAT = 6.5, 0.6                # seat for the M3 button head
+BUMP_GAP = 0.2                              # fit around the lid corner and in the frame recess
+BUMP_IN, FRAME_UNDER = 9.5, 2.0             # frame recess under the bumper: reach from the corner, frame left below
+SCREW_AT, SCREW_D, SCREW_L = (5.5, 5.5), 3.3, 8.0   # frame corner screw M3x8 (length under the head)
+HEAD_D, HEAD_H, HEAD_SINK = 6.0, 3.0, 0.3   # counterbore for the DIN 912 head (d 5.5, h 3), head sunk below the top
+INSERT_D, INSERT_L, INSERT_OD = 4.2, 4.0, 5.0   # heat-set insert M3x4x5: hole, insert length, outer diameter
+INSERT_SPARE = 2.0                          # hole deeper than the insert (melt, screw tip)
+INSERT_LEAD, INSERT_LEAD_D = 0.45, 5.1      # lead-in chamfer (45°): depth, top diameter
+OLD_INSERT_D = 5.0                          # 5.skp's post: Ø7 cylinder touching the walls, Ø5 hole (really 4.97)
+# The insert needs more wall than 5.skp's Ø7 post gives (1.4 mm around Ø4.2), and its dirty top
+# leaves slivers, so the post top is cut out and rebuilt: Ø9 from POST_Z0 up, 45° cone below.
+# Radii are kept > 0.05 mm away from what stays of 5.skp (post r 3.5, frame pocket arc r 3.7),
+# because skp_write welds points closer than 0.03 mm.
+POST_D, POST_Z0, POST_CUT_D = 9.0, 21.5, 7.2
 SEAM_Z, SEAM_D = (4.5, 5.5), 0.6            # panel line around the lid
 PANEL_PAD, PANEL_R, PANEL_D = 1.5, 1.5, 0.6     # recessed panels around vents and port windows
 NUM_TEXT = "05"
@@ -98,6 +112,8 @@ def bolt(x, y, z_top):
 def save(man, path):
     m = man.to_mesh()
     t = trimesh.Trimesh(np.asarray(m.vert_properties)[:, :3], np.asarray(m.tri_verts), process=True)
+    t.update_faces(t.nondegenerate_faces())          # zero-area slivers left by 5.skp's dirty corner
+    t.remove_unreferenced_vertices()
     t.export(path)
     b = man.bounding_box()
     print(f"{path}: size {np.round(np.subtract(b[3:], b[:3]), 2).tolist()} volume {man.volume() / 1000:.1f} cm3 "
@@ -135,6 +151,26 @@ for wall, (axis, at, keep, xf) in WALLS.items():
         cuts.append(prism(panel, 0, PANEL_D + 1.0).transform(np.array(xf, float)))
     print(f"wall {wall}: {len(holes)} openings in {len(groups)} panels")
 lid = mf.Manifold.batch_boolean([lid] + cuts, mf.OpType.Subtract)
+
+# heat-set inserts in the 4 corner posts: fill 5.skp's Ø5 hole, cut the insert hole with a lead-in
+v = np.asarray(lid_mesh.vertices)
+wall_v = v[np.abs(np.hypot(v[:, 0] - SCREW_AT[0], v[:, 1] - SCREW_AT[1]) - OLD_INSERT_D / 2) < 0.05]
+post_top = wall_v[:, 2].max()
+assert abs(post_top - FRAME_Z) < 0.01, f"post top at {post_top}, frame seat at {FRAME_Z}"
+ins_bot = post_top - INSERT_L - INSERT_SPARE
+disc = lambda p, d: Point(p).buffer(d / 2, quad_segs=SEG // 4)
+cone_z0 = POST_Z0 - (POST_D - POST_CUT_D) / 2                  # 45° from the cut radius out to the new post
+cut_z0 = cone_z0 + 0.5
+lid = lid - mf.Manifold.batch_boolean([prism(disc(p, POST_CUT_D), cut_z0, post_top + 1) for p in FRAME_SCREWS],
+                                      mf.OpType.Add)
+inner = outline.buffer(-0.5, join_style="mitre")               # new post may run into the walls, not through them
+lid = mf.Manifold.batch_boolean([lid] + [mf.Manifold.batch_hull([prism(disc(p, POST_CUT_D) & inner, cone_z0 - 1.0, cone_z0),
+                                                                prism(disc(p, POST_D) & inner, POST_Z0, post_top)])
+                                         for p in FRAME_SCREWS], mf.OpType.Add)
+lid = mf.Manifold.batch_boolean([lid] + [prism(disc(p, INSERT_D), ins_bot, post_top + 1) for p in FRAME_SCREWS]
+                                + [mf.Manifold.batch_hull([prism(disc(p, INSERT_D), post_top - INSERT_LEAD, post_top + 1),
+                                                           prism(disc(p, INSERT_LEAD_D), post_top, post_top + 1)])
+                                   for p in FRAME_SCREWS], mf.OpType.Subtract)
 
 # ================= back frame: corrugation, curved X straps, plates =================
 def bezier(p0, p2, bow, n=40):
@@ -207,7 +243,11 @@ vents = shapely.union_all([v for v in getattr(vents, "geoms", [vents]) if v.leng
 num, num_scale, num_ang = fit_text(NUM_TEXT, plate)
 lab, lab_scale, _ = fit_text(LABEL_TEXT, label, margin=2.5)
 holes = shapely.union_all([Point(p).buffer(SCREW_D / 2, quad_segs=SEG // 4) for p in FRAME_SCREWS])
+recess = shapely.union_all([box(-2.0, -2.0, BUMP_IN, BUMP_IN), box(L - BUMP_IN, -2.0, L + 2.0, BUMP_IN),   # under the bumpers
+                            box(-2.0, W - BUMP_IN, BUMP_IN, W + 2.0),
+                            box(L - BUMP_IN, W - BUMP_IN, L + 2.0, W + 2.0)])
 frame = mf.Manifold.batch_boolean([frame, prism(vents, -1, CORR_Z[0] + 0.5), prism(holes, -1, T + 1),
+                                   prism(recess, FRAME_UNDER, T + 1),
                                    prism(num, PLATE_TOP - NUM_D, T + 1),
                                    prism(lab, LABEL_Z[1] - LABEL_D, T + 1)], mf.OpType.Subtract)
 
@@ -222,16 +262,29 @@ print(f"frame: {len(getattr(vents, 'geoms', [vents]))} vent slots, open area {ve
 # ================= corner bumper (corner at x=0, y=0; same part fits all four) =================
 ztop = H + BUMP_T
 fp = outline.buffer(BUMP_T, join_style="mitre") & box(-BUMP_T - 1, -BUMP_T - 1, BUMP_L, BUMP_L)
+fp_top = (outline.buffer(BUMP_T - BUMP_C, join_style="mitre")
+          & box(-BUMP_T - 1, -BUMP_T - 1, BUMP_L - BUMP_C_IN, BUMP_L - BUMP_C_IN))
 bumper = mf.Manifold.batch_hull([prism(fp, BUMP_Z0 + BUMP_C, ztop - BUMP_C),
-                                 prism(fp.buffer(-BUMP_C, join_style="mitre"), BUMP_Z0, ztop)])
+                                 prism(fp.buffer(-BUMP_C, join_style="mitre"), BUMP_Z0, BUMP_Z0 + BUMP_C),
+                                 prism(fp_top, ztop - BUMP_C, ztop)])
 sx, sy = SCREW_AT
 gz, gh, gd = BUMP_GROOVE
 bumper = mf.Manifold.batch_boolean([bumper,
                                     prism(fp - fp.buffer(-gd, join_style="mitre"), gz - gh / 2, gz + gh / 2),
-                                    prism(outline.buffer(BUMP_GAP, join_style="mitre"), BUMP_Z0 - 1, H),
-                                    prism(Point(sx, sy).buffer(SCREW_D / 2, quad_segs=SEG // 4), H - 1, ztop + 1),
-                                    prism(Point(sx, sy).buffer(HEAD_D / 2, quad_segs=SEG // 4), ztop - HEAD_SEAT, ztop + 1)],
+                                    prism(outline.buffer(BUMP_GAP, join_style="mitre"), BUMP_Z0 - 1, H)],
                                    mf.OpType.Subtract)
+tongue = fouter & box(-2.0, -2.0, BUMP_IN - BUMP_GAP, BUMP_IN - BUMP_GAP)      # drops into the frame recess
+under = FRAME_Z + FRAME_UNDER
+seat = ztop - HEAD_H - HEAD_SINK                                                # under side of the screw head
+bumper = (bumper + prism(tongue, under, H + 0.01)) - mf.Manifold.batch_boolean(
+    [prism(disc(SCREW_AT, SCREW_D), under - 1, ztop + 1), prism(disc(SCREW_AT, HEAD_D), seat, ztop + 1)], mf.OpType.Add)
+tip = seat - SCREW_L
+grip = min(post_top, seat) - max(tip, post_top - INSERT_L)
+print(f"corner screw: head {seat:.1f}..{seat + HEAD_H:.1f} (bumper top {ztop:.1f}), plastic under head "
+      f"{seat - under:.1f}, frame under bumper {FRAME_UNDER:.1f}; tip at {tip:.1f}, insert {post_top - INSERT_L:.1f}.."
+      f"{post_top:.1f} -> thread in insert {grip:.1f} of {INSERT_L:.1f}, hole bottom {ins_bot:.1f} "
+      f"({tip - ins_bot:.1f} below the tip)")
+assert seat + HEAD_H <= ztop and tip > ins_bot + 0.5 and grip >= INSERT_L - 0.01
 
 save(lid, f"{prefix} - крышка.stl")
 save(frame, f"{prefix} - рамка.stl")
