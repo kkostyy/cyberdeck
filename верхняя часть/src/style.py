@@ -41,9 +41,10 @@ CORR_PITCH, CORR_TOP, CORR_RUN = 6.0, 1.8, 0.8  # pitch, ridge top width, flank 
 CORR_Z = (1.4, 3.2)                         # valley floor, ridge top
 VENT_W, VENT_KEEP = 2.0, 1.5                # slot in each valley; kept clear of straps/plates/border
 # Pi 4B cooler GeeekPi Armor Lite (ZP-0110): heatsink with a 3510 fan on the Pi's component side,
-# so it faces the frame. Its height is not published: HS_H is read off the photos, measure and update.
-PCB_TOP = 14.4                              # Pi board top (lid.py: USB_TOP 30 - USB stack 15.6)
-HS_H = 14.0                                 # heatsink + fan above the board (estimate)
+# so it faces the frame. Its height is not published: HS_H is estimated, measure and update
+# (same values as electronics.py, which models the Pi, the cooler and the display).
+PCB_TOP = 14.0                              # Pi board top: measured USB top 30 - official USB height 16.0
+HS_H = 16.0                                 # heatsink + fan above the board (estimate: 3510 fan is 10 mm thick)
 FAN_AT = (86.0, 58.0)                       # fan centre: Pi (38.5, 31) from its DSI/power corner (47.5, 27)
 WIN_W, WIN_H, WIN_R = 46.0, 38.0, 6.0       # grille window over the fan (Ø35); width puts its sides one valley
                                             # past the outer ribs, so all gaps are equal (4.2)

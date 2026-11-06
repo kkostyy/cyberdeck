@@ -275,6 +275,16 @@ print("model units", UNITS[units.value] if 0 <= units.value < 5 else units.value
 ents = Ref()
 ok(api.SUModelGetEntities(model, C.byref(ents)), "SUModelGetEntities")
 
+def new_group(parent_ents, name):
+    group, gents = Ref(), Ref()
+    ok(api.SUGroupCreate(C.byref(group)), "SUGroupCreate")
+    ok(api.SUEntitiesAddGroup(parent_ents, group), "SUEntitiesAddGroup")
+    ok(api.SUGroupSetName(group, name.encode("utf-8")), "SUGroupSetName")
+    ok(api.SUGroupGetEntities(group, C.byref(gents)), "SUGroupGetEntities")
+    return group, gents
+
+
+materials, parents = {}, {}
 parts = sys.argv[1].split(",")                             # several meshes -> one group each
 for spec in parts:
     path, _, color = spec.partition("#")
@@ -283,20 +293,28 @@ for spec in parts:
     if len(parts) == 1:
         fill(ents, V, faces, soft)
         continue
-    group, gents = Ref(), Ref()
-    ok(api.SUGroupCreate(C.byref(group)), "SUGroupCreate")
-    ok(api.SUEntitiesAddGroup(ents, group), "SUEntitiesAddGroup")
-    ok(api.SUGroupSetName(group, os.path.splitext(os.path.basename(path))[0].encode("utf-8")), "SUGroupSetName")
-    ok(api.SUGroupGetEntities(group, C.byref(gents)), "SUGroupGetEntities")
+    # "Device - part.stl" -> group "part" inside group "Device" (one parent per device)
+    stem = os.path.splitext(os.path.basename(path))[0]
+    parent, sep, name = stem.partition(" - ")
+    where = ents
+    if sep:
+        if parent not in parents:
+            parents[parent] = new_group(ents, parent)[1]
+        where = parents[parent]
+    else:
+        name = stem
+    group, gents = new_group(where, name)
     fill(gents, V, faces, soft)
     if color:
-        mat = Ref()
-        ok(api.SUMaterialCreate(C.byref(mat)), "SUMaterialCreate")
-        ok(api.SUMaterialSetName(mat, ("#" + color).encode()), "SUMaterialSetName")
-        rgb = [int(color[i:i + 2], 16) for i in (0, 2, 4)]
-        ok(api.SUMaterialSetColor(mat, C.byref(Color(*rgb, 255))), "SUMaterialSetColor")
-        ok(api.SUModelAddMaterials(model, C.c_size_t(1), C.byref(mat)), "SUModelAddMaterials")
-        ok(api.SUDrawingElementSetMaterial(Ref(api.SUGroupToDrawingElement(group)), mat), "SetMaterial")
+        if color not in materials:
+            mat = Ref()
+            ok(api.SUMaterialCreate(C.byref(mat)), "SUMaterialCreate")
+            ok(api.SUMaterialSetName(mat, ("#" + color).encode()), "SUMaterialSetName")
+            rgb = [int(color[i:i + 2], 16) for i in (0, 2, 4)]
+            ok(api.SUMaterialSetColor(mat, C.byref(Color(*rgb, 255))), "SUMaterialSetColor")
+            ok(api.SUModelAddMaterials(model, C.c_size_t(1), C.byref(mat)), "SUModelAddMaterials")
+            materials[color] = mat
+        ok(api.SUDrawingElementSetMaterial(Ref(api.SUGroupToDrawingElement(group)), materials[color]), "SetMaterial")
 ok(api.SUModelSaveToFile(model, out.encode("utf-8")), "SUModelSaveToFile")
 api.SUModelRelease(C.byref(model))
 api.SUTerminate()
