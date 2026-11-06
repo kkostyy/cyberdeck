@@ -3,9 +3,10 @@
 Lid (from vents.py, so ports, vents and the monitor mount stay as they are): seam line and
 recessed panels around the wall openings.
 Back frame (built here, replaces lid.py's grille): container corrugation along the short
-side with vent slots hidden in the valleys, curved X straps meeting at an off-centre node
-(as in the reference: node right of and below centre, arms to three corners and the bottom
-edge), a flat "05" plate filling the right section, a riveted label plate on the ribs.
+side with vent slots hidden in the valleys, curved X straps meeting at a band round the fan
+window of the Pi's cooler (GeeekPi Armor Lite: the ridges run on across the window as an open
+grille, the heatsink sits 2.6 mm under it), a flat "05" plate filling the right section, a
+riveted label plate on the ribs, a buckle plate with a pocket underneath for the fan's GPIO plugs.
 Corner bumper: separate part, the same for all 4 corners (print 4, e.g. in another colour);
 it caps the corner over the frame and is held by the frame's corner screw: M3x8 socket cap
 (DIN 912) sunk below the bumper top, through bumper and frame into a heat-set insert M3x4x5
@@ -39,12 +40,24 @@ FRAME_SCREWS = [(5.5, 5.5), (154.5, 5.5), (5.5, 104.5), (154.5, 104.5)]
 CORR_PITCH, CORR_TOP, CORR_RUN = 6.0, 1.8, 0.8  # pitch, ridge top width, flank run (valley = rest, 2.6)
 CORR_Z = (1.4, 3.2)                         # valley floor, ridge top
 VENT_W, VENT_KEEP = 2.0, 1.5                # slot in each valley; kept clear of straps/plates/border
-# X straps: node, arm ends with the sideways bow of each arm (mm), strap width, junction fillet
-NODE = (99.0, 44.0)
-ARMS = [((12.0, 98.0), 6.0), ((146.0, 102.0), -5.0), ((152.0, 14.0), 5.0), ((71.0, 8.0), -6.0)]
+# Pi 4B cooler GeeekPi Armor Lite (ZP-0110): heatsink with a 3510 fan on the Pi's component side,
+# so it faces the frame. Its height is not published: HS_H is read off the photos, measure and update.
+PCB_TOP = 14.4                              # Pi board top (lid.py: USB_TOP 30 - USB stack 15.6)
+HS_H = 14.0                                 # heatsink + fan above the board (estimate)
+FAN_AT = (86.0, 58.0)                       # fan centre: Pi (38.5, 31) from its DSI/power corner (47.5, 27)
+WIN_W, WIN_H, WIN_R = 46.0, 38.0, 6.0       # grille window over the fan (Ø35); width puts its sides one valley
+                                            # past the outer ribs, so all gaps are equal (4.2)
+HUB_W = 7.0                                 # strap band round the window: the X straps meet here
+GRILLE_TOP = 3.2                            # window ribs: the corrugation ridges carried across, top level with them
+# fan plugs (dupont, 14 mm housings) on GPIO pins 4/6/8 = 5V, GND, TXD at Pi (10.9..16.0, 53.8):
+# their tops reach z ~30.9, just under the frame (31), so the frame gets a pocket there under a buckle plate
+PLUGS = (55.5, 77.0, 67.0, 85.0)            # pocket footprint x0, y0, x1, y1 (plugs 57..65 x 79.5..82)
+PLUG_POCKET = 2.6                           # pocket depth into the frame underside (wire bend room)
+# X straps: arm ends with the sideways bow of each arm (mm), from the hub corners TL, TR, BR, BL
+ARMS = [((14.0, 96.0), 6.0), ((146.0, 100.0), -5.0), ((150.0, 16.0), 5.0), ((40.0, 10.0), -5.0)]
 STRAP_W, STRAP_FILLET, STRAP_BEVEL = 8.0, 6.0, 0.6
 PLATE_TOP, NUM_D = 3.6, 0.8                 # "05" plate filling the section between the right arms
-LABEL = (47.0, 33.0, 48.0, 16.0)            # label plate on the ridges: centre x, y, width, height
+LABEL = (33.0, 55.0, 40.0, 15.0)            # label plate on the ridges: centre x, y, width, height
 LABEL_R, LABEL_Z, LABEL_TEXT, LABEL_D = 1.5, (3.0, 3.8), "CYBERDECK", 0.4
 BUMP_T = 3.0                                # bumper wall: sticks out past the lid walls and the frame
 BUMP_L = 10.0                               # along each wall from the corner (vent panels start ~11)
@@ -182,12 +195,12 @@ def bezier(p0, p2, bow, n=40):
     return (1 - t) ** 2 * p0 + 2 * (1 - t) * t * c + t ** 2 * p2
 
 
-def fit_text(name, region, margin=1.5):
+def fit_text(name, region, margin=1.5, angles=(0, 90)):
     """Largest scale/orientation of the text that fits inside region, centred at its pole."""
     centre = shapely.ops.polylabel(region, tolerance=0.2)
     inner = region.buffer(-margin)
     for scale in np.arange(1.4, 0.5, -0.05):
-        for ang in (0, 90):
+        for ang in angles:
             g = shapely.affinity.rotate(shapely.affinity.scale(text_shape(name, (0, 0)), scale, scale, origin=(0, 0)),
                                         ang, origin=(0, 0))
             g = shapely.affinity.translate(g, centre.x, centre.y)
@@ -205,16 +218,26 @@ fx0, fy0, fx1, fy1, fr = FIELD
 field = rounded((fx0 + fx1) / 2, (fy0 + fy1) / 2, fx1 - fx0, fy1 - fy0, fr)
 ox0, oy0, ox1, oy1, orr = FRAME
 fouter = rounded((ox0 + ox1) / 2, (oy0 + oy1) / 2, ox1 - ox0, oy1 - oy0, orr)
-centre_lines = [LineString(bezier(NODE, end, bow)) for end, bow in ARMS]
-straps = shapely.union_all([c.buffer(STRAP_W / 2, cap_style="flat") for c in centre_lines]
-                           + [Point(NODE).buffer(STRAP_W * 0.75, quad_segs=SEG // 4)])
+# the X straps meet a band (hub) round the fan window instead of a node
+cx, cy = FAN_AT
+window = rounded(cx, cy, WIN_W, WIN_H, WIN_R)
+hub = rounded(cx, cy, WIN_W + 2 * HUB_W, WIN_H + 2 * HUB_W, WIN_R + HUB_W)
+starts = [(cx - WIN_W / 2, cy + WIN_H / 2), (cx + WIN_W / 2, cy + WIN_H / 2),      # window corners, inside the band
+          (cx + WIN_W / 2, cy - WIN_H / 2), (cx - WIN_W / 2, cy - WIN_H / 2)]
+centre_lines = [LineString(bezier(s, end, bow)) for s, (end, bow) in zip(starts, ARMS)]
+plugs = box(*PLUGS)
+buckle = plugs.buffer(1.6, join_style="mitre").buffer(1.0, quad_segs=SEG // 4)   # strap plate over the fan plugs
+straps = shapely.union_all([c.buffer(STRAP_W / 2, cap_style="flat") for c in centre_lines] + [hub, buckle])
 straps = straps.buffer(STRAP_FILLET, quad_segs=SEG // 4).buffer(-STRAP_FILLET, quad_segs=SEG // 4) & fouter
 # sections between the straps; opening by 0.3 mm drops slivers and point contacts where an arm
 # meets the field edge (they would leave non-manifold pinches); border + straps = the rest
 zones = (field - straps).buffer(-0.3, join_style="mitre").buffer(0.3, join_style="mitre")
-plate = next(g for g in zones.geoms if g.contains(Point(fx1 - 3, NODE[1])))   # right section
+plate = next(g for g in zones.geoms if g.contains(Point(fx1 - 3, cy)))       # right section
 corr_zone = zones - plate
-top = fouter - zones
+top = fouter - zones - window
+assert top.buffer(-1.0).contains(plugs - window.buffer(1.2)), "fan plug pocket leaves the straps"
+hs_top = PCB_TOP + HS_H
+assert hs_top < FRAME_Z - 0.5, f"heatsink top {hs_top} hits the frame"
 
 # corrugation profile in (x, z), pushed along y over the field
 ridges = np.arange(L / 2 - 30 * CORR_PITCH, L / 2 + 30 * CORR_PITCH, CORR_PITCH)
@@ -225,13 +248,17 @@ for xr in ridges:
 profile = Polygon([(wave[0][0], 0)] + wave + [(wave[-1][0], 0)]) & box(fx0 - 1, 0, fx1 + 1, T)
 corr = prism(profile, 0, fy1 - fy0 + 2).transform(np.array([[1, 0, 0, 0], [0, 0, -1, fy1 + 1], [0, 1, 0, 0]], float))
 corr = corr ^ prism(corr_zone, -1, T + 1)
+# fan grille: the ridges run on across the window as free ribs, valleys open
+wx0, wy0, wx1, wy1 = window.bounds
+grille = shapely.union_all([box(xr - CORR_TOP / 2, wy0 - 1, xr + CORR_TOP / 2, wy1 + 1)
+                            for xr in ridges if wx0 + 2.5 < xr < wx1 - 2.5]) & window.buffer(0.5)
 
 lx, ly, lw, lh = LABEL
 label = rounded(lx, ly, lw, lh, LABEL_R)
 assert corr_zone.buffer(-1.0).contains(label), "label plate leaves its section"
 bevel = [prism(top.buffer(-STRAP_BEVEL * k / 3, join_style="mitre"),
                T - STRAP_BEVEL + STRAP_BEVEL * (k - 1) / 3, T - STRAP_BEVEL + STRAP_BEVEL * k / 3) for k in (1, 2, 3)]
-frame = mf.Manifold.batch_boolean([prism(top, 0, T - STRAP_BEVEL), *bevel,
+frame = mf.Manifold.batch_boolean([prism(top, 0, T - STRAP_BEVEL), *bevel, prism(grille, 0, GRILLE_TOP),
                                    prism(plate, 0, PLATE_TOP), corr, prism(label, *LABEL_Z)], mf.OpType.Add)
 
 # vents: a slot along the floor of every valley, clear of straps, plates and the border
@@ -240,7 +267,7 @@ valleys = shapely.union_all([box(xr + CORR_PITCH / 2 - VENT_W / 2, fy0, xr + COR
 vents = valleys & (corr_zone - label.buffer(VENT_KEEP)).buffer(-VENT_KEEP)
 vents = vents.buffer(-VENT_W / 2 + 0.01, quad_segs=8).buffer(VENT_W / 2 - 0.01, quad_segs=8)
 vents = shapely.union_all([v for v in getattr(vents, "geoms", [vents]) if v.length > 2 * VENT_W + 8])
-num, num_scale, num_ang = fit_text(NUM_TEXT, plate)
+num, num_scale, num_ang = fit_text(NUM_TEXT, plate, angles=(0,))              # upright, as on the reference
 lab, lab_scale, _ = fit_text(LABEL_TEXT, label, margin=2.5)
 holes = shapely.union_all([Point(p).buffer(SCREW_D / 2, quad_segs=SEG // 4) for p in FRAME_SCREWS])
 recess = shapely.union_all([box(-2.0, -2.0, BUMP_IN, BUMP_IN), box(L - BUMP_IN, -2.0, L + 2.0, BUMP_IN),   # under the bumpers
@@ -248,6 +275,7 @@ recess = shapely.union_all([box(-2.0, -2.0, BUMP_IN, BUMP_IN), box(L - BUMP_IN, 
                             box(L - BUMP_IN, W - BUMP_IN, L + 2.0, W + 2.0)])
 frame = mf.Manifold.batch_boolean([frame, prism(vents, -1, CORR_Z[0] + 0.5), prism(holes, -1, T + 1),
                                    prism(recess, FRAME_UNDER, T + 1),
+                                   prism(plugs - window.buffer(1.2), -1, PLUG_POCKET),
                                    prism(num, PLATE_TOP - NUM_D, T + 1),
                                    prism(lab, LABEL_Z[1] - LABEL_D, T + 1)], mf.OpType.Subtract)
 
@@ -255,9 +283,16 @@ bolts = [bolt(*along(c, 7.0), T) for c in centre_lines]                        #
 bolts += [bolt(lx + sx * (lw / 2 - 2.5), ly + sy * (lh / 2 - 2.5), LABEL_Z[1]) for sx in (-1, 1) for sy in (-1, 1)]
 pb = plate.buffer(-4.0).bounds                                                  # plate: two bolts at the border side
 bolts += [bolt(pb[2], pb[1] + 4, PLATE_TOP), bolt(pb[2], pb[3] - 4, PLATE_TOP)]
+k = (WIN_W / 2 - WIN_R) + (WIN_R + HUB_W / 2) / np.sqrt(2)                       # hub band corners
+bolts += [bolt(cx + sx * k, cy + sy * k, T) for sx in (-1, 1) for sy in (-1, 1)]
+bolts += [bolt(PLUGS[0] + 0.3, PLUGS[1] + 1.2, T), bolt(PLUGS[0] + 0.3, PLUGS[3] - 1.2, T)]   # buckle plate
 frame = mf.Manifold.batch_boolean([frame] + bolts, mf.OpType.Add)
+fan_open = (window - grille).intersection(Point(FAN_AT).buffer(17.5)).area
 print(f"frame: {len(getattr(vents, 'geoms', [vents]))} vent slots, open area {vents.area:.0f} mm2; "
-      f"'{NUM_TEXT}' x{num_scale:.2f} rot {num_ang}, label text x{lab_scale:.2f}")
+      f"fan grille {len(getattr(grille, 'geoms', [grille]))} ribs, open {(window - grille).area:.0f} mm2 "
+      f"({fan_open:.0f} over the fan disc); heatsink top {hs_top:.1f}, {FRAME_Z - hs_top:.1f} under the frame; "
+      f"plug tops {PCB_TOP + 16.5:.1f}, pocket roof at {FRAME_Z + PLUG_POCKET:.1f}, "
+      f"left above it {T - PLUG_POCKET:.1f}; '{NUM_TEXT}' x{num_scale:.2f} rot {num_ang}, label text x{lab_scale:.2f}")
 
 # ================= corner bumper (corner at x=0, y=0; same part fits all four) =================
 ztop = H + BUMP_T
