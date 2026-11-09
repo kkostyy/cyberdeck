@@ -31,6 +31,13 @@ body{margin:0;background:#050506}
 @keyframes pxFlip{0%,59.9%{transform:translateY(0)}60%,80%{transform:translateY(-1px)}80.1%,100%{transform:translateY(0)}}
 @keyframes pxCur{0%,49.9%{opacity:1}50%,100%{opacity:0}}
 @keyframes pxPeek{0%,49.9%{transform:translateY(0)}50%,100%{transform:translateY(-1px)}}
+@keyframes petBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.03,.97)}}
+@keyframes petWalk{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@keyframes petJig{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-3px)}}
+@keyframes petEye{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes petSpark{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+@keyframes dropZ{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(10px,-20px) scale(1.1)}}
+@keyframes dropDot{0%,100%{opacity:.25}50%{opacity:1}}
 @keyframes clIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes clPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes clBlink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -103,15 +110,39 @@ body{margin:0;background:#050506}
         <div style="margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px">
           <div style="display: flex; align-items: center; gap: 10px">
             <button aria-label="Погладить {{petName}}" onClick="{{petTap}}" style="{{petMini}}">
-              <svg aria-hidden="true" width="64" height="64" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
+              <sc-if value="{{isPx}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="64" height="64" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
                 <sc-for list="{{petLayers}}" as="L" hint-placeholder-count="8"><path d="{{L.d}}" fill="{{L.fill}}" style="{{L.style}}"></path></sc-for>
-              </svg>
+              </svg></sc-if><sc-if value="{{isDrop}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" style="display: block; overflow: visible; filter: {{dpv.glow}}">
+          <ellipse cx="32" cy="60" rx="16" ry="3.2" fill="rgba(0,0,0,.5)"></ellipse>
+          <g style="{{dpv.body}}">
+            <path d="M32 6 C 38 16 52 26 52 41 C 52 52 43 58 32 58 C 21 58 12 52 12 41 C 12 26 26 16 32 6 Z" fill="{{dpv.c1}}"></path>
+            <path d="M32 26 C 42 26 47 33 47 42 C 47 51 40 55 32 55 C 24 55 17 51 17 42 C 17 33 22 26 32 26 Z" fill="{{dpv.c2}}" opacity=".55"></path>
+            <ellipse cx="23" cy="24" rx="3" ry="5" fill="#fff" opacity=".45" transform="rotate(25 23 24)"></ellipse>
+            <g style="{{dpv.eyes}}"><ellipse cx="25" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><ellipse cx="39" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><circle cx="26" cy="38.6" r="1" fill="#fff"></circle><circle cx="40" cy="38.6" r="1" fill="#fff"></circle></g>
+            <g style="{{dpv.shut}}"><path d="M22 40 Q 25 42.5 28 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path><path d="M36 40 Q 39 42.5 42 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path></g>
+            <g style="{{dpv.smile}}"><path d="M22 41 Q 25 37.5 28 41" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path><path d="M36 41 Q 39 37.5 42 41" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path></g>
+            <circle cx="20" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle><circle cx="44" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle>
+            <path d="M29 47 Q 32 50 35 47" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+            <ellipse cx="24" cy="57.5" rx="4.5" ry="2.2" fill="{{dpv.c1}}" style="{{dpv.footL}}"></ellipse>
+            <ellipse cx="40" cy="57.5" rx="4.5" ry="2.2" fill="{{dpv.c1}}" style="{{dpv.footR}}"></ellipse>
+          </g>
+          <circle cx="16" cy="16" r="1.7" fill="{{dpv.c2}}" style="{{dpv.spark1}}"></circle>
+          <circle cx="49" cy="11" r="1.4" fill="{{dpv.c2}}" style="{{dpv.spark2}}"></circle>
+          <circle cx="40" cy="4" r="1.1" fill="{{dpv.c2}}" style="{{dpv.spark3}}"></circle>
+          <g style="{{dpv.z}}"><text x="48" y="22" font-family="Inter, sans-serif" font-weight="700" font-size="9" fill="{{dpv.c2}}" style="animation: dropZ 2.4s ease-out infinite">z</text><text x="52" y="14" font-family="Inter, sans-serif" font-weight="700" font-size="12" fill="{{dpv.c2}}" style="animation: dropZ 2.4s ease-out 1.2s infinite">Z</text></g>
+          <g style="{{dpv.think}}"><ellipse cx="50" cy="8" rx="12" ry="7" fill="#f2f2f4"></ellipse><circle cx="41" cy="18" r="2.2" fill="#f2f2f4"></circle><circle cx="44" cy="8" r="1.8" fill="{{dpv.c1}}" style="animation: dropDot 1.2s infinite"></circle><circle cx="50" cy="8" r="1.8" fill="{{dpv.c1}}" style="animation: dropDot 1.2s .3s infinite"></circle><circle cx="56" cy="8" r="1.8" fill="{{dpv.c1}}" style="animation: dropDot 1.2s .6s infinite"></circle></g>
+        </svg></sc-if>
             </button>
             <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
               <span style="font-size: 14px; font-weight: 700">{{petName}}</span>
               <span style="font-size: 11.5px; color: #a1a1a8">{{petMood}}</span>
               <span aria-label="Сытость {{petFood}}%" style="width: 110px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{petFoodBar}}"></span></span>
             </div>
+          </div>
+          <div role="radiogroup" aria-label="Питомец" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.05)">
+            <sc-for list="{{kinds}}" as="kd" hint-placeholder-count="2">
+              <button role="radio" aria-checked="{{kd.on}}" onClick="{{kd.pick}}" style="{{kd.style}}">{{kd.name}}</button>
+            </sc-for>
           </div>
           <div role="radiogroup" aria-label="Цвет питомца" style="display: flex; gap: 6px">
             <sc-for list="{{petColors}}" as="pc" hint-placeholder-count="4">
@@ -300,7 +331,7 @@ class Component extends DCLogic {
     sess: 0, proj: 0, pal: 0, waiting: null, spinT: 0, spinAt: 0, verb: 0,
     mcp: { filesystem: true, github: true, playwright: false, 'arch-wiki': true },
     agents: { 'code-reviewer': 'готов', explorer: 'готов', 'test-runner': 'готов' },
-    petColor: 'ember', petLocal: false, food: 70, petHop: 0, petSaid: ''
+    petKind: 'px', petColor: 'ember', petLocal: false, food: 70, petHop: 0, petSaid: ''
   };
   PROJ = ['~/Проекты/ashen-shell', '~/Проекты/cyberdeck', '~/dotfiles'];
   SESS = [
@@ -434,6 +465,22 @@ class Component extends DCLogic {
       add('#8f9de0', Z(6, 3, 2), 'animation:pxZ 2.4s steps(6) 1.6s infinite');
     }
     return out;
+  }
+  /* ---------- «Капелька»: smooth vector droplet ---------- */
+  dropView(pose, colorKey, walking) {
+    const PAL = { ember: ['#ff8a3d', '#ffd27a'], frost: ['#5aa8ff', '#c9e6ff'], moss: ['#59c27a', '#c8f0a8'], ash: ['#b9b9c2', '#f2f2f4'] };
+    const [c1, c2] = PAL[colorKey] || PAL.frost;
+    const sleep = pose === 'sleep', busy = ['work', 'search', 'cook', 'pay'].includes(pose), think = pose === 'think', happy = pose === 'happy';
+    return { c1, c2,
+      body: `transform-origin:32px 58px;animation:${walking ? 'petWalk .45s' : sleep ? 'petBob 4s' : busy ? 'petBob .9s' : happy ? 'petJig .5s' : 'petBob 2.4s'} ease-in-out infinite`,
+      eyes: `transform-origin:32px 40px;animation:petEye 4s infinite;display:${sleep || happy ? 'none' : 'inline'}`,
+      shut: `display:${sleep ? 'inline' : 'none'}`,
+      smile: `display:${happy ? 'inline' : 'none'}`,
+      footL: walking ? 'animation:petWalk .45s ease-in-out infinite' : '', footR: walking ? 'animation:petWalk .45s ease-in-out -.22s infinite' : '',
+      spark1: `animation:petSpark ${busy ? '.8s' : '1.8s'} ease-out infinite`, spark2: `animation:petSpark ${busy ? '1s' : '2.3s'} ease-out .4s infinite`, spark3: `animation:petSpark ${busy ? '1.2s' : '2.9s'} ease-out .8s infinite`,
+      z: `display:${sleep ? 'inline' : 'none'}`,
+      think: `display:${think ? 'inline' : 'none'}`,
+      glow: busy ? `drop-shadow(0 0 10px ${c1})` : 'none' };
   }
   setPose(p) { if (this.state.pose !== p) { this.setState({ pose: p }); this.act('pet:tool:' + (p || 'none')); } }
   componentDidMount() {
@@ -641,9 +688,9 @@ class Component extends DCLogic {
 
   /* ---------- pet ---------- */
   petOnDesk() { return this.props.petOn !== undefined && this.props.petOn !== '' && this.props.petOn !== null ? !!this.props.petOn : this.state.petLocal; }
-  petToggle = () => { const on = !this.petOnDesk(); this.setState({ petLocal: on }); this.act(on ? 'pet:on:' + this.state.petColor : 'pet:off'); };
+  petToggle = () => { const on = !this.petOnDesk(); this.setState({ petLocal: on }); if (on) this.act('pet:kind:' + this.state.petKind); this.act(on ? 'pet:on:' + this.state.petColor : 'pet:off'); };
   petFeed = () => { this.setState({ food: Math.min(100, this.state.food + 25), petHop: this.state.petHop + 1 }); this.act('pet:feed'); };
-  petTap = () => { this.setState({ petHop: this.state.petHop + 1 }); this.act('pet:pat'); };
+  petTap = () => { this._hopAt = Date.now(); this.setState({ petHop: this.state.petHop + 1 }); setTimeout(() => this.forceUpdate(), 950); this.act('pet:pat'); };
 
   renderVals() {
     const st = this.state;
@@ -716,7 +763,10 @@ class Component extends DCLogic {
         style: `width:100%;padding:8px 10px;border-radius:11px;display:flex;flex-direction:column;gap:2px;border:0;color:#e8e8ec;background:${i === st.sess ? 'rgba(255,255,255,.08)' : 'transparent'}` })),
       projects: this.PROJ.map((p, i) => ({ name: p.replace('~/Проекты/', ''), pick: () => { this.setState({ proj: i }); this.push({ k: 'note', text: `Рабочая папка: ${p}`, color: '#a1a1a8' }); },
         style: `height:32px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:8px;font:500 12.5px 'JetBrains Mono',monospace;border:0;color:${i === st.proj ? '#f2f2f4' : '#a1a1a8'};background:${i === st.proj ? 'rgba(255,255,255,.06)' : 'transparent'}` })),
-      pet: { c1: pet[1], c2: pet[2] }, petLayers: this.pxSprite(st.pose || (st.food < 20 ? 'think' : 'idle'), st.petColor, false), petName: pet[0], petMood: mood, petFood: food,
+      isPx: st.petKind !== 'drop', isDrop: st.petKind === 'drop', dpv: this.dropView(st.pose || (st.petHop % 2 && Date.now() - (this._hopAt || 0) < 900 ? 'happy' : 'idle'), st.petColor, false),
+      kinds: [['px', 'Уголёк'], ['drop', 'Капелька']].map(([id, name]) => ({ name, on: st.petKind === id, pick: () => { this.setState({ petKind: id, petColor: id === 'drop' && st.petColor === 'ember' ? 'frost' : st.petColor }); this.act('pet:kind:' + id); if (id === 'drop' && st.petColor === 'ember') this.act('pet:color:frost'); },
+        style: `height:28px;border-radius:8px;border:0;font-size:12px;font-weight:600;transition:background .2s,color .2s;background:${st.petKind === id ? '#f2f2f4' : 'transparent'};color:${st.petKind === id ? '#111113' : '#a1a1a8'}` })),
+      pet: { c1: pet[1], c2: pet[2] }, petLayers: this.pxSprite(st.pose || (st.food < 20 ? 'think' : 'idle'), st.petColor, false), petName: st.petKind === 'drop' ? 'Капелька' : pet[0], petMood: mood, petFood: food,
       petFoodBar: `display:block;height:100%;width:${food}%;border-radius:3px;background:${food < 25 ? '#ff7b7b' : pet[1]};transition:width .5s,background .3s`,
       petMini: `width:64px;height:64px;flex:none;border:0;background:none;padding:0;${st.petHop ? `animation:clHop .45s cubic-bezier(.3,1.4,.5,1)` : ''}`,
       petColors: Object.keys(this.PETS).map((k) => ({ name: this.PETS[k][0], on: k === st.petColor,
