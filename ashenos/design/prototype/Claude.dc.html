@@ -18,6 +18,19 @@ body{margin:0;background:#050506}
 .cl-b:hover{background:rgba(255,255,255,.08)}
 .cl-b:active{transform:scale(.94)}
 .cl-in::placeholder{color:#6f6f77}
+@keyframes pxBob{0%,49.9%{transform:translateY(0)}50%,100%{transform:translateY(-1px)}}
+@keyframes pxBlink{0%,93%{opacity:1}93.1%,98%{opacity:0}98.1%,100%{opacity:1}}
+@keyframes pxBlinkC{0%,93%{opacity:0}93.1%,98%{opacity:1}98.1%,100%{opacity:0}}
+@keyframes pxStepA{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes pxStepB{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+@keyframes pxRise{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-6px);opacity:0}}
+@keyframes pxZ{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(-2px,-5px);opacity:0}}
+@keyframes pxTw{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes pxHop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pxSwing{0%,49.9%{transform:translate(0,0)}50%,100%{transform:translate(-1px,1px)}}
+@keyframes pxFlip{0%,59.9%{transform:translateY(0)}60%,80%{transform:translateY(-1px)}80.1%,100%{transform:translateY(0)}}
+@keyframes pxCur{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes pxPeek{0%,49.9%{transform:translateY(0)}50%,100%{transform:translateY(-1px)}}
 @keyframes clIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes clPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes clBlink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -90,17 +103,8 @@ body{margin:0;background:#050506}
         <div style="margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px">
           <div style="display: flex; align-items: center; gap: 10px">
             <button aria-label="Погладить {{petName}}" onClick="{{petTap}}" style="{{petMini}}">
-              <svg aria-hidden="true" width="58" height="58" viewBox="0 0 64 64" style="overflow: visible">
-                <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(0,0,0,.45)"></ellipse>
-                <g style="transform-origin: 32px 58px; animation: clBob 2.4s ease-in-out infinite">
-                  <path d="M32 6 C 36 13 41 15 42 21 C 50 25 54 32 54 41 C 54 52 45 58 32 58 C 19 58 10 52 10 41 C 10 32 15 25 22 21 C 24 16 29 13 32 6 Z" fill="{{pet.c1}}"></path>
-                  <path d="M32 26 C 42 26 48 33 48 42 C 48 51 41 55 32 55 C 23 55 16 51 16 42 C 16 33 22 26 32 26 Z" fill="{{pet.c2}}" opacity=".55"></path>
-                  <g style="transform-origin: 32px 40px; animation: clEye 4s infinite"><ellipse cx="25" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><ellipse cx="39" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><circle cx="26" cy="38.6" r="1" fill="#fff"></circle><circle cx="40" cy="38.6" r="1" fill="#fff"></circle></g>
-                  <circle cx="20" cy="46" r="2.6" fill="#ff8fa0" opacity=".45"></circle><circle cx="44" cy="46" r="2.6" fill="#ff8fa0" opacity=".45"></circle>
-                  <path d="M29 47 Q 32 50 35 47" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
-                </g>
-                <circle cx="18" cy="16" r="1.6" fill="{{pet.c2}}" style="animation: clSpark 1.8s ease-out infinite"></circle>
-                <circle cx="47" cy="12" r="1.3" fill="{{pet.c2}}" style="animation: clSpark 2.3s ease-out .7s infinite"></circle>
+              <svg aria-hidden="true" width="64" height="64" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
+                <sc-for list="{{petLayers}}" as="L" hint-placeholder-count="8"><path d="{{L.d}}" fill="{{L.fill}}" style="{{L.style}}"></path></sc-for>
               </svg>
             </button>
             <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
@@ -329,6 +333,109 @@ class Component extends DCLogic {
   SPIN = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
   PETS = { ember: ['Уголёк', '#ff8a3d', '#ffd27a'], frost: ['Ледок', '#5aa8ff', '#c9e6ff'], moss: ['Мох', '#59c27a', '#c8f0a8'], ash: ['Пепел', '#b9b9c2', '#f2f2f4'] };
 
+  /* ---------- pixel pet «Уголёк»: 32×32 sprite, every pose built from rects ---------- */
+  pxSprite(pose, colorKey, walking) {
+    const PAL = { ember: ['#f08a4b', '#c4602c', '#ffc07a'], frost: ['#5aa0f0', '#3a74c0', '#b4dcff'], moss: ['#5cbf74', '#3a8e52', '#bdf0a8'], ash: ['#b4b4bd', '#85858f', '#efeff3'] };
+    const [M, D, L] = PAL[colorKey] || PAL.ember;
+    const out = [];
+    const R = (x, y, w = 1, h = 1) => `M${x} ${y}h${w}v${h}h-${w}z`;
+    const add = (fill, rects, style) => { if (rects.length) out.push({ d: rects.map((r) => R(...r)).join(''), fill, style: style || '' }); };
+    const sleep = pose === 'sleep';
+    const bob = `animation:pxBob ${sleep ? '2.6s' : walking ? '.36s' : pose === 'work' ? '.8s' : '1.3s'} linear infinite`;
+    /* body: a flame-drop with a tip leaning right */
+    const BODY = { 8: [17, 17], 9: [16, 17], 10: [15, 17], 11: [14, 17], 12: [13, 18], 13: [12, 19], 14: [11, 20], 15: [10, 21], 16: [9, 22], 17: [9, 22], 18: [8, 23], 19: [8, 23], 20: [8, 23], 21: [8, 23], 22: [8, 23], 23: [8, 23], 24: [9, 22], 25: [9, 22], 26: [10, 21], 27: [11, 20] };
+    const rows = Object.keys(BODY).map(Number);
+    add(M, rows.map((y) => [BODY[y][0], y, BODY[y][1] - BODY[y][0] + 1, 1]), bob);
+    add(D, rows.filter((y) => y >= 12).map((y) => [BODY[y][1], y, 1, 1]).concat([[11, 27, 10, 1], [10, 26, 1, 1]]), bob);
+    add(L, [[11, 21, 8, 1], [10, 22, 10, 2], [11, 24, 8, 1], [12, 25, 6, 1], [13, 14, 1, 1], [12, 15, 1, 1], [11, 16, 1, 1], [16, 9, 1, 1]], bob + ';opacity:.85');
+    /* feet */
+    if (walking) {
+      add(D, [[11, 28, 3, 1], [18, 28, 3, 1]], 'animation:pxStepA .36s linear infinite');
+      add(D, [[10, 28, 3, 1], [19, 28, 3, 1]], 'animation:pxStepB .36s linear infinite');
+    } else add(D, [[11, 28, 3, 1], [18, 28, 3, 1]], '');
+    /* face */
+    const EYE = '#17121a';
+    const happy = pose === 'cook' || pose === 'happy';
+    if (sleep) add(EYE, [[12, 19, 2, 1], [18, 19, 2, 1]], bob);
+    else if (happy) add(EYE, [[11, 19, 1, 1], [12, 18, 1, 1], [13, 19, 1, 1], [18, 19, 1, 1], [19, 18, 1, 1], [20, 19, 1, 1]], bob);
+    else if (pose === 'search') { add(EYE, [[12, 18, 2, 2]], bob); add(EYE, [[18, 19, 2, 1]], bob); }
+    else {
+      add(EYE, [[12, 18, 2, 2], [18, 18, 2, 2]], bob + ';animation-name:pxBob,pxBlink;animation-duration:' + (walking ? '.36s' : pose === 'work' ? '.8s' : '1.3s') + ',3.6s;animation-timing-function:linear;animation-iteration-count:infinite');
+      add(EYE, [[12, 19, 2, 1], [18, 19, 2, 1]], 'animation:pxBlinkC 3.6s linear infinite');
+      add('#ffffff', [[12, 18, 1, 1], [18, 18, 1, 1]], bob + ';opacity:.7');
+    }
+    add('#ff8fa0', [[10, 21, 1, 1], [21, 21, 1, 1]], bob + ';opacity:.6');
+    add(EYE, pose === 'think' ? [[15, 22, 1, 1]] : [[15, 21, 2, 1]], bob + ';opacity:.85');
+    /* hats */
+    if (sleep) {
+      add('#7f8fd0', [[16, 9, 6, 1], [14, 10, 9, 1], [12, 11, 10, 1], [11, 12, 10, 1], [22, 11, 3, 1], [23, 12, 3, 1], [24, 13, 2, 1], [25, 14, 2, 2]], bob);
+      add('#5f6fb0', [[21, 12, 1, 1], [22, 12, 1, 1], [25, 13, 1, 1], [26, 15, 1, 1], [20, 9, 2, 1]], bob);
+      add('#f4efe6', [[10, 13, 12, 2], [25, 16, 3, 2]], bob);
+      add('#d8cfc0', [[10, 14, 12, 1], [26, 17, 2, 1]], bob);
+    }
+    if (pose === 'cook') {
+      add('#f4f1ea', [[9, 6, 4, 6], [13, 4, 5, 8], [18, 6, 5, 6], [10, 11, 12, 2]], bob);
+      add('#d9d3c8', [[10, 12, 12, 1], [12, 7, 1, 4], [17, 6, 1, 5], [22, 8, 1, 3]], bob);
+    }
+    if (pose === 'search') {
+      add('#7a6250', [[12, 8, 8, 1], [10, 9, 12, 3]], bob);
+      add('#9a8168', [[11, 9, 1, 1], [13, 10, 1, 1], [15, 9, 1, 1], [17, 10, 1, 1], [19, 9, 1, 1], [21, 10, 1, 1], [14, 8, 1, 1], [18, 8, 1, 1]], bob);
+      add('#4e3e33', [[7, 12, 18, 1], [9, 13, 14, 1], [15, 6, 1, 2], [17, 6, 1, 2]], bob);
+    }
+    /* props + fx */
+    if (pose === 'work') {
+      add('#efe6d6', [[2, 20, 5, 5]], '');
+      add('#cdbfa8', [[2, 24, 5, 1], [6, 20, 1, 4], [1, 21, 1, 3]], '');
+      add('#4a2e1e', [[3, 20, 3, 1]], '');
+      add('#e9dcc6', [[3, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) infinite');
+      add('#e9dcc6', [[5, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) .55s infinite');
+      add('#e9dcc6', [[4, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) 1.1s infinite');
+      add('#232328', [[19, 19, 10, 8]], '');
+      add('#33333a', [[19, 19, 10, 1], [28, 20, 1, 7]], '');
+      add('#121215', [[14, 27, 16, 2]], '');
+      add('#3a3a42', [[14, 27, 16, 1]], '');
+      add('#9a9aa5', [[22, 22, 1, 1], [23, 23, 1, 1], [22, 24, 1, 1]], '');
+      add('#9a9aa5', [[24, 24, 2, 1]], 'animation:pxCur 1s steps(1) infinite');
+    }
+    if (pose === 'pay') {
+      add('#7cc46a', [[23, 14, 5, 4]], 'animation:pxPeek 1.4s steps(2) infinite');
+      add('#4f9a45', [[25, 15, 1, 2], [23, 14, 5, 1]], 'animation:pxPeek 1.4s steps(2) infinite');
+      add('#7a4a2c', [[22, 17, 8, 7]], '');
+      add('#5a341e', [[22, 23, 8, 1], [29, 17, 1, 7], [22, 17, 8, 1]], '');
+      add('#a0683f', [[24, 19, 4, 1]], '');
+      add('#e0b04a', [[28, 20, 1, 2]], '');
+      add('#f5c542', [[29, 10, 1, 3], [28, 11, 3, 1]], 'animation:pxTw 1.2s steps(3) infinite');
+      add('#f5c542', [[25, 7, 1, 3], [24, 8, 3, 1]], 'animation:pxTw 1.2s steps(3) .6s infinite');
+    }
+    if (pose === 'search') {
+      const ring = [[25, 15, 3, 1], [24, 16, 1, 1], [28, 16, 1, 1], [23, 17, 1, 3], [29, 17, 1, 3], [24, 20, 1, 1], [28, 20, 1, 1], [25, 21, 3, 1]];
+      add('#cfe6ff', [[25, 16, 3, 5], [24, 17, 5, 3]], 'opacity:.55;animation:pxSwing 1.6s linear infinite');
+      add('#2a2a30', ring.concat([[23, 22, 1, 1], [22, 23, 1, 1], [21, 24, 1, 1]]), 'animation:pxSwing 1.6s linear infinite');
+      add('#ffffff', [[25, 17, 1, 1]], 'animation:pxSwing 1.6s linear infinite');
+    }
+    if (pose === 'cook') {
+      add('#3a3a42', [[17, 22, 5, 1]], 'animation:pxFlip 1s linear infinite');
+      add('#26262b', [[22, 21, 9, 2], [23, 23, 7, 1]], 'animation:pxFlip 1s linear infinite');
+      add('#f5c542', [[25, 18, 2, 1]], 'animation:pxHop 1s steps(4) infinite');
+      add('#f5c542', [[28, 17, 1, 1]], 'animation:pxHop 1s steps(4) .25s infinite');
+      add('#ffd86a', [[23, 16, 1, 1]], 'animation:pxHop 1s steps(4) .5s infinite');
+    }
+    if (pose === 'think') {
+      add('#f2f2f4', [[21, 1, 7, 1], [20, 2, 9, 1], [19, 3, 11, 3], [20, 6, 9, 1], [21, 7, 7, 1], [18, 9, 2, 2], [17, 12, 1, 1]], '');
+      add('#c9c9cf', [[20, 6, 9, 1], [19, 5, 1, 1], [29, 5, 1, 1]], 'opacity:.6');
+      add(M, [[21, 4, 2, 1]], 'animation:pxTw 1.2s steps(2) infinite');
+      add(M, [[24, 4, 2, 1]], 'animation:pxTw 1.2s steps(2) .3s infinite');
+      add(M, [[27, 4, 1, 1]], 'animation:pxTw 1.2s steps(2) .6s infinite');
+    }
+    if (sleep) {
+      const Z = (x, y, s) => s === 1 ? [[x, y, 2, 1], [x + 1, y + 1, 1, 1], [x, y + 2, 2, 1]] : [[x, y, 3, 1], [x + 2, y + 1, 1, 1], [x + 1, y + 2, 1, 1], [x, y + 3, 1, 1], [x, y + 4, 3, 1]];
+      add('#8f9de0', Z(5, 14, 1), 'animation:pxZ 2.4s steps(6) infinite');
+      add('#8f9de0', Z(3, 9, 2), 'animation:pxZ 2.4s steps(6) .8s infinite');
+      add('#8f9de0', Z(6, 3, 2), 'animation:pxZ 2.4s steps(6) 1.6s infinite');
+    }
+    return out;
+  }
+  setPose(p) { if (this.state.pose !== p) { this.setState({ pose: p }); this.act('pet:tool:' + (p || 'none')); } }
   componentDidMount() {
     this._len = 0;
     this.spinTick = setInterval(() => { if (this.state.busy) this.setState({ spinT: this.state.spinT + 1 }); }, 110);
@@ -360,7 +467,7 @@ class Component extends DCLogic {
   next() {
     clearTimeout(this.stepT);
     const s = this.queue && this.queue.shift();
-    if (!s) { this.setBusy(false); this.act('claudeDone'); return; }
+    if (!s) { this.setBusy(false); this.setPose(null); this.act('claudeDone'); return; }
     this.stepT = setTimeout(() => this.exec(s), s.d || 650);
   }
   exec(s) {
@@ -368,19 +475,20 @@ class Component extends DCLogic {
     if (s.say) { this.push({ k: 'say', text: s.say }); this.bill(900, 220); }
     if (s.todo) this.setState({ todos: s.todo });
     if (s.todo && s.showTodo) this.push({ k: 'todo', rows: s.todo });
+    if (s.tool) this.setPose(/Read|Grep|Glob|Task/.test(s.tool) ? 'search' : /Edit|Write/.test(s.tool) ? 'cook' : 'work');
     if (s.tool) {
       const needAsk = s.ask && (st.mode === 'default' || (st.mode === 'auto' && s.tool === 'Bash'));
       this.push({ k: 'tool', name: s.tool, arg: s.arg, sum: needAsk ? 'ожидает разрешения…' : s.sum, lines: s.lines || [], diff: !!s.diff, open: !!s.openLines, running: true });
       this.bill(1600, 400);
       if (needAsk) {
-        this.setState({ waiting: s });
+        this.setState({ waiting: s }); this.setPose('think');
         this.push({ k: 'ask', title: s.tool === 'Bash' ? 'Выполнить команду?' : `Изменить ${s.arg}?`, cmd: s.tool === 'Bash' ? s.arg : (s.lines || []).filter((l) => l[0] !== ' ').slice(0, 4).map((l) => l).join('\n'), kind: s.tool });
         return;
       }
       this.finishTool(s);
       return;
     }
-    if (s.plan) { this.push({ k: 'ask', plan: true, title: 'План готов. Выполнить?', cmd: s.plan }); this.setState({ waiting: s }); return; }
+    if (s.plan) { this.setPose('think'); this.push({ k: 'ask', plan: true, title: 'План готов. Выполнить?', cmd: s.plan }); this.setState({ waiting: s }); return; }
     this.next();
   }
   finishTool(s) {
@@ -399,7 +507,7 @@ class Component extends DCLogic {
     log[i] = { ...log[i], picked: choice, rev: (log[i].rev || 0) + 1 };
     this.setState({ log, waiting: null });
     if (s.plan) {
-      if (choice === 3) { this.push({ k: 'note', text: 'Хорошо, остаюсь в режиме плана. Что поправить?', color: '#a1a1a8' }); this.setBusy(false); return; }
+      if (choice === 3) { this.push({ k: 'note', text: 'Хорошо, остаюсь в режиме плана. Что поправить?', color: '#a1a1a8' }); this.setBusy(false); this.setPose(null); return; }
       this.setState({ mode: choice === 1 ? 'auto' : 'default' });
       this.queue = this.work(s.task).slice(2);
       this.next();
@@ -410,7 +518,7 @@ class Component extends DCLogic {
       for (let j = l2.length - 1; j >= 0; j--) if (l2[j].k === 'tool' && l2[j].running) { l2[j] = { ...l2[j], running: false, sum: 'отклонено', rej: true, rev: 1 }; break; }
       this.setState({ log: l2 });
       this.push({ k: 'note', text: 'Отклонено. Скажите, как сделать иначе.', color: '#ff9b6b' });
-      this.queue = []; this.setBusy(false); return;
+      this.queue = []; this.setBusy(false); this.setPose(null); return;
     }
     if (choice === 2 && s.tool !== 'Bash' && this.state.mode === 'default') this.setState({ mode: 'auto' });
     this.finishTool(s);
@@ -450,7 +558,7 @@ class Component extends DCLogic {
     if (c === '/clear') { this.queue = []; clearTimeout(this.stepT); this.setBusy(false); this.setState({ log: [{ k: 'wel' }], todos: [], ctx: 18400, waiting: null }); return; }
     if (c === '/compact') return this.compact();
     if (c === '/model') { this.setState({ modelMenu: true }); return; }
-    if (c === '/cost') return box('Стоимость сессии', [['Стоимость', `$${st.cost.toFixed(4)}`], ['Время API', `${(st.apiMs / 1000).toFixed(1)} с`], ['Изменения кода', `+${Object.values(st.changes).reduce((a, x) => a + x.add, 0)} −${Object.values(st.changes).reduce((a, x) => a + x.del, 0)}`], ['Токены', `↑ ${st.tin} · ↓ ${st.tout}`]]);
+    if (c === '/cost') { this.setPose('pay'); clearTimeout(this.payT); this.payT = setTimeout(() => this.setPose(null), 4500); } if (c === '/cost') return box('Стоимость сессии', [['Стоимость', `$${st.cost.toFixed(4)}`], ['Время API', `${(st.apiMs / 1000).toFixed(1)} с`], ['Изменения кода', `+${Object.values(st.changes).reduce((a, x) => a + x.add, 0)} −${Object.values(st.changes).reduce((a, x) => a + x.del, 0)}`], ['Токены', `↑ ${st.tin} · ↓ ${st.tout}`]]);
     if (c === '/context') { this.setState({ tab: 'ctx' }); return this.push({ k: 'note', text: 'Открыл вкладку «Контекст» справа', color: '#a1a1a8' }); }
     if (c === '/init') return this.run([
       { d: 600, say: 'Изучу проект и составлю CLAUDE.md.' },
@@ -497,7 +605,7 @@ class Component extends DCLogic {
     const log = this.state.log.map((m) => m.running ? { ...m, running: false, sum: 'прервано' } : m);
     this.setState({ log, waiting: null });
     this.push({ k: 'note', text: 'Прервано. Что сделать вместо этого?', color: '#ff9b6b' });
-    this.setBusy(false);
+    this.setBusy(false); this.setPose(null);
   };
   palItems() {
     const d = this.state.draft;
@@ -608,9 +716,9 @@ class Component extends DCLogic {
         style: `width:100%;padding:8px 10px;border-radius:11px;display:flex;flex-direction:column;gap:2px;border:0;color:#e8e8ec;background:${i === st.sess ? 'rgba(255,255,255,.08)' : 'transparent'}` })),
       projects: this.PROJ.map((p, i) => ({ name: p.replace('~/Проекты/', ''), pick: () => { this.setState({ proj: i }); this.push({ k: 'note', text: `Рабочая папка: ${p}`, color: '#a1a1a8' }); },
         style: `height:32px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:8px;font:500 12.5px 'JetBrains Mono',monospace;border:0;color:${i === st.proj ? '#f2f2f4' : '#a1a1a8'};background:${i === st.proj ? 'rgba(255,255,255,.06)' : 'transparent'}` })),
-      pet: { c1: pet[1], c2: pet[2] }, petName: pet[0], petMood: mood, petFood: food,
+      pet: { c1: pet[1], c2: pet[2] }, petLayers: this.pxSprite(st.pose || (st.food < 20 ? 'think' : 'idle'), st.petColor, false), petName: pet[0], petMood: mood, petFood: food,
       petFoodBar: `display:block;height:100%;width:${food}%;border-radius:3px;background:${food < 25 ? '#ff7b7b' : pet[1]};transition:width .5s,background .3s`,
-      petMini: `width:62px;height:62px;flex:none;border:0;background:none;padding:0;${st.petHop ? `animation:clHop .45s cubic-bezier(.3,1.4,.5,1)` : ''}`,
+      petMini: `width:64px;height:64px;flex:none;border:0;background:none;padding:0;${st.petHop ? `animation:clHop .45s cubic-bezier(.3,1.4,.5,1)` : ''}`,
       petColors: Object.keys(this.PETS).map((k) => ({ name: this.PETS[k][0], on: k === st.petColor,
         pick: () => { this.setState({ petColor: k }); this.act('pet:color:' + k); },
         style: `width:22px;height:22px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,${this.PETS[k][2]},${this.PETS[k][1]} 70%);box-shadow:0 0 0 2px #101012,0 0 0 ${k === st.petColor ? 4 : 2}px ${k === st.petColor ? '#f2f2f4' : 'rgba(255,255,255,.12)'};transition:box-shadow .2s` })),

@@ -26,7 +26,7 @@
 | ![Экран блокировки](design/screens/01-lock.jpg) Экран блокировки: пароль, PIN-код или лицо | ![Календарь](design/screens/03-calendar.jpg) Календарь и погода из рамки |
 | ![Музыка](design/screens/04-music.jpg) Плеер с эквалайзером | ![Сеть](design/screens/05-network.jpg) Wi-Fi и Bluetooth |
 | ![Клавиатура](design/screens/06-keyboard.jpg) Экранная клавиатура | ![Параметры](design/screens/07-settings.jpg) Параметры системы |
-| ![Claude](design/screens/08-claude.jpg) Claude — оболочка над `claude` в терминале и питомец Уголёк на рабочем столе | |
+| ![Claude](design/screens/08-claude.jpg) Claude — оболочка над `claude` в терминале | ![Уголёк](design/screens/09-pet.jpg) Пиксельный питомец Уголёк: ждёт, гуляет, спит, работает, ищет, готовит, думает, считает |
 
 Исходники интерактивного прототипа лежат в [`design/prototype`](design/prototype)
 (`System.dc.html` — вся система: блокировка → рабочий стол → окна). Это макет интерфейса,
