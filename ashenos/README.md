@@ -17,7 +17,7 @@
 | Ввод | экранная клавиатура (Maliit на рабочем столе, Qt Virtual Keyboard на экране входа) |
 | Экран | оверлей `vc4-kms-dsi-waveshare-800x480`, автоопределение выключено |
 | Сеть | NetworkManager, Bluetooth (bluez), SSH, WayVNC |
-| Терминал | Konsole + `claude` (Claude Code) из npm |
+| Терминал | Konsole + `claude` (Claude Code) из npm, приложение-оболочка «Claude» с питомцем |
 
 ## Скриншоты концепта оболочки
 
@@ -26,6 +26,7 @@
 | ![Экран блокировки](design/screens/01-lock.jpg) Экран блокировки: пароль, PIN-код или лицо | ![Календарь](design/screens/03-calendar.jpg) Календарь и погода из рамки |
 | ![Музыка](design/screens/04-music.jpg) Плеер с эквалайзером | ![Сеть](design/screens/05-network.jpg) Wi-Fi и Bluetooth |
 | ![Клавиатура](design/screens/06-keyboard.jpg) Экранная клавиатура | ![Параметры](design/screens/07-settings.jpg) Параметры системы |
+| ![Claude](design/screens/08-claude.jpg) Claude — оболочка над `claude` в терминале и питомец Уголёк на рабочем столе | |
 
 Исходники интерактивного прототипа лежат в [`design/prototype`](design/prototype)
 (`System.dc.html` — вся система: блокировка → рабочий стол → окна). Это макет интерфейса,

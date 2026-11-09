@@ -23,6 +23,16 @@ body{margin:0;background:#050506}
 .isl-row:hover{background:rgba(255,255,255,.06)}
 .osk-k{transition:background .12s,transform .12s cubic-bezier(.3,1.6,.5,1)}
 .osk-k:active{transform:scale(.9);background:rgba(255,255,255,.3) !important}
+@keyframes clDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@keyframes petBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.03,.97)}}
+@keyframes petWalk{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@keyframes petEye{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes petSpark{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+@keyframes petHopA{0%{translate:0 0}35%{translate:0 -26px}60%{translate:0 0}75%{translate:0 -7px}100%{translate:0 0}}
+@keyframes petHopB{0%{translate:0 0}35%{translate:0 -26px}60%{translate:0 0}75%{translate:0 -7px}100%{translate:0 0}}
+@keyframes petSay{from{opacity:0;transform:translate(-50%,6px) scale(.8)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes petZ{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(14px,-26px) scale(1.1)}}
+@keyframes petIn{from{opacity:0;scale:.3}to{opacity:1;scale:1}}
 @keyframes sysLockIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
 @keyframes sysLockOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:scale(1.06);filter:blur(10px)}}
 @keyframes sysWinIn{from{opacity:0;transform:translateY(36px) scale(.9);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
@@ -53,7 +63,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.files.open}}" hint-placeholder-val="{{false}}">
     <section data-win="files" aria-label="{{win.files.title}}" onMouseDown="{{h.files.down}}" style="{{win.files.box}}">
       <div data-inner="1" style="{{win.files.inner}}">
-        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.files.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.files.title}}»" onClick="{{h.files.restore}}" onMouseEnter="{{h.files.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -75,7 +85,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.term.open}}" hint-placeholder-val="{{false}}">
     <section data-win="term" aria-label="{{win.term.title}}" onMouseDown="{{h.term.down}}" style="{{win.term.box}}">
       <div data-inner="1" style="{{win.term.inner}}">
-        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.term.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.term.title}}»" onClick="{{h.term.restore}}" onMouseEnter="{{h.term.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -97,7 +107,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.music.open}}" hint-placeholder-val="{{false}}">
     <section data-win="music" aria-label="{{win.music.title}}" onMouseDown="{{h.music.down}}" style="{{win.music.box}}">
       <div data-inner="1" style="{{win.music.inner}}">
-        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.music.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.music.title}}»" onClick="{{h.music.restore}}" onMouseEnter="{{h.music.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -119,7 +129,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.lab.open}}" hint-placeholder-val="{{false}}">
     <section data-win="lab" aria-label="{{win.lab.title}}" onMouseDown="{{h.lab.down}}" style="{{win.lab.box}}">
       <div data-inner="1" style="{{win.lab.inner}}">
-        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.lab.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.lab.title}}»" onClick="{{h.lab.restore}}" onMouseEnter="{{h.lab.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -141,7 +151,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.set.open}}" hint-placeholder-val="{{false}}">
     <section data-win="set" aria-label="{{win.set.title}}" onMouseDown="{{h.set.down}}" style="{{win.set.box}}">
       <div data-inner="1" style="{{win.set.inner}}">
-        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.set.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.set.title}}»" onClick="{{h.set.restore}}" onMouseEnter="{{h.set.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -157,6 +167,28 @@ body{margin:0;background:#050506}
         <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.set.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
         <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.set.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
         <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.set.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+  <sc-if value="{{win.claude.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="claude" aria-label="{{win.claude.title}}" onMouseDown="{{h.claude.down}}" style="{{win.claude.box}}">
+      <div data-inner="1" style="{{win.claude.inner}}">
+        <dc-import name="Claude" on-close="{{h.claude.close}}" on-minimize="{{h.claude.min}}" on-maximize="{{h.claude.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.claude.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.claude.title}}»" onClick="{{h.claude.restore}}" onMouseEnter="{{h.claude.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.claude.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.claude.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.claude.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.claude.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.claude.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.claude.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
       </sc-if>
     </section>
   </sc-if>
@@ -640,6 +672,33 @@ body{margin:0;background:#050506}
     <div style="font-size: 11.5px; color: #8b8b93; text-align: center">Смахните карточку в сторону, чтобы убрать</div>
   </section>
 
+  <!-- ============ DESKTOP PET ============ -->
+  <sc-if value="{{pet.on}}" hint-placeholder-val="{{false}}">
+    <div id="sys-pet" role="button" aria-label="Питомец {{pet.name}}" onMouseDown="{{petDown}}" style="{{pet.box}}">
+      <span style="{{pet.bubble}}">{{pet.say}}</span>
+      <span aria-hidden="true" style="{{pet.z1}}">z</span><span aria-hidden="true" style="{{pet.z2}}">Z</span>
+      <span aria-hidden="true" style="{{pet.think}}"><span style="width: 5px; height: 5px; border-radius: 50%; background: #f2f2f4; animation: clDot 1s ease-in-out infinite"></span><span style="width: 5px; height: 5px; border-radius: 50%; background: #f2f2f4; animation: clDot 1s ease-in-out .15s infinite"></span><span style="width: 5px; height: 5px; border-radius: 50%; background: #f2f2f4; animation: clDot 1s ease-in-out .3s infinite"></span></span>
+      <div style="{{pet.flip}}">
+        <svg aria-hidden="true" width="84" height="84" viewBox="0 0 64 64" style="overflow: visible; display: block">
+          <ellipse cx="32" cy="60" rx="16" ry="3.2" fill="rgba(0,0,0,.5)"></ellipse>
+          <g style="{{pet.body}}">
+            <path d="M32 6 C 36 13 41 15 42 21 C 50 25 54 32 54 41 C 54 52 45 58 32 58 C 19 58 10 52 10 41 C 10 32 15 25 22 21 C 24 16 29 13 32 6 Z" fill="{{pet.c1}}"></path>
+            <path d="M32 26 C 42 26 48 33 48 42 C 48 51 41 55 32 55 C 23 55 16 51 16 42 C 16 33 22 26 32 26 Z" fill="{{pet.c2}}" opacity=".55"></path>
+            <g style="{{pet.eyes}}"><ellipse cx="25" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><ellipse cx="39" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><circle cx="26" cy="38.6" r="1" fill="#fff"></circle><circle cx="40" cy="38.6" r="1" fill="#fff"></circle></g>
+            <g style="{{pet.shut}}"><path d="M22 40 Q 25 42.5 28 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path><path d="M36 40 Q 39 42.5 42 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path></g>
+            <circle cx="20" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle><circle cx="44" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle>
+            <path d="M29 47 Q 32 50 35 47" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+            <ellipse cx="24" cy="57.5" rx="4.5" ry="2.2" fill="{{pet.c1}}" style="{{pet.footL}}"></ellipse>
+            <ellipse cx="40" cy="57.5" rx="4.5" ry="2.2" fill="{{pet.c1}}" style="{{pet.footR}}"></ellipse>
+          </g>
+          <circle cx="16" cy="16" r="1.7" fill="{{pet.c2}}" style="animation: petSpark 1.8s ease-out infinite"></circle>
+          <circle cx="49" cy="11" r="1.4" fill="{{pet.c2}}" style="animation: petSpark 2.3s ease-out .7s infinite"></circle>
+          <circle cx="40" cy="4" r="1.1" fill="{{pet.c2}}" style="animation: petSpark 2.9s ease-out 1.3s infinite"></circle>
+        </svg>
+      </div>
+    </div>
+  </sc-if>
+
   <!-- ============ ON-SCREEN KEYBOARD ============ -->
   <section aria-label="Экранная клавиатура" onMouseDown="{{oskKeep}}" style="{{osk.box}}">
     <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px 8px">
@@ -685,6 +744,7 @@ class Component extends DCLogic {
     menu: false, q: '', hitSel: 0,
     right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
     wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
+    pet: { on: false, color: 'ember', x: 1120, y: 744, dir: -1, busy: false, at: Date.now(), hop: 0, say: '', sayAt: 0, walkTo: 0 },
     ws: 1, oskOn: false, oskLang: 'RU', oskShift: false, oskCaps: false, oskNum: false, oskSym: false, oskTarget: '',
     music: { on: true, playing: true, pos: 62, dur: 214, idx: 0 },
     dl: { on: true, pct: 12 }, evHidden: false,
@@ -705,7 +765,8 @@ class Component extends DCLogic {
     term: { title: 'Терминал', sub: 'zsh · ~', comp: 'Terminal' },
     music: { title: 'Музыка', sub: 'Сейчас играет', comp: 'Music' },
     lab: { title: 'Тест острова', sub: 'Проверка функций', comp: 'Lab' },
-    set: { title: 'Параметры системы', sub: 'Plasma 6.8.1', comp: 'Settings' }
+    set: { title: 'Параметры системы', sub: 'Plasma 6.8.1', comp: 'Settings' },
+    claude: { title: 'Claude', sub: '~/Проекты/ashen-shell', comp: 'Claude' }
   };
   R = 836 / 1368;
 
@@ -799,8 +860,51 @@ class Component extends DCLogic {
   onLevel = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
   onWaveSet = (v) => { if (this.state.waveOn !== v) this.setState({ waveOn: v }); };
   onWall = (i) => { if (this.state.curWall !== i) this.setState({ curWall: i }); };
+  PETS = { ember: ['Уголёк', '#ff8a3d', '#ffd27a'], frost: ['Ледок', '#5aa8ff', '#c9e6ff'], moss: ['Мох', '#59c27a', '#c8f0a8'], ash: ['Пепел', '#b9b9c2', '#f2f2f4'] };
+  PHRASES = ['Привет!', 'Мур-р', 'Я тёплый', 'Погладь ещё', 'Что делаем?', 'Пепел — это стиль', 'Хочу печеньку'];
+  petPatch(p) { this.setState({ pet: { ...this.state.pet, ...p } }); }
+  petSay(text, hop) { const pt = this.state.pet; this.petPatch({ say: text, sayAt: Date.now(), at: Date.now(), hop: hop ? pt.hop + 1 : pt.hop }); clearTimeout(this.petSayT); this.petSayT = setTimeout(() => this.forceUpdate(), 2700); }
+  petDown = (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    const root = document.querySelector('[data-sys-root]'); const rr = root.getBoundingClientRect(); const k = rr.width / 1440 || 1;
+    const pt = this.state.pet;
+    this.petDrag = { sx: e.clientX, sy: e.clientY, x: pt.x, y: pt.y, k, moved: false };
+    const el = document.getElementById('sys-pet'); if (el) el.style.transition = 'none';
+    window.addEventListener('mousemove', this.petMove); window.addEventListener('mouseup', this.petUp);
+  };
+  petMove = (e) => {
+    const d = this.petDrag; if (!d) return;
+    const dx = (e.clientX - d.sx) / d.k, dy = (e.clientY - d.sy) / d.k;
+    if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
+    d.nx = Math.max(10, Math.min(1346, d.x + dx)); d.ny = Math.max(60, Math.min(800, d.y + dy));
+    const el = document.getElementById('sys-pet'); if (el) { el.style.left = d.nx + 'px'; el.style.top = d.ny + 'px'; }
+  };
+  petUp = () => {
+    const d = this.petDrag; this.petDrag = null;
+    window.removeEventListener('mousemove', this.petMove); window.removeEventListener('mouseup', this.petUp);
+    const el = document.getElementById('sys-pet'); if (el) el.style.transition = '';
+    if (!d) return;
+    if (d.moved) { this.petPatch({ x: d.nx, y: d.ny, at: Date.now(), walkTo: 0 }); this.petSay('Уи-и!', false); }
+    else this.petSay(this.PHRASES[Math.floor(Math.random() * this.PHRASES.length)], true);
+  };
   labAction = (id) => {
     const st = this.state, now = Date.now();
+    if (id.startsWith('pet:')) {
+      const [, cmd, arg] = id.split(':');
+      if (cmd === 'on') { this.petPatch({ on: true, color: arg || st.pet.color, at: now }); setTimeout(() => this.petSay('Я тут!', true), 450); }
+      else if (cmd === 'off') this.petPatch({ on: false });
+      else if (cmd === 'color') { this.petPatch({ color: arg }); if (st.pet.on) this.petSay('Новый цвет!', true); }
+      else if (cmd === 'feed') this.petSay('Ням-ням!', true);
+      else if (cmd === 'pat') this.petSay('Мур-р', true);
+      else if (cmd === 'busy') this.petPatch({ busy: arg === '1', at: now });
+      return;
+    }
+    if (id === 'claudeDone') {
+      this.notify({ app: 'Claude', title: 'Задача выполнена', body: 'Claude закончил работу в ~/Проекты/ashen-shell', kind: 'short', glyph: '>_' });
+      if (st.pet.on) this.petSay('Готово!', true);
+      return;
+    }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
     const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
@@ -858,6 +962,10 @@ class Component extends DCLogic {
           this.notify({ app: 'Загрузки', title: 'Загрузка завершена', body: 'linux-zen-6.17.2 сохранён в ~/Загрузки', kind: 'short', glyph: '↓' });
         }, 1200);
       }
+    }
+    if (st.pet.on && !this.petDrag && !st.pet.busy && Date.now() - st.pet.at > 4000 && Date.now() - st.pet.at < 40000 && Math.random() < 0.22) {
+      const nx = Math.max(40, Math.min(1330, st.pet.x + (Math.random() < 0.5 ? -1 : 1) * (60 + Math.random() * 160)));
+      patch.pet = { ...st.pet, x: nx, dir: nx < st.pet.x ? -1 : 1, walkTo: Date.now() + 2600 };
     }
     if (st.prog && st.prog.pct < 100) patch.prog = { ...st.prog, pct: Math.min(100, st.prog.pct + 3) };
     if (st.prog && st.prog.pct >= 100 && !this.progT) this.progT = setTimeout(() => { this.progT = null; this.setState({ prog: null }); }, 2500);
@@ -1161,7 +1269,7 @@ class Component extends DCLogic {
     const unlocked = st.lock === 'off';
 
     /* ---- windows ---- */
-    const ids = ['files', 'term', 'music', 'lab', 'set'];
+    const ids = ['files', 'term', 'music', 'lab', 'set', 'claude'];
     const minimized = st.order.filter((id) => st.wins[id] && st.wins[id].min && !st.wins[id].closing).sort((a, b) => st.wins[a].minAt - st.wins[b].minAt);
     const TW = 168, TH = Math.round(TW * this.R);
     const slot = (id) => {
@@ -1350,7 +1458,7 @@ class Component extends DCLogic {
     const nowMs = Date.now();
     const fl = st.flash && nowMs - st.flash.at < 1700 ? st.flash : null;
     const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
-    const glyphOf = { desk: ['◇', '#2e2e33'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2e2e33'], set: ['⚙', '#6d6d73'] };
+    const glyphOf = { desk: ['◇', '#2e2e33'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2e2e33'], set: ['⚙', '#6d6d73'], claude: ['>_', '#232327'] };
     const winT = active === 'desk' ? 'Рабочий стол' : this.meta[active].title;
     /* live activities */
     const tm = st.timer, tLeft = tm ? (tm.paused ? tm.left : tm.end - nowMs) : 0, tDone = !!tm && tLeft <= 0;
@@ -1606,6 +1714,22 @@ class Component extends DCLogic {
       /* lock */
       showLock: st.lock !== 'off',
       lockStyle: `position:absolute;inset:0;z-index:300;${st.lock === 'out' ? 'animation:sysLockOut .7s cubic-bezier(.65,0,.35,1) both;pointer-events:none' : st.lock === 'in' ? 'animation:sysLockIn .5s cubic-bezier(.2,1,.3,1) both' : ''}`,
+      petOn: !!st.pet.on, petDown: this.petDown,
+      pet: (() => {
+        const pt = st.pet, P = this.PETS[pt.color] || this.PETS.ember, t = Date.now();
+        const walking = pt.walkTo > t, sleeping = !pt.busy && t - pt.at > 40000, saying = pt.say && t - pt.sayAt < 2600;
+        return { on: !!pt.on && st.lock === 'off', name: P[0], c1: P[1], c2: P[2], say: pt.say,
+          box: `position:absolute;left:${pt.x}px;top:${pt.y}px;width:84px;height:84px;z-index:95;cursor:grab;transition:left 2.6s linear,top .6s ease;animation:petIn .5s cubic-bezier(.3,1.5,.5,1) both;filter:drop-shadow(0 0 ${pt.busy ? 18 : 10}px ${P[1]}${pt.busy ? 'aa' : '55'})`,
+          flip: `width:84px;height:84px;transform:scaleX(${pt.dir < 0 ? -1 : 1});transition:transform .25s;${pt.hop ? `animation:${pt.hop % 2 ? 'petHopA' : 'petHopB'} .7s cubic-bezier(.3,1.2,.5,1) both` : ''}`,
+          body: `transform-origin:32px 58px;animation:${walking ? 'petWalk .45s' : sleeping ? 'petBob 4s' : pt.busy ? 'petBob .9s' : 'petBob 2.4s'} ease-in-out infinite`,
+          eyes: `transform-origin:32px 40px;animation:petEye 4s infinite;display:${sleeping ? 'none' : 'inline'}`,
+          shut: `display:${sleeping ? 'inline' : 'none'}`,
+          footL: walking ? 'animation:petWalk .45s ease-in-out infinite' : '', footR: walking ? 'animation:petWalk .45s ease-in-out -.22s infinite' : '',
+          bubble: `position:absolute;left:50%;bottom:90px;transform:translate(-50%,0);padding:6px 11px;border-radius:12px;white-space:nowrap;font:600 12.5px Inter,sans-serif;color:#111113;background:#f2f2f4;box-shadow:0 8px 20px rgba(0,0,0,.4);pointer-events:none;display:${saying ? 'block' : 'none'};animation:petSay .3s cubic-bezier(.3,1.5,.5,1) both`,
+          think: `position:absolute;left:50%;bottom:90px;transform:translateX(-50%);height:24px;padding:0 9px;border-radius:12px;gap:4px;align-items:center;background:rgba(17,17,19,.9);border:1px solid #2e2e33;pointer-events:none;display:${pt.busy && !saying ? 'flex' : 'none'}`,
+          z1: `position:absolute;right:4px;top:4px;font:700 12px Inter,sans-serif;color:${P[2]};pointer-events:none;display:${sleeping && !saying ? 'block' : 'none'};animation:petZ 2.4s ease-out infinite`,
+          z2: `position:absolute;right:-6px;top:-8px;font:700 16px Inter,sans-serif;color:${P[2]};pointer-events:none;display:${sleeping && !saying ? 'block' : 'none'};animation:petZ 2.4s ease-out 1.2s infinite` };
+      })(),
       toggleOsk: this.toggleOsk, oskOn: !!st.oskOn, oskKeep: this.oskKeep,
       osk: (() => {
         const up = st.oskShift || st.oskCaps;

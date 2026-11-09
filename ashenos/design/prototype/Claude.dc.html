@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Claude</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+.cl-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+.cl-scroll::-webkit-scrollbar{width:6px}.cl-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:6px}
+.cl-b{transition:background .15s,transform .2s cubic-bezier(.3,1.6,.5,1),color .15s}
+.cl-b:hover{background:rgba(255,255,255,.08)}
+.cl-b:active{transform:scale(.94)}
+.cl-in::placeholder{color:#6f6f77}
+@keyframes clIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes clPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes clBlink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes clShim{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes clBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.02,.98)}}
+@keyframes clEye{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes clSpark{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+@keyframes clHop{0%{transform:translateY(0)}40%{transform:translateY(-14px)}100%{transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Claude" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(16,16,18,0.96); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+
+    <!-- header -->
+    <header style="height: 60px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+      <span aria-hidden="true" style="width: 36px; height: 36px; flex: none; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 90% at 85% 8%, #3a3a40 0%, #232327 55%, #161618 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); font: 700 13px 'JetBrains Mono', monospace; color: #f2f2f4">&gt;_</span>
+      <div style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0">
+        <span style="font-size: 15px; font-weight: 600">Claude</span>
+        <span style="font-size: 12px; color: #8b8b93; font-family: 'JetBrains Mono', monospace">{{proj}} · ⎇ main</span>
+      </div>
+      <div style="position: relative; margin-left: 18px">
+        <button class="cl-b" aria-label="Модель" aria-expanded="{{modelMenu}}" onClick="{{toggleModel}}" style="height: 32px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">
+          <span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #6fd39b"></span>{{modelName}}<span aria-hidden="true" style="color: #8b8b93">▾</span>
+        </button>
+        <sc-if value="{{modelMenu}}" hint-placeholder-val="{{false}}">
+          <div role="listbox" aria-label="Выбор модели" style="position: absolute; left: 0; top: 40px; z-index: 30; width: 300px; padding: 6px; border-radius: 16px; background: #141416; border: 1px solid #2e2e33; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: clPop .22s cubic-bezier(.22,1,.36,1) both">
+            <sc-for list="{{models}}" as="m" hint-placeholder-count="3">
+              <button role="option" aria-selected="{{m.on}}" onClick="{{m.pick}}" style="{{m.style}}">
+                <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0"><span style="font-size: 13px; font-weight: 600">{{m.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{m.note}}</span></span>
+                <span aria-hidden="true" style="{{m.check}}">✓</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div role="radiogroup" aria-label="Режим работы" style="display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,0.05)">
+        <sc-for list="{{modes}}" as="md" hint-placeholder-count="4">
+          <button role="radio" aria-checked="{{md.on}}" onClick="{{md.pick}}" style="{{md.style}}">{{md.name}}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; margin-left: auto">
+        <button class="cl-b" aria-label="Свернуть" onClick="{{minApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        <button class="cl-b" aria-label="Развернуть" onClick="{{maxApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="3"></rect></svg></button>
+        <button class="cl-b" aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+    </header>
+
+    <div style="flex: 1; min-height: 0; display: flex">
+      <!-- ============ sidebar ============ -->
+      <aside style="width: 248px; flex: none; display: flex; flex-direction: column; gap: 6px; padding: 14px 10px 12px; border-right: 1px solid rgba(255,255,255,0.06)">
+        <button class="cl-b" onClick="{{newSession}}" style="height: 38px; border-radius: 12px; display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 13px; font-weight: 600; background: #f2f2f4; color: #111113; border: 0">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Новая сессия<span style="margin-left: auto; font: 500 11px 'JetBrains Mono', monospace; color: #6f6f77">/clear</span>
+        </button>
+        <span style="margin: 10px 8px 2px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6f6f77">Сессии</span>
+        <div class="cl-scroll" style="display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 250px">
+          <sc-for list="{{sessions}}" as="se" hint-placeholder-count="5">
+            <button class="cl-b" aria-current="{{se.cur}}" onClick="{{se.pick}}" style="{{se.style}}">
+              <span style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left">{{se.title}}</span>
+              <span style="font-size: 11px; color: #6f6f77; text-align: left">{{se.when}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <span style="margin: 10px 8px 2px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #6f6f77">Проекты</span>
+        <sc-for list="{{projects}}" as="pj" hint-placeholder-count="3">
+          <button class="cl-b" onClick="{{pj.pick}}" style="{{pj.style}}"><span aria-hidden="true" style="color: #8b8b93">▤</span>{{pj.name}}</button>
+        </sc-for>
+
+        <!-- pet card -->
+        <div style="margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <button aria-label="Погладить {{petName}}" onClick="{{petTap}}" style="{{petMini}}">
+              <svg aria-hidden="true" width="58" height="58" viewBox="0 0 64 64" style="overflow: visible">
+                <ellipse cx="32" cy="59" rx="15" ry="3" fill="rgba(0,0,0,.45)"></ellipse>
+                <g style="transform-origin: 32px 58px; animation: clBob 2.4s ease-in-out infinite">
+                  <path d="M32 6 C 36 13 41 15 42 21 C 50 25 54 32 54 41 C 54 52 45 58 32 58 C 19 58 10 52 10 41 C 10 32 15 25 22 21 C 24 16 29 13 32 6 Z" fill="{{pet.c1}}"></path>
+                  <path d="M32 26 C 42 26 48 33 48 42 C 48 51 41 55 32 55 C 23 55 16 51 16 42 C 16 33 22 26 32 26 Z" fill="{{pet.c2}}" opacity=".55"></path>
+                  <g style="transform-origin: 32px 40px; animation: clEye 4s infinite"><ellipse cx="25" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><ellipse cx="39" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><circle cx="26" cy="38.6" r="1" fill="#fff"></circle><circle cx="40" cy="38.6" r="1" fill="#fff"></circle></g>
+                  <circle cx="20" cy="46" r="2.6" fill="#ff8fa0" opacity=".45"></circle><circle cx="44" cy="46" r="2.6" fill="#ff8fa0" opacity=".45"></circle>
+                  <path d="M29 47 Q 32 50 35 47" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+                </g>
+                <circle cx="18" cy="16" r="1.6" fill="{{pet.c2}}" style="animation: clSpark 1.8s ease-out infinite"></circle>
+                <circle cx="47" cy="12" r="1.3" fill="{{pet.c2}}" style="animation: clSpark 2.3s ease-out .7s infinite"></circle>
+              </svg>
+            </button>
+            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+              <span style="font-size: 14px; font-weight: 700">{{petName}}</span>
+              <span style="font-size: 11.5px; color: #a1a1a8">{{petMood}}</span>
+              <span aria-label="Сытость {{petFood}}%" style="width: 110px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{petFoodBar}}"></span></span>
+            </div>
+          </div>
+          <div role="radiogroup" aria-label="Цвет питомца" style="display: flex; gap: 6px">
+            <sc-for list="{{petColors}}" as="pc" hint-placeholder-count="4">
+              <button role="radio" aria-checked="{{pc.on}}" aria-label="{{pc.name}}" onClick="{{pc.pick}}" style="{{pc.style}}"></button>
+            </sc-for>
+            <button class="cl-b" onClick="{{petFeed}}" style="margin-left: auto; height: 26px; padding: 0 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.07); color: #e8e8ec; border: 0">Покормить</button>
+          </div>
+          <button role="switch" aria-checked="{{petOnDesk}}" onClick="{{petToggle}}" style="height: 34px; border-radius: 11px; display: flex; align-items: center; gap: 10px; padding: 0 6px 0 12px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.05); color: #e8e8ec; border: 0">
+            На рабочий стол
+            <span style="{{petSw.track}}"><span style="{{petSw.knob}}"></span></span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ============ transcript ============ -->
+      <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative">
+        <div id="cl-log" class="cl-scroll" role="log" aria-label="Диалог с Claude" style="flex: 1; min-height: 0; overflow-y: auto; padding: 20px 28px 12px; display: flex; flex-direction: column; gap: 14px">
+          <sc-for list="{{log}}" as="m" hint-placeholder-count="6">
+            <div style="animation: clIn .32s cubic-bezier(.22,1,.36,1) both">
+              <sc-if value="{{m.wel}}" hint-placeholder-val="{{false}}">
+                <div style="padding: 18px 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); display: flex; gap: 18px; align-items: center">
+                  <span aria-hidden="true" style="font: 700 30px 'JetBrains Mono', monospace; color: #f2f2f4">&gt;_</span>
+                  <div style="display: flex; flex-direction: column; gap: 4px">
+                    <span style="font-size: 16px; font-weight: 700">Claude в AshenOS</span>
+                    <span style="font-size: 13px; color: #a1a1a8">Оболочка над терминальным <span style="font-family: 'JetBrains Mono', monospace; color: #e8e8ec">claude</span> · рабочая папка <span style="font-family: 'JetBrains Mono', monospace; color: #e8e8ec">{{proj}}</span></span>
+                    <span style="font-size: 12.5px; color: #8b8b93">Напишите задачу. <b style="color: #c9c9cf">/</b> команды · <b style="color: #c9c9cf">@</b> файл · <b style="color: #c9c9cf">!</b> команда shell · <b style="color: #c9c9cf">#</b> запомнить · <b style="color: #c9c9cf">Shift+Tab</b> режим · <b style="color: #c9c9cf">Esc</b> прервать</span>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{m.user}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; gap: 10px; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,0.06); font: 500 13.5px/1.55 'JetBrains Mono', monospace; color: #f2f2f4"><span aria-hidden="true" style="color: #8b8b93">&gt;</span><span style="white-space: pre-wrap; min-width: 0">{{m.text}}</span></div>
+              </sc-if>
+              <sc-if value="{{m.say}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; gap: 10px; font-size: 14px; line-height: 1.6; color: #e8e8ec"><span aria-hidden="true" style="color: #f2f2f4; font-size: 10px; margin-top: 6px">●</span><span style="white-space: pre-wrap; min-width: 0">{{m.text}}</span></div>
+              </sc-if>
+              <sc-if value="{{m.note}}" hint-placeholder-val="{{false}}">
+                <div style="padding-left: 20px; font: 500 12.5px 'JetBrains Mono', monospace; color: {{m.color}}">⎿ {{m.text}}</div>
+              </sc-if>
+              <sc-if value="{{m.tool}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; flex-direction: column; gap: 4px">
+                  <button aria-expanded="{{m.open}}" onClick="{{m.toggle}}" style="display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left; font: 600 13px 'JetBrains Mono', monospace">
+                    <span aria-hidden="true" style="{{m.dot}}">●</span><span>{{m.name}}<span style="color: #a1a1a8; font-weight: 500">({{m.arg}})</span></span>
+                  </button>
+                  <div style="padding-left: 20px; font: 500 12.5px 'JetBrains Mono', monospace; color: #8b8b93">⎿ {{m.sum}}</div>
+                  <sc-if value="{{m.showLines}}" hint-placeholder-val="{{true}}">
+                    <div style="margin-left: 20px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); background: #0b0b0d; font: 500 12px/1.6 'JetBrains Mono', monospace">
+                      <sc-for list="{{m.lines}}" as="ln" hint-placeholder-count="4">
+                        <div style="{{ln.style}}"><span style="{{ln.gut}}">{{ln.n}}</span><span style="white-space: pre">{{ln.t}}</span></div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{m.todo}}" hint-placeholder-val="{{false}}">
+                <div style="display: flex; flex-direction: column; gap: 4px">
+                  <div style="display: flex; align-items: center; gap: 10px; font: 600 13px 'JetBrains Mono', monospace"><span aria-hidden="true" style="color: #6fd39b">●</span>Задачи</div>
+                  <sc-for list="{{m.rows}}" as="r" hint-placeholder-count="3">
+                    <div style="{{r.style}}"><span aria-hidden="true">{{r.icon}}</span><span>{{r.text}}</span></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{m.box}}" hint-placeholder-val="{{false}}">
+                <div style="border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+                  <span style="font: 700 12.5px 'JetBrains Mono', monospace; color: #f2f2f4">{{m.title}}</span>
+                  <sc-for list="{{m.rows}}" as="r" hint-placeholder-count="4">
+                    <div style="display: grid; grid-template-columns: 170px 1fr; gap: 12px; font: 500 12.5px/1.5 'JetBrains Mono', monospace"><span style="color: #e8e8ec">{{r.k}}</span><span style="color: #8b8b93">{{r.v}}</span></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{m.ask}}" hint-placeholder-val="{{false}}">
+                <div style="{{m.askBox}}">
+                  <span style="font-size: 13.5px; font-weight: 700">{{m.title}}</span>
+                  <span style="font: 500 12.5px/1.5 'JetBrains Mono', monospace; color: #c9c9cf; white-space: pre-wrap; padding: 8px 10px; border-radius: 10px; background: #0b0b0d">{{m.cmd}}</span>
+                  <div style="display: flex; flex-direction: column; gap: 4px">
+                    <sc-for list="{{m.opts}}" as="o" hint-placeholder-count="3">
+                      <button class="cl-b" disabled="{{o.off}}" onClick="{{o.pick}}" style="{{o.style}}"><span style="font-family: 'JetBrains Mono', monospace; color: #8b8b93">{{o.n}}.</span>{{o.label}}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- spinner -->
+        <div aria-live="polite" style="{{spin.row}}">
+          <span aria-hidden="true" style="font: 700 15px 'JetBrains Mono', monospace; color: #f2f2f4; width: 14px">{{spin.glyph}}</span>
+          <span style="font-size: 13.5px; font-weight: 600; background: linear-gradient(90deg, #8b8b93 0%, #f2f2f4 50%, #8b8b93 100%) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: clShim 2s linear infinite">{{spin.verb}}…</span>
+          <span style="font: 500 12px 'JetBrains Mono', monospace; color: #6f6f77">({{spin.meta}} · esc — прервать)</span>
+        </div>
+
+        <!-- palette -->
+        <sc-if value="{{pal.show}}" hint-placeholder-val="{{false}}">
+          <div role="listbox" aria-label="{{pal.title}}" class="cl-scroll" style="position: absolute; left: 28px; right: 28px; bottom: 112px; z-index: 20; max-height: 300px; overflow-y: auto; padding: 6px; border-radius: 16px; background: #141416; border: 1px solid #2e2e33; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: clPop .2s cubic-bezier(.22,1,.36,1) both">
+            <sc-for list="{{pal.items}}" as="it" hint-placeholder-count="5">
+              <button role="option" aria-selected="{{it.on}}" onMouseDown="{{it.pick}}" style="{{it.style}}"><span style="font: 600 12.5px 'JetBrains Mono', monospace; color: #f2f2f4; width: 150px; flex: none; text-align: left">{{it.name}}</span><span style="font-size: 12.5px; color: #8b8b93; text-align: left">{{it.desc}}</span></button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- input -->
+        <div style="padding: 6px 28px 14px">
+          <div style="{{inBox}}">
+            <span aria-hidden="true" style="{{inGlyph}}">{{inPrefix}}</span>
+            <input id="cl-in" class="cl-in" aria-label="Сообщение для Claude" placeholder="{{inHint}}" value="{{draft}}" onInput="{{onDraft}}" onKeyDown="{{onKey}}" autocomplete="off" spellcheck="false" style="flex: 1; min-width: 0; height: 100%; background: none; border: 0; outline: none; color: #f2f2f4; font: 500 14px 'JetBrains Mono', monospace">
+            <sc-if value="{{busy}}" hint-placeholder-val="{{false}}">
+              <button class="cl-b" aria-label="Прервать" onClick="{{stop}}" style="width: 34px; height: 34px; flex: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); color: #f2f2f4; border: 0"><span style="width: 11px; height: 11px; border-radius: 2px; background: currentColor"></span></button>
+            </sc-if>
+            <sc-if value="{{idle}}" hint-placeholder-val="{{true}}">
+              <button class="cl-b" aria-label="Отправить" onClick="{{send}}" style="{{sendBtn}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button>
+            </sc-if>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; margin-top: 8px; padding: 0 4px; font: 500 11.5px 'JetBrains Mono', monospace; color: #6f6f77">
+            <span style="{{modeHint.style}}">{{modeHint.text}}</span>
+            <span>shift+tab — сменить режим</span>
+            <span style="margin-left: auto">{{ctxText}}</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- ============ right panel ============ -->
+      <aside style="width: 300px; flex: none; display: flex; flex-direction: column; border-left: 1px solid rgba(255,255,255,0.06)">
+        <div role="tablist" aria-label="Панель сессии" style="display: flex; gap: 2px; padding: 12px 10px 8px; flex-wrap: wrap">
+          <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5">
+            <button role="tab" aria-selected="{{tb.on}}" onClick="{{tb.pick}}" style="{{tb.style}}">{{tb.name}}</button>
+          </sc-for>
+        </div>
+        <div class="cl-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 8px">
+          <sc-if value="{{tab.todo}}" hint-placeholder-val="{{true}}">
+            <sc-for list="{{todos}}" as="t" hint-placeholder-count="3">
+              <div style="{{t.style}}"><span aria-hidden="true" style="{{t.iconStyle}}">{{t.icon}}</span><span style="min-width: 0">{{t.text}}</span></div>
+            </sc-for>
+            <sc-if value="{{todoEmpty}}" hint-placeholder-val="{{false}}"><span style="font-size: 12.5px; color: #6f6f77; padding: 10px 2px">Claude составит список задач, когда возьмётся за многошаговую работу.</span></sc-if>
+          </sc-if>
+          <sc-if value="{{tab.diff}}" hint-placeholder-val="{{false}}">
+            <sc-for list="{{changes}}" as="c" hint-placeholder-count="2">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 11px; background: rgba(255,255,255,0.04); font: 500 12.5px 'JetBrains Mono', monospace"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{c.file}}</span><span style="margin-left: auto; color: #6fd39b">+{{c.add}}</span><span style="color: #ff7b7b">−{{c.del}}</span></div>
+            </sc-for>
+            <sc-if value="{{changesEmpty}}" hint-placeholder-val="{{false}}"><span style="font-size: 12.5px; color: #6f6f77; padding: 10px 2px">Файлы ещё не менялись.</span></sc-if>
+            <sc-if value="{{changesAny}}" hint-placeholder-val="{{true}}"><button class="cl-b" onClick="{{rewind}}" style="height: 34px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.07); color: #e8e8ec; border: 0">Откатить изменения (Esc Esc)</button></sc-if>
+          </sc-if>
+          <sc-if value="{{tab.ctx}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 6px 2px">
+              <span aria-hidden="true" style="{{ctx.ring}}"><span style="width: 52px; height: 52px; border-radius: 50%; background: #101012; display: flex; align-items: center; justify-content: center; font: 700 13px 'JetBrains Mono', monospace">{{ctx.pct}}%</span></span>
+              <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 13px; font-weight: 600">{{ctx.used}} из 200k</span><span style="font-size: 12px; color: #8b8b93">до авто-сжатия {{ctx.left}}%</span></div>
+            </div>
+            <sc-for list="{{ctx.parts}}" as="p" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px"><span aria-hidden="true" style="{{p.sw}}"></span>{{p.name}}<span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; color: #a1a1a8">{{p.v}}</span></div>
+            </sc-for>
+            <div style="height: 1px; background: rgba(255,255,255,0.07); margin: 6px 0"></div>
+            <sc-for list="{{ctx.stats}}" as="p" hint-placeholder-count="4">
+              <div style="display: flex; font-size: 12.5px"><span style="color: #a1a1a8">{{p.k}}</span><span style="margin-left: auto; font-family: 'JetBrains Mono', monospace">{{p.v}}</span></div>
+            </sc-for>
+            <button class="cl-b" onClick="{{compact}}" style="margin-top: 6px; height: 34px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.07); color: #e8e8ec; border: 0">Сжать контекст (/compact)</button>
+          </sc-if>
+          <sc-if value="{{tab.mcp}}" hint-placeholder-val="{{false}}">
+            <sc-for list="{{mcp}}" as="s" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.04)">
+                <span aria-hidden="true" style="{{s.dot}}"></span>
+                <span style="display: flex; flex-direction: column; min-width: 0"><span style="font: 600 12.5px 'JetBrains Mono', monospace">{{s.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{s.note}}</span></span>
+                <button role="switch" aria-checked="{{s.on}}" aria-label="{{s.name}}" onClick="{{s.toggle}}" style="{{s.track}}"><span style="{{s.knob}}"></span></button>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{tab.agents}}" hint-placeholder-val="{{false}}">
+            <sc-for list="{{agents}}" as="a" hint-placeholder-count="3">
+              <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.04)">
+                <div style="display: flex; align-items: center; gap: 8px"><span style="font: 600 12.5px 'JetBrains Mono', monospace">{{a.name}}</span><span style="{{a.badge}}">{{a.state}}</span></div>
+                <span style="font-size: 12px; color: #8b8b93; line-height: 1.45">{{a.desc}}</span>
+              </div>
+            </sc-for>
+            <button class="cl-b" onClick="{{runAgent}}" style="height: 34px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.07); color: #e8e8ec; border: 0">Запустить code-reviewer</button>
+          </sc-if>
+        </div>
+      </aside>
+    </div>
+  </section>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"petOn":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = {
+    log: [{ k: 'wel' }], draft: '', busy: false, mode: 'default', model: 'opus', modelMenu: false,
+    tab: 'todo', todos: [], changes: {}, ctx: 18400, cost: 0, tin: 0, tout: 0, apiMs: 0,
+    sess: 0, proj: 0, pal: 0, waiting: null, spinT: 0, spinAt: 0, verb: 0,
+    mcp: { filesystem: true, github: true, playwright: false, 'arch-wiki': true },
+    agents: { 'code-reviewer': 'готов', explorer: 'готов', 'test-runner': 'готов' },
+    petColor: 'ember', petLocal: false, food: 70, petHop: 0, petSaid: ''
+  };
+  PROJ = ['~/Проекты/ashen-shell', '~/Проекты/cyberdeck', '~/dotfiles'];
+  SESS = [
+    { title: 'Анимации капель в рамке', when: 'сейчас' },
+    { title: 'PKGBUILD для quickshell', when: 'вчера' },
+    { title: 'Экранная клавиатура', when: '2 дня назад' },
+    { title: 'Сборка образа для Pi 4', when: 'неделю назад' },
+    { title: 'Тёмная тема SDDM', when: '3 нед. назад' }
+  ];
+  MODELS = [
+    { id: 'opus', name: 'Opus 5.5', note: 'Самая умная для сложных задач' },
+    { id: 'sonnet', name: 'Sonnet 5.5', note: 'Быстрая и сильная на каждый день' },
+    { id: 'haiku', name: 'Haiku 5.5', note: 'Самая быстрая для простых правок' }
+  ];
+  MODES = [
+    { id: 'default', name: 'Спрашивать', hint: '⏵ обычный режим — спрашивает перед правками и командами' },
+    { id: 'auto', name: 'Автоправки', hint: '⏵⏵ правки файлов принимаются сами' },
+    { id: 'plan', name: 'План', hint: '⏸ режим плана — только читает и предлагает план' },
+    { id: 'bypass', name: 'Без вопросов', hint: '⚠ разрешения пропускаются' }
+  ];
+  CMDS = [
+    ['/help', 'Справка по командам'], ['/clear', 'Начать заново, очистить историю'], ['/compact', 'Сжать контекст с кратким пересказом'],
+    ['/model', 'Выбрать модель'], ['/cost', 'Стоимость и токены сессии'], ['/context', 'Что занимает контекст'], ['/init', 'Создать CLAUDE.md для проекта'],
+    ['/memory', 'Открыть память проекта'], ['/review', 'Ревью текущих изменений'], ['/mcp', 'MCP-серверы'], ['/agents', 'Субагенты'],
+    ['/permissions', 'Разрешённые инструменты'], ['/resume', 'Продолжить прошлую сессию'], ['/plan', 'Включить режим плана'],
+    ['/pet', 'Питомец на рабочий стол'], ['/doctor', 'Проверить установку'], ['/status', 'Версия, модель, аккаунт'], ['/config', 'Настройки']
+  ];
+  FILES = ['src/Bezel.qml', 'src/Island.qml', 'src/Drop.qml', 'src/Dock.qml', 'src/Keyboard.qml', 'CLAUDE.md', 'PKGBUILD', 'tests/drop.test.js', 'install.sh'];
+  VERBS = ['Размышляю', 'Соображаю', 'Перебираю', 'Колдую', 'Разбираюсь', 'Плету', 'Вычисляю', 'Прикидываю'];
+  SPIN = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  PETS = { ember: ['Уголёк', '#ff8a3d', '#ffd27a'], frost: ['Ледок', '#5aa8ff', '#c9e6ff'], moss: ['Мох', '#59c27a', '#c8f0a8'], ash: ['Пепел', '#b9b9c2', '#f2f2f4'] };
+
+  componentDidMount() {
+    this._len = 0;
+    this.spinTick = setInterval(() => { if (this.state.busy) this.setState({ spinT: this.state.spinT + 1 }); }, 110);
+    this.foodTick = setInterval(() => { const f = this.state.food; if (f > 0) this.setState({ food: f - 1 }); }, 9000);
+  }
+  componentWillUnmount() { clearInterval(this.spinTick); clearInterval(this.foodTick); clearTimeout(this.stepT); }
+  componentDidUpdate() {
+    const n = this.state.log.length + (this.state.busy ? 1 : 0) + (this.state.log[this.state.log.length - 1] || {}).rev;
+    if (n !== this._len) {
+      this._len = n;
+      const el = document.getElementById('cl-log');
+      if (el) requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    }
+  }
+  act(id) { if (this.props.onAction) this.props.onAction(id); }
+
+  /* ---------- log helpers ---------- */
+  push(m) { this.setState({ log: [...this.state.log, { ...m, id: Math.random() }] }); }
+  patchLast(p) { const log = this.state.log.slice(); const i = log.length - 1; log[i] = { ...log[i], ...p, rev: (log[i].rev || 0) + 1 }; this.setState({ log }); }
+  setBusy(b) {
+    if (b === this.state.busy) return;
+    this.setState({ busy: b, spinAt: Date.now(), verb: Math.floor(Math.random() * this.VERBS.length) });
+    this.act('pet:busy:' + (b ? 1 : 0));
+  }
+  bill(tin, tout) { this.setState({ ctx: this.state.ctx + tin + tout, tin: this.state.tin + tin, tout: this.state.tout + tout, cost: this.state.cost + tin * 0.000005 + tout * 0.000025, apiMs: this.state.apiMs + 1400 + Math.random() * 900 }); }
+
+  /* ---------- scenario engine ---------- */
+  run(steps) { this.queue = steps.slice(); this.setBusy(true); this.next(); }
+  next() {
+    clearTimeout(this.stepT);
+    const s = this.queue && this.queue.shift();
+    if (!s) { this.setBusy(false); this.act('claudeDone'); return; }
+    this.stepT = setTimeout(() => this.exec(s), s.d || 650);
+  }
+  exec(s) {
+    const st = this.state;
+    if (s.say) { this.push({ k: 'say', text: s.say }); this.bill(900, 220); }
+    if (s.todo) this.setState({ todos: s.todo });
+    if (s.todo && s.showTodo) this.push({ k: 'todo', rows: s.todo });
+    if (s.tool) {
+      const needAsk = s.ask && (st.mode === 'default' || (st.mode === 'auto' && s.tool === 'Bash'));
+      this.push({ k: 'tool', name: s.tool, arg: s.arg, sum: needAsk ? 'ожидает разрешения…' : s.sum, lines: s.lines || [], diff: !!s.diff, open: !!s.openLines, running: true });
+      this.bill(1600, 400);
+      if (needAsk) {
+        this.setState({ waiting: s });
+        this.push({ k: 'ask', title: s.tool === 'Bash' ? 'Выполнить команду?' : `Изменить ${s.arg}?`, cmd: s.tool === 'Bash' ? s.arg : (s.lines || []).filter((l) => l[0] !== ' ').slice(0, 4).map((l) => l).join('\n'), kind: s.tool });
+        return;
+      }
+      this.finishTool(s);
+      return;
+    }
+    if (s.plan) { this.push({ k: 'ask', plan: true, title: 'План готов. Выполнить?', cmd: s.plan }); this.setState({ waiting: s }); return; }
+    this.next();
+  }
+  finishTool(s) {
+    const log = this.state.log.slice();
+    for (let i = log.length - 1; i >= 0; i--) if (log[i].k === 'tool' && log[i].running) { log[i] = { ...log[i], running: false, sum: s.sum, rev: (log[i].rev || 0) + 1 }; break; }
+    const patch = { log };
+    if (s.diff) { const c = { ...this.state.changes }; const old = c[s.arg] || { add: 0, del: 0 }; c[s.arg] = { add: old.add + s.diff[0], del: old.del + s.diff[1] }; patch.changes = c; }
+    this.setState(patch);
+    this.next();
+  }
+  answer(choice) {
+    const s = this.state.waiting;
+    if (!s) return;
+    const log = this.state.log.slice();
+    const i = log.length - 1;
+    log[i] = { ...log[i], picked: choice, rev: (log[i].rev || 0) + 1 };
+    this.setState({ log, waiting: null });
+    if (s.plan) {
+      if (choice === 3) { this.push({ k: 'note', text: 'Хорошо, остаюсь в режиме плана. Что поправить?', color: '#a1a1a8' }); this.setBusy(false); return; }
+      this.setState({ mode: choice === 1 ? 'auto' : 'default' });
+      this.queue = this.work(s.task).slice(2);
+      this.next();
+      return;
+    }
+    if (choice === 3) {
+      const l2 = this.state.log.slice();
+      for (let j = l2.length - 1; j >= 0; j--) if (l2[j].k === 'tool' && l2[j].running) { l2[j] = { ...l2[j], running: false, sum: 'отклонено', rej: true, rev: 1 }; break; }
+      this.setState({ log: l2 });
+      this.push({ k: 'note', text: 'Отклонено. Скажите, как сделать иначе.', color: '#ff9b6b' });
+      this.queue = []; this.setBusy(false); return;
+    }
+    if (choice === 2 && s.tool !== 'Bash' && this.state.mode === 'default') this.setState({ mode: 'auto' });
+    this.finishTool(s);
+  }
+
+  work(task) {
+    const t = task.toLowerCase();
+    const file = t.includes('клав') ? 'src/Keyboard.qml' : t.includes('док') ? 'src/Dock.qml' : t.includes('остров') ? 'src/Island.qml' : 'src/Drop.qml';
+    const todo = (a, b, c) => [{ text: 'Разобрать текущий код', s: a }, { text: `Внести правку в ${file}`, s: b }, { text: 'Прогнать тесты', s: c }];
+    return [
+      { d: 700, say: 'Посмотрю, как это устроено сейчас.' },
+      { d: 650, tool: 'Read', arg: file, sum: 'Прочитано 214 строк' },
+      { d: 600, tool: 'Grep', arg: '"duration|easing" в src/', sum: 'Найдено 9 совпадений в 4 файлах', lines: ['src/Drop.qml:41    duration: 850', 'src/Drop.qml:42    easing.type: Easing.OutCubic', 'src/Island.qml:88  duration: Kirigami.Units.longDuration', 'src/Dock.qml:17    duration: 160'], openLines: false },
+      { d: 500, todo: todo(2, 1, 0), showTodo: true },
+      { d: 800, tool: 'Edit', arg: file, sum: 'Изменено: +6 −2', diff: [6, 2], ask: true, openLines: true,
+        lines: ['  Behavior on height {', '-     NumberAnimation { duration: 850 }', '+     NumberAnimation {', '+         duration: Kirigami.Units.longDuration', '+         easing.type: Easing.OutCubic', '+     }', '  }', '- opacity: open ? 1 : 0', '+ opacity: open ? 1 : 0; Behavior on opacity { OpacityAnimator { duration: 200 } }'] },
+      { d: 450, todo: todo(2, 2, 1) },
+      { d: 800, tool: 'Bash', arg: 'npm test -- drop', sum: '14 тестов пройдено за 1,8 с', ask: true, openLines: true, lines: ['> ashen-shell@1.0 test', '> vitest run drop', '', ' ✓ tests/drop.test.js (14)', ' Test Files  1 passed (1)', '      Tests  14 passed (14)'] },
+      { d: 500, todo: todo(2, 2, 2), showTodo: true },
+      { d: 700, say: `Готово. В ${file} анимация теперь берёт длительность из Kirigami (200 мс, OutCubic), как в Plasma, и плавно меняет прозрачность. Тесты проходят.` }
+    ];
+  }
+  plan(task) {
+    return [
+      { d: 700, say: 'Режим плана: только читаю код и ничего не меняю.' },
+      { d: 650, tool: 'Read', arg: 'src/Drop.qml', sum: 'Прочитано 214 строк' },
+      { d: 800, plan: '1. Заменить длительность 850 мс на Kirigami.Units.longDuration\n2. Добавить OutCubic и плавную прозрачность\n3. Прогнать npm test', task }
+    ];
+  }
+
+  /* ---------- commands ---------- */
+  slash(cmd) {
+    const st = this.state;
+    const c = cmd.split(/\s+/)[0];
+    const box = (title, rows) => this.push({ k: 'box', title, rows: rows.map(([k, v]) => ({ k, v })) });
+    if (c === '/help') return box('Команды', this.CMDS.map(([k, v]) => [k, v]).concat([['! команда', 'выполнить в shell'], ['# текст', 'запомнить в CLAUDE.md'], ['@файл', 'приложить файл'], ['Esc', 'прервать'], ['Shift+Tab', 'сменить режим']]));
+    if (c === '/clear') { this.queue = []; clearTimeout(this.stepT); this.setBusy(false); this.setState({ log: [{ k: 'wel' }], todos: [], ctx: 18400, waiting: null }); return; }
+    if (c === '/compact') return this.compact();
+    if (c === '/model') { this.setState({ modelMenu: true }); return; }
+    if (c === '/cost') return box('Стоимость сессии', [['Стоимость', `$${st.cost.toFixed(4)}`], ['Время API', `${(st.apiMs / 1000).toFixed(1)} с`], ['Изменения кода', `+${Object.values(st.changes).reduce((a, x) => a + x.add, 0)} −${Object.values(st.changes).reduce((a, x) => a + x.del, 0)}`], ['Токены', `↑ ${st.tin} · ↓ ${st.tout}`]]);
+    if (c === '/context') { this.setState({ tab: 'ctx' }); return this.push({ k: 'note', text: 'Открыл вкладку «Контекст» справа', color: '#a1a1a8' }); }
+    if (c === '/init') return this.run([
+      { d: 600, say: 'Изучу проект и составлю CLAUDE.md.' },
+      { d: 600, tool: 'Glob', arg: '**/*.qml', sum: 'Найдено 12 файлов' },
+      { d: 800, tool: 'Write', arg: 'CLAUDE.md', sum: 'Создано 18 строк', diff: [18, 0], ask: true, openLines: true, lines: ['+ # ashen-shell', '+ Оболочка рабочего стола AshenOS (Quickshell + Plasma 6).', '+ ## Команды', '+ - npm test — тесты', '+ - ./install.sh — установка', '+ ## Стиль', '+ - анимации: Kirigami.Units, OutCubic'] },
+      { d: 500, say: 'CLAUDE.md создан, буду опираться на него в следующих сессиях.' }]);
+    if (c === '/memory') return box('CLAUDE.md', [['# ashen-shell', 'Quickshell + Plasma 6'], ['Команды', 'npm test · ./install.sh'], ['Стиль', 'анимации Kirigami, OutCubic'], ['Ветка', 'main']]);
+    if (c === '/review') return this.run([
+      { d: 600, say: 'Запускаю субагента code-reviewer для текущих изменений.' },
+      { d: 900, tool: 'Task', arg: 'code-reviewer: git diff main', sum: 'Готово · 2 замечания' },
+      { d: 600, say: '1. В Drop.qml дважды задаётся opacity, лучше одним Behavior.\n2. В тесте drop нет случая быстрого закрытия во время открытия.' }]);
+    if (c === '/mcp') { this.setState({ tab: 'mcp' }); return box('MCP-серверы', Object.keys(st.mcp).map((k) => [k, st.mcp[k] ? '● подключён' : '○ выключен'])); }
+    if (c === '/agents') { this.setState({ tab: 'agents' }); return box('Субагенты', Object.keys(st.agents).map((k) => [k, st.agents[k]])); }
+    if (c === '/permissions') return box('Разрешения', [['Разрешено', 'Read · Grep · Glob · Bash(npm test:*)'], ['Спрашивать', 'Edit · Write · Bash(*)'], ['Запрещено', 'Bash(rm -rf:*) · Bash(sudo:*)']]);
+    if (c === '/resume') return box('Прошлые сессии', this.SESS.map((s) => [s.title, s.when]));
+    if (c === '/plan') { this.setState({ mode: 'plan' }); return this.push({ k: 'note', text: 'Режим плана включён', color: '#a1a1a8' }); }
+    if (c === '/pet') return this.petToggle();
+    if (c === '/doctor') return box('Проверка', [['claude', '✓ 2.4 · установлен через pacman'], ['node', '✓ 22.11'], ['ripgrep', '✓ 14.1'], ['Авторизация', '✓ вход выполнен'], ['Обновления', '✓ последняя версия']]);
+    if (c === '/status') return box('Статус', [['Модель', this.MODELS.find((m) => m.id === st.model).name], ['Режим', this.MODES.find((m) => m.id === st.mode).name], ['Папка', this.PROJ[st.proj]], ['Система', 'AshenOS · aarch64 · Raspberry Pi 4']]);
+    if (c === '/config') return box('Настройки', [['Тема', 'тёмная (AshenOS)'], ['Уведомления', 'в острове и в центре уведомлений'], ['Автосжатие', 'включено'], ['Питомец', st.petLocal || this.props.petOn ? 'на рабочем столе' : 'в приложении']]);
+    this.push({ k: 'note', text: `Неизвестная команда ${c}. Наберите /help`, color: '#ff9b6b' });
+  }
+  compact = () => { const before = this.state.ctx; const after = Math.max(9000, Math.round(before * 0.18)); this.setState({ ctx: after }); this.push({ k: 'note', text: `Контекст сжат: ${(before / 1000).toFixed(1)}k → ${(after / 1000).toFixed(1)}k токенов, пересказ сохранён`, color: '#a1a1a8' }); };
+  shell(cmd) {
+    const out = cmd.startsWith('ls') ? ['CLAUDE.md  PKGBUILD  install.sh  src  tests'] : cmd.startsWith('git status') ? ['На ветке main', 'Изменения, не в индексе:', '        изменено:      src/Drop.qml'] : cmd.startsWith('uname') ? ['Linux ashenos 6.17.2-1-rpi aarch64 GNU/Linux'] : cmd.startsWith('pacman') ? ['пакеты обновлены'] : [`$ ${cmd}`, 'готово'];
+    this.push({ k: 'tool', name: 'Bash', arg: cmd, sum: `код выхода 0`, lines: out, open: true, running: false });
+  }
+
+  submit() {
+    const st = this.state;
+    const v = st.draft.trim();
+    if (!v) return;
+    if (st.busy) { this.push({ k: 'note', text: 'Сообщение в очереди — Claude дочитает его после текущего шага', color: '#a1a1a8' }); this.setState({ draft: '' }); return; }
+    this.setState({ draft: '', pal: 0 });
+    if (v.startsWith('/')) { this.push({ k: 'user', text: v }); this.slash(v); return; }
+    if (v.startsWith('!')) { this.push({ k: 'user', text: v }); this.shell(v.slice(1).trim()); return; }
+    if (v.startsWith('#')) { this.push({ k: 'user', text: v }); this.push({ k: 'note', text: `Запомнено в CLAUDE.md: «${v.slice(1).trim()}»`, color: '#6fd39b' }); return; }
+    this.push({ k: 'user', text: v });
+    this.run(st.mode === 'plan' ? this.plan(v) : this.work(v));
+  }
+  stop = () => {
+    if (!this.state.busy) return;
+    clearTimeout(this.stepT); this.queue = [];
+    const log = this.state.log.map((m) => m.running ? { ...m, running: false, sum: 'прервано' } : m);
+    this.setState({ log, waiting: null });
+    this.push({ k: 'note', text: 'Прервано. Что сделать вместо этого?', color: '#ff9b6b' });
+    this.setBusy(false);
+  };
+  palItems() {
+    const d = this.state.draft;
+    if (/^\/\S*$/.test(d)) return { title: 'Команды', items: this.CMDS.filter(([k]) => k.startsWith(d)).map(([name, desc]) => ({ name, desc, val: name + ' ' })) };
+    const m = d.match(/@(\S*)$/);
+    if (m) return { title: 'Файлы', items: this.FILES.filter((f) => f.toLowerCase().includes(m[1].toLowerCase())).map((f) => ({ name: '@' + f, desc: 'приложить файл', val: d.slice(0, d.length - m[0].length) + '@' + f + ' ' })) };
+    return { title: '', items: [] };
+  }
+  onDraft = (e) => this.setState({ draft: e.target.value, pal: 0 });
+  onKey = (e) => {
+    const st = this.state;
+    const P = this.palItems();
+    if (P.items.length && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); const n = P.items.length; this.setState({ pal: (st.pal + (e.key === 'ArrowDown' ? 1 : n - 1)) % n }); return; }
+    if (P.items.length && e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); this.setState({ draft: P.items[st.pal % P.items.length].val, pal: 0 }); return; }
+    if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); this.cycleMode(); return; }
+    if (e.key === 'Escape') { e.preventDefault(); if (st.busy) this.stop(); else if (st.modelMenu) this.setState({ modelMenu: false }); else if (this._esc && Date.now() - this._esc < 600) this.rewind(); else this._esc = Date.now(); return; }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (P.items.length && P.title === 'Команды' && st.draft.trim() !== P.items[st.pal % P.items.length].name) { this.setState({ draft: P.items[st.pal % P.items.length].name }); setTimeout(() => this.submit(), 0); return; }
+      if (P.items.length && P.title === 'Файлы') { this.setState({ draft: P.items[st.pal % P.items.length].val, pal: 0 }); return; }
+      if (st.waiting && /^[123]$/.test(st.draft.trim())) { const n = +st.draft.trim(); this.setState({ draft: '' }); this.answer(n); return; }
+      this.submit();
+    }
+    if (st.waiting && !st.draft && /^[123]$/.test(e.key)) { e.preventDefault(); this.answer(+e.key); }
+  };
+  cycleMode() { const ids = ['default', 'auto', 'plan']; const i = ids.indexOf(this.state.mode); this.setState({ mode: ids[(i + 1) % ids.length] }); }
+  rewind = () => {
+    const n = Object.keys(this.state.changes).length;
+    if (!n) return;
+    this.setState({ changes: {} });
+    this.push({ k: 'note', text: `Откат: восстановлено ${n} ${n === 1 ? 'файл' : 'файла'} до состояния перед правками`, color: '#a1a1a8' });
+  };
+
+  /* ---------- pet ---------- */
+  petOnDesk() { return this.props.petOn !== undefined && this.props.petOn !== '' && this.props.petOn !== null ? !!this.props.petOn : this.state.petLocal; }
+  petToggle = () => { const on = !this.petOnDesk(); this.setState({ petLocal: on }); this.act(on ? 'pet:on:' + this.state.petColor : 'pet:off'); };
+  petFeed = () => { this.setState({ food: Math.min(100, this.state.food + 25), petHop: this.state.petHop + 1 }); this.act('pet:feed'); };
+  petTap = () => { this.setState({ petHop: this.state.petHop + 1 }); this.act('pet:pat'); };
+
+  renderVals() {
+    const st = this.state;
+    const pet = this.PETS[st.petColor];
+    const onDesk = this.petOnDesk();
+    const model = this.MODELS.find((m) => m.id === st.model);
+    const mode = this.MODES.find((m) => m.id === st.mode);
+    const pill = (on) => `height:28px;padding:0 11px;border-radius:9px;font-size:12px;font-weight:600;border:0;transition:background .2s,color .2s;background:${on ? 'rgba(255,255,255,.14)' : 'transparent'};color:${on ? '#ffffff' : '#a1a1a8'}`;
+    const modeCol = { default: '#8b8b93', auto: '#b48cff', plan: '#5fb3ff', bypass: '#ff7b7b' }[st.mode];
+
+    const lastAsk = (() => { for (let i = st.log.length - 1; i >= 0; i--) if (st.log[i].k === 'ask') return i; return -1; })();
+    const log = st.log.map((m, idx) => {
+      const base = { wel: m.k === 'wel', user: m.k === 'user', say: m.k === 'say', note: m.k === 'note', tool: m.k === 'tool', todo: m.k === 'todo', box: m.k === 'box', ask: m.k === 'ask', text: m.text || '', color: m.color || '#8b8b93' };
+      if (m.k === 'tool') {
+        const open = m.open !== undefined ? m.open : false;
+        const lines = (m.lines || []).map((t, i) => {
+          const sign = m.diff || m.name === 'Edit' || m.name === 'Write' ? t[0] : ' ';
+          const add = sign === '+', del = sign === '-';
+          return { t: (add || del) ? t.slice(1) : t, n: m.name === 'Bash' || m.name === 'Grep' ? '' : (add ? '+' : del ? '−' : ' '),
+            gut: `display:inline-block;width:${m.name === 'Bash' || m.name === 'Grep' ? 0 : 22}px;color:${add ? '#6fd39b' : del ? '#ff7b7b' : '#4a4a50'}`,
+            style: `padding:0 12px;background:${add ? 'rgba(111,211,155,.1)' : del ? 'rgba(255,123,123,.1)' : 'transparent'};color:${add ? '#c8f0d8' : del ? '#ffc9c9' : '#c9c9cf'}` };
+        });
+        return { ...base, name: m.name, arg: m.arg, sum: m.sum, lines, open, showLines: open && lines.length > 0,
+          dot: `font-size:10px;color:${m.rej ? '#ff7b7b' : m.running ? '#f2f2f4' : '#6fd39b'};${m.running ? 'animation:clBlink 1s ease-in-out infinite' : ''}`,
+          toggle: () => { const l2 = this.state.log.slice(); l2[idx] = { ...l2[idx], open: !open }; this.setState({ log: l2 }); } };
+      }
+      if (m.k === 'todo' || m.k === 'box') {
+        return { ...base, title: m.title || '', rows: (m.rows || []).map((r) => m.k === 'box' ? r : ({ icon: r.s === 2 ? '☒' : r.s === 1 ? '◼' : '☐', text: r.text,
+          style: `display:flex;gap:10px;padding-left:20px;font:500 12.5px/1.6 'JetBrains Mono',monospace;color:${r.s === 2 ? '#6f6f77' : r.s === 1 ? '#f2f2f4' : '#a1a1a8'};${r.s === 2 ? 'text-decoration:line-through;' : ''}${r.s === 1 ? 'font-weight:700;' : ''}` })) };
+      }
+      if (m.k === 'ask') {
+        const live = idx === lastAsk && st.waiting && !m.picked;
+        const labels = m.plan ? ['Да, выполнить и принимать правки сами', 'Да, но спрашивать перед каждой правкой', 'Нет, продолжить планировать']
+          : m.kind === 'Bash' ? ['Да', 'Да, и не спрашивать про эту команду', 'Нет, сказать иначе (esc)'] : ['Да', 'Да, и принимать правки в этой сессии', 'Нет, сказать иначе (esc)'];
+        return { ...base, title: m.title, cmd: m.cmd,
+          askBox: `display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;border:1px solid ${live ? (m.plan ? '#5fb3ff' : '#b48cff') : 'rgba(255,255,255,.08)'};background:${live ? 'rgba(180,140,255,.06)' : 'transparent'};transition:border-color .3s,background .3s`,
+          opts: labels.map((label, i) => ({ n: i + 1, label, off: !live,
+            pick: () => this.answer(i + 1),
+            style: `height:34px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;border:0;text-align:left;color:${m.picked === i + 1 ? '#111113' : live ? '#e8e8ec' : '#6f6f77'};background:${m.picked === i + 1 ? '#f2f2f4' : live && i === 0 ? 'rgba(255,255,255,.08)' : 'transparent'};pointer-events:${live ? 'auto' : 'none'}` })) };
+      }
+      return base;
+    });
+
+    const P = this.palItems();
+    const busyFor = Math.floor((Date.now() - st.spinAt) / 1000);
+    const used = st.ctx;
+    const pct = Math.min(99, Math.round(used / 2000));
+    const ring = (p, col) => `width:64px;height:64px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(${col} ${p * 3.6}deg,rgba(255,255,255,.08) 0)`;
+    const sw = (on) => ({ track: `width:38px;height:22px;flex:none;margin-left:auto;border-radius:11px;padding:2px;display:flex;border:0;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    const ch = Object.keys(st.changes).map((f) => ({ file: f, ...st.changes[f] }));
+    const todoS = (s) => s === 2 ? ['☒', '#6fd39b'] : s === 1 ? ['◼', '#f2f2f4'] : ['☐', '#6f6f77'];
+    const food = st.food;
+    const mood = st.busy ? 'смотрит, как Claude работает' : food < 25 ? 'проголодался' : food > 85 ? 'сытый и довольный' : onDesk ? 'гуляет по рабочему столу' : 'дремлет в приложении';
+
+    return {
+      proj: this.PROJ[st.proj],
+      modelName: model.name, modelMenu: st.modelMenu,
+      toggleModel: () => this.setState({ modelMenu: !st.modelMenu }),
+      models: this.MODELS.map((m) => ({ ...m, on: m.id === st.model,
+        pick: () => { this.setState({ model: m.id, modelMenu: false }); this.push({ k: 'note', text: `Модель: ${m.name}`, color: '#a1a1a8' }); },
+        style: `width:100%;padding:9px 10px;border-radius:11px;display:flex;align-items:center;gap:10px;border:0;color:#e8e8ec;text-align:left;background:${m.id === st.model ? 'rgba(255,255,255,.07)' : 'transparent'}`,
+        check: `margin-left:auto;font-weight:700;color:#f2f2f4;opacity:${m.id === st.model ? 1 : 0}` })),
+      modes: this.MODES.map((m) => ({ ...m, on: m.id === st.mode, pick: () => this.setState({ mode: m.id }), style: pill(m.id === st.mode) })),
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      newSession: () => this.slash('/clear'),
+      sessions: this.SESS.map((s, i) => ({ ...s, cur: i === st.sess ? 'page' : 'false',
+        pick: () => { if (i === st.sess) return; this.setState({ sess: i, log: [{ k: 'wel' }, { k: 'user', text: s.title }, { k: 'note', text: `Сессия восстановлена · ${s.when}`, color: '#a1a1a8' }], todos: [] }); },
+        style: `width:100%;padding:8px 10px;border-radius:11px;display:flex;flex-direction:column;gap:2px;border:0;color:#e8e8ec;background:${i === st.sess ? 'rgba(255,255,255,.08)' : 'transparent'}` })),
+      projects: this.PROJ.map((p, i) => ({ name: p.replace('~/Проекты/', ''), pick: () => { this.setState({ proj: i }); this.push({ k: 'note', text: `Рабочая папка: ${p}`, color: '#a1a1a8' }); },
+        style: `height:32px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:8px;font:500 12.5px 'JetBrains Mono',monospace;border:0;color:${i === st.proj ? '#f2f2f4' : '#a1a1a8'};background:${i === st.proj ? 'rgba(255,255,255,.06)' : 'transparent'}` })),
+      pet: { c1: pet[1], c2: pet[2] }, petName: pet[0], petMood: mood, petFood: food,
+      petFoodBar: `display:block;height:100%;width:${food}%;border-radius:3px;background:${food < 25 ? '#ff7b7b' : pet[1]};transition:width .5s,background .3s`,
+      petMini: `width:62px;height:62px;flex:none;border:0;background:none;padding:0;${st.petHop ? `animation:clHop .45s cubic-bezier(.3,1.4,.5,1)` : ''}`,
+      petColors: Object.keys(this.PETS).map((k) => ({ name: this.PETS[k][0], on: k === st.petColor,
+        pick: () => { this.setState({ petColor: k }); this.act('pet:color:' + k); },
+        style: `width:22px;height:22px;border-radius:50%;border:0;background:radial-gradient(circle at 35% 30%,${this.PETS[k][2]},${this.PETS[k][1]} 70%);box-shadow:0 0 0 2px #101012,0 0 0 ${k === st.petColor ? 4 : 2}px ${k === st.petColor ? '#f2f2f4' : 'rgba(255,255,255,.12)'};transition:box-shadow .2s` })),
+      petFeed: this.petFeed, petTap: this.petTap, petToggle: this.petToggle, petOnDesk: onDesk, petSw: sw(onDesk),
+      log,
+      spin: { glyph: this.SPIN[st.spinT % this.SPIN.length], verb: this.VERBS[(st.verb + Math.floor(st.spinT / 28)) % this.VERBS.length],
+        meta: `${busyFor} с · ↓ ${(st.tout / 1000).toFixed(1)}k токенов`,
+        row: `display:${st.busy && !st.waiting ? 'flex' : 'none'};align-items:center;gap:10px;padding:4px 32px 2px` },
+      pal: { show: P.items.length > 0, title: P.title, items: P.items.map((it, i) => ({ ...it, on: i === st.pal % P.items.length,
+        pick: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ draft: it.val, pal: 0 }); },
+        style: `width:100%;height:36px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:10px;border:0;background:${i === st.pal % P.items.length ? 'rgba(255,255,255,.09)' : 'transparent'}` })) },
+      draft: st.draft, onDraft: this.onDraft, onKey: this.onKey, send: () => this.submit(), stop: this.stop,
+      busy: st.busy, idle: !st.busy,
+      inPrefix: st.draft.startsWith('!') ? '!' : st.draft.startsWith('#') ? '#' : '>',
+      inGlyph: `font:700 15px 'JetBrains Mono',monospace;color:${st.draft.startsWith('!') ? '#ff9b6b' : st.draft.startsWith('#') ? '#5fb3ff' : '#8b8b93'};width:12px`,
+      inHint: st.waiting ? 'Ответьте 1, 2 или 3 — или нажмите кнопку выше' : st.busy ? 'Можно написать следующее сообщение…' : 'Попросите Claude что-нибудь сделать — например «ускорь анимацию капель»',
+      inBox: `height:52px;display:flex;align-items:center;gap:10px;padding:0 9px 0 16px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid ${st.draft.startsWith('!') ? 'rgba(255,155,107,.5)' : st.draft.startsWith('#') ? 'rgba(95,179,255,.5)' : st.mode === 'plan' ? 'rgba(95,179,255,.35)' : st.mode === 'auto' ? 'rgba(180,140,255,.35)' : 'rgba(255,255,255,.1)'};transition:border-color .25s`,
+      sendBtn: `width:34px;height:34px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;border:0;background:${st.draft.trim() ? '#f2f2f4' : 'rgba(255,255,255,.08)'};color:${st.draft.trim() ? '#111113' : '#6f6f77'}`,
+      modeHint: { text: mode.hint, style: `color:${modeCol}` },
+      ctxText: `контекст ${pct}% · $${st.cost.toFixed(3)}`,
+      tabs: [['todo', 'Задачи'], ['diff', 'Изменения'], ['ctx', 'Контекст'], ['mcp', 'MCP'], ['agents', 'Агенты']].map(([id, name]) => ({ name, on: st.tab === id, pick: () => this.setState({ tab: id }), style: pill(st.tab === id) })),
+      tab: { todo: st.tab === 'todo', diff: st.tab === 'diff', ctx: st.tab === 'ctx', mcp: st.tab === 'mcp', agents: st.tab === 'agents' },
+      todos: st.todos.map((t) => { const [icon, col] = todoS(t.s); return { icon, text: t.text, iconStyle: `color:${col};width:16px;flex:none`,
+        style: `display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:${t.s === 1 ? 'rgba(255,255,255,.07)' : 'rgba(255,255,255,.03)'};font-size:13px;color:${t.s === 2 ? '#6f6f77' : '#e8e8ec'};${t.s === 2 ? 'text-decoration:line-through;' : ''}transition:background .3s` }; }),
+      todoEmpty: st.todos.length === 0,
+      changes: ch, changesEmpty: ch.length === 0, changesAny: ch.length > 0, rewind: this.rewind,
+      ctx: { pct, used: `${(used / 1000).toFixed(1)}k`, left: Math.max(0, 80 - pct), ring: ring(pct, pct > 70 ? '#ff9b6b' : '#f2f2f4'),
+        parts: [['Системный промпт', '3.1k', '#8b8b93'], ['Инструменты', '11.2k', '#5fb3ff'], ['MCP', `${Object.values(st.mcp).filter(Boolean).length * 1.1}k`, '#b48cff'], ['CLAUDE.md', '0.9k', '#6fd39b'], ['Сообщения', `${Math.max(0, (used - 18400) / 1000).toFixed(1)}k`, '#f2f2f4']].map(([name, v, c]) => ({ name, v, sw: `width:9px;height:9px;border-radius:3px;background:${c}` })),
+        stats: [{ k: 'Стоимость', v: `$${st.cost.toFixed(4)}` }, { k: 'Токены ↑', v: String(st.tin) }, { k: 'Токены ↓', v: String(st.tout) }, { k: 'Модель', v: model.name }] },
+      compact: this.compact,
+      mcp: Object.keys(st.mcp).map((k) => ({ name: k, on: st.mcp[k], note: { filesystem: 'файлы проекта', github: 'issues и pull requests', playwright: 'управление браузером', 'arch-wiki': 'поиск по ArchWiki' }[k],
+        dot: `width:8px;height:8px;flex:none;border-radius:50%;background:${st.mcp[k] ? '#6fd39b' : '#4a4a50'};box-shadow:0 0 0 3px ${st.mcp[k] ? 'rgba(111,211,155,.18)' : 'transparent'}`,
+        toggle: () => this.setState({ mcp: { ...this.state.mcp, [k]: !this.state.mcp[k] } }), ...sw(st.mcp[k]) })),
+      agents: Object.keys(st.agents).map((k) => ({ name: k, state: st.agents[k], desc: { 'code-reviewer': 'Проверяет диффы: ошибки, стиль, тесты', explorer: 'Быстро ищет по коду и докладывает вывод', 'test-runner': 'Запускает тесты и разбирает падения' }[k],
+        badge: `margin-left:auto;padding:2px 8px;border-radius:7px;font-size:10.5px;font-weight:600;background:${st.agents[k] === 'работает' ? 'rgba(95,179,255,.18)' : 'rgba(255,255,255,.07)'};color:${st.agents[k] === 'работает' ? '#5fb3ff' : '#a1a1a8'}` })),
+      runAgent: () => { if (st.busy) return; this.setState({ agents: { ...st.agents, 'code-reviewer': 'работает' } }); this.slash('/review'); setTimeout(() => this.setState({ agents: { ...this.state.agents, 'code-reviewer': 'готов' } }), 2600); }
+    };
+  }
+}
+</script>
+</body>
+</html>
