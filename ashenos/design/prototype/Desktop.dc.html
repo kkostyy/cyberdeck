@@ -40,6 +40,24 @@ input[type=range]{width:100%;height:22px;margin:0;cursor:pointer}
 @keyframes dockB{0%{opacity:0;translate:0 120px}100%{opacity:1;translate:0 0}}
 @keyframes barA{0%{opacity:0;translate:0 -18px;filter:blur(6px)}100%{opacity:1;translate:0 0;filter:blur(0)}}
 @keyframes barB{0%{opacity:0;translate:0 -18px;filter:blur(6px)}100%{opacity:1;translate:0 0;filter:blur(0)}}
+@keyframes snA{from{opacity:0;translate:var(--ix,0px) var(--iy,0px);scale:var(--is,1)}to{opacity:1;translate:0 0;scale:1}}
+@keyframes snB{from{opacity:0;translate:var(--ix,0px) var(--iy,0px);scale:var(--is,1)}to{opacity:1;translate:0 0;scale:1}}
+@keyframes snFA{from{opacity:0}to{opacity:1}}
+@keyframes snFB{from{opacity:0}to{opacity:1}}
+@keyframes riseA{from{opacity:0;transform:translateY(8px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes riseB{from{opacity:0;transform:translateY(8px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes calSA{from{opacity:0;translate:calc(var(--cd)*20px) 0}to{opacity:1;translate:0 0}}
+@keyframes calSB{from{opacity:0;translate:calc(var(--cd)*20px) 0}to{opacity:1;translate:0 0}}
+@keyframes wxInA{from{opacity:0;translate:calc(var(--sd)*60px) 0}to{opacity:1;translate:0 0}}
+@keyframes wxInB{from{opacity:0;translate:calc(var(--sd)*60px) 0}to{opacity:1;translate:0 0}}
+@keyframes wxSpinA{from{rotate:calc(var(--sd)*-180deg);scale:.8}to{rotate:0deg;scale:1}}
+@keyframes wxSpinB{from{rotate:calc(var(--sd)*-180deg);scale:.8}to{rotate:0deg;scale:1}}
+@keyframes nCoreA{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+@keyframes nCoreB{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+@keyframes nPingA{0%{scale:.2;opacity:.9}100%{scale:1.1;opacity:0}}
+@keyframes nPingB{0%{scale:.2;opacity:.9}100%{scale:1.1;opacity:0}}
+@keyframes nBgA{from{opacity:0;scale:.96;filter:blur(6px)}to{opacity:1;scale:1;filter:blur(0)}}
+@keyframes nBgB{from{opacity:0;scale:.96;filter:blur(6px)}to{opacity:1;scale:1;filter:blur(0)}}
 @keyframes calA{from{opacity:0;transform:translateY(calc(var(--cd)*38%))}to{opacity:1;transform:none}}
 @keyframes calB{from{opacity:0;transform:translateY(calc(var(--cd)*38%))}to{opacity:1;transform:none}}
 @keyframes calHA{from{opacity:0;transform:translateX(calc(var(--cd)*38%))}to{opacity:1;transform:none}}
@@ -771,14 +789,16 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 
       <!-- music + EQ (as in the video) -->
       <div style="{{pane.music}}">
+        <div style="{{mi.main}}">
         <div style="display: flex; flex-direction: row-reverse; align-items: center; gap: 12px; padding: 12px 16px 6px">
-          <span aria-hidden="true" style="{{spikeBox}}">
+          <span style="{{mi.cover}}"><span aria-hidden="true" style="{{spikeBox}}">
             <sc-for list="{{spikes}}" as="k" hint-placeholder-count="48">
               <span style="{{k.o}}"><span style="{{k.i}}"></span></span>
             </sc-for>
             <span style="{{artOld}}"></span><span style="{{artFade}}"><span style="{{bigVinyl}}"></span></span><span style="{{busy}}"></span>
-          </span>
+          </span></span>
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+            <div style="{{mi.text}}">
             <div style="overflow: hidden; white-space: nowrap; mask-image: linear-gradient(90deg, rgba(0,0,0,0), #000 6%, #000 92%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,0), #000 6%, #000 92%, rgba(0,0,0,0))">
               <span style="{{marquee}}">{{trkT}} — {{trkA}} &nbsp;&nbsp;·&nbsp;&nbsp; {{trkT}} — {{trkA}} &nbsp;&nbsp;·&nbsp;&nbsp; </span>
             </div>
@@ -787,9 +807,12 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
               <span style="padding: 2px 8px; border-radius: 7px; background: rgba(255,255,255,0.07); font-size: 10.5px; font-family: 'JetBrains Mono', monospace">{{outName}}</span>
               <span style="padding: 2px 8px; border-radius: 7px; background: rgba(255,255,255,0.07); font-size: 10.5px; font-family: 'JetBrains Mono', monospace">через Музыку</span>
             </div>
+            </div>
+            <div style="{{mi.seek}}">
             <div style="{{seekBar}}"><div style="{{seekFill}}"></div></div>
             <div style="{{seekTimes}}"><span>{{trkAt}}</span><span>{{trkLen}}</span></div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: -4px">
+            </div>
+            <div style="{{mi.ctrl}}">
               <button aria-label="Предыдущий трек" onClick="{{trkPrev}}" style="width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.2v11.6a1 1 0 0 1-1.5.87L9 13.2V17a1 1 0 0 1-2 0V7a1 1 0 0 1 2 0v3.8l8.5-5.47A1 1 0 0 1 19 6.2z"></path></svg></button>
               <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #111113; background: {{accent}}; transition: background .6s">
                 <sc-if value="{{playing}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"></rect><rect x="14" y="5" width="4" height="14" rx="1.2"></rect></svg></sc-if>
@@ -799,8 +822,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
             </div>
           </div>
         </div>
-        <div style="margin: 4px 12px 0; padding: 12px 12px 10px; border-radius: 16px; background: rgba(255,255,255,0.05)">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px">
+        <div style="{{mi.sep}}">
+          <div style="{{mi.eqh}}">
             <span style="font-weight: 600; color: #e8e8ec; margin-right: auto">Эквалайзер</span>
             <span style="padding: 2px 8px; border-radius: 7px; background: rgba(255,255,255,0.07); font-size: 10.5px; color: #a1a1a8">Сохранено</span>
             <span style="color: {{accent}}; font-weight: 600">{{eqName}}</span>
@@ -814,17 +837,18 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
               <span style="{{eqSweep.blob}}"></span>
             </span>
             <sc-for list="{{bands}}" as="b" hint-placeholder-count="10">
-              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <div style="{{b.wrap}}">
                 <span role="meter" aria-label="{{b.label}}" aria-valuenow="{{b.v}}" aria-valuemin="-12" aria-valuemax="12" style="position: relative; display: block; width: 4px; height: 84px; border-radius: 4px; background: rgba(255,255,255,0.1)"><span style="{{b.fill}}"></span><span style="{{b.thumb}}"></span></span>
                 <span style="font-size: 9px; color: #8b8b93; font-family: 'JetBrains Mono', monospace">{{b.f}}</span>
               </div>
             </sc-for>
           </div>
-          <div role="radiogroup" aria-label="Пресеты эквалайзера" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 10px">
+          <div role="radiogroup" aria-label="Пресеты эквалайзера" style="{{mi.pre}}">
             <sc-for list="{{presets}}" as="p" hint-placeholder-count="8">
               <button role="radio" aria-checked="{{p.on}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.name}}</button>
             </sc-for>
           </div>
+        </div>
         </div>
       </div>
 
@@ -876,10 +900,10 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 
       <!-- network / bluetooth web (as in the video) -->
       <div style="{{pane.net}}">
-        <div style="position: relative; width: 400px; height: 290px">
+        <div style="{{web.bg}}">
           <svg aria-hidden="true" width="400" height="290" viewBox="0 0 400 290" style="position: absolute; left: 0; top: 0; overflow: visible">
-            <circle cx="200" cy="138" r="128" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"></circle>
-            <circle cx="200" cy="138" r="86" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.06)" stroke-width="1"></circle>
+            <circle cx="200" cy="138" r="128" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1" style="{{web.r1}}"></circle>
+            <circle cx="200" cy="138" r="86" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.06)" stroke-width="1" style="{{web.r0}}"></circle>
             <path d="{{web.p0}}" fill="none" stroke="{{web.stroke}}" stroke-width="1.5" stroke-linecap="round" style="{{web.d0}}"></path>
             <path d="{{web.p1}}" fill="none" stroke="{{web.stroke}}" stroke-width="1.5" stroke-linecap="round" style="{{web.d1}}"></path>
             <path d="{{web.p2}}" fill="none" stroke="{{web.stroke}}" stroke-width="1.5" stroke-linecap="round" style="{{web.d2}}"></path>
@@ -888,6 +912,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </svg>
           <span aria-hidden="true" style="{{web.ping}}"></span>
           <span aria-hidden="true" style="{{web.halo}}"></span>
+          <span aria-hidden="true" style="{{web.iping}}"></span>
           <div style="{{web.core}}">
             <sc-if value="{{tabWifi}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20 1.5 8.5a15 15 0 0 1 21 0z"></path></svg></sc-if>
             <sc-if value="{{tabBt}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"></path><rect x="3" y="14" width="5" height="7" rx="1.5" fill="currentColor"></rect><rect x="16" y="14" width="5" height="7" rx="1.5" fill="currentColor"></rect></svg></sc-if>
@@ -927,8 +952,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 
       <!-- calendar + orbit clock + weather (as in the video) -->
       <div style="{{pane.clock}}">
-        <div style="display: flex; gap: 12px; padding: 14px; height: 100%">
-          <div style="width: 214px; flex: none; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 6px">
+        <div style="{{ci.main}}">
+          <div style="{{ci.cal}}">
             <div style="display: flex; align-items: center">
               <button aria-label="Назад" onClick="{{calPrev}}" style="width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #a1a1a8"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 5-7 7 7 7"></path></svg></button>
               <button class="pday" aria-label="{{calHeadLabel}}" onClick="{{calHead}}" style="flex: 1; height: 24px; border-radius: 7px; text-align: center; font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #f2f2f4">{{calTitle}}</button>
@@ -962,7 +987,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
             </div>
           </div>
           <div style="position: relative; flex: 1; min-width: 0">
-            <svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 330 270" preserveAspectRatio="none" style="position: absolute; inset: 0">
+            <svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 330 270" preserveAspectRatio="none" style="{{ci.amb}}">
               <ellipse cx="165" cy="135" rx="148" ry="104" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1" stroke-dasharray="2 6"></ellipse>
             </svg>
             <sc-for list="{{orbit2}}" as="o" hint-placeholder-count="8">
@@ -974,18 +999,26 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
                 <span style="font-size: 10.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace">{{o.temp}}</span>
               </span>
             </sc-for>
-            <div style="position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none">
+            <div style="position: absolute; left: 50%; top: 50%; translate: -50% -50%; pointer-events: none">
+              <div style="{{ci.clock}}">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums">{{timeSec}}</span>
               <span style="font-size: 11px; color: #a1a1a8; font-family: 'JetBrains Mono', monospace">{{dateLong}}</span>
+              </div>
             </div>
           </div>
-          <div style="width: 186px; flex: none; display: flex; flex-direction: column">
+          <div style="{{ci.wx}}">
             <div style="display: flex; align-items: center">
               <button aria-label="Предыдущий день" onClick="{{dayPrev}}" style="width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #a1a1a8; background: rgba(255,255,255,0.05)"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m15 5-7 7 7 7"></path></svg></button>
               <span style="flex: 1; text-align: center; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase">{{wd.day}}</span>
               <button aria-label="Следующий день" onClick="{{dayNext}}" style="width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #a1a1a8; background: rgba(255,255,255,0.05)"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg></button>
             </div>
-            <span style="margin-top: 10px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: {{accent}}; transition: color .6s; animation: rise .3s ease both">{{wd.t}}</span>
+            <div style="{{ci.wxc}}">
+            <span style="{{ci.icon}}">
+              <sc-if value="{{wdIco.cloud}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="#c9c9cf"><path d="M7 19a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.9 9.6 4.75 4.75 0 0 1 17.25 19z"></path></svg></sc-if>
+              <sc-if value="{{wdIco.sun}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="4" fill="#f5c84b"></circle><path d="M8 20a4 4 0 0 1-.5-7.97A5 5 0 0 1 17 11.5 3.75 3.75 0 0 1 16.5 20z" fill="#c9c9cf"></path></svg></sc-if>
+              <sc-if value="{{wdIco.rain}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M7 15a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.9 5.6 4.75 4.75 0 0 1 17.25 15z" fill="#c9c9cf"></path><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3" stroke="#7fb8ff" stroke-width="2" stroke-linecap="round"></path></svg></sc-if>
+            </span>
+            <span style="margin-top: 10px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 34px; font-weight: 700; color: {{accent}}; transition: color .6s"><span id="wd-temp">{{wdTemp}}</span>°C</span>
             <span style="text-align: right; font-size: 12px; font-weight: 600">Таллин</span>
             <span style="text-align: right; font-size: 11px; color: #a1a1a8">{{wd.cond}}</span>
             <div style="margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
@@ -993,6 +1026,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
               <span style="padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; font-size: 11px"><span style="font-weight: 700; font-family: 'JetBrains Mono', monospace">{{wd.hum}}</span><span style="color: #8b8b93; font-size: 10px">влажность</span></span>
               <span style="padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; font-size: 11px"><span style="font-weight: 700; font-family: 'JetBrains Mono', monospace">{{wd.rain}}</span><span style="color: #8b8b93; font-size: 10px">осадки</span></span>
               <span style="padding: 6px 8px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; font-size: 11px"><span style="font-weight: 700; font-family: 'JetBrains Mono', monospace">{{wd.feels}}</span><span style="color: #8b8b93; font-size: 10px">ощущается</span></span>
+            </div>
             </div>
           </div>
         </div>
@@ -1174,8 +1208,29 @@ class Component extends DCLogic {
   /* Plasma calendar: MonthView (InfiniteList, 200 ms), Days/Months/Years swipe */
   calStep(d) {
     const s = this.state, v = s.calView || 'days';
+    if (s.calPhase === 'out') return;
     const k = v === 'days' ? 1 : v === 'months' ? 12 : 120;
-    this.setState({ calOff: s.calOff + d * k, selDay: null, calDir: d, calN: (s.calN || 0) + 1, calLast: 'step' });
+    this.setState({ calPhase: 'out', calDir: d, calLast: 'step' });
+    clearTimeout(this.calT);
+    this.calT = setTimeout(() => this.setState({ calPhase: 'in', calOff: this.state.calOff + d * k, selDay: null, calN: (this.state.calN || 0) + 1 }), 200);
+  }
+  /* serpantinum weather switch: out 250/300 ms (InSine, InBack spin), in 450–600 ms (OutQuart, OutBack 1.2) + temperature count-up 800 ms OutQuart */
+  wxStep(d) {
+    if (this.state.wxPhase === 'out') return;
+    this.setState({ wxPhase: 'out', wxDir: d });
+    clearTimeout(this.wxT);
+    this.wxT = setTimeout(() => this.setState({ wxPhase: 'in', dayIdx: this.state.dayIdx + d, wxN: (this.state.wxN || 0) + 1 }), 300);
+  }
+  twStart(from, to) {
+    const t0 = performance.now();
+    cancelAnimationFrame(this.twRaf);
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 800), e = 1 - Math.pow(1 - k, 4);
+      this._twShown = from + (to - from) * e;
+      const el = document.getElementById('wd-temp'); if (el) el.textContent = this._twShown.toFixed(1);
+      if (k < 1) this.twRaf = requestAnimationFrame(step);
+    };
+    this.twRaf = requestAnimationFrame(step);
   }
   calPrevH = () => this.calStep(-1);
   calNextH = () => this.calStep(1);
@@ -1368,6 +1423,30 @@ class Component extends DCLogic {
     };
 
 
+    /* ---------- serpantinum intro choreography (timings from shell/animations) ---------- */
+    const openKey = exp && st.grow ? cur : null;
+    if (openKey !== this._ok) { this._ok = openKey; if (openKey) this._on = (this._on || 0) + 1; }
+    const iN = this._on || 0;
+    const EZ = { quart: 'cubic-bezier(.25,1,.5,1)', quint: 'cubic-bezier(.22,1,.36,1)', sine: 'cubic-bezier(.61,1,.88,1)', expo: 'cubic-bezier(.16,1,.3,1)', cubic: 'cubic-bezier(.33,1,.68,1)', back: 'cubic-bezier(.34,1.56,.64,1)', back115: 'cubic-bezier(.34,1.42,.64,1)', back08: 'cubic-bezier(.34,1.3,.64,1)', back10: 'cubic-bezier(.34,1.38,.64,1)' };
+    const IN = (dur, delay, ease, ix = 0, iy = 0, sc = 1) => iN ? `--ix:${ix}px;--iy:${iy}px;--is:${sc};animation:${iN % 2 ? 'snA' : 'snB'} ${dur}ms ${EZ[ease]} ${delay}ms both;` : '';
+    const FADE = (dur, delay, ease) => iN ? `animation:${iN % 2 ? 'snFA' : 'snFB'} ${dur}ms ${EZ[ease]} ${delay}ms both;` : '';
+    const mi = {
+      main: IN(760, 0, 'quart', 0, 12, 0.92),
+      cover: 'display:block;flex:none;' + IN(810, 70, 'back10', -35, 9),
+      text: 'display:flex;flex-direction:column;gap:6px;' + IN(760, 150, 'quart', 25, 0),
+      seek: 'display:flex;flex-direction:column;gap:6px;' + IN(760, 190, 'quart', 25, 0),
+      ctrl: 'display:flex;align-items:center;justify-content:center;gap:6px;margin-top:-4px;' + IN(760, 230, 'back08', 18, 9),
+      sep: 'margin:4px 12px 0;padding:12px 12px 10px;border-radius:16px;background:rgba(255,255,255,.05);' + IN(660, 310, 'quart', 0, 12),
+      eqh: 'display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;' + IN(710, 370, 'quart', 0, 12),
+      pre: 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px;' + IN(810, 550, 'back08', 0, 18)
+    };
+    const ci = {
+      main: 'display:flex;gap:12px;padding:14px;height:100%;' + IN(800, 0, 'quart', 0, 0, 0.95),
+      cal: 'width:214px;flex:none;padding:12px;border-radius:16px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;gap:6px;' + IN(850, 350, 'quint', 0, 14),
+      amb: 'position:absolute;inset:0;' + FADE(1000, 150, 'sine'),
+      clock: 'display:flex;flex-direction:column;align-items:center;gap:4px;' + IN(900, 250, 'back115', 0, 25, 0.85),
+      wx: 'width:186px;flex:none;display:flex;flex-direction:column;' + IN(850, 400, 'quint', 16, 0)
+    };
     /* ---------- shelf (drag files onto the bar) ---------- */
     const PER = 4;
     const shelf = st.shelf;
@@ -1460,7 +1539,8 @@ class Component extends DCLogic {
       pick: () => this.calGo('months', (Y - nowY) * 12 + m - nowM, -1) }; });
     const calTitle = calView === 'days' ? monthName : calView === 'months' ? String(y) : `${dec} – ${dec + 9}`;
     const calAnim = st.calLast === 'view' ? `--cd:${st.calDir || 1};animation:${(st.calVN || 0) % 2 ? 'calHA' : 'calHB'} .2s cubic-bezier(.45,0,.55,1) both`
-      : st.calN ? `--cd:${st.calDir || 1};animation:${st.calN % 2 ? 'calA' : 'calB'} .2s cubic-bezier(.45,0,.55,1) both` : '';
+      : st.calPhase === 'out' ? `opacity:0;translate:${-20 * (st.calDir || 1)}px 0;transition:opacity .2s cubic-bezier(.12,0,.39,0),translate .2s cubic-bezier(.12,0,.39,0)`
+      : st.calN ? `--cd:${st.calDir || 1};animation:${st.calN % 2 ? 'calSA' : 'calSB'} .35s cubic-bezier(.25,1,.5,1) both` : 'opacity:1;translate:0 0';
     const agenda = (EV[key(sel)] || []).map((e) => ({ ...e, bar: `width:3px;height:14px;border-radius:2px;background:${accent}` }));
     const agendaDay = new Date(y, m, sel).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
     const zoneList = [{ city: 'Таллин', tz: 'Europe/Tallinn' }, { city: 'Москва', tz: 'Europe/Moscow' }, { city: 'Токио', tz: 'Asia/Tokyo' }, { city: 'Нью-Йорк', tz: 'America/New_York' }];
@@ -1489,7 +1569,7 @@ class Component extends DCLogic {
       classic: ['Классика', [4, 3, 2, 1, -1, -1, 0, 2, 3, 4]]
     };
     const freqs = ['31', '62', '125', '250', '500', '1k', '2k', '4k', '8k', '16k'];
-    const bands = P[st.eq][1].map((v, i) => ({ v, f: freqs[i], label: `${freqs[i]} Гц: ${v > 0 ? '+' : ''}${v} дБ`,
+    const bands = P[st.eq][1].map((v, i) => ({ v, f: freqs[i], wrap: 'display:flex;flex-direction:column;align-items:center;gap:6px;' + IN(860, 430, 'expo', 0, 25 + i * 7), label: `${freqs[i]} Гц: ${v > 0 ? '+' : ''}${v} дБ`,
       thumb: `position:absolute;left:50%;bottom:${Math.round(50 + v * 3.6)}%;width:14px;height:14px;margin:0 0 -7px -7px;border-radius:50%;background:#f2f2f4;box-shadow:0 2px 6px rgba(0,0,0,.5);transition:bottom .55s cubic-bezier(.2,1.5,.3,1) ${(0.12 + i * 0.065).toFixed(3)}s`,
       fill: `position:absolute;left:0;right:0;bottom:0;height:${Math.round(50 + v * 3.6)}%;border-radius:6px;background:${accent};transition:height .55s cubic-bezier(.2,1.5,.3,1) ${(0.12 + i * 0.065).toFixed(3)}s,background .6s ease` }));
     const presets = Object.keys(P).map((k) => ({ name: P[k][0], on: st.eq === k, pick: () => { if (this.state.eq !== k) this.setState({ eq: k, eqN: (this.state.eqN || 0) + 1 }); },
@@ -1941,9 +2021,14 @@ class Component extends DCLogic {
         const nN = st.netN || 0;
         P.forEach((pt, k) => {
           web['p' + k] = on ? path(pt, k) : '';
-          web['d' + k] = `stroke-dasharray:420;stroke-dashoffset:${shut ? 420 : 0};transition:stroke-dashoffset ${shut ? '.25s ease' : `.8s cubic-bezier(.3,.8,.3,1) ${(0.18 + k * 0.06).toFixed(2)}s`};transform-box:view-box;transform-origin:200px 138px;animation:wob${k % 3} ${(2.6 + k * 0.45).toFixed(2)}s ease-in-out ${(-k * 0.7).toFixed(1)}s infinite`;
+          web['d' + k] = `stroke-dasharray:420;stroke-dashoffset:${shut ? 420 : 0};transition:stroke-dashoffset ${shut ? '.085s ease' : `.405s cubic-bezier(.33,1,.68,1) ${(0.36 + k * 0.03).toFixed(2)}s`};transform-box:view-box;transform-origin:200px 138px;animation:wob${k % 3} ${(2.6 + k * 0.45).toFixed(2)}s ease-in-out ${(-k * 0.7).toFixed(1)}s infinite`;
         });
-        web.coreAnim = shut ? 'transform:scale(.86);opacity:.75;transition:transform .25s ease,opacity .25s' : `animation:${nN % 2 ? 'coreA' : 'coreB'} .7s cubic-bezier(.2,1.3,.3,1) both`;
+        const nk = iN + nN;
+        web.coreAnim = shut ? 'transform:scale(.86);opacity:.75;transition:transform .085s ease,opacity .085s' : `animation:${nk % 2 ? 'nCoreA' : 'nCoreB'} .2s cubic-bezier(.34,1.56,.64,1) .09s both`;
+        web.bg = 'position:relative;width:400px;height:290px;' + (shut ? 'opacity:0;transition:opacity .085s cubic-bezier(.5,1,.89,1)' : `animation:${nk % 2 ? 'nBgA' : 'nBgB'} .36s cubic-bezier(.33,1,.68,1) both`);
+        web.iping = shut ? 'display:none' : `position:absolute;left:${CX2 - 64}px;top:${CY2 - 64}px;width:128px;height:128px;border-radius:50%;border:2px solid ${accent};pointer-events:none;animation:${nk % 2 ? 'nPingA' : 'nPingB'} .26s cubic-bezier(.33,1,.68,1) .027s both`;
+        web.r0 = `transform-box:fill-box;transform-origin:center;transition:scale .144s cubic-bezier(.33,1,.68,1) ${shut ? '0s' : '.054s'},opacity .144s;scale:${shut ? .75 : 1};opacity:${shut ? 0 : 1}`;
+        web.r1 = `transform-box:fill-box;transform-origin:center;transition:scale .144s cubic-bezier(.33,1,.68,1) ${shut ? '0s' : '.099s'},opacity .144s;scale:${shut ? .75 : 1};opacity:${shut ? 0 : 1}`;
         web.core = web.core + ';' + web.coreAnim;
         web.halo = connected && !shut ? `position:absolute;left:${CX2 - R2}px;top:${CY2 - R2}px;width:${R2 * 2}px;height:${R2 * 2}px;border-radius:50%;background:${hexA(accent, .35)};animation:halo 2.4s ease-out infinite;pointer-events:none` : 'display:none';
         const sat = {};
@@ -1960,7 +2045,7 @@ class Component extends DCLogic {
         P.forEach(([x, y], k) => {
           sat['s' + k] = { label: labels[k],
             open: chipOpen(k), more: chipMore(k), wrap: chipWrap(k), inner: chipInner(k),
-            style: `position:absolute;left:${x}px;top:${y}px;z-index:${chipOpen(k) ? 5 : 1};translate:${shut ? `calc(-50% + ${CX2 - x}px) calc(${ay(k)} + ${CY2 - y}px)` : `-50% calc(${ay(k)})`};scale:${shut ? 0.3 : 1};opacity:${shut ? 0 : 1};min-height:30px;padding:0 11px;border-radius:10px;display:${on ? 'flex' : 'none'};flex-direction:${k === 3 ? 'column-reverse' : 'column'};align-items:flex-start;text-align:left;white-space:nowrap;font:600 11px 'JetBrains Mono',monospace;background:#141416;border:1px solid ${k === 0 ? hexA(accent, .5) : 'rgba(255,255,255,.1)'};color:${k === 0 ? accent : '#e8e8ec'};transition:${shut ? 'translate .25s cubic-bezier(.5,0,.75,0),scale .25s ease,opacity .2s ease' : `translate .75s cubic-bezier(.2,1.25,.3,1) ${(0.22 + k * 0.06).toFixed(2)}s,scale .75s cubic-bezier(.2,1.4,.3,1) ${(0.22 + k * 0.06).toFixed(2)}s,opacity .3s ease ${(0.22 + k * 0.06).toFixed(2)}s,box-shadow .05s cubic-bezier(.25,.46,.45,.94)`}`,
+            style: `position:absolute;left:${x}px;top:${y}px;z-index:${chipOpen(k) ? 5 : 1};translate:-50% calc(${ay(k)});scale:${shut ? 0 : 1};opacity:${shut ? 0 : 1};min-height:30px;padding:0 11px;border-radius:10px;display:${on ? 'flex' : 'none'};flex-direction:${k === 3 ? 'column-reverse' : 'column'};align-items:flex-start;text-align:left;white-space:nowrap;font:600 11px 'JetBrains Mono',monospace;background:#141416;border:1px solid ${k === 0 ? hexA(accent, .5) : 'rgba(255,255,255,.1)'};color:${k === 0 ? accent : '#e8e8ec'};transition:${shut ? 'scale .085s ease,opacity .085s ease' : `scale .6s cubic-bezier(.34,1.56,.64,1) ${40 + k * 30}ms,opacity .4s cubic-bezier(.22,1,.36,1) ${40 + k * 30}ms,box-shadow .05s cubic-bezier(.25,.46,.45,.94)`}`,
             act: k === 0 ? () => this.setState({ scanAt: Date.now() })
               : (!isW && k === 1) ? () => this.setState({ btLinks: { ...this.state.btLinks, 'Наушники': !this.state.btLinks['Наушники'] } })
               : () => { const id = `${st.netTab}:${k}`; this.setState({ chipOpen: this.state.chipOpen === id ? null : id }); } };
@@ -1972,17 +2057,26 @@ class Component extends DCLogic {
           const a = (-90 + i * 45) * Math.PI / 180;
           const x = 50 + (148 / 330) * 100 * Math.cos(a), yy = 50 + (104 / 270) * 100 * Math.sin(a);
           return { t, temp, sun: k === 'sun', cloud: k === 'cloud', moon: k === 'moon',
-            style: `position:absolute;left:${x.toFixed(1)}%;top:${yy.toFixed(1)}%;translate:-50% -50%;width:46px;padding:4px 0;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:1px;background:${i === 0 ? hexA(accent, .2) : '#141416'};border:1px solid ${i === 0 ? hexA(accent, .5) : 'rgba(255,255,255,.08)'};animation:rise .35s ease ${(0.15 + i * 0.04).toFixed(2)}s both` };
+            style: `position:absolute;left:${x.toFixed(1)}%;top:${yy.toFixed(1)}%;translate:-50% -50%;width:46px;padding:4px 0;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:1px;background:${i === 0 ? hexA(accent, .2) : '#141416'};border:1px solid ${i === 0 ? hexA(accent, .5) : 'rgba(255,255,255,.08)'};animation:${iN % 2 ? 'riseA' : 'riseB'} .9s cubic-bezier(.22,1,.36,1) ${(0.4 + i * 0.05).toFixed(2)}s both` };
         });
         const WD = [
-          { day: 'Сегодня', t: '15.0°C', cond: 'облачно', wind: '4 м/с', hum: '71%', rain: '10%', feels: '13°' },
-          { day: 'Завтра', t: '14.2°C', cond: 'переменная облачность', wind: '6 м/с', hum: '64%', rain: '20%', feels: '12°' },
-          { day: 'Среда', t: '12.6°C', cond: 'дождь', wind: '8 м/с', hum: '88%', rain: '70%', feels: '10°' },
-          { day: 'Четверг', t: '13.1°C', cond: 'облачно', wind: '5 м/с', hum: '75%', rain: '30%', feels: '11°' }
+          { day: 'Сегодня', t: '15.0', cond: 'облачно', wind: '4 м/с', hum: '71%', rain: '10%', feels: '13°' },
+          { day: 'Завтра', t: '14.2', cond: 'переменная облачность', wind: '6 м/с', hum: '64%', rain: '20%', feels: '12°' },
+          { day: 'Среда', t: '12.6', cond: 'дождь', wind: '8 м/с', hum: '88%', rain: '70%', feels: '10°' },
+          { day: 'Четверг', t: '13.1', cond: 'облачно', wind: '5 м/с', hum: '75%', rain: '30%', feels: '11°' }
         ];
         const wdI = ((st.dayIdx % WD.length) + WD.length) % WD.length;
-        return { spikes, web, sat, cal2, orbit2, wd: WD[wdI],
-          dayPrev: () => this.setState({ dayIdx: this.state.dayIdx - 1 }), dayNext: () => this.setState({ dayIdx: this.state.dayIdx + 1 }),
+        const wdNow = WD[wdI];
+        const tNum = parseFloat(wdNow.t);
+        if (typeof this._twShown !== 'number') this._twShown = tNum;
+        if ((st.wxN || 0) !== (this._twN || 0)) { this._twN = st.wxN || 0; const from = this._twShown; setTimeout(() => this.twStart(from, tNum), 0); }
+        const sd = st.wxDir || 1, wxN = st.wxN || 0;
+        ci.wxc = 'display:flex;flex-direction:column;flex:1;' + (st.wxPhase === 'out' ? `opacity:0;translate:${-60 * sd}px 0;transition:opacity .25s cubic-bezier(.12,0,.39,0),translate .25s cubic-bezier(.12,0,.39,0)` : wxN ? `--sd:${sd};animation:${wxN % 2 ? 'wxInA' : 'wxInB'} .45s cubic-bezier(.25,1,.5,1) both` : '');
+        ci.icon = 'align-self:flex-end;margin-top:8px;height:34px;display:block;' + (st.wxPhase === 'out' ? `rotate:${180 * sd}deg;scale:.8;transition:rotate .3s cubic-bezier(.36,0,.66,-.56),scale .3s cubic-bezier(.32,0,.67,0)` : wxN ? `--sd:${sd};animation:${wxN % 2 ? 'wxSpinA' : 'wxSpinB'} .6s cubic-bezier(.34,1.6,.64,1) both` : '');
+        return { spikes, web, sat, cal2, orbit2, wd: wdNow, ci, mi,
+          wdTemp: this._twShown.toFixed(1),
+          wdIco: { cloud: /^облачно/.test(wdNow.cond), sun: /перемен/.test(wdNow.cond), rain: /дожд/.test(wdNow.cond) },
+          dayPrev: () => this.wxStep(-1), dayNext: () => this.wxStep(1),
           powerBtn: `position:absolute;right:14px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${on ? accent : 'rgba(255,255,255,.08)'};color:${on ? '#111113' : '#a1a1a8'};transition:background .3s` };
       })(),
       netList, netEmpty: netList.length === 0,
