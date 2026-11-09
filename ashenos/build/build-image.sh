@@ -37,13 +37,26 @@ mount "${LOOP}p1" "$MNT/boot"
 
 echo "==> Распаковываю корневую систему"
 bsdtar -xpf "$OUT/$TARBALL" -C "$MNT"
-sed -i 's/mmcblk0/mmcblk1/g' "$MNT/etc/fstab" || true
+# по меткам, а не по mmcblk0/mmcblk1: имя карты зависит от ядра (linux-rpi — mmcblk0)
+cat > "$MNT/etc/fstab" <<'FSTAB'
+# AshenOS
+LABEL=ashenos     /      ext4  defaults,noatime  0 1
+LABEL=ASHEN_BOOT  /boot  vfat  defaults          0 2
+FSTAB
 
 echo "==> Накладываю файлы AshenOS"
 cp -a "$ROOT_OVERLAY/." "$MNT/"
 cat "$MNT/boot/config-ashenos.txt" >> "$MNT/boot/config.txt"
 rm "$MNT/boot/config-ashenos.txt"
 install -Dm755 "$HERE/ashenos-info" "$MNT/usr/local/bin/ashenos-info"
+
+echo "==> Ставлю приложение Claude (claude-desk)"
+APP="$HERE/../apps/claude-desk"
+for home in "$MNT/etc/skel" "$MNT/home/alarm"; do
+  mkdir -p "$home/.local/share/claude-desk" "$home/.local/state/claude-desk" "$home/claude"
+  tar -C "$APP" --exclude=./install.sh --exclude=./README.md -cf - . | tar -C "$home/.local/share/claude-desk" -xf -
+  cp "$ROOT_OVERLAY/etc/skel/.local/state/claude-desk/prefs.json" "$home/.local/state/claude-desk/"
+done
 
 echo "==> Ставлю пакеты (через qemu, это долго)"
 PKGS="$(grep -v '^\s*#' "$HERE/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')"
@@ -52,6 +65,7 @@ pacman-key --init
 pacman-key --populate archlinuxarm
 pacman -Syu --noconfirm --needed $PKGS
 systemctl enable sddm NetworkManager bluetooth sshd
+chown -R alarm:alarm /home/alarm
 echo 'alarm ALL=(ALL) ALL' > /etc/sudoers.d/alarm
 ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
 sed -i 's/^#\(ru_RU.UTF-8\)/\1/; s/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Claude (терминал)
+Comment=Claude Code в Konsole
+Exec=claude-console --terminal
+Icon=claude-desk
+Terminal=false
+Categories=Development;Utility;

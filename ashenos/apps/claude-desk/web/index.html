@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude · cyberdeck</title>
+<style>
+  :root {
+    --bg: #130d07; --card: #261e18; --cardHi: #312822; --border: #3c332c;
+    --text: #efe0d5; --sub: #d5c3b6; --dim: #9e8e82; --accent: #feb877;
+    --accentDeep: #6b3b03; --error: #ffb4ab; --ok: #c2cb98;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 15px/1.55 "Iosevka Nerd Font", "Iosevka", ui-monospace, "Cascadia Code", Consolas, monospace; }
+  body { display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+    border-bottom: 1px solid var(--border); background: #19120c; }
+  header .star { color: var(--accent); font-size: 22px; }
+  header .star.busy { animation: spin 2.4s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  header h1 { margin: 0; font-size: 17px; }
+  header .chip { background: var(--card); border-radius: 14px; padding: 3px 12px; color: var(--sub); font-size: 13px; }
+  header .status { margin-left: auto; color: var(--dim); font-size: 13px; }
+  #feed { flex: 1; overflow-y: auto; padding: 18px 0; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+  .row { margin: 10px 0; }
+  .user { display: flex; justify-content: flex-end; }
+  .user .bubble { background: var(--accentDeep); border: 1px solid rgba(254,184,119,.35);
+    border-radius: 14px; padding: 8px 14px; max-width: 80%; white-space: pre-wrap; word-wrap: break-word; }
+  .assistant { display: flex; gap: 10px; }
+  .assistant .mark { color: var(--accent); flex: none; }
+  .assistant .body { flex: 1; min-width: 0; word-wrap: break-word; }
+  .assistant .body p { margin: 0 0 8px; }
+  .assistant .body ul, .assistant .body ol { margin: 4px 0 8px; padding-left: 22px; }
+  .assistant .body h1, .assistant .body h2, .assistant .body h3 { font-size: 16px; margin: 12px 0 6px; color: var(--accent); }
+  .assistant .body a { color: var(--accent); }
+  code { background: var(--card); border-radius: 5px; padding: 1px 5px; color: var(--sub); }
+  pre { position: relative; background: #19120c; border: 1px solid var(--border); border-radius: 10px;
+    padding: 28px 12px 10px; overflow-x: auto; margin: 6px 0 10px; }
+  pre code { background: none; padding: 0; color: var(--sub); }
+  pre .lang { position: absolute; top: 6px; left: 12px; font-size: 11px; color: var(--accent); font-weight: bold; }
+  pre .copy { position: absolute; top: 4px; right: 8px; font: inherit; font-size: 11px; color: var(--dim);
+    background: none; border: 0; cursor: pointer; }
+  pre .copy:hover { color: var(--accent); }
+  table { border-collapse: collapse; margin: 6px 0 10px; }
+  td, th { border: 1px solid var(--border); padding: 4px 10px; }
+  .tool { margin-left: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 6px 12px; display: flex; gap: 10px; align-items: center; font-size: 13px; }
+  .tool .name { font-weight: bold; }
+  .tool .sum { color: var(--sub); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tool .st.ok { color: var(--ok); } .tool .st.error { color: var(--error); } .tool .st.running { color: var(--accent); }
+  .thinking { color: var(--dim); margin: 10px 0 10px 22px; }
+  .cursor { color: var(--accent); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .perm { margin: 12px 0; border: 1.5px solid rgba(254,184,119,.6); background: var(--card); border-radius: 14px; padding: 12px 14px; }
+  .perm .t { font-weight: bold; margin-bottom: 6px; }
+  .perm pre { margin: 6px 0 10px; padding: 8px 10px; white-space: pre-wrap; }
+  .perm .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .perm button { font: inherit; border-radius: 16px; border: 0; padding: 6px 14px; cursor: pointer; background: var(--cardHi); color: var(--text); }
+  .perm button.yes { background: var(--accent); color: var(--bg); font-weight: bold; }
+  .perm button.no { color: var(--error); border: 1px solid rgba(255,180,171,.45); }
+  .acts { margin: 6px 0 4px 22px; display: flex; gap: 8px; }
+  .acts button { font: inherit; font-size: 13px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--sub); padding: 4px 12px; cursor: pointer; }
+  .acts button:hover { color: var(--accent); }
+  .queued { margin: 6px 0 6px 22px; color: var(--dim); font-size: 13px; }
+  header .ctx { color: var(--dim); font-size: 13px; }
+  footer { border-top: 1px solid var(--border); padding: 12px 20px; background: #19120c; }
+  footer .wrap { display: flex; gap: 10px; align-items: flex-end; }
+  textarea { flex: 1; resize: none; background: var(--card); color: var(--text); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 10px 14px; font: inherit; min-height: 46px; max-height: 200px; outline: none; }
+  textarea:focus { border-color: rgba(254,184,119,.7); }
+  button.main { height: 46px; min-width: 46px; border-radius: 23px; border: 0; background: var(--accent); color: var(--bg);
+    font: inherit; font-weight: bold; padding: 0 18px; cursor: pointer; }
+  button.main.stop { background: var(--cardHi); color: var(--accent); }
+  .hint { color: var(--dim); font-size: 12px; margin-top: 6px; }
+  .offline { color: var(--error); }
+</style>
+</head>
+<body>
+<header>
+  <span class="star" id="star">✻</span>
+  <h1>Claude</h1>
+  <span class="chip" id="dir">…</span>
+  <span class="ctx" id="ctx"></span>
+  <span class="status" id="status">подключение…</span>
+</header>
+<div id="feed"><div class="wrap" id="rows"></div></div>
+<footer>
+  <div class="wrap">
+    <textarea id="input" rows="1" placeholder="Напиши Claude…  (Enter — отправить, Shift+Enter — новая строка)"></textarea>
+    <button class="main" id="send">Отправить</button>
+  </div>
+  <div class="wrap hint" id="hint">Сообщения уходят в claude-desk на Pi. Пока Claude работает — встают в очередь.</div>
+</footer>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// Small, safe markdown: everything is escaped first, then a few patterns are re-enabled.
+function inline(s) {
+  return s
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function md(text) {
+  const out = [];
+  const parts = text.split(/```/);
+  parts.forEach((part, i) => {
+    if (i % 2 === 1) {
+      const nl = part.indexOf("\n");
+      const lang = nl >= 0 ? part.slice(0, nl).trim() : "";
+      const code = (nl >= 0 ? part.slice(nl + 1) : part).replace(/\n$/, "");
+      out.push('<pre><span class="lang">' + esc(lang || "код") + '</span><button class="copy">копировать</button><code>' + esc(code) + "</code></pre>");
+      return;
+    }
+    const lines = esc(part).split("\n");
+    let list = null, para = [], table = [];
+    const flushPara = () => { if (para.length) { out.push("<p>" + inline(para.join("<br>")) + "</p>"); para = []; } };
+    const flushList = () => { if (list) { out.push("<" + list.tag + ">" + list.items.map((x) => "<li>" + inline(x) + "</li>").join("") + "</" + list.tag + ">"); list = null; } };
+    const flushTable = () => {
+      if (!table.length) return;
+      const cells = (r) => r.replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const body = table.filter((r) => !/^\|?[\s:-]+\|[\s|:-]*$/.test(r));
+      out.push("<table>" + body.map((r, k) => "<tr>" + cells(r).map((c) => (k ? "<td>" : "<th>") + inline(c) + (k ? "</td>" : "</th>")).join("") + "</tr>").join("") + "</table>");
+      table = [];
+    };
+    for (const line of lines) {
+      let m;
+      if (/^\s*\|.*\|\s*$/.test(line)) { flushPara(); flushList(); table.push(line.trim()); continue; }
+      flushTable();
+      if ((m = line.match(/^(#{1,3})\s+(.*)/))) { flushPara(); flushList(); out.push("<h3>" + inline(m[2]) + "</h3>"); }
+      else if ((m = line.match(/^\s*[-*]\s+(.*)/))) { flushPara(); if (!list || list.tag !== "ul") { flushList(); list = { tag: "ul", items: [] }; } list.items.push(m[1]); }
+      else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { flushPara(); if (!list || list.tag !== "ol") { flushList(); list = { tag: "ol", items: [] }; } list.items.push(m[1]); }
+      else if (line.trim() === "") { flushPara(); flushList(); }
+      else { flushList(); para.push(line); }
+    }
+    flushTable(); flushPara(); flushList();
+  });
+  return out.join("");
+}
+
+let lastKey = "", busy = false;
+// while Claude works: empty box → the button stops it, typed text → it queues
+function updateButton() {
+  const stop = busy && !$("input").value.trim();
+  $("send").textContent = stop ? "Стоп" : busy ? "В очередь" : "Отправить";
+  $("send").classList.toggle("stop", stop);
+}
+function render(data) {
+  busy = data.busy;
+  $("star").classList.toggle("busy", busy);
+  $("status").textContent = busy ? "Claude работает…" : "готов";
+  $("status").classList.remove("offline");
+  $("dir").textContent = (data.dir || "").replace(/^\/home\/[^/]+/, "~");
+  updateButton();
+  $("ctx").textContent = data.context >= 0 ? "контекст " + Math.round(data.context * 100) + "%" : "";
+  const key = JSON.stringify([data.rows, data.streaming, data.permission, data.queue]) + busy;
+  if (key === lastKey) return;
+  lastKey = key;
+  const feed = $("feed");
+  const atBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 80;
+  $("rows").innerHTML = data.rows.map((r) => {
+    if (r.kind === "user") return '<div class="row user"><div class="bubble">' + esc(r.text) + "</div></div>";
+    if (r.kind === "assistant") return '<div class="row assistant"><span class="mark">✻</span><div class="body">' + md(r.text) + "</div></div>";
+    const icon = r.status === "ok" ? "✓" : r.status === "error" ? "✕" : "…";
+    return '<div class="row tool"><span class="name">' + esc(r.tool) + '</span><span class="sum">' + esc(r.summary || "") + '</span><span class="st ' + r.status + '">' + icon + "</span></div>";
+  }).join("")
+    + (data.streaming ? '<div class="row assistant"><span class="mark">✻</span><div class="body">' + md(data.streaming) + '<span class="cursor">▍</span></div></div>' : "")
+    + (busy && !data.streaming && !data.permission ? '<div class="thinking">✻ думаю…</div>' : "")
+    + (data.permission ? permCard(data.permission) : "")
+    + (data.queue || []).map((q) => '<div class="queued">⏳ в очереди: ' + esc(q) + "</div>").join("")
+    + (!busy && data.rows.length && data.rows[data.rows.length - 1].kind === "assistant"
+        ? '<div class="acts"><button data-a="retry">↻ Заново</button><button data-a="continue">▶ Продолжи</button></div>' : "");
+  if (atBottom) feed.scrollTop = feed.scrollHeight;
+}
+
+function permCard(p) {
+  return '<div class="perm"><div class="t">🔐 Claude хочет использовать ' + esc(p.tool) + "</div>"
+    + (p.summary && p.summary !== p.detail ? "<div>" + esc(p.summary) + "</div>" : "")
+    + (p.detail ? "<pre><code>" + esc(p.detail) + "</code></pre>" : "")
+    + '<div class="btns"><button class="yes" data-d="allow">Разрешить</button>'
+    + (p.canAlways ? '<button data-d="always">Всегда</button>' : "")
+    + '<button data-d="auto">Режим авто</button><button class="no" data-d="deny">Отклонить</button></div></div>';
+}
+
+async function poll() {
+  try {
+    const r = await fetch("/api/chat", { cache: "no-store" });
+    render(await r.json());
+  } catch (e) {
+    $("status").textContent = "нет связи с Pi";
+    $("status").classList.add("offline");
+  }
+  setTimeout(poll, 1500);
+}
+
+async function post(path, body) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+  return r.json().catch(() => ({ ok: false }));
+}
+
+async function submit() {
+  const text = $("input").value.trim();
+  if (!text) { if (busy) await post("/api/stop"); return; }
+  const res = await post("/api/send", { text });
+  if (res.ok) { $("input").value = ""; autosize(); }
+  else $("hint").textContent = "Не удалось отправить — claude-desk на Pi запущен?";
+}
+
+function autosize() { const t = $("input"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 200) + "px"; }
+$("input").addEventListener("input", () => { autosize(); updateButton(); });
+$("input").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } });
+$("send").addEventListener("click", submit);
+$("rows").addEventListener("click", async (e) => {
+  const d = e.target.dataset && e.target.dataset.d;
+  if (d) { e.target.parentElement.querySelectorAll("button").forEach((b) => (b.disabled = true)); await post("/api/answer", { decision: d }); return; }
+  const act = e.target.dataset && e.target.dataset.a;
+  if (act) { e.target.disabled = true; await post("/api/" + act); return; }
+  if (!e.target.classList.contains("copy")) return;
+  navigator.clipboard.writeText(e.target.parentElement.querySelector("code").textContent);
+  e.target.textContent = "скопировано"; setTimeout(() => (e.target.textContent = "копировать"), 1500);
+});
+poll();
+</script>
+</body>
+</html>
