@@ -1,0 +1,31 @@
+{
+  "textScale": 0.9,
+  "showTools": true,
+  "showCost": true,
+  "notify": true,
+  "sound": false,
+  "enterSends": true,
+  "appendPrompt": "",
+  "autoContinue": false,
+  "quickPrompts": true,
+  "replyActions": true,
+  "recentTabs": true,
+  "confirmNewChat": false,
+  "defaultDir": "",
+  "ntfyTopic": "",
+  "templates": [
+    {
+      "name": "Коммит",
+      "text": "Сделай коммит с понятным сообщением и запушь на GitHub"
+    },
+    {
+      "name": "Объясни",
+      "text": "Объясни простыми словами, что делает этот код и зачем"
+    },
+    {
+      "name": "Проверь",
+      "text": "Проверь, что всё работает, и исправь ошибки, если найдёшь"
+    }
+  ],
+  "tasks": []
+}

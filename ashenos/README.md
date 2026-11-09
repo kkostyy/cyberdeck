@@ -18,6 +18,7 @@
 | Экран | оверлей `vc4-kms-dsi-waveshare-800x480`, автоопределение выключено |
 | Сеть | NetworkManager, Bluetooth (bluez), SSH, WayVNC |
 | Терминал | Konsole + `claude` (Claude Code) из npm, приложение-оболочка «Claude» с питомцем |
+| Claude | приложение [claude-desk](apps/claude-desk): Claude Code в окне, скиллы, агенты, история |
 
 ## Скриншоты концепта оболочки
 
@@ -41,11 +42,14 @@ ashenos/
 │   ├── build-image.sh   сборка .img для SD-карты
 │   ├── packages.txt     список пакетов
 │   └── ashenos-info     команда: версия, ядро, температура
+├── apps/claude-desk/     приложение Claude (Quickshell) + install.sh
+├── shell/animations/    попапы календаря, Wi-Fi, Bluetooth и музыки для будущей оболочки
 ├── airootfs/            файлы, которые накладываются на систему
 │   ├── etc/os-release, hostname, motd, issue
 │   ├── etc/sddm.conf.d/ashenos.conf
 │   ├── etc/xdg/kdeglobals, kwinrc
 │   ├── usr/share/color-schemes/AshenOS.colors
+│   ├── usr/local/bin/claude-console   кнопка/команда запуска Claude
 │   └── boot/config-ashenos.txt   дописывается в /boot/config.txt
 └── design/              скриншоты и исходники прототипа
 ```
@@ -62,8 +66,8 @@ sudo dd if=out/ashenos-rpi4-*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
 Скрипт скачивает Arch Linux ARM для Pi 4, размечает образ (boot 512 МБ + root ext4),
-накладывает `airootfs`, ставит пакеты через qemu-chroot и включает `sddm`, `NetworkManager`,
-`bluetooth`, `sshd`. Пользователь по умолчанию — `alarm` / `alarm` (смените пароль после первого входа).
+накладывает `airootfs`, ставит пакеты и приложение Claude через qemu-chroot и включает `sddm`,
+`NetworkManager`, `bluetooth`, `sshd`. Разделы монтируются по меткам (`ASHEN_BOOT`, `ashenos`). Пользователь по умолчанию — `alarm` / `alarm` (смените пароль после первого входа).
 
 ## Установка поверх уже работающего Arch Linux ARM
 
@@ -73,6 +77,7 @@ sudo pacman -Syu --needed $(grep -v '^\s*#' build/packages.txt | grep -v '^\s*$'
 sudo cp -r airootfs/etc airootfs/usr /
 sudo sh -c 'cat airootfs/boot/config-ashenos.txt >> /boot/config.txt'
 sudo install -Dm755 build/ashenos-info /usr/local/bin/ashenos-info
+apps/claude-desk/install.sh          # приложение Claude для текущего пользователя
 sudo systemctl enable --now sddm NetworkManager bluetooth
 ```
 
@@ -83,5 +88,6 @@ sudo systemctl enable --now sddm NetworkManager bluetooth
 - [x] Концепт оболочки: рамка, Dynamic Island, капли-панели, виджеты, док, экран блокировки
 - [x] Цветовая схема, конфиги SDDM/KWin, оверлей экрана
 - [x] Скрипт сборки образа
-- [ ] Перенос оболочки из прототипа в Quickshell/QML
+- [x] Приложение Claude (claude-desk) в образе
+- [ ] Перенос оболочки из прототипа в Quickshell/QML (заготовки анимаций — в `shell/animations`)
 - [ ] Свой экран входа SDDM в стиле прототипа

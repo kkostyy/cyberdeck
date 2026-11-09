@@ -48,3 +48,13 @@ noto-fonts-emoji
 nodejs
 npm
 ripgrep
+
+# приложение Claude (claude-desk, apps/claude-desk)
+quickshell
+python
+ttf-iosevka-nerd
+wl-clipboard
+libnotify
+libcanberra
+curl
+jq

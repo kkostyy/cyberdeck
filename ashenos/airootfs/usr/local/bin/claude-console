@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Кнопка Claude: открывает приложение Claude (claude-desk). На sway, если окно уже есть,
+# прячет/показывает его. С --terminal открывает Claude Code в терминале.
+# Рабочая папка для терминала: первый аргумент или ~/claude
+APP="$HOME/.local/share/claude-desk/shell.qml"
+MARK=claude
+
+if [ "$1" = "--terminal" ] || [ ! -f "$APP" ]; then
+  [ "$1" = "--terminal" ] && shift
+  DIR="${1:-$HOME/claude}"
+  [ -d "$DIR" ] || DIR="$HOME"
+  CMD='claude; echo; echo "Claude завершился. Enter — закрыть."; read'
+  if command -v konsole >/dev/null; then
+    exec konsole --workdir "$DIR" -p tabtitle=Claude -e bash -lc "$CMD"
+  elif command -v kitty >/dev/null; then
+    exec kitty --directory "$DIR" --title Claude bash -lc "$CMD"
+  fi
+  exit 1
+fi
+
+# sway: hide/show/focus the existing window via its mark
+if [ -n "$SWAYSOCK" ] && command -v jq >/dev/null; then
+  state=$(swaymsg -t get_tree | jq -r --arg m "$MARK" '
+    .. | objects | select(.type=="workspace") | .name as $ws
+    | .. | objects | select((.marks // []) | index($m))
+    | "\($ws) \(.focused)"' | head -n1)
+  if [ -n "$state" ]; then
+    read -r ws focused <<<"$state"
+    if [ "$ws" = "__i3_scratch" ]; then
+      swaymsg "[con_mark=$MARK] scratchpad show, floating disable, focus" >/dev/null
+    elif [ "$focused" = "true" ]; then
+      swaymsg "[con_mark=$MARK] move scratchpad" >/dev/null
+    else
+      swaymsg "[con_mark=$MARK] focus" >/dev/null
+    fi
+    exit 0
+  fi
+  quickshell -p "$APP" >/dev/null 2>&1 &
+  pid=$!
+  for _ in $(seq 80); do
+    swaymsg "[pid=$pid] mark --add $MARK" >/dev/null 2>&1 && break
+    sleep 0.1
+  done
+  wait $pid
+  exit 0
+fi
+
+# KWin and others: one window only; a second press does nothing while it's open
+pgrep -u "$USER" -f "quickshell -p $APP" >/dev/null && exit 0
+exec quickshell -p "$APP" >/dev/null 2>&1
