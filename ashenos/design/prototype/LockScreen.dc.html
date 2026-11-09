@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Экран блокировки</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;600;700&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #e8e8ec;outline-offset:2px}
+input::placeholder{color:#8b8b93}
+a{color:#c9c9cf}a:hover{color:#ffffff}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes lShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@keyframes lmq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes lblink{50%{opacity:0}}
+@keyframes lwIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes lwx{from{transform:translateX(0)}to{transform:translateX(-1440px)}}
+@keyframes lwy{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1)}}
+@keyframes ltA{from{opacity:.2;filter:blur(8px);transform:translateY(-10px) scale(.98)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes ltB{from{opacity:.2;filter:blur(8px);transform:translateY(-10px) scale(.98)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes lbreath{0%,100%{opacity:.45}50%{opacity:.9}}
+@keyframes lscan{0%,100%{top:22px}50%{top:86px}}
+@keyframes lpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 5px rgba(255,255,255,.12)}}
+.lpw:hover{filter:brightness(1.15)}
+</style>
+</helmet>
+
+<div onMouseMove="{{px}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #050506; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
+
+  <!-- ===== SCREEN (wallpaper inside the black frame) ===== -->
+  <div style="position: absolute; left: 8px; right: 8px; top: 40px; bottom: 8px; border-radius: 20px; overflow: hidden">
+    <div aria-hidden="true" style="{{wallStyle}}"></div>
+    <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) 1.2px) 0 0/3px 3px"></div>
+    <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 45%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%)"></div>
+
+
+
+
+    <!-- big clock -->
+    <div style="{{clockWrap}}">
+      <span style="font-size: 20px; font-weight: 500; color: rgba(255,255,255,0.82)">{{date}}</span>
+      <span role="timer" aria-label="{{time}}" style="{{timeAnim}};font-size: 168px; font-weight: 600; line-height: 1; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; color: rgba(246,246,248,0.95); text-shadow: 0 10px 50px rgba(0,0,0,0.35)">{{time}}</span>
+    </div>
+
+    <!-- login -->
+    <div role="group" aria-label="Вход" style="{{loginWrap}}">
+      <sc-if value="{{m.notFace}}" hint-placeholder-val="{{true}}">
+      <div aria-hidden="true" style="width: 96px; height: 96px; border-radius: 50%; padding: 3px; background: linear-gradient(140deg, rgba(255,255,255,0.75), rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.4)); box-shadow: 0 16px 40px rgba(0,0,0,0.45)">
+        <div style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 700; color: #fff; background: repeating-linear-gradient(118deg, rgba(255,255,255,0.07) 0 3px, rgba(0,0,0,0.07) 3px 7px), linear-gradient(118deg, #1c1d2b 0%, #c2412f 18%, #2a3150 34%, #4f7fb8 50%, #7a8fb0 72%, #b5473a 86%, #2b2e45 100%); text-shadow: 0 2px 8px rgba(0,0,0,0.4)">U</div>
+      </div>
+      </sc-if>
+      <sc-if value="{{m.face}}" hint-placeholder-val="{{false}}">
+        <button type="button" aria-label="Распознавание лица: {{face.label}}" onClick="{{faceRetry}}" style="{{face.box}}">
+          <span aria-hidden="true" style="{{face.ring}}"></span>
+          <svg aria-hidden="true" width="58" height="58" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="{{face.icon}}">
+            <path d="M6 15V10a4 4 0 0 1 4-4h5M33 6h5a4 4 0 0 1 4 4v5M42 33v5a4 4 0 0 1-4 4h-5M15 42h-5a4 4 0 0 1-4-4v-5"></path>
+            <sc-if value="{{face.ok}}" hint-placeholder-val="{{false}}"><path d="m15 25 6 6 12-13" stroke-width="3"></path></sc-if>
+            <sc-if value="{{face.scanning}}" hint-placeholder-val="{{true}}"><path d="M17 18v3M31 18v3M24 19v8l-2 1M18 32c3.5 3 8.5 3 12 0"></path></sc-if>
+          </svg>
+          <span aria-hidden="true" style="{{face.line}}"></span>
+        </button>
+      </sc-if>
+      <span style="font-size: 20px; font-weight: 600; margin-top: 2px">user</span>
+
+      <sc-if value="{{m.pw}}" hint-placeholder-val="{{true}}">
+      <div style="{{fieldStyle}}">
+          <label for="lock-pw" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Пароль</label>
+          <input onKeyDown="{{pwKey}}" id="lock-pw" type="{{pwType}}" value="{{pw}}" onChange="{{onPw}}" placeholder="Пароль" autocomplete="current-password" style="flex: 1; min-width: 0; height: 100%; padding: 0 16px; border: 0; outline: none; background: transparent; color: #f6f6f8; font: 500 15px Inter, sans-serif; letter-spacing: 0.02em">
+          <button type="button" aria-label="{{eyeLabel}}" aria-pressed="{{show}}" onClick="{{toggleShow}}" style="width: 40px; height: 40px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #a1a1a8">
+            <sc-if value="{{show}}" hint-placeholder-val="{{false}}">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c5 0 9 4.5 10 6-.4.7-1.4 2-2.9 3.3M6.6 6.6C4.4 8 2.8 10.4 2 12c1 1.5 5 6 10 6 1.7 0 3.2-.5 4.5-1.2"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+            </sc-if>
+            <sc-if value="{{hidden}}" hint-placeholder-val="{{true}}">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c1-1.5 5-6 10-6s9 4.5 10 6c-1 1.5-5 6-10 6S3 13.5 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </sc-if>
+          </button>
+          <button type="button" onClick="{{submit}}" aria-label="Разблокировать" style="{{goBtn}}">
+            <sc-if value="{{busy}}" hint-placeholder-val="{{false}}">
+              <span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(17,17,19,0.25); border-top-color: #111113; animation: spin 0.8s linear infinite"></span>
+            </sc-if>
+            <sc-if value="{{idle}}" hint-placeholder-val="{{true}}">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg>
+            </sc-if>
+          </button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{m.pin}}" hint-placeholder-val="{{false}}">
+        <div role="group" aria-label="PIN-код" style="{{pinWrap}}">
+          <div aria-label="Введено цифр: {{pinLen}} из 4" style="display: flex; gap: 14px; height: 18px; align-items: center">
+            <sc-for list="{{pinDots}}" as="d" hint-placeholder-count="4"><span style="{{d}}"></span></sc-for>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px">
+            <sc-for list="{{pinKeys}}" as="k" hint-placeholder-count="12">
+              <button type="button" aria-label="{{k.label}}" onClick="{{k.tap}}" style="{{k.style}}">{{k.text}}<span style="font-size: 8.5px; font-weight: 600; letter-spacing: 0.12em; opacity: 0.55">{{k.sub}}</span></button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+        <span role="status" style="{{msgStyle}}">{{msg}}</span>
+
+      <div role="radiogroup" aria-label="Способ входа" style="display: flex; gap: 4px; padding: 4px; border-radius: 22px; background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1)">
+        <sc-for list="{{methods}}" as="o" hint-placeholder-count="3">
+          <button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}"><span aria-hidden="true" style="font-size: 14px">{{o.glyph}}</span>{{o.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- power -->
+    <div style="position: absolute; right: 22px; bottom: 22px; display: flex; gap: 8px; z-index: 5">
+      <sc-for list="{{power}}" as="p" hint-placeholder-count="3">
+        <button aria-label="{{p.name}}" title="{{p.name}}" onClick="{{p.run}}" style="{{p.tile}}">{{p.glyph}}</button>
+      </sc-for>
+    </div>
+
+    <!-- wave -->
+    <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 80px; pointer-events: none; overflow: hidden">
+      <svg width="100%" height="100%" viewBox="0 0 1440 90" preserveAspectRatio="none" style="display: block">
+        <g style="{{wv.s3}}"><g style="{{wv.g3}}"><path d="{{wv.p3}}" fill="{{wv.c3}}"></path></g></g>
+        <g style="{{wv.s2}}"><g style="{{wv.g2}}"><path d="{{wv.p2}}" fill="{{wv.c2}}"></path></g></g>
+        <g style="{{wv.s1}}"><g style="{{wv.g1}}"><path d="{{wv.p1}}" fill="{{wv.c1}}"></path></g></g>
+      </svg>
+    </div>
+  </div>
+
+
+  <!-- ===== BLACK FRAME: top line ===== -->
+  <div style="position: absolute; left: 22px; top: 0; height: 40px; display: flex; align-items: center; gap: 12px">
+    <span style="display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 9px; background: rgba(255,255,255,0.07); font-size: 12.5px; color: #c9c9cf">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
+      Экран блокировки
+    </span>
+    <span style="font: 500 12.5px 'JetBrains Mono', monospace; color: #8b8b93">user@ashenos</span>
+  </div>
+  <div aria-label="Состояние" style="position: absolute; left: 720px; top: 4px; translate: -50% 0; z-index: 30; height: 32px; padding: 0 14px; border-radius: 16px; background: #000; border: 1px solid #1f1f23; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #f2f2f4; animation: lpulse 3s ease-in-out infinite">
+    <span aria-hidden="true" style="{{islandDot}}"></span>
+    {{islandText}}
+  </div>
+  <div style="position: absolute; right: 22px; top: 0; height: 40px; display: flex; align-items: center; gap: 12px; color: #e8e8ec">
+    <span aria-hidden="true" style="display: flex; align-items: center; gap: 7px">
+      <svg width="22" height="22" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="#2f2f34" stroke-width="3"></circle><circle cx="16" cy="16" r="13" fill="none" stroke="#e8e8ec" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{ring.cpu}}" transform="rotate(-90 16 16)" style="transition: stroke-dasharray .6s ease"></circle><rect x="11" y="11" width="10" height="10" rx="2" fill="none" stroke="#e8e8ec" stroke-width="2"></rect></svg>
+      <svg width="22" height="22" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="#2f2f34" stroke-width="3"></circle><circle cx="16" cy="16" r="13" fill="none" stroke="#4fd18b" stroke-width="3" stroke-linecap="round" stroke-dasharray="{{ring.ram}}" transform="rotate(-90 16 16)" style="transition: stroke-dasharray .6s ease"></circle><rect x="10" y="12" width="12" height="8" rx="1.6" fill="none" stroke="#e8e8ec" stroke-width="2"></rect></svg>
+      <svg width="22" height="22" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="#2f2f34" stroke-width="3"></circle><circle cx="16" cy="16" r="13" fill="none" stroke="#f2d03b" stroke-width="3" stroke-linecap="round" stroke-dasharray="67 81.7" transform="rotate(-90 16 16)"></circle><path d="M17.2 9.5 11.5 17h4.3l-1 5.5 5.7-7.5h-4.3z" fill="#f2d03b"></path></svg>
+    </span>
+    <button aria-label="Раскладка клавиатуры: {{lang}}" onClick="{{toggleLang}}" style="height: 26px; padding: 0 8px; border-radius: 7px; font: 700 11.5px 'JetBrains Mono', monospace; background: rgba(255,255,255,0.08)">{{lang}}</button>
+    <svg role="img" aria-label="Wi-Fi подключён" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"></path><path d="M12 19.5h.01" stroke-width="3"></path></svg>
+    <span style="font-size: 12.5px; font-weight: 600">82%</span>
+    <span style="font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums">{{time}}</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"wall":{"editor":"enum","options":["Апельсин","Лава","Шёлк","Радуга","Волны"],"default":"Волны"},"onUnlock":{"editor":null},"curWall":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+const WALLS = [
+      { name: 'Апельсин', accent: '#ff9a4d', css: 'radial-gradient(70% 60% at 88% 78%,#ef7d2c 0%,rgba(239,125,44,0) 70%),radial-gradient(60% 60% at 10% 25%,#9c3218 0%,rgba(156,50,24,0) 70%),linear-gradient(160deg,#6e2412 0%,#b84a1c 40%,#d9661f 72%,#b4481a 100%)' },
+      { name: 'Лава', accent: '#ff8f8a', css: 'radial-gradient(55% 50% at 82% 88%,#e3381f 0%,rgba(227,56,31,0) 65%),radial-gradient(45% 45% at 70% 60%,rgba(240,74,42,.7) 0%,rgba(240,74,42,0) 60%),radial-gradient(45% 55% at 12% 20%,#3f6f78 0%,rgba(63,111,120,0) 72%),radial-gradient(60% 50% at 40% 0%,#2b4e57 0%,rgba(0,0,0,0) 70%),linear-gradient(160deg,#16252a,#0b0d0f)' },
+      { name: 'Шёлк', accent: '#9cc0ee', css: 'repeating-linear-gradient(118deg,rgba(255,255,255,.035) 0 4px,rgba(0,0,0,.05) 4px 10px),linear-gradient(118deg,#121320 0%,#8a2f24 14%,#1c2238 28%,#3e6596 42%,#9fb0c8 52%,#4f6283 62%,#8a3a30 74%,#1c1f30 86%,#5d6c88 100%)' },
+      { name: 'Радуга', accent: '#e2b0ef', css: 'radial-gradient(55% 45% at 8% 4%,#3b6cf5 0%,rgba(59,108,245,0) 65%),radial-gradient(45% 40% at 26% 28%,#f4e04d 0%,rgba(244,224,77,0) 62%),radial-gradient(60% 50% at 28% 55%,#ff8a3d 0%,rgba(255,138,61,0) 66%),radial-gradient(50% 45% at 78% 22%,#8fd6ff 0%,rgba(143,214,255,0) 62%),radial-gradient(50% 45% at 82% 55%,#d9a3e8 0%,rgba(217,163,232,0) 62%),linear-gradient(180deg,#f0c9b8 0%,#cfcfd3 85%)' },
+      { name: 'Волны', accent: '#ededf0', css: 'radial-gradient(130% 90% at 105% 118%,rgba(0,0,0,0) 57%,rgba(255,255,255,.17) 58.2%,rgba(255,255,255,.04) 62%,rgba(0,0,0,0) 66%),radial-gradient(110% 80% at -12% -22%,rgba(0,0,0,0) 54%,rgba(255,255,255,.13) 55.2%,rgba(255,255,255,.03) 59%,rgba(0,0,0,0) 63%),linear-gradient(155deg,#2a2a2e 0%,#141416 60%,#1e1e21 100%)' }
+    ];
+
+class Component extends DCLogic {
+  state = { now: new Date(), pw: '', show: false, err: '', busy: false, ok: false, playing: true, shake: 0, pos: 102,
+    cpu: 12, ram: 41, silent: false, cleared: false, lang: 'RU', open: false, method: 'pw', pin: '', face: 'idle' };
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.setState((s) => ({ now: new Date(), pos: s.playing ? (s.pos + 1) % 238 : s.pos })), 1000);
+    this.sys = setInterval(() => {
+      const j = (v, d, lo, hi) => Math.min(hi, Math.max(lo, v + (Math.random() * 2 - 1) * d));
+      this.setState((s) => ({ cpu: Math.round(j(s.cpu, 5, 3, 48)), ram: Math.round(j(s.ram, 2, 30, 60)) }));
+    }, 2000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.sys); clearTimeout(this.t2); clearTimeout(this.fT); clearTimeout(this.pT); }
+  startFace() { clearTimeout(this.fT); this.setState({ face: 'scan', err: '', ok: false }); this.fT = setTimeout(() => { this.setState({ face: 'ok', ok: true }); this.fT = setTimeout(() => { if (this.props.onUnlock) this.props.onUnlock(); }, 650); }, 2200); }
+
+  renderVals() {
+    const st = this.state;
+    const names = WALLS.map((w) => w.name);
+    const wi = typeof this.props.curWall === 'number' ? this.props.curWall : Math.max(0, names.indexOf(this.props.wall ?? 'Волны'));
+    const wall = WALLS[wi] || WALLS[4];
+    const accent = wall.accent;
+    const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+    const pad = (n) => String(n).padStart(2, '0');
+    const now = st.now;
+    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const dl = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+
+    let msg = ' ', msgColor = '#a1a1a8';
+    if (st.err) { msg = st.err; msgColor = '#ffb4a8'; }
+    else if (st.busy) msg = st.method === 'pin' ? 'Проверка PIN-кода…' : 'Проверка пароля…';
+    else if (st.method === 'face' && !st.ok) msg = st.face === 'scan' ? 'Смотрите в камеру…' : 'Нажмите на значок, чтобы начать';
+    else if (st.method === 'pin' && !st.ok) msg = 'Введите PIN-код';
+    else if (st.ok) { msg = 'С возвращением, user'; msgColor = '#b6e3c8'; }
+
+    const glass = 'border-radius:24px;background:rgba(20,20,23,.74);backdrop-filter:blur(34px) saturate(140%);-webkit-backdrop-filter:blur(34px) saturate(140%);border:1px solid rgba(255,255,255,.11);box-shadow:0 24px 50px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)';
+    const card = (x, y, ww, hh, d) => `position:absolute;left:${x}px;top:${y}px;width:${ww}px;height:${hh}px;padding:12px;display:flex;flex-direction:column;gap:10px;${glass};animation:lwIn .6s cubic-bezier(.2,1.2,.3,1) ${d}s both`;
+    const led = (dur) => `display:inline-block;white-space:nowrap;padding-left:8px;font:24px/24px 'Press Start 2P',monospace;color:#ededf0;-webkit-mask-image:radial-gradient(circle,#000 1.15px,rgba(0,0,0,0) 1.45px);-webkit-mask-size:3px 3px;mask-image:radial-gradient(circle,#000 1.15px,rgba(0,0,0,0) 1.45px);mask-size:3px 3px;animation:lmq ${dur}s linear infinite`;
+
+    const hourly = [{ t: '15°', h: '21' }, { t: '14°', h: '00' }, { t: '13°', h: '03' }, { t: '12°', h: '06' }, { t: '13°', h: '09' }, { t: '15°', h: '12' }]
+      .map((x) => ({ ...x, bar: `display:block;width:100%;max-width:18px;height:${(parseInt(x.t, 10) - 6) * 3.4}px;border-radius:6px;background:rgba(17,17,19,.78)` }));
+    const tempC = Math.round(40 + st.cpu * 0.3);
+    const meters = [
+      { name: 'ЦП', v: st.cpu, label: `${st.cpu}%` },
+      { name: 'ОЗУ', v: st.ram, label: `${st.ram}%` },
+      { name: 'Темп.', v: Math.round((tempC - 20) / 80 * 100), label: `${tempC}°` }
+    ].map((m) => ({ ...m, fill: `position:absolute;left:0;right:0;bottom:0;height:${m.v}%;border-radius:12px;background:${accent};transition:height .8s cubic-bezier(.3,1.2,.4,1),background .6s` }));
+
+    const notesAll = [
+      { glyph: '⟳', title: 'Обновления', time: 'сейчас', text: 'Доступно 14 пакетов · pacman -Syu' },
+      { glyph: '●', title: 'Запись экрана', time: '1 мин', text: 'Сохранено в ~/Видео' },
+      { glyph: 'Л', title: 'Лена', time: '12 мин', text: 'Ок, увидимся в восемь' }
+    ];
+    const notes = (st.cleared ? [] : notesAll).map((n, i) => ({ ...n,
+      style: `display:flex;gap:11px;padding:11px 12px;border-radius:16px;${i === 0 ? `background:${accent};color:#111113` : 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05)'};animation:lwIn .5s ease ${(0.3 + i * 0.08).toFixed(2)}s both`,
+      icon: `width:34px;height:34px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:${i === 0 ? 'rgba(17,17,19,.14)' : 'rgba(255,255,255,.08)'}` }));
+
+    const sinePath = (amp, len, phase) => { let d = 'M 0 90 L 0 ' + (60 - amp * Math.sin(phase)).toFixed(1); for (let x = 20; x <= 2880; x += 20) d += ' L ' + x + ' ' + (60 - amp * Math.sin((x / len) * Math.PI * 2 + phase)).toFixed(1); return d + ' L 2880 90 Z'; };
+    const ps = `animation-play-state:${st.playing ? 'running' : 'paused'}`;
+    const wv = {
+      p1: sinePath(18, 360, 0), p2: sinePath(24, 480, 1.3), p3: sinePath(30, 720, 2.4),
+      c1: hexA(accent, .34), c2: hexA(accent, .2), c3: hexA(accent, .12),
+      g1: `animation:lwx 7s linear infinite;${ps}`, g2: `animation:lwx 11s linear infinite reverse;${ps}`, g3: `animation:lwx 16s linear infinite;${ps}`,
+      s1: `transform-box:view-box;transform-origin:0 90px;animation:lwy 2.6s ease-in-out infinite;${ps}`,
+      s2: `transform-box:view-box;transform-origin:0 90px;animation:lwy 3.4s ease-in-out -.8s infinite;${ps}`,
+      s3: `transform-box:view-box;transform-origin:0 90px;animation:lwy 4.2s ease-in-out -1.6s infinite;${ps}`
+    };
+    const power = [
+      { name: 'Сон', glyph: '☾' }, { name: 'Перезагрузка', glyph: '⟳' }, { name: 'Выключение', glyph: '⏻' }, { name: 'Сменить', glyph: '⇆' }
+    ].slice(0, 3).map((p) => ({ ...p, run: () => {}, tile: 'width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#e8e8ec;background:rgba(255,255,255,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12)' }));
+
+    /* liquid drop under the island */
+    const SB = 60, CW = 400, DW = CW + SB * 2, DH = st.open ? 232 : 0;
+    const f = (n) => n.toFixed(1);
+    const liquid = (w, h) => { const c = Math.min(SB, w / 2), k = Math.min(h, 58), R = Math.min(24, Math.max(0, h - k)), a1 = c * 0.62, a2 = c, b2 = k * 0.38;
+      return `M 0 0 C ${f(a1)} 0 ${f(a2)} ${f(b2)} ${f(c)} ${f(k)} L ${f(c)} ${f(h - R)} Q ${f(c)} ${f(h)} ${f(c + R)} ${f(h)} L ${f(w - c - R)} ${f(h)} Q ${f(w - c)} ${f(h)} ${f(w - c)} ${f(h - R)} L ${f(w - c)} ${f(k)} C ${f(w - a2)} ${f(b2)} ${f(w - a1)} 0 ${f(w)} 0 Z`; };
+    const eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
+    const drop = {
+      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:25;width:${DW}px;height:${DH}px;pointer-events:${st.open ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.5));transition:height ${st.open ? `.75s ${eS}` : `.42s ${eI}`}`,
+      body: `position:absolute;left:0;top:0;width:${DW}px;height:${DH + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquid(DW, DH + 2)}');transition:${st.open ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
+      inner: `position:absolute;left:${SB}px;top:0;width:${CW}px;padding:14px 4px 12px;display:flex;flex-direction:column;gap:12px;opacity:${st.open ? 1 : 0};filter:blur(${st.open ? 0 : 6}px);transform:translateY(${st.open ? 0 : -24}px);transition:opacity ${st.open ? '.45s ease .24s' : '.14s'},filter ${st.open ? '.5s ease .2s' : '.14s'},transform ${st.open ? `.9s ${eS} .08s` : '.3s ease'}`
+    };
+    const focusPw = () => setTimeout(() => { const i = document.getElementById('lock-pw'); if (i) i.focus(); }, 380);
+    return {
+      px: (e) => { const el = e.currentTarget; const b = el.getBoundingClientRect(); if (this.pxR) return; this.pxR = requestAnimationFrame(() => { this.pxR = null; el.style.setProperty('--mx', ((e.clientX - b.left) / b.width - 0.5).toFixed(3)); el.style.setProperty('--my', ((e.clientY - b.top) / b.height - 0.5).toFixed(3)); }); },
+      m: { pw: st.method === 'pw', pin: st.method === 'pin', face: st.method === 'face', notFace: st.method !== 'face' },
+      methods: [['pw', 'Пароль', '•••'], ['pin', 'PIN-код', '#'], ['face', 'Лицо', '◉']].map(([id, name, glyph]) => ({ name, glyph, on: st.method === id,
+        pick: () => { if (this.state.method === id) return; clearTimeout(this.fT); this.setState({ method: id, err: '', pin: '', face: 'idle', ok: false }); if (id === 'face') setTimeout(() => this.startFace(), 350); if (id === 'pw') setTimeout(() => { const i = document.getElementById('lock-pw'); if (i) i.focus(); }, 80); },
+        style: `height:32px;padding:0 13px;border-radius:16px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;background:${st.method === id ? accent : 'transparent'};color:${st.method === id ? '#111113' : '#d6d6dc'};transition:background .3s,color .3s` })),
+      pinLen: String(st.pin.length),
+      pinWrap: `display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:6px;${st.shake % 2 && st.method === 'pin' ? 'animation:lShake .4s ease' : 'animation:lwIn .45s cubic-bezier(.2,1.2,.3,1) both'}`,
+      pinDots: [0, 1, 2, 3].map((i) => `width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:${i < st.pin.length ? '#f2f2f4' : 'transparent'};transform:scale(${i === st.pin.length - 1 ? 1.25 : 1});transition:background .2s,transform .25s cubic-bezier(.3,1.8,.5,1)`),
+      pinKeys: [['1', ''], ['2', 'ABC'], ['3', 'DEF'], ['4', 'GHI'], ['5', 'JKL'], ['6', 'MNO'], ['7', 'PQRS'], ['8', 'TUV'], ['9', 'WXYZ'], ['', ''], ['0', '+'], ['⌫', '']].map(([t, sub]) => ({
+        text: t, sub, label: t === '⌫' ? 'Стереть' : t ? `Цифра ${t}` : 'Пусто',
+        tap: () => {
+          if (!t) return;
+          const p0 = this.state.pin;
+          if (t === '⌫') { this.setState({ pin: p0.slice(0, -1), err: '' }); return; }
+          if (p0.length >= 4 || this.state.busy) return;
+          const p1 = p0 + t;
+          this.setState({ pin: p1, err: '' });
+          if (p1.length === 4) { clearTimeout(this.pT); this.pT = setTimeout(() => { this.setState({ busy: true }); this.t2 = setTimeout(() => { this.setState({ busy: false, ok: true }); if (this.props.onUnlock) this.props.onUnlock(); }, 700); }, 200); }
+        },
+        style: t ? 'width:66px;height:66px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;font-weight:500;line-height:1;color:#f2f2f4;background:rgba(255,255,255,.1);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);transition:background .15s,transform .2s cubic-bezier(.3,1.8,.5,1)' : 'visibility:hidden;width:66px;height:66px'
+      })),
+      face: (() => {
+        const f = st.face;
+        return {
+          ok: f === 'ok', scanning: f !== 'ok', label: f === 'ok' ? 'лицо распознано' : f === 'scan' ? 'идёт сканирование' : 'нажмите, чтобы начать',
+          box: `position:relative;width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;color:${f === 'ok' ? '#4fd18b' : '#f2f2f4'};background:rgba(255,255,255,.08);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.14);transition:color .3s;animation:lwIn .45s cubic-bezier(.2,1.2,.3,1) both`,
+          ring: `position:absolute;inset:4px;border-radius:50%;border:3px solid ${f === 'ok' ? '#4fd18b' : 'transparent'};border-top-color:${f === 'ok' ? '#4fd18b' : accent};${f === 'scan' ? 'animation:spin 1.1s linear infinite;' : ''}transition:border-color .3s`,
+          icon: `position:relative;transform:scale(${f === 'ok' ? 1.08 : 1});transition:transform .4s cubic-bezier(.3,1.8,.5,1)`,
+          line: f === 'scan' ? `position:absolute;left:18px;right:18px;height:2px;border-radius:1px;background:${accent};box-shadow:0 0 12px ${accent};animation:lscan 1.4s ease-in-out infinite` : 'display:none'
+        };
+      })(),
+      faceRetry: () => { if (this.state.face !== 'scan' && this.state.face !== 'ok') this.startFace(); },
+      drop, open: st.open,
+      openDrop: () => { if (!this.state.open) { this.setState({ open: true }); focusPw(); } },
+      toggleDrop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); const o = !this.state.open; this.setState({ open: o, err: '' }); if (o) focusPw(); },
+      clockWrap: `position:absolute;left:0;right:0;top:${st.method === 'pin' ? 18 : 92}px;display:flex;flex-direction:column;align-items:center;gap:4px;scale:${st.method === 'pin' ? 0.6 : 1};transform-origin:50% 0;transition:top .6s cubic-bezier(.3,1.2,.4,1),scale .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) both`,
+      loginWrap: `position:absolute;left:50%;top:${st.method === 'pin' ? 196 : 400}px;width:320px;margin-left:-160px;display:flex;flex-direction:column;align-items:center;gap:12px;transition:top .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) .15s both`,
+      hintStyle: `margin-top:18px;font-size:14px;font-weight:500;color:rgba(255,255,255,.7);opacity:${st.open ? 0 : 1};transition:opacity .3s;${st.open ? '' : 'animation:lbreath 2.8s ease-in-out infinite'}`,
+      timeAnim: `display:inline-block;animation:${now.getMinutes() % 2 ? 'ltA' : 'ltB'} .7s cubic-bezier(.2,1,.3,1) both`,
+      date: (() => { const d = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }); return d.charAt(0).toUpperCase() + d.slice(1); })(),
+      wallStyle: `position:absolute;inset:-24px;background:${wall.css};filter:blur(2px) brightness(.82);transform:translate(calc(var(--mx, 0) * -22px), calc(var(--my, 0) * -14px)) scale(1.02);transition:background .8s,filter .8s,transform 1.2s cubic-bezier(.2,.8,.2,1)`,
+      w: {
+        weather: card(24, 24, 272, 272, 0.05),
+        system: card(24, 312, 272, 272, 0.12),
+        notes: card(1424 - 24 - 340, 24, 340, 380, 0.08),
+        clock: `width:600px;padding:12px;display:flex;flex-direction:column;gap:10px;${glass};animation:lwIn .6s cubic-bezier(.2,1.2,.3,1) both`,
+        login: `width:460px;padding:16px;display:flex;flex-direction:column;gap:12px;${glass};animation:lwIn .6s cubic-bezier(.2,1.2,.3,1) .1s both`,
+        music: `position:absolute;left:24px;bottom:104px;width:520px;height:200px;padding:12px;display:flex;gap:10px;${glass};animation:lwIn .6s cubic-bezier(.2,1.2,.3,1) .16s both`,
+        power: `position:absolute;right:24px;bottom:104px;display:flex;align-items:flex-end;gap:2px;padding:10px 12px 8px;${glass};border-radius:22px;animation:lwIn .6s cubic-bezier(.2,1.2,.3,1) .2s both`
+      },
+      ledBox: 'height:44px;flex:none;border-radius:13px;overflow:hidden;display:flex;align-items:center;background:radial-gradient(circle,rgba(255,255,255,.07) 1.15px,rgba(0,0,0,0) 1.45px) 0 0/3px 3px,rgba(0,0,0,.25)',
+      ledRun: led(20), ledRunSlow: led(24),
+      ledBig: `font:64px/64px 'Press Start 2P',monospace;color:#ededf0;-webkit-mask-image:radial-gradient(circle,#000 2.3px,rgba(0,0,0,0) 2.8px);-webkit-mask-size:6px 6px;mask-image:radial-gradient(circle,#000 2.3px,rgba(0,0,0,0) 2.8px);mask-size:6px 6px`,
+      accTile: `background:${accent};color:#111113;border-radius:18px;transition:background .6s ease`,
+      platter: `position:relative;width:104px;height:104px;border-radius:50%;background:conic-gradient(from 30deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.07) 40deg,rgba(255,255,255,0) 80deg,rgba(255,255,255,0) 200deg,rgba(255,255,255,.05) 240deg,rgba(255,255,255,0) 280deg),repeating-radial-gradient(circle,#141416 0 1.5px,#1f1f23 1.5px 3px);box-shadow:0 0 0 2px #050506;animation:spin 6s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
+      posBar: `width:${(st.pos / 238 * 100).toFixed(2)}%;height:100%;border-radius:12px;background:#111113;transition:width 1s linear`,
+      posTime: `${pad(Math.floor(st.pos / 60))}:${pad(st.pos % 60)}`,
+      playBtn: `width:42px;height:42px;margin-left:auto;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#111113;color:${accent}`,
+      hourly, meters, notes, noNotes: notes.length === 0, noteCount: String(notes.length), wv, power,
+      ring: { cpu: `${(st.cpu / 100 * 81.7).toFixed(1)} 81.7`, ram: `${(st.ram / 100 * 81.7).toFixed(1)} 81.7` },
+      lang: st.lang, toggleLang: () => this.setState({ lang: st.lang === 'RU' ? 'EN' : 'RU' }),
+      islandText: st.busy ? 'Проверка…' : st.ok ? 'Добро пожаловать' : st.err ? 'Неверный ввод' : 'Заблокировано',
+      islandDot: `width:7px;height:7px;border-radius:50%;background:${st.ok ? '#4fd18b' : st.err ? '#e5484d' : accent}`,
+      silent: st.silent, toggleSilent: () => this.setState({ silent: !st.silent }),
+      clearAll: () => this.setState({ cleared: true }),
+      silentStyle: `flex:1;height:34px;border-radius:11px;font-size:12.5px;font-weight:600;background:${st.silent ? accent : 'rgba(255,255,255,.07)'};color:${st.silent ? '#111113' : '#e8e8ec'}`,
+      time, hh: pad(now.getHours()), mm: pad(now.getMinutes()), dateLed: dl,
+      wd: now.toLocaleDateString('ru-RU', { weekday: 'short' }).replace('.', ''), day: String(now.getDate()), mon: now.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', ''),
+      pw: st.pw, show: st.show, hidden: !st.show,
+      pwType: st.show ? 'text' : 'password',
+      eyeLabel: st.show ? 'Скрыть пароль' : 'Показать пароль',
+      busy: st.busy, idle: !st.busy, msg,
+      msgStyle: `min-height:16px;font-size:12.5px;text-align:center;color:${msgColor}`,
+      fieldStyle: `position:relative;width:100%;height:50px;margin-top:8px;display:flex;align-items:center;gap:2px;padding-right:5px;border-radius:25px;background:rgba(255,255,255,.1);backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%);border:1px solid ${st.err ? 'rgba(255,140,120,.6)' : 'rgba(255,255,255,.16)'};box-shadow:0 14px 34px rgba(0,0,0,.3);${st.shake % 2 ? 'animation:lShake .4s ease' : ''}`,
+      goBtn: `width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${accent};color:#111113;transition:background .6s`,
+      onPw: (e) => this.setState({ pw: e.target.value, err: '', ok: false }),
+      pwKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.__submit && this.__submit(e); } else if (e.key === 'Escape') { e.preventDefault(); this.setState({ open: false, err: '' }); } },
+      toggleShow: () => this.setState({ show: !st.show }),
+      submit: this.__submit = (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        if (st.busy) return;
+        if (!st.pw) { this.setState({ err: 'Введите пароль', shake: st.shake + 1 }); return; }
+        this.setState({ busy: true, err: '', ok: false });
+        clearTimeout(this.t2);
+        this.t2 = setTimeout(() => { this.setState({ busy: false, ok: true, pw: '' }); if (this.props.onUnlock) this.props.onUnlock(); }, 900);
+      },
+      playing: st.playing, paused: !st.playing,
+      playLabel: st.playing ? 'Пауза' : 'Воспроизвести',
+      togglePlay: () => this.setState({ playing: !st.playing })
+    };
+  }
+}
+</script>
+</body>
+</html>

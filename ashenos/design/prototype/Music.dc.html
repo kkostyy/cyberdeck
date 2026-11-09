@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Музыка</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #e8e8ec;outline-offset:2px}
+input::placeholder{color:#6f6f77}
+input[type=range]{margin:0;cursor:pointer}
+.mscroll::-webkit-scrollbar{width:8px}.mscroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes mEq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes mRowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes mWinIn{from{opacity:0;transform:scale(.95) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(130% 90% at 105% 118%, rgba(0,0,0,0) 57%, rgba(255,255,255,0.17) 58.2%, rgba(255,255,255,0.04) 62%, rgba(0,0,0,0) 66%), radial-gradient(110% 80% at -12% -22%, rgba(0,0,0,0) 54%, rgba(255,255,255,0.13) 55.2%, rgba(255,255,255,0.03) 59%, rgba(0,0,0,0) 63%), radial-gradient(50% 40% at 82% 0%, rgba(255,255,255,0.12), rgba(0,0,0,0) 70%), linear-gradient(155deg, #1e1e21 0%, #0b0b0c 60%, #151517 100%)">
+
+  <section aria-label="Музыка" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: mWinIn .5s cubic-bezier(.2,1.1,.3,1) both">
+    <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
+      <div style="display: flex; align-items: center; gap: 12px; width: 206px; flex: none">
+        <span aria-hidden="true" style="{{appVinyl}}"></span>
+        <div style="display: flex; flex-direction: column; line-height: 1.2">
+          <span style="font-size: 15px; font-weight: 600">Музыка</span>
+          <span style="font-size: 12.5px; color: #a1a1a8">{{connCount}}</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
+        <button aria-label="Назад" onClick="{{navBack}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
+        </button>
+        <button aria-label="Вперёд" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
+        </button>
+      </div>
+      <nav aria-label="Путь" style="flex: 1 1 auto; min-width: 0; height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 14px; background: rgba(255,255,255,0.05); font-size: 14.5px">
+        <button onClick="{{navBack}}" style="height: 32px; padding: 0 8px; display: flex; align-items: center; gap: 8px; border-radius: 9px; color: #c9c9cf">
+          <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="17" cy="16" r="3"></circle></svg>
+          Медиатека
+        </button>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6f6f77" stroke-width="2" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg>
+        <span style="height: 32px; padding: 0 8px; display: flex; align-items: center; color: #c9c9cf">{{crumbLib}}</span>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6f6f77" stroke-width="2" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg>
+        <span aria-current="page" style="height: 32px; padding: 0 10px; display: flex; align-items: center; border-radius: 9px; background: rgba(255,255,255,0.08); font-weight: 600">{{crumbSrc}}</span>
+      </nav>
+      <label style="position: relative; display: flex; align-items: center; width: 260px; height: 44px; flex: none">
+        <svg aria-hidden="true" style="position: absolute; left: 14px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Поиск по всем сервисам</span>
+        <input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Поиск во всех сервисах" style="width: 100%; height: 44px; padding: 0 14px 0 42px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.05); color: #f2f2f4; font: 14px Inter, sans-serif; outline: none">
+      </label>
+      <div role="group" aria-label="Вид" style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
+        <button aria-label="Аудиоволна на рабочем столе" title="Волна на рабочем столе" aria-pressed="{{waveOn}}" onClick="{{toggleWave}}" style="{{waveBtn}}">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M2 14c2.5 0 2.5-5 5-5s2.5 7 5 7 2.5-9 5-9 2.5 7 5 7"></path></svg>
+          <span style="font-size: 12.5px; font-weight: 600">Волна</span>
+        </button>
+        <button aria-label="Показать очередь" aria-pressed="{{queueOn}}" onClick="{{toggleQueue}}" style="{{queueBtn}}">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M4 12h12M4 18h8"></path><path d="M18 14v6l4-3z" fill="currentColor"></path></svg>
+        </button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; margin-left: 4px; flex: none">
+        <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
+        <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+    </header>
+
+    <div style="flex: 1; min-height: 0; display: flex; gap: 12px; padding: 0 12px">
+
+      <!-- ============ SIDEBAR ============ -->
+      <aside aria-label="Источники и медиатека" style="width: 250px; flex: none; padding: 10px; display: flex; flex-direction: column; gap: 4px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05)">
+        <span style="padding: 2px 10px 6px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93">Источники</span>
+        <sc-for list="{{sources}}" as="s" hint-placeholder-count="6">
+          <div style="{{s.row}}">
+            <span aria-hidden="true" style="{{s.mono}}">{{s.mono_t}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25">
+              <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.name}}</span>
+              <span style="{{s.statusStyle}}">{{s.status}}</span>
+            </span>
+            <button aria-label="{{s.btnLabel}}" onClick="{{s.toggle}}" style="{{s.btn}}">
+              <sc-if value="{{s.busy}}" hint-placeholder-val="{{false}}">
+                <span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); border-top-color: #ffffff; animation: spin .7s linear infinite"></span>
+              </sc-if>
+              <sc-if value="{{s.idle}}" hint-placeholder-val="{{true}}">
+                <span>{{s.btnText}}</span>
+              </sc-if>
+            </button>
+          </div>
+        </sc-for>
+        <span style="padding: 16px 10px 6px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93">Медиатека</span>
+        <sc-for list="{{lib}}" as="l" hint-placeholder-count="4">
+          <button aria-current="{{l.current}}" onClick="{{l.pick}}" style="{{l.style}}">
+            <span>{{l.name}}</span><span style="margin-left: auto; font-size: 12px; opacity: 0.6">{{l.count}}</span>
+          </button>
+        </sc-for>
+        <div style="flex: 1"></div>
+        <div style="padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); font-size: 12px; line-height: 1.5; color: #a1a1a8">
+          Все сервисы в одной очереди. Трек играет через тот сервис, где он найден.
+        </div>
+      </aside>
+
+      <!-- ============ MAIN ============ -->
+      <main class="mscroll" style="flex: 1; min-width: 0; overflow-y: auto; padding: 24px 26px 22px; display: flex; flex-direction: column; gap: 18px; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05)">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">{{pageTitle}}</h1>
+            <span style="font-size: 14px; color: #a1a1a8">{{trackInfo}}</span>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button aria-pressed="{{shuffle}}" onClick="{{toggleShuffle}}" style="height: 44px; padding: 0 16px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: #e8e8ec; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07)">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
+              Перемешать
+            </button>
+            <button onClick="{{playFirst}}" style="height: 44px; padding: 0 18px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; color: #111113; background: #ededf0">
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg>
+              Слушать
+            </button>
+          </div>
+        </div>
+        <div role="radiogroup" aria-label="Фильтр по сервису" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: -4px">
+          <sc-for list="{{chips}}" as="c" hint-placeholder-count="7">
+            <button role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.name}}</button>
+          </sc-for>
+        </div>
+
+        <!-- now playing -->
+        <section aria-label="Сейчас играет" style="flex: none; padding: 12px; border-radius: 30px; background: #0b0b0c; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.3)">
+          <div style="height: 44px; border-radius: 14px; overflow: hidden; display: flex; align-items: center; background: radial-gradient(circle, rgba(255,255,255,0.07) 1.15px, rgba(0,0,0,0) 1.45px) 0 0/3px 3px">
+            <span style="{{led}}">{{ledText}}</span>
+          </div>
+          <div style="display: flex; gap: 10px; height: 186px">
+            <div aria-hidden="true" style="width: 186px; height: 186px; flex: none; border-radius: 22px; background: #17171a; display: flex; align-items: center; justify-content: center">
+              <div style="width: 160px; height: 160px; border-radius: 50%; background: #0c0c0e; box-shadow: inset 0 2px 6px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center">
+                <div style="{{platter}}">
+                  <span style="{{label}}"></span>
+                  <span style="position: absolute; left: 74px; top: 30px; width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0%, #dcdce0 16%, #8d8d93 44%, #2a2a2e 74%, #0d0d0f 100%); box-shadow: 0 4px 8px rgba(0,0,0,0.6)"></span>
+                  <span style="position: absolute; left: 92px; top: 56px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0%, #dcdce0 16%, #8d8d93 44%, #2a2a2e 74%, #0d0d0f 100%); box-shadow: 0 4px 8px rgba(0,0,0,0.6)"></span>
+                  <span style="position: absolute; left: 70px; top: 62px; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0%, #dcdce0 16%, #8d8d93 44%, #2a2a2e 74%, #0d0d0f 100%); box-shadow: 0 4px 8px rgba(0,0,0,0.6)"></span>
+                  <span style="position: absolute; left: 34px; top: 84px; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0%, #dcdce0 16%, #8d8d93 44%, #2a2a2e 74%, #0d0d0f 100%); box-shadow: 0 3px 6px rgba(0,0,0,0.6)"></span>
+                  <span style="position: absolute; left: 96px; top: 84px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, #ffffff 0%, #dcdce0 16%, #8d8d93 44%, #2a2a2e 74%, #0d0d0f 100%); box-shadow: 0 3px 6px rgba(0,0,0,0.6)"></span>
+                </div>
+              </div>
+            </div>
+            <div style="{{accTile}}">
+              <div style="display: flex; align-items: center; gap: 14px; min-width: 0">
+                <span aria-hidden="true" style="{{curCover}}"></span>
+                <div style="min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px">
+                  <span style="font-size: 22px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cur.title}}</span>
+                  <span style="font-size: 14px; font-weight: 500; opacity: 0.7">{{cur.artist}}</span>
+                </div>
+                <span style="flex: none; padding: 5px 10px; border-radius: 10px; background: rgba(17,17,19,0.14); font-size: 12px; font-weight: 700">через {{cur.srcName}}</span>
+              </div>
+              <div role="progressbar" aria-label="Прогресс трека" aria-valuenow="{{pct}}" aria-valuemin="0" aria-valuemax="100" style="height: 30px; border-radius: 15px; background: rgba(17,17,19,0.16); overflow: hidden"><div style="{{bigBar}}"></div></div>
+              <div style="display: flex; align-items: flex-end; gap: 6px; margin-top: auto">
+                <span style="font-size: 44px; font-weight: 500; line-height: 0.9; font-variant-numeric: tabular-nums">{{posT}}</span>
+                <span style="font-size: 12px; font-weight: 600; opacity: 0.7; align-self: flex-start">{{durT}}</span>
+                <button aria-label="{{likeLabel}}" aria-pressed="{{liked}}" onClick="{{toggleLike}}" style="{{likeBtn}}">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="{{likeFill}}" stroke="#111113" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>
+                </button>
+                <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="{{bigPlay}}">
+                  <sc-if value="{{playing}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"></rect><rect x="14" y="5" width="4" height="14" rx="1.2"></rect></svg></sc-if>
+                  <sc-if value="{{paused}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg></sc-if>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- mixes -->
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 16px; font-weight: 700">Подборки из всех сервисов</span>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+            <sc-for list="{{mixes}}" as="m" hint-placeholder-count="4">
+              <button onClick="{{m.play}}" style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 20px; text-align: left; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05)">
+                <span aria-hidden="true" style="{{m.cover}}"><span style="{{m.badge}}">{{m.n}}</span></span>
+                <span style="font-size: 13.5px; font-weight: 600">{{m.name}}</span>
+                <span style="font-size: 12px; color: #a1a1a8">{{m.sub}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- tracks -->
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 6px">
+            <span style="font-size: 16px; font-weight: 700">Треки</span>
+            <span style="font-size: 12.5px; color: #8b8b93">{{trackInfo}}</span>
+          </div>
+          <div role="list" style="display: flex; flex-direction: column; gap: 2px">
+            <sc-for list="{{tracks}}" as="t" hint-placeholder-count="8">
+              <div role="listitem" style="{{t.row}}">
+                <button aria-label="{{t.playLabel}}" onClick="{{t.play}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 14px; text-align: left; height: 100%">
+                  <span style="width: 22px; flex: none; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8b8b93">
+                    <sc-if value="{{t.isCur}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display: inline-flex; align-items: flex-end; gap: 2px; height: 12px"><span style="{{t.eq1}}"></span><span style="{{t.eq2}}"></span><span style="{{t.eq3}}"></span></span></sc-if>
+                    <sc-if value="{{t.notCur}}" hint-placeholder-val="{{true}}">{{t.n}}</sc-if>
+                  </span>
+                  <span aria-hidden="true" style="{{t.cover}}"></span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3">
+                    <span style="{{t.titleStyle}}">{{t.title}}</span>
+                    <span style="font-size: 12.5px; color: #a1a1a8">{{t.artist}}</span>
+                  </span>
+                  <span style="width: 150px; flex: none; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #c9c9cf">
+                    <span aria-hidden="true" style="{{t.mono}}">{{t.mono_t}}</span>{{t.srcName}}
+                  </span>
+                  <span style="width: 48px; flex: none; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #a1a1a8">{{t.durT}}</span>
+                </button>
+                <button aria-label="{{t.likeLabel}}" aria-pressed="{{t.liked}}" onClick="{{t.like}}" style="width: 40px; height: 40px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+                  <svg aria-hidden="true" style="{{t.heartAnim}}" width="16" height="16" viewBox="0 0 24 24" fill="{{t.heartFill}}" stroke="{{t.heartStroke}}" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>
+                </button>
+              </div>
+            </sc-for>
+            <sc-if value="{{noTracks}}" hint-placeholder-val="{{false}}">
+              <div style="padding: 30px; text-align: center; color: #8b8b93; font-size: 13px">Ничего не найдено. Подключите сервис слева или измените запрос.</div>
+            </sc-if>
+          </div>
+        </div>
+      </main>
+
+      <!-- ============ QUEUE ============ -->
+      <aside aria-label="Очередь" style="{{queueStyle}}">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 6px">
+          <span style="font-size: 15px; font-weight: 700">Очередь</span>
+          <button aria-pressed="{{shuffle}}" onClick="{{toggleShuffle}}" style="{{shuffleBtn}}">Перемешать</button>
+        </div>
+        <div class="mscroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 4px">
+          <sc-for list="{{queue}}" as="u" hint-placeholder-count="6">
+            <button onClick="{{u.play}}" style="{{u.style}}">
+              <span aria-hidden="true" style="{{u.cover}}"></span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; text-align: left">
+                <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{u.title}}</span>
+                <span style="font-size: 11.5px; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{u.artist}} · {{u.srcName}}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 8px; font-size: 12.5px">
+          <div style="display: flex; justify-content: space-between"><span style="color: #a1a1a8">Вывод</span><span>Наушники</span></div>
+          <div style="display: flex; justify-content: space-between"><span style="color: #a1a1a8">Качество</span><span>{{quality}}</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ============ PLAYER BAR ============ -->
+    <footer aria-label="Плеер" style="height: 84px; flex: none; display: flex; align-items: center; gap: 18px; padding: 0 26px">
+      <div style="width: 270px; flex: none; display: flex; align-items: center; gap: 12px; min-width: 0">
+        <span aria-hidden="true" style="{{barCover}}"></span>
+        <span style="min-width: 0; display: flex; flex-direction: column; line-height: 1.3">
+          <span style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cur.title}}</span>
+          <span style="font-size: 12px; color: #a1a1a8">{{cur.artist}} · {{cur.srcName}}</span>
+        </span>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <button aria-label="Перемешать" aria-pressed="{{shuffle}}" onClick="{{toggleShuffle}}" style="{{iconBtnShuffle}}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
+          </button>
+          <button aria-label="Предыдущий трек" onClick="{{prev}}" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.2v11.6a1 1 0 0 1-1.5.87L9 13.2V17a1 1 0 0 1-2 0V7a1 1 0 0 1 2 0v3.8l8.5-5.47A1 1 0 0 1 19 6.2z"></path></svg>
+          </button>
+          <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="{{barPlay}}">
+            <sc-if value="{{playing}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"></rect><rect x="14" y="5" width="4" height="14" rx="1.2"></rect></svg></sc-if>
+            <sc-if value="{{paused}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg></sc-if>
+          </button>
+          <button aria-label="Следующий трек" onClick="{{next}}" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M5 6.2v11.6a1 1 0 0 0 1.5.87L15 13.2V17a1 1 0 0 0 2 0V7a1 1 0 0 0-2 0v3.8L6.5 5.33A1 1 0 0 0 5 6.2z"></path></svg>
+          </button>
+          <button aria-label="Повтор" aria-pressed="{{repeat}}" onClick="{{toggleRepeat}}" style="{{iconBtnRepeat}}">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"></path><path d="M21 13v2a3 3 0 0 1-3 3H3"></path></svg>
+          </button>
+        </div>
+        <label style="width: 100%; max-width: 560px; display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #a1a1a8">
+          <span>{{posT}}</span>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Перемотка</span>
+          <input type="range" min="0" max="{{cur.dur}}" value="{{pos}}" onChange="{{seek}}" style="flex: 1; accent-color: {{accent}}">
+          <span>{{durT}}</span>
+        </label>
+      </div>
+      <label style="width: 200px; flex: none; display: flex; align-items: center; gap: 10px; color: #c9c9cf">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7"></path></svg>
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Громкость</span>
+        <input type="range" min="0" max="100" value="{{vol}}" onChange="{{setVol}}" style="flex: 1; accent-color: {{accent}}">
+      </label>
+    </footer>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#e2b0ef"]},"onClose":{"editor":null},"onAction":{"editor":null},"waveOn":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = {
+    conn: { sc: true, sp: true, am: false, ym: true, yt: false, loc: true }, busy: null,
+    src: 'all', q: '', cur: 1, pos: 64, playing: true, liked: { 1: true, 5: true }, popId: null,
+    shuffle: false, repeat: false, vol: 70, lib: 'all', queueOn: true
+  };
+
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      const s = this.state;
+      if (!s.playing) return;
+      const t = this.allTracks().find((x) => x.id === s.cur);
+      if (s.pos + 1 >= t.dur) { if (s.repeat) this.setState({ pos: 0 }); else this.step(1); }
+      else this.setState({ pos: s.pos + 1 });
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.busyT); clearTimeout(this.popT); }
+
+  sources() {
+    return [
+      { id: 'sc', name: 'SoundCloud', mono: 'SC' }, { id: 'sp', name: 'Spotify', mono: 'SP' },
+      { id: 'am', name: 'Apple Music', mono: 'AM' }, { id: 'ym', name: 'Яндекс Музыка', mono: 'ЯМ' },
+      { id: 'yt', name: 'YouTube Music', mono: 'YT' }, { id: 'loc', name: 'Мои файлы', mono: '♪' }
+    ];
+  }
+  covers() {
+    return [
+      'repeating-linear-gradient(118deg,rgba(255,255,255,.07) 0 2px,rgba(0,0,0,.07) 2px 5px),linear-gradient(118deg,#1c1d2b 0%,#c2412f 20%,#2a3150 38%,#4f7fb8 55%,#dfe6ef 68%,#b5473a 86%,#2b2e45 100%)',
+      'radial-gradient(60% 60% at 30% 70%,#e3381f,rgba(0,0,0,0) 65%),radial-gradient(50% 50% at 75% 30%,#f04a2a,rgba(0,0,0,0) 60%),radial-gradient(45% 60% at 15% 20%,#3f6f78,rgba(0,0,0,0) 72%),linear-gradient(160deg,#16252a,#0b0d0f)',
+      'radial-gradient(60% 50% at 20% 20%,#3b6cf5,rgba(0,0,0,0) 65%),radial-gradient(50% 50% at 70% 40%,#f4e04d,rgba(0,0,0,0) 62%),radial-gradient(60% 60% at 40% 90%,#ff8a3d,rgba(0,0,0,0) 66%),linear-gradient(180deg,#d9a3e8,#8fd6ff)',
+      'radial-gradient(70% 60% at 88% 78%,#ef7d2c,rgba(0,0,0,0) 70%),linear-gradient(160deg,#6e2412,#d9661f)',
+      'linear-gradient(135deg,#bdbdc1 0%,#6a6a6f 45%,#d6d6d9 70%,#7b7b80 100%)',
+      'radial-gradient(50% 60% at 20% 40%,#6a55a0,rgba(0,0,0,0) 70%),radial-gradient(40% 60% at 90% 40%,#d23a22,rgba(0,0,0,0) 70%),linear-gradient(90deg,#2e2547,#7a3b2a 50%,#3b1612)',
+      'radial-gradient(60% 60% at 70% 30%,#5ee39a,rgba(0,0,0,0) 65%),linear-gradient(160deg,#0f2a22,#123d5a)',
+      'radial-gradient(130% 90% at 105% 118%,rgba(0,0,0,0) 57%,rgba(255,255,255,.3) 58.5%,rgba(0,0,0,0) 63%),linear-gradient(155deg,#2a2a2e,#141416)'
+    ];
+  }
+  allTracks() {
+    return [
+      { id: 1, title: 'Ночной трамвай', artist: 'Северный свет', src: 'sc', dur: 222, c: 0 },
+      { id: 2, title: 'Стеклянный город', artist: 'Полярная', src: 'sp', dur: 245, c: 1 },
+      { id: 3, title: 'Тихий шторм', artist: 'Mira Lane', src: 'am', dur: 198, c: 2 },
+      { id: 4, title: 'Огни на воде', artist: 'Кит и Маяк', src: 'ym', dur: 177, c: 3 },
+      { id: 5, title: 'Late Signal', artist: 'Orbit Kids', src: 'yt', dur: 216, c: 6 },
+      { id: 6, title: 'Пыль и неон', artist: 'Северный свет', src: 'sp', dur: 261, c: 5 },
+      { id: 7, title: 'Coastline', artist: 'Mira Lane', src: 'am', dur: 182, c: 4 },
+      { id: 8, title: 'Пятничный бит', artist: 'DJ Сова', src: 'sc', dur: 310, c: 7 },
+      { id: 9, title: 'Утро в Таллине', artist: 'Кит и Маяк', src: 'ym', dur: 229, c: 2 },
+      { id: 10, title: 'Трек.mp3', artist: 'user', src: 'loc', dur: 238, c: 0 }
+    ];
+  }
+  visible() {
+    const s = this.state;
+    const q = s.q.trim().toLowerCase();
+    return this.allTracks().filter((t) => s.conn[t.src]
+      && (s.src === 'all' || t.src === s.src)
+      && (s.lib !== 'liked' || s.liked[t.id])
+      && (!q || (t.title + ' ' + t.artist).toLowerCase().includes(q)));
+  }
+  play(id) { this.setState({ cur: id, pos: 0, playing: true }); }
+  step(d) {
+    const list = this.visible().length ? this.visible() : this.allTracks().filter((t) => this.state.conn[t.src]);
+    if (!list.length) return;
+    let i = list.findIndex((t) => t.id === this.state.cur);
+    if (this.state.shuffle && d > 0) i = Math.floor(Math.random() * list.length);
+    else i = (i + d + list.length) % list.length;
+    this.play(list[i].id);
+  }
+
+  renderVals() {
+    const st = this.state;
+    const accent = this.props.accent ?? '#ededf0';
+    const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+    const SRC = this.sources();
+    const srcName = (id) => SRC.find((s) => s.id === id).name;
+    const srcMono = (id) => SRC.find((s) => s.id === id).mono;
+    const CV = this.covers();
+    const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const all = this.allTracks();
+    const cur0 = all.find((t) => t.id === st.cur);
+    const cur = { ...cur0, srcName: srcName(cur0.src) };
+    const monoStyle = (on) => `width:24px;height:24px;flex:none;border-radius:7px;display:flex;align-items:center;justify-content:center;font:700 9.5px 'JetBrains Mono',monospace;letter-spacing:-.02em;background:${on ? 'rgba(255,255,255,.1)' : 'rgba(255,255,255,.04)'};color:${on ? '#f2f2f4' : '#6f6f77'};border:1px solid rgba(255,255,255,.08)`;
+
+    const sources = SRC.map((s) => {
+      const on = !!st.conn[s.id];
+      const busy = st.busy === s.id;
+      const n = all.filter((t) => t.src === s.id).length;
+      return { ...s, mono_t: s.mono, busy, idle: !busy,
+        mono: `${monoStyle(on)};width:32px;height:32px;border-radius:10px;font-size:10.5px`,
+        status: busy ? 'подключение…' : on ? `подключено · ${n} тр.` : 'не подключено',
+        statusStyle: `font-size:11.5px;color:${on ? '#6fd39b' : '#8b8b93'}`,
+        btnText: on ? 'Выкл' : 'Войти', btnLabel: on ? `Отключить ${s.name}` : `Подключить ${s.name}`,
+        toggle: () => {
+          if (this.state.busy) return;
+          if (this.state.conn[s.id]) { this.setState({ conn: { ...this.state.conn, [s.id]: false } }); return; }
+          this.setState({ busy: s.id });
+          clearTimeout(this.busyT);
+          this.busyT = setTimeout(() => this.setState({ busy: null, conn: { ...this.state.conn, [s.id]: true } }), 1300);
+        },
+        row: `display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:13px;background:${on ? 'rgba(255,255,255,.035)' : 'transparent'};transition:background .3s`,
+        btn: `height:28px;min-width:52px;padding:0 10px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;background:${on ? 'rgba(255,255,255,.07)' : accent};color:${on ? '#c9c9cf' : '#111113'};transition:background .25s` };
+    });
+
+    const chipList = [{ id: 'all', name: 'Все' }, ...SRC.filter((s) => st.conn[s.id]).map((s) => ({ id: s.id, name: s.name }))];
+    const chips = chipList.map((c) => ({ ...c, on: st.src === c.id, pick: () => this.setState({ src: c.id }),
+      style: `height:32px;padding:0 14px;border-radius:16px;font-size:12.5px;font-weight:600;background:${st.src === c.id ? accent : 'rgba(255,255,255,.06)'};color:${st.src === c.id ? '#111113' : '#d6d6db'};transition:background .2s` }));
+
+    const libList = [{ id: 'all', name: 'Все треки', count: all.filter((t) => st.conn[t.src]).length }, { id: 'liked', name: 'Избранное', count: Object.values(st.liked).filter(Boolean).length }];
+    const lib = libList.map((l) => ({ ...l, current: st.lib === l.id ? 'page' : 'false', pick: () => this.setState({ lib: l.id }),
+      style: `display:flex;align-items:center;height:38px;padding:0 12px;border-radius:11px;font-size:13.5px;font-weight:${st.lib === l.id ? 600 : 450};background:${st.lib === l.id ? 'rgba(255,255,255,.08)' : 'transparent'}` }));
+
+    const vis = this.visible();
+    const eqb = (h, d) => `display:block;width:3px;height:${h}px;border-radius:2px;background:${accent};transform-origin:50% 100%;${st.playing ? `animation:mEq ${d}s ease-in-out infinite` : 'transform:scaleY(.35)'}`;
+    const tracks = vis.map((t, i) => {
+      const isCur = t.id === st.cur;
+      const liked = !!st.liked[t.id];
+      return { ...t, n: String(i + 1), isCur, notCur: !isCur, liked, srcName: srcName(t.src), mono_t: srcMono(t.src), mono: monoStyle(true), durT: fmt(t.dur),
+        playLabel: `Играть «${t.title}»`, likeLabel: liked ? 'Убрать из избранного' : 'В избранное',
+        play: () => this.play(t.id),
+        like: () => { this.setState({ liked: { ...this.state.liked, [t.id]: !this.state.liked[t.id] }, popId: t.id }); clearTimeout(this.popT); this.popT = setTimeout(() => this.setState({ popId: null }), 400); },
+        heartFill: liked ? accent : 'none', heartStroke: liked ? accent : '#8b8b93',
+        heartAnim: st.popId === t.id ? 'animation:pop .4s ease' : '',
+        eq1: eqb(10, 0.8), eq2: eqb(12, 0.6), eq3: eqb(8, 1),
+        cover: `width:42px;height:42px;flex:none;border-radius:10px;background:${CV[t.c]}`,
+        titleStyle: `font-size:14px;font-weight:600;color:${isCur ? accent : '#f2f2f4'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
+        row: `display:flex;align-items:center;gap:6px;height:58px;padding:0 6px 0 10px;border-radius:14px;background:${isCur ? hexA(accent, .1) : 'transparent'};animation:mRowIn .3s ease ${(i * 0.03).toFixed(2)}s both` };
+    });
+
+    const qi = vis.findIndex((t) => t.id === st.cur);
+    const queue = (qi >= 0 ? [...vis.slice(qi + 1), ...vis.slice(0, qi)] : vis).slice(0, 8).map((t) => ({ ...t, srcName: srcName(t.src), play: () => this.play(t.id),
+      cover: `width:38px;height:38px;flex:none;border-radius:9px;background:${CV[t.c]}`,
+      style: 'display:flex;align-items:center;gap:10px;padding:6px;border-radius:12px;background:rgba(255,255,255,.03)' }));
+
+    const mixDefs = [
+      { name: 'Всё вперемешку', sub: '5 сервисов · 42 трека', c: 2, src: 'all' },
+      { name: 'Для работы', sub: 'SoundCloud + Spotify', c: 7, src: 'sc' },
+      { name: 'Ночной режим', sub: 'Яндекс Музыка', c: 1, src: 'ym' },
+      { name: 'Свои файлы', sub: '~/Музыка', c: 0, src: 'loc' }
+    ];
+    const mixes = mixDefs.map((m, i) => ({ ...m, n: String(i + 1).padStart(2, '0'),
+      play: () => { const t = all.find((x) => (m.src === 'all' || x.src === m.src) && st.conn[x.src]); this.setState({ src: m.src === 'all' || !st.conn[m.src] ? 'all' : m.src }); if (t) this.play(t.id); },
+      cover: `position:relative;display:block;aspect-ratio:1.5/1;border-radius:14px;background:${CV[m.c]}`,
+      badge: "position:absolute;left:8px;bottom:8px;padding:3px 8px;border-radius:8px;background:rgba(10,10,12,.72);font:700 10px 'JetBrains Mono',monospace" }));
+
+    const pct = Math.round(st.pos / cur.dur * 100);
+    const ledText = `СЕЙЧАС ИГРАЕТ > ${cur.title.toUpperCase()} > ${cur.artist.toUpperCase()} > ${cur.srcName.toUpperCase()} > `;
+    const connN = SRC.filter((s) => st.conn[s.id]).length;
+    return {
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
+      connCount: `${connN} из ${SRC.length} источников`,
+      crumbLib: st.lib === 'liked' ? 'Избранное' : 'Все треки',
+      crumbSrc: st.src === 'all' ? 'Все сервисы' : srcName(st.src),
+      pageTitle: st.src === 'all' ? (st.lib === 'liked' ? 'Избранное' : 'Все треки') : srcName(st.src),
+      navBack: () => this.setState({ src: 'all', lib: 'all', q: '' }),
+      playFirst: () => { const v = this.visible(); if (v.length) this.play(v[0].id); },
+      queueOn: st.queueOn, toggleQueue: () => this.setState({ queueOn: !st.queueOn }),
+      waveOn: this.props.waveOn !== false && this.props.waveOn !== '' ? !!(this.props.waveOn === undefined ? true : this.props.waveOn) : false,
+      toggleWave: () => { const cur = this.props.waveOn === undefined ? true : !!this.props.waveOn; if (this.props.onAction) this.props.onAction(cur ? 'wave:0' : 'wave:1'); },
+      waveBtn: `height:38px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:7px;background:${(this.props.waveOn === undefined || this.props.waveOn) ? 'rgba(255,255,255,.12)' : 'transparent'};color:${(this.props.waveOn === undefined || this.props.waveOn) ? '#ffffff' : '#b8b8be'};transition:background .2s,color .2s`,
+      queueBtn: `width:40px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:${st.queueOn ? 'rgba(255,255,255,.12)' : 'transparent'};color:${st.queueOn ? '#ffffff' : '#b8b8be'}`,
+      queueStyle: `width:${st.queueOn ? 290 : 0}px;flex:none;padding:${st.queueOn ? '16px 12px' : '16px 0'};margin-left:${st.queueOn ? 0 : -12}px;opacity:${st.queueOn ? 1 : 0};overflow:hidden;display:flex;flex-direction:column;gap:10px;transition:width .4s cubic-bezier(.3,1.1,.4,1),opacity .25s,padding .4s,margin .4s;${'border-radius: 18px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.07)'}`,
+      accent, sources, chips, lib, tracks, queue, mixes,
+      noTracks: tracks.length === 0,
+      trackInfo: `${tracks.length} из ${all.length} · ${SRC.filter((s) => st.conn[s.id]).length} источника подключено`,
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      cur, pos: st.pos, pct, posT: fmt(st.pos), durT: fmt(cur.dur),
+      playing: st.playing, paused: !st.playing, playLabel: st.playing ? 'Пауза' : 'Играть',
+      togglePlay: () => this.setState({ playing: !st.playing }),
+      prev: () => (st.pos > 3 ? this.setState({ pos: 0 }) : this.step(-1)), next: () => this.step(1),
+      seek: (e) => this.setState({ pos: +e.target.value }),
+      vol: st.vol, setVol: (e) => this.setState({ vol: +e.target.value }),
+      shuffle: st.shuffle, toggleShuffle: () => this.setState({ shuffle: !st.shuffle }),
+      repeat: st.repeat, toggleRepeat: () => this.setState({ repeat: !st.repeat }),
+      shuffleBtn: `height:30px;padding:0 12px;border-radius:10px;font-size:12px;font-weight:600;background:${st.shuffle ? accent : 'rgba(255,255,255,.06)'};color:${st.shuffle ? '#111113' : '#d6d6db'}`,
+      iconBtnShuffle: `width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${st.shuffle ? accent : '#a1a1a8'}`,
+      iconBtnRepeat: `width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:${st.repeat ? accent : '#a1a1a8'}`,
+      liked: !!st.liked[cur.id], likeLabel: st.liked[cur.id] ? 'Убрать из избранного' : 'В избранное',
+      likeFill: st.liked[cur.id] ? '#111113' : 'none',
+      toggleLike: () => this.setState({ liked: { ...st.liked, [cur.id]: !st.liked[cur.id] } }),
+      likeBtn: 'width:44px;height:44px;margin-left:auto;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(17,17,19,.12)',
+      bigPlay: `width:52px;height:52px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#111113;color:${accent}`,
+      barPlay: `width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${accent};color:#111113`,
+      accTile: `flex:1;min-width:0;padding:16px 18px;border-radius:22px;background:${accent};color:#111113;display:flex;flex-direction:column;gap:14px;transition:background .5s`,
+      curCover: `width:62px;height:62px;flex:none;border-radius:12px;background:${CV[cur.c]};box-shadow:0 3px 8px rgba(0,0,0,.25)`,
+      barCover: `width:50px;height:50px;flex:none;border-radius:11px;background:${CV[cur.c]}`,
+      bigBar: `width:${(st.pos / cur.dur * 100).toFixed(2)}%;height:100%;border-radius:15px;background:#111113;transition:width 1s linear`,
+      led: `display:inline-block;white-space:nowrap;padding-left:8px;font:24px/24px 'Press Start 2P',monospace;color:#ededf0;-webkit-mask-image:radial-gradient(circle,#000 1.15px,rgba(0,0,0,0) 1.45px);-webkit-mask-size:3px 3px;mask-image:radial-gradient(circle,#000 1.15px,rgba(0,0,0,0) 1.45px);mask-size:3px 3px;animation:mq 20s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
+      ledText: ledText + ledText,
+      platter: `position:relative;width:136px;height:136px;border-radius:50%;background:conic-gradient(from 30deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.07) 40deg,rgba(255,255,255,0) 80deg,rgba(255,255,255,0) 200deg,rgba(255,255,255,.05) 240deg,rgba(255,255,255,0) 280deg),repeating-radial-gradient(circle,#141416 0 1.5px,#1f1f23 1.5px 3px);box-shadow:0 0 0 2px #050506;animation:spin 6s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
+      label: `position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle,#0a0a0b 0 3px,rgba(0,0,0,0) 3.5px),${CV[cur.c]}`,
+      appVinyl: `width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#0e0e10 0 2px,${accent} 3px 9px,#141416 10px 11px,rgba(0,0,0,0) 11.5px),repeating-radial-gradient(circle,#131315 0 1px,#26262a 1px 2px);animation:spin 3s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
+      quality: cur.src === 'loc' ? 'FLAC · без потерь' : cur.src === 'sc' ? '128 кбит/с' : '320 кбит/с'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[Plugins]
+slidingpopupsEnabled=true
+blurEnabled=true
+wobblywindowsEnabled=false
+
+[Effect-slidingpopups]
+SlideInTime=200
+SlideOutTime=200
+
+[Wayland]
+InputMethod[$e]=/usr/share/applications/com.github.maliit.keyboard.desktop
+VirtualKeyboardEnabled=true

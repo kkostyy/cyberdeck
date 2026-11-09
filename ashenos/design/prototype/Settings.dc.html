@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Параметры системы</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+@keyframes setIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes setPage{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.set-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+.set-nav:hover{background:rgba(255,255,255,.05)}
+.set-opt:hover{filter:brightness(1.15)}
+.set-range{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:transparent;outline:none}
+.set-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f2f2f4;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.set-range::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:#f2f2f4}
+.set-select{appearance:none;-webkit-appearance:none}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: #050506; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
+
+    <div style="flex: 1; min-height: 0; display: flex">
+      <!-- ===== sidebar ===== -->
+      <aside aria-label="Разделы" style="width: 316px; flex: none; display: flex; flex-direction: column; background: #0a0a0b; border-right: 1px solid rgba(255,255,255,0.06)">
+        <div style="height: 58px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px">
+          <sc-if value="{{inSub}}" hint-placeholder-val="{{false}}">
+            <button aria-label="Назад" onClick="{{back}}" style="width: 36px; height: 36px; flex: none; border-radius: 10px; border: 0; display: flex; align-items: center; justify-content: center; color: #e8e8ec; background: rgba(255,255,255,0.06)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+          </sc-if>
+          <label style="flex: 1; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06)">
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            <input aria-label="Поиск" placeholder="Поиск…" value="{{q}}" onInput="{{onQ}}" style="flex: 1; min-width: 0; height: 34px; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 13px Inter, sans-serif">
+          </label>
+          <button aria-label="Меню" onClick="{{menuTap}}" style="width: 36px; height: 36px; flex: none; border-radius: 10px; border: 0; display: flex; align-items: center; justify-content: center; color: #e8e8ec; background: transparent"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+        </div>
+        <sc-if value="{{inSub}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 2px 16px 8px; font-size: 15px; font-weight: 700">{{subTitle}}</div>
+        </sc-if>
+        <div class="set-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 0 10px 12px">
+          <sc-for list="{{nav}}" as="n" hint-placeholder-count="14">
+            <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}">
+              <div style="flex: none; padding: 18px 12px 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #7d7d86">{{n.cat}}</div>
+            </sc-if>
+            <button class="set-nav" aria-current="{{n.current}}" onClick="{{n.pick}}" style="{{n.style}}">
+              <span aria-hidden="true" style="{{n.icon}}">{{n.glyph}}</span>
+              <span style="flex: 1; min-width: 0; text-align: left; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.name}}</span>
+              <span style="{{n.badge}}">{{n.changed}}</span>
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b8b93" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="{{n.chev}}"><path d="m9 6 6 6-6 6"></path></svg>
+            </button>
+          </sc-for>
+          <sc-if value="{{noNav}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 20px 10px; font-size: 13px; color: #8b8b93; text-align: center">Ничего не найдено</div>
+          </sc-if>
+        </div>
+        <div style="flex: none; padding: 8px 10px 10px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button aria-pressed="{{hl}}" onClick="{{toggleHl}}" style="{{hlBtn}}">
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path><path d="m13.5 6.5 4 4"></path></svg>
+            Выделять изменённые параметры
+          </button>
+        </div>
+      </aside>
+
+      <!-- ===== page ===== -->
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #050506">
+        <header style="height: 58px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 22px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+          <span style="font-size: 14px; font-weight: 600; color: #a1a1a8">Параметры системы</span>
+          <div style="display: flex; align-items: center; gap: 2px; margin-left: auto">
+            <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+            <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="3"></rect></svg></button>
+            <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+        </header>
+
+        <main class="set-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 22px 30px 30px">
+         <div style="width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; align-items: center; gap: 16px; padding: 2px 4px 4px; animation: setPage .3s ease both">
+            <span aria-hidden="true" style="{{heroIcon}}">{{cur.glyph}}</span>
+            <span style="display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 24px; font-weight: 700; letter-spacing: -0.015em">{{cur.name}}</span>
+              <span style="font-size: 13px; color: #8b8b93">{{crumb}}</span>
+            </span>
+          </div>
+
+          <!-- wallpaper page: current wallpaper on top -->
+          <sc-if value="{{isWall}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 14px; animation: setPage .3s ease both">
+              <div style="display: flex; justify-content: center; padding: 6px 0 4px">
+                <div style="display: flex; flex-direction: column; align-items: center">
+                  <div style="position: relative; width: 520px; height: 325px; border-radius: 16px; padding: 10px; box-sizing: border-box; background: #000; box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 30px 70px rgba(0,0,0,0.6)">
+                    <div style="position: relative; width: 100%; height: 100%; border-radius: 8px; overflow: hidden; background: #000">
+                      <div style="{{pv.bezel}}"></div>
+                      <div style="{{pv.screen}}">
+                        <div style="{{pv.img}}"></div>
+                        <div style="{{pv.dock}}"></div>
+                      </div>
+                      <div style="{{pv.lock}}">
+                        <span style="font: 300 54px Inter, sans-serif; letter-spacing: -0.02em; color: #fff">{{pv.time}}</span>
+                        <span style="font-size: 12px; color: rgba(255,255,255,0.8)">{{pv.date}}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span style="width: 120px; height: 34px; background: linear-gradient(#141416, #0b0b0c); clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%)"></span>
+                  <span style="width: 200px; height: 6px; border-radius: 3px; background: #141416"></span>
+                </div>
+              </div>
+              <div style="text-align: center; font-size: 13px; color: #a1a1a8">Сейчас: <span style="color: #f2f2f4; font-weight: 600">{{pv.name}}</span> · {{pv.where}}</div>
+
+              <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; padding: 4px 0">
+                <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #c9c9cf">Обои для:
+                  <span role="radiogroup" aria-label="Обои для" style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+                    <sc-for list="{{wTarget}}" as="o" hint-placeholder-count="2"><button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                  </span>
+                </span>
+                <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #c9c9cf">Тип обоев:
+                  <span role="radiogroup" aria-label="Тип обоев" style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+                    <sc-for list="{{wType}}" as="o" hint-placeholder-count="3"><button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                  </span>
+                </span>
+                <span style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #c9c9cf">Расположение:
+                  <span role="radiogroup" aria-label="Расположение" style="display: flex; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+                    <sc-for list="{{wFit}}" as="o" hint-placeholder-count="3"><button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                  </span>
+                </span>
+              </div>
+
+              <div role="radiogroup" aria-label="Обои" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+                <sc-for list="{{wGrid}}" as="w" hint-placeholder-count="5">
+                  <button role="radio" aria-checked="{{w.on}}" onClick="{{w.pick}}" style="{{w.card}}">
+                    <span aria-hidden="true" style="{{w.img}}"></span>
+                    <span style="display: flex; align-items: center; gap: 8px; padding: 8px 4px 2px; font-size: 13px; font-weight: 600">{{w.name}}<span style="{{w.tag}}">{{w.tagText}}</span></span>
+                  </button>
+                </sc-for>
+                <button onClick="{{wAdd}}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 170px; border-radius: 14px; border: 2px dashed rgba(255,255,255,0.18); background: transparent; color: #a1a1a8; font: 600 13px Inter, sans-serif">
+                  <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                  Добавить…
+                </button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+            <section aria-label="{{g.title}}" style="{{g.style}}">
+              <div style="padding: 12px 16px 6px; font-size: 13px; font-weight: 700; color: #f2f2f4">{{g.title}}</div>
+              <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
+              <div style="{{r.rowStyle}}">
+                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1">
+                  <span style="font-size: 14px; font-weight: 500">{{r.label}}</span>
+                  <span style="{{r.hintStyle}}">{{r.hint}}</span>
+                </div>
+
+                <sc-if value="{{r.is.toggle}}" hint-placeholder-val="{{false}}">
+                  <button role="switch" aria-checked="{{r.on}}" aria-label="{{r.label}}" onClick="{{r.toggle}}" style="{{r.sw}}"><span style="{{r.knob}}"></span></button>
+                </sc-if>
+
+                <sc-if value="{{r.is.slider}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; align-items: center; gap: 12px; width: 340px; flex: none">
+                    <span style="position: relative; flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12)">
+                      <span style="{{r.fill}}"></span>
+                      <input class="set-range" type="range" min="{{r.min}}" max="{{r.max}}" value="{{r.v}}" aria-label="{{r.label}}" onInput="{{r.set}}" style="position: absolute; left: -2px; right: -2px; top: -6px; width: calc(100% + 4px); height: 18px; margin: 0; background: transparent">
+                    </span>
+                    <span style="width: 64px; text-align: right; font: 600 12.5px 'JetBrains Mono', monospace">{{r.text}}</span>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{r.is.seg}}" hint-placeholder-val="{{false}}">
+                  <div role="radiogroup" aria-label="{{r.label}}" style="display: flex; gap: 3px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,0.06); flex: none">
+                    <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3">
+                      <button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{r.is.select}}" hint-placeholder-val="{{false}}">
+                  <span style="position: relative; display: flex; flex: none">
+                    <select class="set-select" aria-label="{{r.label}}" onChange="{{r.set}}" value="{{r.v}}" style="height: 36px; min-width: 220px; padding: 0 36px 0 12px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.06); color: #f2f2f4; font: 500 13px Inter, sans-serif; outline: none">
+                      <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><option value="{{o.name}}">{{o.name}}</option></sc-for>
+                    </select>
+                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 12px; top: 12px; pointer-events: none"><path d="m6 9 6 6 6-6"></path></svg>
+                  </span>
+                </sc-if>
+
+                <sc-if value="{{r.is.swatch}}" hint-placeholder-val="{{false}}">
+                  <div role="radiogroup" aria-label="{{r.label}}" style="display: flex; gap: 8px; flex: none">
+                    <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="6">
+                      <button role="radio" aria-checked="{{o.on}}" aria-label="{{o.name}}" onClick="{{o.pick}}" style="{{o.style}}"></button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{r.is.info}}" hint-placeholder-val="{{false}}">
+                  <span style="font-size: 13px; color: #c9c9cf; text-align: right; flex: none; max-width: 420px">{{r.v}}</span>
+                </sc-if>
+
+                <sc-if value="{{r.is.keys}}" hint-placeholder-val="{{false}}">
+                  <button onClick="{{r.toggle}}" aria-label="{{r.label}}: {{r.v}}" style="{{r.keyStyle}}">{{r.keyText}}</button>
+                </sc-if>
+
+                <sc-if value="{{r.is.button}}" hint-placeholder-val="{{false}}">
+                  <button onClick="{{r.toggle}}" style="{{r.btnStyle}}">{{r.btnText}}</button>
+                </sc-if>
+              </div>
+
+              <sc-if value="{{r.is.list}}" hint-placeholder-val="{{false}}">
+                <div role="radiogroup" aria-label="{{r.label}}" style="display: flex; flex-direction: column; gap: 6px; padding: 0 16px 12px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3">
+                    <button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">
+                      <span aria-hidden="true" style="{{o.dot}}"><span style="{{o.dotIn}}"></span></span>
+                      <span style="display: flex; flex-direction: column; text-align: left"><span style="font-size: 13.5px; font-weight: 600">{{o.name}}</span><span style="font-size: 12px; color: #a1a1a8">{{o.sub}}</span></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-for>
+            </section>
+          </sc-for>
+         </div>
+        </main>
+
+        <!-- Plasma-style footer -->
+        <footer style="height: 58px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-top: 1px solid rgba(255,255,255,0.06); background: #0a0a0b">
+          <button onClick="{{help}}" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 0; display: flex; align-items: center; gap: 7px; font: 600 13px Inter, sans-serif; color: #d6d6dc; background: rgba(255,255,255,0.06)">
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"></path></svg>
+            Справка
+          </button>
+          <button onClick="{{resetSec}}" style="{{defBtn}}">По умолчанию</button>
+          <span style="flex: 1"></span>
+          <button onClick="{{revert}}" style="{{revBtn}}">Сбросить</button>
+          <button onClick="{{apply}}" style="{{applyBtn}}">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
+            Применить
+          </button>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <div role="status" aria-live="polite" style="{{toast}}">{{toastText}}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"curWall":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+const SECTIONS = [
+  { cat: 'Внешний вид', items: [
+    { id: 'look', name: 'Оформление', glyph: '◐', bg: '#3a3a40', sub: 'Тема, цвета, шрифты, значки', groups: [
+      { title: 'Глобальная тема', rows: [
+        { id: 'theme', t: 'list', label: 'Тема', opts: [['glass', 'Стекло (по умолчанию)', 'Матовое стекло, графитовые панели'], ['breeze-dark', 'Breeze Dark', 'Стандартная тёмная тема KDE'], ['breeze', 'Breeze', 'Светлая тема KDE'], ['oled', 'OLED', 'Чистый чёрный для экономии энергии']], v: 'glass' },
+        { id: 'scheme', t: 'seg', label: 'Цветовая схема', opts: ['Тёмная', 'Светлая', 'Авто'], v: 'Тёмная', hint: '«Авто» переключает по времени суток' }
+      ] },
+      { title: 'Цвета', rows: [
+        { id: 'accent', t: 'swatch', label: 'Акцент', opts: ['#f2f2f4', '#4f7fb8', '#3f9a6b', '#d0452f', '#e8a33d', '#8a63d2'], v: '#f2f2f4' },
+        { id: 'accentWall', t: 'toggle', label: 'Брать акцент из обоев', v: true },
+        { id: 'tint', t: 'slider', label: 'Тонировка панелей акцентом', min: 0, max: 100, unit: '%', v: 20 }
+      ] },
+      { title: 'Шрифты', rows: [
+        { id: 'font', t: 'select', label: 'Основной шрифт', opts: ['Inter', 'Noto Sans', 'Cantarell', 'IBM Plex Sans'], v: 'Inter' },
+        { id: 'mono', t: 'select', label: 'Моноширинный', opts: ['JetBrains Mono', 'Hack', 'Fira Code', 'Noto Sans Mono'], v: 'JetBrains Mono' },
+        { id: 'fsize', t: 'slider', label: 'Размер', min: 8, max: 16, unit: ' pt', v: 10 },
+        { id: 'aa', t: 'seg', label: 'Сглаживание', opts: ['Нет', 'Лёгкое', 'Среднее', 'Полное'], v: 'Лёгкое' },
+        { id: 'dpi', t: 'toggle', label: 'Принудительный DPI', v: false }
+      ] },
+      { title: 'Значки и курсор', rows: [
+        { id: 'icons', t: 'select', label: 'Значки', opts: ['Стекло', 'Breeze', 'Papirus Dark', 'Tela'], v: 'Стекло' },
+        { id: 'cursor', t: 'select', label: 'Курсор', opts: ['Стекло (скруглённый)', 'Breeze', 'Bibata Modern'], v: 'Стекло (скруглённый)' },
+        { id: 'csize', t: 'seg', label: 'Размер курсора', opts: ['24', '32', '48'], v: '24' },
+        { id: 'shake', t: 'toggle', label: 'Увеличивать курсор при встряхивании', v: true }
+      ] },
+      { title: 'Оформление окон', rows: [
+        { id: 'deco', t: 'select', label: 'Рамки окон', opts: ['Стекло', 'Breeze', 'Klassy'], v: 'Стекло' },
+        { id: 'btns', t: 'seg', label: 'Кнопки заголовка', opts: ['Справа', 'Слева'], v: 'Справа' },
+        { id: 'radius', t: 'slider', label: 'Скругление углов', min: 0, max: 28, unit: ' px', v: 22 },
+        { id: 'blur', t: 'slider', label: 'Размытие стекла', min: 0, max: 40, unit: ' px', v: 16 }
+      ] }
+    ] },
+    { id: 'wall', name: 'Обои', glyph: '◧', bg: '#4f7fb8', sub: 'Рабочий стол и экран блокировки', groups: [
+      { title: 'Рабочий стол', rows: [
+        { id: 'wallpaper', t: 'swatch', label: 'Обои', opts: ['#2a2a2e', '#1d2b45', '#2f3d2c', '#4a2420', '#3b2f4f', '#0b0b0c'], v: '#2a2a2e' },
+        { id: 'wfit', t: 'seg', label: 'Расположение', opts: ['Заполнить', 'Вписать', 'По центру', 'Плитка'], v: 'Заполнить' },
+        { id: 'slideshow', t: 'toggle', label: 'Слайд-шоу из ~/Изображения/Обои', v: false },
+        { id: 'slideInt', t: 'select', label: 'Смена каждые', opts: ['10 минут', '30 минут', '1 час', 'Ежедневно'], v: '30 минут' },
+        { id: 'dim', t: 'toggle', label: 'Затемнять обои в тёмной схеме', v: true }
+      ] },
+      { title: 'Экран блокировки', rows: [
+        { id: 'lockSame', t: 'toggle', label: 'Те же обои, что на рабочем столе', v: true },
+        { id: 'lockBlur', t: 'slider', label: 'Размытие на экране блокировки', min: 0, max: 60, unit: ' px', v: 24 }
+      ] }
+    ] },
+    { id: 'effects', name: 'Эффекты и анимации', glyph: '✦', bg: '#8a63d2', sub: 'KWin, скорость анимаций', groups: [
+      { title: 'Общее', rows: [
+        { id: 'anim', t: 'slider', label: 'Скорость анимаций', min: 0, max: 100, unit: '%', v: 60, hint: '0 — мгновенно, 100 — медленно' },
+        { id: 'liquid', t: 'toggle', label: 'Жидкие капли из рамки', v: true },
+        { id: 'reduce', t: 'toggle', label: 'Уменьшить движение', v: false }
+      ] },
+      { title: 'Эффекты рабочего стола (KWin)', rows: [
+        { id: 'fxBlur', t: 'toggle', label: 'Размытие', v: true },
+        { id: 'fxWobbly', t: 'toggle', label: 'Желейные окна', v: false },
+        { id: 'fxMagic', t: 'toggle', label: 'Волшебная лампа при сворачивании', v: true },
+        { id: 'fxOverview', t: 'toggle', label: 'Обзор (Meta)', v: true },
+        { id: 'fxDim', t: 'toggle', label: 'Затемнять неактивные окна', v: true },
+        { id: 'fxShake', t: 'toggle', label: 'Найти курсор', v: true },
+        { id: 'fxZoom', t: 'toggle', label: 'Лупа (Meta + =)', v: false }
+      ] },
+      { title: 'Активные углы', rows: [
+        { id: 'cornerTL', t: 'select', label: 'Левый верхний', opts: ['Обзор', 'Рабочий стол', 'Ничего', 'Заблокировать'], v: 'Обзор' },
+        { id: 'cornerTR', t: 'select', label: 'Правый верхний', opts: ['Ничего', 'Центр управления', 'Обзор'], v: 'Ничего' },
+        { id: 'cornerBL', t: 'select', label: 'Левый нижний', opts: ['Ничего', 'Рабочий стол', 'Экран блокировки'], v: 'Ничего' },
+        { id: 'cornerBR', t: 'select', label: 'Правый нижний', opts: ['Показать рабочий стол', 'Ничего'], v: 'Показать рабочий стол' }
+      ] }
+    ] },
+    { id: 'panel', name: 'Рамка, док и остров', glyph: '▭', bg: '#2e2e33', sub: 'Верхняя рамка, Dynamic Island, док', groups: [
+      { title: 'Верхняя рамка', rows: [
+        { id: 'barH', t: 'slider', label: 'Высота', min: 32, max: 52, unit: ' px', v: 40 },
+        { id: 'barSec', t: 'toggle', label: 'Секунды в часах', v: false },
+        { id: 'barOpen', t: 'seg', label: 'Панели открываются', opts: ['Справа', 'Под значком', 'По центру'], v: 'Справа' },
+        { id: 'barRings', t: 'toggle', label: 'Кольца нагрузки (ЦП, ОЗУ, батарея)', v: true }
+      ] },
+      { title: 'Dynamic Island', rows: [
+        { id: 'islWin', t: 'toggle', label: 'Показывать активное окно', v: true },
+        { id: 'islShelf', t: 'toggle', label: 'Полка для файлов', v: true },
+        { id: 'islAct', t: 'toggle', label: 'Живые события (таймер, запись, звонки)', v: true },
+        { id: 'islLvl', t: 'toggle', label: 'Индикатор громкости и яркости', v: true },
+        { id: 'islClip', t: 'toggle', label: 'Буфер обмена', v: true }
+      ] },
+      { title: 'Док', rows: [
+        { id: 'dockSize', t: 'slider', label: 'Размер значков', min: 28, max: 64, unit: ' px', v: 40 },
+        { id: 'dockMag', t: 'slider', label: 'Увеличение', min: 0, max: 100, unit: '%', v: 50 },
+        { id: 'dockWidth', t: 'seg', label: 'Ширина', opts: ['По содержимому', 'Половина экрана', 'Во всю ширину'], v: 'Половина экрана' },
+        { id: 'dockHide', t: 'seg', label: 'Скрытие', opts: ['Никогда', 'Умное', 'Всегда'], v: 'Умное' },
+        { id: 'dockRun', t: 'toggle', label: 'Точки у запущенных приложений', v: true },
+        { id: 'dockWave', t: 'toggle', label: 'Аудиоволна под доком', v: true }
+      ] }
+    ] },
+    { id: 'notif', name: 'Уведомления', glyph: '◔', bg: '#e8a33d', sub: 'Всплывающие, «Не беспокоить»', groups: [
+      { title: 'Показ', rows: [
+        { id: 'nPos', t: 'seg', label: 'Положение', opts: ['Справа сверху', 'По центру', 'Справа снизу'], v: 'Справа сверху' },
+        { id: 'nShort', t: 'slider', label: 'Короткие уведомления', min: 2, max: 10, unit: ' с', v: 3 },
+        { id: 'nLong', t: 'slider', label: 'Длинные уведомления', min: 4, max: 15, unit: ' с', v: 6 },
+        { id: 'nPanel', t: 'toggle', label: 'Не показывать, пока открыта панель', v: true },
+        { id: 'nSound', t: 'toggle', label: 'Звук уведомлений', v: true }
+      ] },
+      { title: 'Не беспокоить', rows: [
+        { id: 'dnd', t: 'toggle', label: 'Включено', v: false },
+        { id: 'dndFull', t: 'toggle', label: 'Автоматически в полноэкранном режиме', v: true },
+        { id: 'dndShare', t: 'toggle', label: 'При демонстрации экрана', v: true },
+        { id: 'dndSched', t: 'select', label: 'По расписанию', opts: ['Выключено', '23:00 – 07:00', '00:00 – 08:00'], v: '23:00 – 07:00' }
+      ] },
+      { title: 'Приложения', rows: [
+        { id: 'apTg', t: 'toggle', label: 'Telegram', v: true },
+        { id: 'apMail', t: 'toggle', label: 'Почта', v: true },
+        { id: 'apPac', t: 'toggle', label: 'Обновления pacman', v: true },
+        { id: 'apDisc', t: 'toggle', label: 'Discord', v: false }
+      ] }
+    ] }
+  ] },
+  { cat: 'Рабочее пространство', items: [
+    { id: 'behav', name: 'Общее поведение', glyph: '⚙', bg: '#3a3a40', sub: 'Клики, прокрутка, подсказки', groups: [
+      { title: 'Нажатия', rows: [
+        { id: 'click', t: 'seg', label: 'Открывать файлы', opts: ['Двойным щелчком', 'Одним щелчком'], v: 'Двойным щелчком' },
+        { id: 'scroll', t: 'seg', label: 'Щелчок по полосе прокрутки', opts: ['Перейти к месту', 'Листать страницу'], v: 'Перейти к месту' },
+        { id: 'tips', t: 'toggle', label: 'Всплывающие подсказки', v: true },
+        { id: 'feedback', t: 'toggle', label: 'Визуальный отклик на изменение статуса', v: true }
+      ] }
+    ] },
+    { id: 'windows', name: 'Окна', glyph: '▢', bg: '#2e2e33', sub: 'Поведение, Alt+Tab, привязка', groups: [
+      { title: 'Фокус', rows: [
+        { id: 'focus', t: 'seg', label: 'Политика фокуса', opts: ['По щелчку', 'Под мышью', 'Строго под мышью'], v: 'По щелчку' },
+        { id: 'raise', t: 'toggle', label: 'Поднимать окно при щелчке', v: true }
+      ] },
+      { title: 'Перемещение и привязка', rows: [
+        { id: 'snap', t: 'slider', label: 'Магнитное притяжение к краям', min: 0, max: 48, unit: ' px', v: 24 },
+        { id: 'tile', t: 'toggle', label: 'Плитка при перетаскивании к краю', v: true },
+        { id: 'quickTile', t: 'toggle', label: 'Быстрая плитка (Meta + стрелки)', v: true },
+        { id: 'center', t: 'toggle', label: 'Открывать новые окна по центру', v: true }
+      ] },
+      { title: 'Переключение задач', rows: [
+        { id: 'tabStyle', t: 'select', label: 'Стиль Alt+Tab', opts: ['Миниатюры', 'Сетка', 'Список', 'Обложки'], v: 'Миниатюры' },
+        { id: 'tabMin', t: 'toggle', label: 'Включать свёрнутые окна', v: true },
+        { id: 'tabAll', t: 'toggle', label: 'Окна со всех рабочих столов', v: false }
+      ] },
+      { title: 'Мини-окна', rows: [
+        { id: 'stack', t: 'seg', label: 'Свёрнутые окна', opts: ['Стопка справа', 'В док', 'Стопка слева'], v: 'Стопка справа' },
+        { id: 'preview', t: 'toggle', label: 'Живой предпросмотр при наведении', v: true },
+        { id: 'pinTop', t: 'toggle', label: 'Закреплённые окна поверх всех', v: true }
+      ] }
+    ] },
+    { id: 'vdesk', name: 'Рабочие столы', glyph: '▦', bg: '#3a3a40', sub: 'Виртуальные столы, комнаты', groups: [
+      { title: 'Виртуальные рабочие столы', rows: [
+        { id: 'vdCount', t: 'seg', label: 'Количество', opts: ['2', '3', '4', '6', '8'], v: '4' },
+        { id: 'vdRows', t: 'seg', label: 'Строк', opts: ['1', '2'], v: '1' },
+        { id: 'vdWrap', t: 'toggle', label: 'Перелистывать по кругу', v: true },
+        { id: 'vdOsd', t: 'toggle', label: 'Показывать название при переключении', v: true },
+        { id: 'vdAnim', t: 'seg', label: 'Анимация', opts: ['Слайд', 'Затухание', 'Нет'], v: 'Слайд' }
+      ] },
+      { title: 'Комнаты (Plasma Activities)', rows: [
+        { id: 'actList', t: 'list', label: 'Комната', opts: [['work', 'Работа', 'Все островки и уведомления'], ['game', 'Игры', 'Автоскрытие и минимум эффектов'], ['min', 'Минимализм', 'Компактная рамка']], v: 'work' },
+        { id: 'actRemember', t: 'toggle', label: 'Помнить открытые документы для каждой комнаты', v: true }
+      ] }
+    ] },
+    { id: 'search', name: 'Поиск', glyph: '⌕', bg: '#3a3a40', sub: 'KRunner, индексация Baloo', groups: [
+      { title: 'Поиск в рамке', rows: [
+        { id: 'sPrev', t: 'toggle', label: 'Предпросмотр справа', v: true },
+        { id: 'sHist', t: 'toggle', label: 'Помнить историю запросов', v: true },
+        { id: 'sKey', t: 'keys', label: 'Открыть поиск', v: 'Meta' }
+      ] },
+      { title: 'Источники', rows: [
+        { id: 'srcApps', t: 'toggle', label: 'Приложения', v: true },
+        { id: 'srcFiles', t: 'toggle', label: 'Файлы', v: true },
+        { id: 'srcSet', t: 'toggle', label: 'Параметры системы', v: true },
+        { id: 'srcCalc', t: 'toggle', label: 'Калькулятор и конвертер единиц', v: true },
+        { id: 'srcWeb', t: 'toggle', label: 'Поиск в интернете', v: false },
+        { id: 'srcCmd', t: 'toggle', label: 'Команды терминала', v: true }
+      ] },
+      { title: 'Индексация файлов (Baloo)', rows: [
+        { id: 'baloo', t: 'toggle', label: 'Индексировать файлы', v: true },
+        { id: 'balooContent', t: 'toggle', label: 'Индексировать содержимое', v: false, hint: 'На Raspberry Pi лучше выключить: сильно грузит карту памяти' },
+        { id: 'balooHidden', t: 'toggle', label: 'Скрытые файлы и папки', v: false },
+        { id: 'balooState', t: 'info', label: 'Состояние', v: '12 480 файлов · 38 МБ' }
+      ] }
+    ] },
+    { id: 'lock', name: 'Блокировка экрана', glyph: '⏻', bg: '#3a3a40', sub: 'KScreenLocker', groups: [
+      { title: 'Блокировка', rows: [
+        { id: 'lockAuto', t: 'toggle', label: 'Блокировать автоматически', v: true },
+        { id: 'lockAfter', t: 'select', label: 'Через', opts: ['1 минуту', '5 минут', '10 минут', '30 минут'], v: '5 минут' },
+        { id: 'lockWake', t: 'toggle', label: 'Блокировать после пробуждения', v: true },
+        { id: 'lockGrace', t: 'select', label: 'Без пароля в течение', opts: ['Сразу', '5 секунд', '30 секунд'], v: '5 секунд' }
+      ] },
+      { title: 'Что показывать', rows: [
+        { id: 'lockMedia', t: 'toggle', label: 'Управление музыкой', v: true },
+        { id: 'lockWeather', t: 'toggle', label: 'Погода и система', v: true },
+        { id: 'lockNotif', t: 'toggle', label: 'Уведомления', v: false },
+        { id: 'lockKey', t: 'keys', label: 'Заблокировать', v: 'Meta + L' }
+      ] }
+    ] }
+  ] },
+  { cat: 'Устройства', items: [
+    { id: 'display', name: 'Экран', glyph: '▭', bg: '#4f7fb8', sub: 'KScreen: разрешение, масштаб', groups: [
+      { title: 'HDMI-A-1 · 27″', rows: [
+        { id: 'res', t: 'select', label: 'Разрешение', opts: ['2560 × 1440', '1920 × 1080', '1600 × 900', '1280 × 720'], v: '2560 × 1440' },
+        { id: 'hz', t: 'seg', label: 'Частота', opts: ['60 Гц', '75 Гц', '144 Гц'], v: '60 Гц' },
+        { id: 'scale', t: 'seg', label: 'Масштаб', opts: ['100%', '125%', '150%', '200%'], v: '125%' },
+        { id: 'rot', t: 'seg', label: 'Поворот', opts: ['0°', '90°', '180°', '270°'], v: '0°' },
+        { id: 'vrr', t: 'seg', label: 'Адаптивная синхронизация', opts: ['Никогда', 'Автоматически', 'Всегда'], v: 'Автоматически' },
+        { id: 'hdr', t: 'toggle', label: 'HDR', v: false },
+        { id: 'overscan', t: 'slider', label: 'Компенсация overscan', min: 0, max: 10, unit: '%', v: 0 }
+      ] },
+      { title: 'Ночная цветовая схема', rows: [
+        { id: 'night', t: 'seg', label: 'Режим', opts: ['Выключено', 'Закат—рассвет', 'Всегда'], v: 'Закат—рассвет' },
+        { id: 'nightTemp', t: 'slider', label: 'Ночная температура', min: 2500, max: 6500, unit: ' K', v: 4200 },
+        { id: 'nightLoc', t: 'info', label: 'Местоположение', v: 'Таллин · 59.44° с. ш.' }
+      ] }
+    ] },
+    { id: 'sound', name: 'Звук', glyph: '♪', bg: '#c2412f', sub: 'PipeWire, EasyEffects', groups: [
+      { title: 'Вывод', rows: [
+        { id: 'out', t: 'list', label: 'Устройство', opts: [['hdmi', 'HDMI · монитор', 'PipeWire · 48 кГц'], ['jack', 'Наушники 3,5 мм', 'bcm2835 headphones'], ['usb', 'USB-ЦАП', 'Не подключено']], v: 'hdmi' },
+        { id: 'vol', t: 'slider', label: 'Громкость', min: 0, max: 150, unit: '%', v: 64 },
+        { id: 'over', t: 'toggle', label: 'Разрешить громкость выше 100%', v: false },
+        { id: 'feedbackSnd', t: 'toggle', label: 'Звук при изменении громкости', v: true }
+      ] },
+      { title: 'Ввод', rows: [
+        { id: 'mic', t: 'select', label: 'Микрофон', opts: ['Встроенный в веб-камеру', 'USB-микрофон', 'Нет'], v: 'Встроенный в веб-камеру' },
+        { id: 'micVol', t: 'slider', label: 'Чувствительность', min: 0, max: 100, unit: '%', v: 70 },
+        { id: 'noise', t: 'toggle', label: 'Шумоподавление (EasyEffects)', v: true }
+      ] },
+      { title: 'EasyEffects', rows: [
+        { id: 'eePreset', t: 'select', label: 'Пресет', opts: ['Ровно', 'Бас', 'Голос', 'Наушники'], v: 'Ровно' },
+        { id: 'eeLimiter', t: 'toggle', label: 'Лимитер', v: true },
+        { id: 'eeCava', t: 'toggle', label: 'Визуализация cava в доке', v: true },
+        { id: 'quantum', t: 'select', label: 'Буфер PipeWire', opts: ['256', '512', '1024', '2048'], v: '1024', hint: 'Меньше — ниже задержка, но выше нагрузка на ЦП' }
+      ] }
+    ] },
+    { id: 'input', name: 'Клавиатура и мышь', glyph: '⌨', bg: '#3a3a40', sub: 'Раскладки, повтор, указатель', groups: [
+      { title: 'Раскладки', rows: [
+        { id: 'layouts', t: 'info', label: 'Раскладки', v: 'Русская, English (US)' },
+        { id: 'switch', t: 'select', label: 'Переключение', opts: ['Alt + Shift', 'Meta + Пробел', 'Caps Lock', 'Ctrl + Shift'], v: 'Alt + Shift' },
+        { id: 'perWin', t: 'seg', label: 'Запоминать раскладку', opts: ['Глобально', 'Для окна', 'Для приложения'], v: 'Для окна' },
+        { id: 'numlock', t: 'seg', label: 'NumLock при входе', opts: ['Включить', 'Выключить', 'Не менять'], v: 'Включить' }
+      ] },
+      { title: 'Повтор клавиш', rows: [
+        { id: 'delay', t: 'slider', label: 'Задержка', min: 100, max: 1000, unit: ' мс', v: 400 },
+        { id: 'rate', t: 'slider', label: 'Скорость', min: 5, max: 60, unit: ' /с', v: 25 }
+      ] },
+      { title: 'Мышь', rows: [
+        { id: 'speed', t: 'slider', label: 'Скорость указателя', min: -100, max: 100, unit: '', v: 0 },
+        { id: 'accel', t: 'seg', label: 'Ускорение', opts: ['Нет', 'Адаптивное'], v: 'Адаптивное' },
+        { id: 'natural', t: 'toggle', label: 'Естественная прокрутка', v: false },
+        { id: 'leftHand', t: 'toggle', label: 'Для левой руки', v: false }
+      ] }
+    ] },
+    { id: 'shortcuts', name: 'Комбинации клавиш', glyph: '⌘', bg: '#3a3a40', sub: 'Глобальные сочетания', groups: [
+      { title: 'Система', rows: [
+        { id: 'kOverview', t: 'keys', label: 'Обзор', v: 'Meta + W' },
+        { id: 'kSearch', t: 'keys', label: 'Поиск', v: 'Meta' },
+        { id: 'kLock', t: 'keys', label: 'Заблокировать экран', v: 'Meta + L' },
+        { id: 'kShot', t: 'keys', label: 'Снимок области', v: 'Meta + Shift + S' },
+        { id: 'kRec', t: 'keys', label: 'Запись экрана', v: 'Meta + Shift + R' },
+        { id: 'kClip', t: 'keys', label: 'История буфера', v: 'Meta + V' }
+      ] },
+      { title: 'Окна', rows: [
+        { id: 'kClose', t: 'keys', label: 'Закрыть окно', v: 'Alt + F4' },
+        { id: 'kMax', t: 'keys', label: 'Развернуть', v: 'Meta + PgUp' },
+        { id: 'kMin', t: 'keys', label: 'Свернуть', v: 'Meta + PgDown' },
+        { id: 'kTileL', t: 'keys', label: 'Плитка влево', v: 'Meta + ←' },
+        { id: 'kTileR', t: 'keys', label: 'Плитка вправо', v: 'Meta + →' },
+        { id: 'kDesk', t: 'keys', label: 'Следующий рабочий стол', v: 'Ctrl + Meta + →' }
+      ] },
+      { title: 'Приложения', rows: [
+        { id: 'kTerm', t: 'keys', label: 'Терминал (kitty)', v: 'Ctrl + Alt + T' },
+        { id: 'kFiles', t: 'keys', label: 'Проводник', v: 'Meta + E' },
+        { id: 'kBrowser', t: 'keys', label: 'Браузер (Chromium)', v: 'Meta + B' }
+      ] }
+    ] },
+    { id: 'bt', name: 'Bluetooth', glyph: 'ᛒ', bg: '#3a3a40', sub: 'bluez установлен, нет bluedevil', groups: [
+      { title: 'Состояние', rows: [
+        { id: 'btMissing', t: 'info', label: 'Служба', v: 'bluez 5 и bluez-utils установлены · модуля bluedevil нет' },
+        { id: 'btInstall', t: 'button', label: 'Установить поддержку Bluetooth', v: 'sudo pacman -S bluedevil bluez-utils' },
+        { id: 'btSvc', t: 'toggle', label: 'Запускать bluetooth.service при загрузке', v: false },
+        { id: 'btCli', t: 'info', label: 'Сейчас управление', v: 'через bluetoothctl в терминале' }
+      ] }
+    ] },
+    { id: 'printers', name: 'Принтеры', glyph: '⎙', bg: '#3a3a40', sub: 'CUPS', groups: [
+      { title: 'CUPS', rows: [
+        { id: 'prList', t: 'info', label: 'Принтеры', v: 'Нет настроенных принтеров' },
+        { id: 'prAdd', t: 'button', label: 'Добавить принтер', v: 'Найти в сети' },
+        { id: 'prShare', t: 'toggle', label: 'Общий доступ к принтерам', v: false }
+      ] }
+    ] },
+    { id: 'disks', name: 'Диски и носители', glyph: '◫', bg: '#3a3a40', sub: 'microSD, USB, автоподключение', groups: [
+      { title: 'Накопители', rows: [
+        { id: 'dRoot', t: 'info', label: 'microSD · / (ext4)', v: '23,4 из 59 ГБ' },
+        { id: 'dBoot', t: 'info', label: 'microSD · /boot (vfat)', v: '86 из 511 МБ' },
+        { id: 'dUsb', t: 'info', label: 'USB-накопитель (exFAT)', v: '14,2 ГБ · отключён' }
+      ] },
+      { title: 'Съёмные носители', rows: [
+        { id: 'automount', t: 'toggle', label: 'Подключать автоматически', v: true },
+        { id: 'openOnMount', t: 'toggle', label: 'Открывать в проводнике', v: true },
+        { id: 'trim', t: 'toggle', label: 'Еженедельный TRIM (fstrim.timer)', v: true },
+        { id: 'smart', t: 'toggle', label: 'Следить за SMART', v: false }
+      ] }
+    ] }
+  ] },
+  { cat: 'Сеть', items: [
+    { id: 'net', name: 'Wi-Fi и сеть', glyph: '◠', bg: '#4f7fb8', sub: 'NetworkManager', groups: [
+      { title: 'Wi-Fi · wlan0', rows: [
+        { id: 'wifiOn', t: 'toggle', label: 'Wi-Fi', v: true },
+        { id: 'wifiNet', t: 'list', label: 'Сеть', opts: [['home5', 'home-5G', 'Подключено · 5 ГГц · WPA2'], ['home24', 'home-2.4', 'WPA2'], ['guest', 'Guest', 'Открытая']], v: 'home5' },
+        { id: 'band', t: 'seg', label: 'Диапазон', opts: ['Авто', '2,4 ГГц', '5 ГГц'], v: '5 ГГц' },
+        { id: 'macRand', t: 'toggle', label: 'Случайный MAC-адрес', v: false }
+      ] },
+      { title: 'Подключение', rows: [
+        { id: 'ipv4', t: 'seg', label: 'IPv4', opts: ['DHCP', 'Вручную'], v: 'DHCP' },
+        { id: 'ip', t: 'info', label: 'Адрес', v: '192.168.1.42 / 24' },
+        { id: 'gw', t: 'info', label: 'Шлюз', v: '192.168.1.1' },
+        { id: 'dns', t: 'select', label: 'DNS', opts: ['Автоматически', 'Cloudflare 1.1.1.1', 'Quad9 9.9.9.9', 'Google 8.8.8.8'], v: 'Автоматически' },
+        { id: 'host', t: 'info', label: 'Имя компьютера', v: 'alarm' }
+      ] },
+      { title: 'Ethernet · end0', rows: [
+        { id: 'eth', t: 'info', label: 'Состояние', v: 'Кабель не подключён' }
+      ] },
+      { title: 'Апплет', rows: [
+        { id: 'plasmaNm', t: 'button', label: 'Апплет сетей в рамке (plasma-nm)', v: 'Установить' }
+      ] }
+    ] },
+    { id: 'vpn', name: 'VPN', glyph: '⛨', bg: '#3f9a6b', sub: 'WireGuard, OpenVPN', groups: [
+      { title: 'Подключения', rows: [
+        { id: 'wg', t: 'toggle', label: 'WireGuard · home', v: false },
+        { id: 'vpnAdd', t: 'button', label: 'Добавить VPN', v: 'Импорт .conf' },
+        { id: 'killSwitch', t: 'toggle', label: 'Блокировать трафик без VPN', v: false }
+      ] }
+    ] },
+    { id: 'remote', name: 'Удалённый доступ', glyph: '⇄', bg: '#3a3a40', sub: 'SSH, WayVNC', groups: [
+      { title: 'SSH', rows: [
+        { id: 'sshd', t: 'toggle', label: 'Сервер SSH (sshd)', v: true },
+        { id: 'sshPort', t: 'info', label: 'Порт', v: '22' },
+        { id: 'sshPass', t: 'toggle', label: 'Вход по паролю', v: true, hint: 'Безопаснее оставить только ключи и сменить пароль alarm' },
+        { id: 'sshRoot', t: 'toggle', label: 'Вход root', v: false }
+      ] },
+      { title: 'Рабочий стол по сети (WayVNC)', rows: [
+        { id: 'vnc', t: 'toggle', label: 'Разрешить подключение', v: false },
+        { id: 'vncPort', t: 'info', label: 'Адрес', v: 'alarm.local:5900' },
+        { id: 'vncPw', t: 'toggle', label: 'Требовать пароль', v: true },
+        { id: 'vncView', t: 'toggle', label: 'Только просмотр', v: false }
+      ] }
+    ] }
+  ] },
+  { cat: 'Система', items: [
+    { id: 'power', name: 'Питание', glyph: '⚡', bg: '#e8a33d', sub: 'PowerDevil, профили', groups: [
+      { title: 'Профиль', rows: [
+        { id: 'pprof', t: 'seg', label: 'Режим', opts: ['Экономия', 'Баланс', 'Производительность'], v: 'Баланс' },
+        { id: 'gov', t: 'info', label: 'Регулятор ЦП', v: 'ondemand · 600–2400 МГц' },
+        { id: 'temp', t: 'info', label: 'Температура SoC', v: '47 °C' }
+      ] },
+      { title: 'Экран', rows: [
+        { id: 'dimAfter', t: 'select', label: 'Затемнять через', opts: ['1 минуту', '2 минуты', '5 минут', 'Никогда'], v: '2 минуты' },
+        { id: 'offAfter', t: 'select', label: 'Выключать через', opts: ['5 минут', '10 минут', '30 минут', 'Никогда'], v: '10 минут' }
+      ] },
+      { title: 'Сон и кнопка', rows: [
+        { id: 'sleepAfter', t: 'select', label: 'Засыпать через', opts: ['15 минут', '30 минут', '1 час', 'Никогда'], v: 'Никогда', hint: 'Raspberry Pi не поддерживает настоящий сон — только выключение экрана' },
+        { id: 'pBtn', t: 'seg', label: 'Кнопка питания', opts: ['Спросить', 'Выключить', 'Заблокировать', 'Ничего'], v: 'Спросить' },
+        { id: 'fan', t: 'seg', label: 'Вентилятор', opts: ['Тихий', 'Авто', 'Максимум'], v: 'Авто' }
+      ] }
+    ] },
+    { id: 'users', name: 'Пользователи', glyph: '☺', bg: '#4f7fb8', sub: 'Учётные записи', groups: [
+      { title: 'alarm', rows: [
+        { id: 'uName', t: 'info', label: 'Имя', v: 'alarm (администратор)' },
+        { id: 'uPw', t: 'button', label: 'Пароль', v: 'Сменить пароль', hint: 'Сейчас стоит стандартный пароль Arch Linux ARM' },
+        { id: 'uAuto', t: 'toggle', label: 'Входить автоматически', v: false },
+        { id: 'uFinger', t: 'toggle', label: 'Отпечаток пальца', v: false }
+      ] },
+      { title: 'Другие', rows: [
+        { id: 'uRoot', t: 'info', label: 'root', v: 'Вход отключён' },
+        { id: 'uAdd', t: 'button', label: 'Новый пользователь', v: 'Добавить' }
+      ] }
+    ] },
+    { id: 'login', name: 'Экран входа', glyph: '⎆', bg: '#3a3a40', sub: 'SDDM', groups: [
+      { title: 'SDDM', rows: [
+        { id: 'sddmTheme', t: 'select', label: 'Тема', opts: ['Стекло', 'Breeze', 'Maya'], v: 'Стекло' },
+        { id: 'sddmSession', t: 'select', label: 'Сеанс по умолчанию', opts: ['Plasma (Wayland)', 'Plasma (X11)', 'Sway'], v: 'Plasma (Wayland)' },
+        { id: 'sddmSync', t: 'button', label: 'Применить оформление Plasma к SDDM', v: 'Синхронизировать' },
+        { id: 'sddmNum', t: 'toggle', label: 'NumLock на экране входа', v: true }
+      ] }
+    ] },
+    { id: 'region', name: 'Язык и регион', glyph: '◎', bg: '#3a3a40', sub: 'Язык, форматы, время', groups: [
+      { title: 'Язык', rows: [
+        { id: 'lang', t: 'select', label: 'Язык системы', opts: ['Русский', 'English (US)', 'Eesti'], v: 'Русский' },
+        { id: 'fmtNum', t: 'info', label: 'Числа', v: '1 234 567,89' },
+        { id: 'fmtCur', t: 'info', label: 'Валюта', v: '12,50 €' },
+        { id: 'units', t: 'seg', label: 'Единицы', opts: ['Метрические', 'Имперские'], v: 'Метрические' }
+      ] },
+      { title: 'Дата и время', rows: [
+        { id: 'tz', t: 'select', label: 'Часовой пояс', opts: ['Europe/Tallinn', 'Europe/Moscow', 'Europe/Kyiv', 'UTC'], v: 'Europe/Tallinn' },
+        { id: 'ntp', t: 'toggle', label: 'Синхронизировать по сети (NTP)', v: true },
+        { id: 'h24', t: 'seg', label: 'Формат', opts: ['24 часа', '12 часов'], v: '24 часа' },
+        { id: 'week', t: 'seg', label: 'Первый день недели', opts: ['Понедельник', 'Воскресенье'], v: 'Понедельник' }
+      ] }
+    ] },
+    { id: 'apps', name: 'Приложения', glyph: '▤', bg: '#3a3a40', sub: 'По умолчанию, автозапуск', groups: [
+      { title: 'По умолчанию', rows: [
+        { id: 'dBrowser', t: 'select', label: 'Браузер', opts: ['Chromium', 'Firefox'], v: 'Chromium' },
+        { id: 'dTerm', t: 'select', label: 'Терминал', opts: ['kitty', 'Konsole', 'Терминал (наш)'], v: 'kitty' },
+        { id: 'dFiles', t: 'select', label: 'Файлы', opts: ['Проводник (наш)', 'Dolphin', 'Nautilus'], v: 'Проводник (наш)' },
+        { id: 'dEditor', t: 'select', label: 'Редактор', opts: ['Visual Studio Code', 'Kate', 'nano'], v: 'Visual Studio Code' },
+        { id: 'dMusic', t: 'select', label: 'Музыка', opts: ['Музыка (наша)', 'Elisa'], v: 'Музыка (наша)' }
+      ] },
+      { title: 'Автозапуск', rows: [
+        { id: 'asEasy', t: 'toggle', label: 'EasyEffects', v: true },
+        { id: 'asVnc', t: 'toggle', label: 'WayVNC', v: false },
+        { id: 'asFetch', t: 'toggle', label: 'fastfetch в терминале', v: true },
+        { id: 'asCava', t: 'toggle', label: 'cava', v: false }
+      ] },
+      { title: 'Flatpak', rows: [
+        { id: 'flathub', t: 'toggle', label: 'Репозиторий Flathub', v: false }
+      ] }
+    ] },
+    { id: 'services', name: 'Службы', glyph: '⚑', bg: '#3a3a40', sub: 'systemd', groups: [
+      { title: 'Системные службы', rows: [
+        { id: 'svNm', t: 'toggle', label: 'NetworkManager', v: true },
+        { id: 'svSddm', t: 'toggle', label: 'sddm', v: true },
+        { id: 'svSsh', t: 'toggle', label: 'sshd', v: true },
+        { id: 'svCups', t: 'toggle', label: 'cups', v: false },
+        { id: 'svTime', t: 'toggle', label: 'systemd-timesyncd', v: true }
+      ] },
+      { title: 'Пользовательские', rows: [
+        { id: 'svPw', t: 'toggle', label: 'pipewire / wireplumber', v: true },
+        { id: 'svBaloo', t: 'toggle', label: 'Индексация Baloo', v: true }
+      ] }
+    ] },
+    { id: 'access', name: 'Специальные возможности', glyph: '♿', bg: '#4f7fb8', sub: 'Зрение, звук, клавиатура', groups: [
+      { title: 'Зрение', rows: [
+        { id: 'contrast', t: 'toggle', label: 'Высокая контрастность', v: false },
+        { id: 'bigText', t: 'slider', label: 'Размер текста', min: 80, max: 200, unit: '%', v: 100 },
+        { id: 'invert', t: 'toggle', label: 'Инверсия цветов (Meta + Ctrl + I)', v: false }
+      ] },
+      { title: 'Клавиатура', rows: [
+        { id: 'sticky', t: 'toggle', label: 'Залипание клавиш', v: false },
+        { id: 'slowKeys', t: 'toggle', label: 'Медленные клавиши', v: false },
+        { id: 'bell', t: 'toggle', label: 'Визуальный звонок', v: false }
+      ] }
+    ] },
+    { id: 'updates', name: 'Обновления', glyph: '⟳', bg: '#3f9a6b', sub: 'pacman, зеркала', groups: [
+      { title: 'pacman', rows: [
+        { id: 'upAvail', t: 'info', label: 'Доступно', v: '14 пакетов · 186 МБ' },
+        { id: 'upNow', t: 'button', label: 'Обновить систему', v: 'pacman -Syu' },
+        { id: 'upCheck', t: 'select', label: 'Проверять', opts: ['Ежедневно', 'Еженедельно', 'Вручную'], v: 'Ежедневно' },
+        { id: 'upNotify', t: 'toggle', label: 'Уведомлять об обновлениях', v: true },
+        { id: 'parallel', t: 'slider', label: 'Параллельные загрузки', min: 1, max: 10, unit: '', v: 5 },
+        { id: 'mirror', t: 'select', label: 'Зеркало', opts: ['Автоматически (geo)', 'de.mirror.archlinuxarm.org', 'fl.us.mirror.archlinuxarm.org'], v: 'Автоматически (geo)' },
+        { id: 'cache', t: 'button', label: 'Кэш пакетов · 1,9 ГБ', v: 'Очистить (paccache -r)' }
+      ] }
+    ] },
+    { id: 'about', name: 'О системе', glyph: 'ⓘ', bg: '#2e2e33', sub: 'Raspberry Pi · AshenOS', groups: [
+      { title: 'Компьютер', rows: [
+        { id: 'abHost', t: 'info', label: 'Имя', v: 'alarm' },
+        { id: 'abOs', t: 'info', label: 'Система', v: 'AshenOS · aarch64 (на базе Arch Linux ARM)' },
+        { id: 'abPlasma', t: 'info', label: 'KDE Plasma', v: '6.8.1' },
+        { id: 'abFw', t: 'info', label: 'KDE Frameworks', v: '6.31.0' },
+        { id: 'abQt', t: 'info', label: 'Qt', v: '6 (и Qt 5.15.19 для совместимости)' },
+        { id: 'abSession', t: 'info', label: 'Графический сеанс', v: 'Wayland' },
+        { id: 'abAudio', t: 'info', label: 'Звук', v: 'PipeWire 1.6.10' },
+        { id: 'abNet', t: 'info', label: 'Сеть', v: 'NetworkManager 1.58.1' },
+        { id: 'abCopy', t: 'button', label: 'Сведения о системе', v: 'Скопировать в буфер' }
+      ] }
+    ] }
+  ] }
+];
+
+const WALLS = [
+      { name: 'Апельсин', accent: '#ff9a4d', css: 'radial-gradient(70% 60% at 88% 78%,#ef7d2c 0%,rgba(239,125,44,0) 70%),radial-gradient(60% 60% at 10% 25%,#9c3218 0%,rgba(156,50,24,0) 70%),linear-gradient(160deg,#6e2412 0%,#b84a1c 40%,#d9661f 72%,#b4481a 100%)' },
+      { name: 'Лава', accent: '#ff8f8a', css: 'radial-gradient(55% 50% at 82% 88%,#e3381f 0%,rgba(227,56,31,0) 65%),radial-gradient(45% 45% at 70% 60%,rgba(240,74,42,.7) 0%,rgba(240,74,42,0) 60%),radial-gradient(45% 55% at 12% 20%,#3f6f78 0%,rgba(63,111,120,0) 72%),radial-gradient(60% 50% at 40% 0%,#2b4e57 0%,rgba(0,0,0,0) 70%),linear-gradient(160deg,#16252a,#0b0d0f)' },
+      { name: 'Шёлк', accent: '#9cc0ee', css: 'repeating-linear-gradient(118deg,rgba(255,255,255,.035) 0 4px,rgba(0,0,0,.05) 4px 10px),linear-gradient(118deg,#121320 0%,#8a2f24 14%,#1c2238 28%,#3e6596 42%,#9fb0c8 52%,#4f6283 62%,#8a3a30 74%,#1c1f30 86%,#5d6c88 100%)' },
+      { name: 'Радуга', accent: '#e2b0ef', css: 'radial-gradient(55% 45% at 8% 4%,#3b6cf5 0%,rgba(59,108,245,0) 65%),radial-gradient(45% 40% at 26% 28%,#f4e04d 0%,rgba(244,224,77,0) 62%),radial-gradient(60% 50% at 28% 55%,#ff8a3d 0%,rgba(255,138,61,0) 66%),radial-gradient(50% 45% at 78% 22%,#8fd6ff 0%,rgba(143,214,255,0) 62%),radial-gradient(50% 45% at 82% 55%,#d9a3e8 0%,rgba(217,163,232,0) 62%),linear-gradient(180deg,#f0c9b8 0%,#cfcfd3 85%)' },
+      { name: 'Волны', accent: '#ededf0', css: 'radial-gradient(130% 90% at 105% 118%,rgba(0,0,0,0) 57%,rgba(255,255,255,.17) 58.2%,rgba(255,255,255,.04) 62%,rgba(0,0,0,0) 66%),radial-gradient(110% 80% at -12% -22%,rgba(0,0,0,0) 54%,rgba(255,255,255,.13) 55.2%,rgba(255,255,255,.03) 59%,rgba(0,0,0,0) 63%),linear-gradient(155deg,#2a2a2e 0%,#141416 60%,#1e1e21 100%)' }
+    ];
+
+
+const T = (id, label, v, hint) => ({ id, t: 'toggle', label, v, hint });
+const S = (id, label, opts, v, hint) => ({ id, t: 'select', label, opts, v, hint });
+const SG = (id, label, opts, v, hint) => ({ id, t: 'seg', label, opts, v, hint });
+const SL = (id, label, min, max, unit, v, hint) => ({ id, t: 'slider', label, min, max, unit, v, hint });
+const I = (id, label, v) => ({ id, t: 'info', label, v });
+const B = (id, label, v, hint) => ({ id, t: 'button', label, v, hint });
+const K = (id, label, v) => ({ id, t: 'keys', label, v });
+const NEW = {
+  touchpad: [{ title: 'Сенсорная панель', rows: [I('tpDev', 'Устройство', 'Не обнаружено (подключите USB- или Bluetooth-тачпад)'), T('tpTap', 'Нажатие касанием', true), T('tpNatural', 'Естественная прокрутка', true), SG('tpScroll', 'Прокрутка', ['Двумя пальцами', 'По краю'], 'Двумя пальцами'), SL('tpSpeed', 'Скорость указателя', -100, 100, '', 0), T('tpTyping', 'Отключать во время набора', true)] }],
+  touchscreen: [{ title: 'Сенсорный экран', rows: [I('tsDev', 'Устройство', 'Официальный дисплей Raspberry Pi 7″ · не подключён'), S('tsMap', 'Привязать к экрану', ['Автоматически', 'HDMI-A-1', 'DSI-1'], 'Автоматически'), T('tsOsk', 'Показывать экранную клавиатуру', true)] }, { title: 'Жесты (KWin)', rows: [S('gTop', 'Свайп сверху', ['Обзор', 'Ничего', 'Центр управления'], 'Обзор'), S('gLeft', 'Свайп слева', ['Ничего', 'Переключение окон'], 'Ничего'), S('gBottom', 'Свайп снизу', ['Показать док', 'Ничего'], 'Показать док')] }],
+  tablet: [{ title: 'Графический планшет', rows: [I('tabDev', 'Устройство', 'Не подключено'), S('tabMap', 'Область', ['Весь экран', 'Активное окно', 'Своя область'], 'Весь экран'), SG('tabHand', 'Ориентация', ['Правша', 'Левша'], 'Правша'), T('tabPress', 'Кривая нажима по умолчанию', true)] }],
+  game: [{ title: 'Игровой контроллер', rows: [I('gcDev', 'Устройство', 'Не подключено'), B('gcTest', 'Проверить кнопки и стики', 'Открыть тест'), SL('gcDead', 'Мёртвая зона стиков', 0, 30, '%', 8), T('gcPlasma', 'Управлять рабочим столом с геймпада', false)] }],
+  vkbd: [{ title: 'Виртуальная клавиатура', rows: [SG('vkWhich', 'Клавиатура', ['Нет', 'Plasma Keyboard', 'Maliit'], 'Нет', 'В Wayland она появляется только при вводе с сенсорного экрана'), S('vkLayout', 'Раскладка', ['Как у системы', 'Русская', 'English'], 'Как у системы')] }],
+  soundtheme: [{ title: 'Системные звуки', rows: [S('sndTheme', 'Звуковая тема', ['Ocean', 'FreeDesktop', 'Без звуков'], 'Ocean'), T('sndLogin', 'Звук входа в систему', false), T('sndNotif', 'Звуки уведомлений', true), T('sndVol', 'Щелчок при изменении громкости', true), B('sndTest', 'Прослушать тему', 'Воспроизвести')] }],
+  plasmaStyle: [{ title: 'Стиль Plasma', rows: [{ id: 'pstyle', t: 'list', label: 'Стиль', opts: [['glass', 'Стекло', 'Наш стиль панелей и капель'], ['breeze', 'Breeze', 'Стандартный KDE'], ['oxygen', 'Oxygen', 'Классический']], v: 'glass' }, SL('pstyleOpacity', 'Прозрачность панелей', 50, 100, '%', 85)] }],
+  appStyle: [{ title: 'Стиль приложений', rows: [S('qtStyle', 'Qt-приложения', ['Breeze', 'Fusion', 'kvantum'], 'Breeze', 'Для Qt6 также используется qt6ct'), S('gtkTheme', 'GTK-приложения', ['adw-gtk3-dark', 'Breeze-Dark', 'Adwaita-dark'], 'adw-gtk3-dark'), T('gtkSync', 'Применять цвета Plasma к GTK (Nautilus, Chromium)', true), SG('tbStyle', 'Панели инструментов', ['Только значки', 'Текст рядом', 'Текст под'], 'Только значки'), T('menuIcons', 'Значки в меню', true)] }],
+  splash: [{ title: 'Заставка при входе', rows: [{ id: 'splashTheme', t: 'list', label: 'Заставка', opts: [['glass', 'Стекло', 'Логотип и полоса загрузки'], ['breeze', 'Breeze', 'Стандартная KDE'], ['none', 'Нет', 'Сразу рабочий стол']], v: 'glass' }] }],
+  nighttime: [{ title: 'День и ночь', rows: [SG('dnMode', 'Переключать оформление', ['Нет', 'По времени суток', 'По расписанию'], 'Нет'), S('dnDay', 'Днём', ['Стекло светлое', 'Breeze'], 'Стекло светлое'), S('dnNight', 'Ночью', ['Стекло', 'Breeze Dark', 'OLED'], 'Стекло'), T('dnWall', 'Менять обои вместе с темой', true)] }],
+  matugen: [{ title: 'Цвета из обоев (matugen)', rows: [T('mgOn', 'Генерировать палитру из обоев', true, 'matugen установлен на Pi'), SG('mgScheme', 'Схема', ['Tonal Spot', 'Vibrant', 'Monochrome'], 'Monochrome'), T('mgGtk', 'Применять к GTK и kitty', true)] }],
+  fontinst: [{ title: 'Управление шрифтами', rows: [I('fiCount', 'Установлено', 'Noto Sans, Noto Serif, Iosevka Nerd Font, Inter, JetBrains Mono'), B('fiAdd', 'Добавить шрифт', 'Установить из файла…'), SG('fiScope', 'Устанавливать', ['Для меня', 'Для всех'], 'Для меня')] }],
+  filetypes: [{ title: 'Привязки файлов', rows: [S('ftPng', 'image/png', ['Просмотр (наш)', 'Chromium', 'satty'], 'Просмотр (наш)'), S('ftPdf', 'application/pdf', ['Chromium', 'Okular'], 'Chromium'), S('ftMp3', 'audio/mpeg', ['Музыка (наша)', 'Chromium'], 'Музыка (наша)'), S('ftTxt', 'text/plain', ['Visual Studio Code', 'nano', 'Kate'], 'Visual Studio Code'), S('ftDir', 'inode/directory', ['Проводник (наш)', 'Dolphin', 'Nautilus'], 'Проводник (наш)')] }],
+  rules: [{ title: 'Правила окон', rows: [I('ruTg', 'Telegram', 'Открывать на рабочем столе 2'), I('ruKitty', 'kitty', 'Без рамки, прозрачность 92%'), I('ruCava', 'cava', 'Поверх всех, без фокуса'), B('ruAdd', 'Новое правило', 'Добавить…'), B('ruDetect', 'Определить свойства окна', 'Выбрать окно')] }],
+  kscripts: [{ title: 'Сценарии KWin', rows: [T('ksTile', 'Автоматическая плитка (Polonium)', false), T('ksMin', 'Сворачивать все', true), T('ksVid', 'Видеостена', false), B('ksGet', 'Получить новые сценарии', 'Открыть…')] }],
+  x11: [{ title: 'Устаревшие X11-приложения (XWayland)', rows: [SG('xKeys', 'Доступ X11-приложений к клавиатуре', ['Никогда', 'Только с модификаторами', 'Всегда'], 'Только с модификаторами'), T('xMouse', 'Передавать кнопки мыши', false), T('xScale', 'Масштабировать X11-приложения сами', true, 'Иначе они будут размытыми при масштабе 125%')] }],
+  webkeys: [{ title: 'Веб-ключевые слова', rows: [T('wkOn', 'Включить быстрый поиск в интернете', true), SG('wkSep', 'Разделитель', [':', 'Пробел'], ':'), S('wkDefault', 'Поиск по умолчанию', ['DuckDuckGo', 'Google', 'Яндекс', 'Wikipedia'], 'DuckDuckGo'), I('wkEx', 'Примеры', 'gg:запрос · wp:статья · aur:пакет · yt:видео')] }],
+  paths: [{ title: 'Пути к папкам', rows: [I('pDesk', 'Рабочий стол', '~/Рабочий стол'), I('pDocs', 'Документы', '~/Документы'), I('pDown', 'Загрузки', '~/Загрузки'), I('pMusic', 'Музыка', '~/Музыка'), I('pPics', 'Изображения', '~/Изображения'), I('pVid', 'Видео', '~/Видео'), I('pShots', 'Снимки экрана', '~/Изображения/Снимки')] }],
+  trash: [{ title: 'Корзина', rows: [T('trAge', 'Удалять файлы старше', true), S('trDays', 'Срок', ['7 дней', '30 дней', '90 дней'], '30 дней'), SL('trSize', 'Максимальный размер', 1, 30, '%', 10), T('trWarn', 'Предупреждать при переполнении', true), I('trNow', 'Сейчас в корзине', '24 файла · 312 МБ'), B('trEmpty', 'Корзина', 'Очистить')] }],
+  solid: [{ title: 'Действия при подключении устройств', rows: [I('saUsb', 'USB-накопитель', 'Открыть в проводнике'), I('saPhone', 'Телефон (MTP)', 'Открыть в проводнике'), I('saCam', 'Камера', 'Импорт фотографий'), B('saAdd', 'Новое действие', 'Добавить…')] }],
+  proxy: [{ title: 'Прокси', rows: [{ id: 'pxMode', t: 'list', label: 'Режим', opts: [['none', 'Без прокси', 'Прямое подключение'], ['auto', 'Автоматически (WPAD)', 'Найти настройки в сети'], ['manual', 'Вручную', 'HTTP, HTTPS, SOCKS'], ['env', 'Из переменных окружения', 'http_proxy, https_proxy']], v: 'none' }, T('pxSocks', 'Использовать SOCKS5 для всего', false)] }],
+  netpref: [{ title: 'Параметры сети', rows: [SL('npTimeout', 'Тайм-аут соединения', 5, 60, ' с', 20), SL('npRead', 'Тайм-аут чтения', 5, 120, ' с', 60), T('npPassive', 'Пассивный режим FTP', true), T('npPartial', 'Помечать недокачанные файлы', true)] }],
+  krdp: [{ title: 'Удалённый рабочий стол (KRDP)', rows: [T('rdpOn', 'Разрешить вход по RDP', false, 'krdp установлен на Pi'), I('rdpAddr', 'Адрес', 'alarm.local:3389'), I('rdpUser', 'Пользователь', 'alarm'), T('rdpH264', 'Аппаратное кодирование H.264', true)] }],
+  spell: [{ title: 'Проверка орфографии', rows: [S('spLang', 'Язык по умолчанию', ['Русский (hunspell-ru)', 'English'], 'Русский (hunspell-ru)'), T('spAuto', 'Проверять при вводе', true), T('spCaps', 'Пропускать слова В ВЕРХНЕМ РЕГИСТРЕ', true), T('spRun', 'Пропускать слитные слова', false)] }],
+  session: [{ title: 'Сеанс рабочего стола', rows: [SG('seStart', 'При входе', ['Восстановить сеанс', 'Пустой сеанс', 'Сохранённый вручную'], 'Восстановить сеанс'), T('seConfirm', 'Подтверждать выход', true), SG('seDefault', 'По умолчанию при выходе', ['Выключить', 'Перезагрузить', 'Выйти'], 'Выключить'), I('seExclude', 'Не восстанавливать', 'cava, wayvnc')] }],
+  kded: [{ title: 'Фоновые службы', rows: [T('kdBaloo', 'Наблюдение за файлами (Baloo)', true), T('kdNet', 'Состояние сети', true), T('kdPower', 'Управление питанием', true), T('kdKeys', 'Глобальные комбинации клавиш', true), T('kdBt', 'Bluetooth', false), T('kdTz', 'Часовой пояс (ktimezoned)', true)] }],
+  qtquick: [{ title: 'Отрисовка Qt Quick', rows: [SG('qqBackend', 'Движок', ['Авто', 'OpenGL', 'Программный'], 'Авто', 'На Raspberry Pi лучше OpenGL ES (V3D)'), SG('qqLoop', 'Цикл отрисовки', ['Авто', 'Базовый', 'Многопоточный'], 'Авто')] }],
+  feedback: [{ title: 'Отзывы пользователей', rows: [SG('fbLevel', 'Отправлять в KDE', ['Ничего', 'Базовые сведения', 'Подробно'], 'Ничего'), SG('fbSurvey', 'Опросы', ['Никогда', 'Иногда'], 'Никогда')] }],
+  memory: [{ title: 'Память', rows: [I('memRam', 'ОЗУ', 'см. О системе'), T('zram', 'Сжатая подкачка zram (zram-generator)', true), SL('zramSize', 'Размер zram', 25, 100, '% ОЗУ', 50), S('zramAlg', 'Сжатие', ['zstd', 'lz4', 'lzo-rle'], 'zstd')] }],
+  capture: [{ title: 'Снимки и запись экрана', rows: [S('shotTool', 'Снимки экрана', ['grim + slurp + satty', 'Spectacle'], 'grim + slurp + satty'), K('shotKey', 'Снимок области', 'Meta + Shift + S'), S('recTool', 'Запись экрана', ['gpu-screen-recorder', 'wf-recorder'], 'gpu-screen-recorder', 'Запись показывается в Dynamic Island'), S('recFps', 'Кадров в секунду', ['30', '60'], '60'), I('recDir', 'Сохранять в', '~/Видео')] }, { title: 'Буфер обмена', rows: [T('cliphist', 'История буфера (cliphist)', true), SL('clipMax', 'Хранить записей', 10, 500, '', 100), T('clipImg', 'Сохранять картинки', true), K('clipKey', 'Открыть историю', 'Meta + V')] }]
+};
+/* Plasma 6 layout: same categories and nesting as «Параметры системы» on the Pi */
+const P = {};
+SECTIONS.forEach((c) => c.items.forEach((it) => { P[it.id] = it; }));
+const G = (id, ...titles) => P[id].groups.filter((g) => titles.includes(g.title));
+const page = (id, name, glyph, bg, groups, extra) => ({ id, name, glyph, bg, groups, ...(extra || {}) });
+const CATS = [
+  { cat: 'Ввод и вывод', items: [
+    page('mouse', 'Мышь и сенсорная панель', '◉', '#3a3a40', null, { children: [
+      page('mouseP', 'Мышь', '◉', '#3a3a40', G('input', 'Мышь')),
+      page('touchpad', 'Сенсорная панель', '▭', '#3a3a40', NEW.touchpad)
+    ] }),
+    page('keyboard', 'Клавиатура', '⌨', '#3a3a40', G('input', 'Раскладки', 'Повтор клавиш')),
+    page('sound', 'Звук', '♪', '#c2412f', P.sound.groups),
+    page('display', 'Экран и монитор', '▭', '#4f7fb8', null, { children: [
+      page('displayCfg', 'Настройка экранов', '▭', '#4f7fb8', [P.display.groups[0]]),
+      page('night', 'Ночная цветовая схема', '☾', '#e8a33d', [P.display.groups[1]])
+    ] }),
+    page('access', 'Специальные возможности', '♿', '#4f7fb8', P.access.groups),
+    page('touchscreen', 'Сенсорный экран', '☝', '#3a3a40', NEW.touchscreen),
+    page('tablet', 'Графический планшет', '✎', '#3a3a40', NEW.tablet),
+    page('game', 'Игровой контроллер', '◎', '#3a3a40', NEW.game),
+    page('vkbd', 'Виртуальная клавиатура', '⌨', '#3a3a40', NEW.vkbd)
+  ] },
+  { cat: 'Подключённые устройства', items: [
+    page('bt', 'Bluetooth', 'ᛒ', '#4f7fb8', P.bt.groups),
+    page('disks', 'Диски и камеры', '◫', '#3a3a40', [...P.disks.groups, ...NEW.solid]),
+    page('printers', 'Принтеры', '⎙', '#3a3a40', P.printers.groups)
+  ] },
+  { cat: 'Сеть', items: [
+    page('net', 'Wi-Fi и интернет', '◠', '#4f7fb8', [...P.net.groups, ...P.vpn.groups.map((g) => ({ ...g, title: 'VPN' }))]),
+    page('remote', 'Удалённый рабочий стол', '⇄', '#3a3a40', [...NEW.krdp, ...P.remote.groups]),
+    page('netset', 'Параметры сети', '⚙', '#3a3a40', null, { children: [
+      page('proxy', 'Прокси', '⇢', '#3a3a40', NEW.proxy),
+      page('netpref', 'Подключения', '◠', '#3a3a40', NEW.netpref)
+    ] })
+  ] },
+  { cat: 'Внешний вид и стиль', items: [
+    page('wall', 'Обои', '◧', '#4f7fb8', G('wall', 'Экран блокировки'), { custom: 'wall' }),
+    page('themes', 'Цвета и темы', '◐', '#8a63d2', null, { children: [
+      page('global', 'Глобальная тема', '◐', '#8a63d2', [P.look.groups[0]]),
+      page('pstyle', 'Стиль Plasma', '▭', '#2e2e33', NEW.plasmaStyle),
+      page('appstyle', 'Стиль приложений', '▤', '#3a3a40', NEW.appStyle),
+      page('colors', 'Цвета', '●', '#d0452f', [P.look.groups[1], ...NEW.matugen]),
+      page('nighttime', 'День и ночь', '◑', '#e8a33d', NEW.nighttime),
+      page('icons', 'Значки и курсоры', '◇', '#3a3a40', [P.look.groups[3]]),
+      page('deco', 'Оформление окон', '▢', '#3a3a40', [P.look.groups[4]]),
+      page('sounds', 'Системные звуки', '♪', '#c2412f', NEW.soundtheme),
+      page('splash', 'Заставка', '◌', '#3a3a40', NEW.splash),
+      page('sddm', 'Экран входа (SDDM)', '⎆', '#3a3a40', P.login.groups)
+    ] }),
+    page('fontsP', 'Текст и шрифты', 'Aa', '#3a3a40', null, { children: [
+      page('fonts', 'Шрифты', 'Aa', '#3a3a40', [P.look.groups[2]]),
+      page('fontinst', 'Управление шрифтами', 'A+', '#3a3a40', NEW.fontinst)
+    ] })
+  ] },
+  { cat: 'Приложения и окна', items: [
+    page('defapps', 'Приложения по умолчанию', '▤', '#3a3a40', G('apps', 'По умолчанию')),
+    page('filetypes', 'Привязки файлов', '◫', '#3a3a40', NEW.filetypes),
+    page('notif', 'Уведомления', '◔', '#e8a33d', P.notif.groups),
+    page('shortcuts', 'Комбинации клавиш', '⌘', '#3a3a40', P.shortcuts.groups),
+    page('wm', 'Управление окнами', '▢', '#2e2e33', null, { children: [
+      page('wbehav', 'Поведение окон', '▢', '#2e2e33', G('windows', 'Фокус', 'Перемещение и привязка', 'Мини-окна')),
+      page('tabbox', 'Переключение окон', '⇆', '#2e2e33', G('windows', 'Переключение задач')),
+      page('fx', 'Эффекты рабочего стола', '✦', '#8a63d2', G('effects', 'Эффекты рабочего стола (KWin)')),
+      page('rules', 'Правила окон', '☰', '#3a3a40', NEW.rules),
+      page('kscripts', 'Сценарии KWin', '{ }', '#3a3a40', NEW.kscripts),
+      page('x11', 'Устаревшие X11-приложения', 'X', '#3a3a40', NEW.x11)
+    ] }),
+    page('autostart', 'Автозапуск', '▶', '#3f9a6b', G('apps', 'Автозапуск', 'Flatpak'))
+  ] },
+  { cat: 'Рабочая среда', items: [
+    page('behav', 'Общее поведение', '⚙', '#3a3a40', [...G('effects', 'Общее'), ...P.behav.groups]),
+    page('search', 'Поиск', '⌕', '#3a3a40', null, { children: [
+      page('searchP', 'Поиск в рамке и файлы', '⌕', '#3a3a40', P.search.groups),
+      page('webkeys', 'Веб-ключевые слова', '◎', '#4f7fb8', NEW.webkeys)
+    ] }),
+    page('files', 'Файлы', '▤', '#3a3a40', null, { children: [
+      page('paths', 'Пути к папкам', '⌂', '#3a3a40', NEW.paths),
+      page('trash', 'Корзина', '⌫', '#3a3a40', NEW.trash)
+    ] }),
+    page('capture', 'Снимки, запись и буфер', '●', '#e5484d', NEW.capture),
+    page('vdesk', 'Рабочие столы и комнаты', '▦', '#3a3a40', P.vdesk.groups),
+    page('edges', 'Края экрана', '◰', '#3a3a40', G('effects', 'Активные углы')),
+    page('panel', 'Рамка, док и остров', '▭', '#2e2e33', P.panel.groups)
+  ] },
+  { cat: 'Безопасность и конфиденциальность', items: [
+    page('lock', 'Блокировка экрана', '⏻', '#3a3a40', P.lock.groups),
+    page('recent', 'Недавние файлы', '◷', '#3a3a40', [{ title: 'История', rows: [
+      { id: 'recentKeep', t: 'toggle', label: 'Запоминать открытые файлы', v: true },
+      { id: 'recentFor', t: 'select', label: 'Хранить', opts: ['1 неделю', '1 месяц', '3 месяца', 'Всегда'], v: '1 месяц' },
+      { id: 'recentClear', t: 'button', label: 'История недавних файлов', v: 'Очистить' }
+    ] }])
+  ] },
+  { cat: 'Язык и время', items: [
+    page('region', 'Регион и язык', '◎', '#3a3a40', [P.region.groups[0]]),
+    page('datetime', 'Дата и время', '◷', '#3a3a40', [P.region.groups[1]]),
+    page('spell', 'Проверка орфографии', 'abc', '#3a3a40', NEW.spell)
+  ] },
+  { cat: 'Система', items: [
+    page('about', 'О системе', 'ⓘ', '#2e2e33', P.about.groups),
+    page('power', 'Управление питанием', '⚡', '#e8a33d', P.power.groups),
+    page('users', 'Пользователи', '☺', '#4f7fb8', P.users.groups),
+    page('session', 'Сеанс', '⎋', '#3a3a40', NEW.session),
+    page('services', 'Службы', '⚑', '#3a3a40', [...P.services.groups, ...NEW.kded]),
+    page('memory', 'Память и подкачка', '▥', '#3a3a40', NEW.memory),
+    page('qtquick', 'Отрисовка Qt Quick', '◇', '#3a3a40', NEW.qtquick),
+    page('feedback', 'Отзывы пользователей', '✉', '#3a3a40', NEW.feedback),
+    page('updates', 'Обновления', '⟳', '#3f9a6b', P.updates.groups)
+  ] }
+];
+
+class Component extends DCLogic {
+  state = { sec: 'wall', parent: null, q: '', vals: {}, saved: {}, toast: null, keyEdit: null, hl: true, wTarget: 'desk', wPick: null };
+  componentDidMount() {
+    try { const v = JSON.parse(localStorage.getItem('archSettings.v2') || '{}'); if (v && typeof v === 'object') this.setState({ vals: v, saved: v }); } catch (e) {}
+  }
+  componentWillUnmount() { clearTimeout(this.tt); }
+  say(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+  renderVals() {
+    const st = this.state;
+    const pages = [];
+    CATS.forEach((c) => c.items.forEach((it) => { if (it.children) it.children.forEach((ch) => pages.push({ ...ch, cat: c.cat, parent: it })); else pages.push({ ...it, cat: c.cat, parent: null }); }));
+    const groupsOf = (pg) => pg.groups || [];
+    const val = (r) => (r.id in st.vals ? st.vals[r.id] : r.v);
+    const savedVal = (r) => (r.id in st.saved ? st.saved[r.id] : r.v);
+    const set = (id, v) => this.setState({ vals: { ...this.state.vals, [id]: v } });
+    const ql = st.q.trim().toLowerCase();
+    const matchRow = (r) => (r.label + ' ' + (r.hint || '') + ' ' + (Array.isArray(r.opts) ? r.opts.map((o) => Array.isArray(o) ? o.join(' ') : o).join(' ') : '')).toLowerCase().includes(ql);
+    const pageHit = (pg) => !ql || pg.name.toLowerCase().includes(ql) || groupsOf(pg).some((g) => g.title.toLowerCase().includes(ql) || g.rows.some(matchRow));
+    const curWallSys = typeof this.props.curWall === 'number' ? this.props.curWall : 4;
+    const wallPick = st.wPick === null ? curWallSys : st.wPick;
+    const changedIn = (pg) => groupsOf(pg).reduce((n, g) => n + g.rows.filter((r) => val(r) !== savedVal(r)).length, 0) + (pg.custom === 'wall' && wallPick !== curWallSys ? 1 : 0);
+    const cur = pages.find((p) => p.id === st.sec) || pages[0];
+    const icon = (bg, size) => `width:${size}px;height:${size}px;flex:none;border-radius:${Math.round(size * 0.3)}px;display:flex;align-items:center;justify-content:center;font:700 ${Math.round(size * 0.44)}px Inter,sans-serif;background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),${bg};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.35)`;
+    const navStyle = (on) => `flex:none;display:flex;align-items:center;gap:12px;height:46px;padding:0 12px 0 10px;border-radius:12px;border:0;color:${on ? '#fff' : '#d6d6dc'};font:inherit;background:${on ? 'rgba(255,255,255,.1)' : 'transparent'};box-shadow:${on ? 'inset 0 0 0 1px rgba(255,255,255,.09)' : 'none'};transition:background .15s`;
+    const badge = (n) => n && st.hl ? 'min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#f2f2f4;color:#0b0b0c' : 'display:none';
+    let nav = [];
+    const inSub = !ql && st.parent;
+    if (ql) {
+      let pc = '';
+      nav = pages.filter(pageHit).map((pg) => { const head = pg.cat !== pc; pc = pg.cat; const on = pg.id === cur.id; const ch = changedIn(pg);
+        return { cat: pg.cat, head, name: pg.parent ? `${pg.parent.name} › ${pg.name}` : pg.name, glyph: pg.glyph, current: on ? 'page' : 'false', changed: ch ? String(ch) : '', pick: () => this.setState({ sec: pg.id, parent: pg.parent ? pg.parent.id : null }), style: navStyle(on), icon: icon(pg.bg, 30), badge: badge(ch), chev: 'display:none' }; });
+    } else if (inSub) {
+      const par = CATS.flatMap((c) => c.items).find((it) => it.id === st.parent);
+      nav = (par ? par.children : []).map((ch2) => { const on = ch2.id === cur.id; const n = changedIn(ch2);
+        return { cat: '', head: false, name: ch2.name, glyph: ch2.glyph, current: on ? 'page' : 'false', changed: n ? String(n) : '', pick: () => this.setState({ sec: ch2.id }), style: navStyle(on), icon: icon(ch2.bg, 30), badge: badge(n), chev: 'display:none' }; });
+    } else {
+      CATS.forEach((c) => c.items.forEach((it, i) => {
+        const kids = it.children;
+        const on = kids ? kids.some((k) => k.id === cur.id) : it.id === cur.id;
+        const n = kids ? kids.reduce((a, k) => a + changedIn(k), 0) : changedIn(it);
+        nav.push({ cat: c.cat, head: i === 0, name: it.name, glyph: it.glyph, current: on ? 'page' : 'false', changed: n ? String(n) : '',
+          pick: () => kids ? this.setState({ parent: it.id, sec: kids.some((k) => k.id === st.sec) ? st.sec : kids[0].id }) : this.setState({ sec: it.id, parent: null }),
+          style: navStyle(on), icon: icon(it.bg, 30), badge: badge(n), chev: kids ? 'flex:none' : 'display:none' });
+      }));
+    }
+    const par2 = cur.parent;
+    const sw = (on) => `width:46px;height:26px;flex:none;border-radius:13px;padding:3px;box-sizing:border-box;border:0;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.16)'};transition:background .25s`;
+    const knob = (on) => `width:20px;height:20px;border-radius:50%;background:${on ? '#0b0b0c' : '#f2f2f4'};transform:translateX(${on ? 20 : 0}px);transition:transform .3s cubic-bezier(.34,1.4,.6,1),background .25s`;
+    const segStyle = (on) => `height:30px;padding:0 12px;border-radius:9px;border:0;font:600 12.5px Inter,sans-serif;white-space:nowrap;background:${on ? '#f2f2f4' : 'transparent'};color:${on ? '#0b0b0c' : '#d6d6dc'};transition:background .2s,color .2s`;
+    const groups = groupsOf(cur).map((g, gi) => ({
+      title: g.title,
+      style: `display:flex;flex-direction:column;border-radius:20px;background:#0d0d0f;border:1px solid rgba(255,255,255,.07);box-shadow:0 1px 0 rgba(255,255,255,.03) inset;padding:4px 4px 8px;animation:setPage .35s ease ${(gi * 0.04).toFixed(2)}s both`,
+      rows: g.rows.map((r, ri) => {
+        const v = val(r), changed = v !== savedVal(r);
+        const hit = ql && matchRow(r);
+        const o = {
+          ...r, v,
+          is: { toggle: r.t === 'toggle', slider: r.t === 'slider', seg: r.t === 'seg', select: r.t === 'select', swatch: r.t === 'swatch', info: r.t === 'info', keys: r.t === 'keys', button: r.t === 'button', list: r.t === 'list' },
+          hint: r.hint || '', hintStyle: r.hint ? 'font-size:12px;color:#8b8b93;line-height:1.4' : 'display:none',
+          rowStyle: `display:flex;align-items:center;gap:18px;min-height:${r.t === 'list' ? 44 : 58}px;padding:8px 16px;border-radius:12px;${ri && r.t !== 'list' ? 'border-top:1px solid rgba(255,255,255,.05);' : ''}${hit ? 'background:rgba(255,255,255,.06);' : ''}${changed && st.hl ? 'box-shadow:inset 3px 0 0 #f2f2f4;background:rgba(255,255,255,.03);' : ''}`
+        };
+        if (r.t === 'toggle') Object.assign(o, { on: !!v, toggle: () => set(r.id, !v), sw: sw(!!v), knob: knob(!!v) });
+        if (r.t === 'slider') Object.assign(o, { min: r.min, max: r.max, text: `${v}${r.unit}`, set: (e) => set(r.id, +e.target.value), fill: `position:absolute;left:0;top:0;bottom:0;width:${((v - r.min) / (r.max - r.min) * 100).toFixed(1)}%;border-radius:3px;background:#f2f2f4;pointer-events:none` });
+        if (r.t === 'seg') o.opts = r.opts.map((n) => ({ name: n, on: v === n, pick: () => set(r.id, n), style: segStyle(v === n) }));
+        if (r.t === 'select') Object.assign(o, { opts: r.opts.map((n) => ({ name: n })), set: (e) => set(r.id, e.target.value) });
+        if (r.t === 'swatch') o.opts = r.opts.map((c) => ({ name: c, on: v === c, pick: () => set(r.id, c), style: `width:30px;height:30px;border-radius:50%;border:0;background:${c};box-shadow:${v === c ? '0 0 0 2px #050506,0 0 0 4px #f2f2f4' : 'inset 0 0 0 1px rgba(255,255,255,.2)'};transition:box-shadow .2s` }));
+        if (r.t === 'list') o.opts = r.opts.map(([id, n, sub]) => ({ name: n, sub, on: v === id, pick: () => set(r.id, id),
+          style: `display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:13px;border:0;color:inherit;font:inherit;background:${v === id ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.03)'};box-shadow:${v === id ? 'inset 0 0 0 1.5px rgba(255,255,255,.5)' : 'none'};transition:background .2s,box-shadow .2s`,
+          dot: `width:18px;height:18px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px ${v === id ? '#f2f2f4' : 'rgba(255,255,255,.3)'}`,
+          dotIn: `width:8px;height:8px;border-radius:50%;background:#f2f2f4;transform:scale(${v === id ? 1 : 0});transition:transform .25s cubic-bezier(.34,1.5,.6,1)` }));
+        if (r.t === 'keys') Object.assign(o, { keyText: st.keyEdit === r.id ? 'Нажмите сочетание…' : v, toggle: () => this.setState({ keyEdit: st.keyEdit === r.id ? null : r.id }), keyStyle: `height:32px;padding:0 12px;border-radius:9px;flex:none;border:0;font:600 12px 'JetBrains Mono',monospace;color:${st.keyEdit === r.id ? '#0b0b0c' : '#f2f2f4'};background:${st.keyEdit === r.id ? '#f2f2f4' : 'rgba(255,255,255,.08)'};box-shadow:inset 0 -2px 0 rgba(0,0,0,.35)` });
+        if (r.t === 'button') Object.assign(o, { btnText: r.v, toggle: () => this.say(`${r.label}: ${r.v} — в макете действие не выполняется`), btnStyle: 'height:34px;padding:0 14px;border-radius:10px;flex:none;border:0;font:600 12.5px Inter,sans-serif;background:rgba(255,255,255,.1);color:#f2f2f4' });
+        return o;
+      })
+    }));
+
+    /* ---------- wallpaper page ---------- */
+    const lockT = st.wTarget === 'lock';
+    const wv = (id, d) => (id in st.vals ? st.vals[id] : d);
+    const fit = wv('wfit', 'Заполнить');
+    const wtype = wv('wtype', 'Изображение');
+    const shown = WALLS[wallPick];
+    const nowD = new Date();
+    const pv = {
+      name: shown.name, where: lockT ? 'экран блокировки' : 'рабочий стол',
+      bezel: `position:absolute;left:0;right:0;top:0;height:${lockT ? 0 : 14}px;background:#000;z-index:2;transition:height .4s`,
+      screen: `position:absolute;left:${lockT ? 0 : 4}px;right:${lockT ? 0 : 4}px;top:${lockT ? 0 : 14}px;bottom:${lockT ? 0 : 4}px;border-radius:${lockT ? 0 : 7}px;overflow:hidden;transition:all .4s`,
+      img: `position:absolute;inset:0;background:${wtype === 'Цвет' ? '#1b1b1f' : shown.css};${fit === 'По центру' ? 'transform:scale(.7);border-radius:6px;' : fit === 'Вписать' ? 'transform:scale(.88);' : ''}${lockT ? `filter:blur(${wv('lockBlur', 24) / 6}px) brightness(.8);transform:scale(1.08);` : ''}transition:background .6s,filter .4s,transform .4s`,
+      dock: `position:absolute;left:50%;bottom:6px;width:50%;height:16px;translate:-50% 0;border-radius:6px;background:rgba(20,20,23,.74);border:1px solid rgba(255,255,255,.12);opacity:${lockT ? 0 : 1};transition:opacity .3s`,
+      lock: `position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;opacity:${lockT ? 1 : 0};transition:opacity .4s;pointer-events:none`,
+      time: nowD.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), date: nowD.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
+    };
+    const wTarget = [['desk', 'Рабочий стол'], ['lock', 'Экран блокировки']].map(([id, n]) => ({ name: n, on: st.wTarget === id, pick: () => this.setState({ wTarget: id }), style: segStyle(st.wTarget === id) }));
+    const wType = ['Изображение', 'Слайд-шоу', 'Цвет'].map((n) => ({ name: n, on: wtype === n, pick: () => set('wtype', n), style: segStyle(wtype === n) }));
+    const wFit = ['Заполнить', 'Вписать', 'По центру'].map((n) => ({ name: n, on: fit === n, pick: () => set('wfit', n), style: segStyle(fit === n) }));
+    const wGrid = WALLS.map((w, i) => ({
+      name: w.name, on: i === wallPick, pick: () => this.setState({ wPick: i }),
+      tagText: i === curWallSys ? 'включены' : i === wallPick ? 'выбраны' : '',
+      tag: i === curWallSys || i === wallPick ? `font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:${i === curWallSys ? '#f2f2f4' : 'rgba(255,255,255,.12)'};color:${i === curWallSys ? '#0b0b0c' : '#f2f2f4'}` : 'display:none',
+      card: `display:flex;flex-direction:column;padding:8px;border-radius:16px;border:0;color:#f2f2f4;font:inherit;text-align:left;background:${i === wallPick ? 'rgba(255,255,255,.08)' : '#0e0e10'};box-shadow:${i === wallPick ? 'inset 0 0 0 2px #f2f2f4' : 'inset 0 0 0 1px rgba(255,255,255,.07)'};transition:background .2s,box-shadow .2s`,
+      img: `display:block;height:130px;border-radius:10px;background:${w.css}`
+    }));
+
+    const curDirty = changedIn(cur) > 0;
+    const anyDirty = pages.some((p) => changedIn(p) > 0);
+    const btn = (on, main) => `height:34px;padding:0 14px;border-radius:10px;border:0;display:flex;align-items:center;gap:7px;font:${main ? 700 : 600} 13px Inter,sans-serif;background:${main && on ? '#f2f2f4' : 'rgba(255,255,255,.07)'};color:${main && on ? '#0b0b0c' : on ? '#e8e8ec' : '#6b6b73'};transition:background .25s,color .25s`;
+    return {
+      nav, noNav: nav.length === 0, inSub: !!inSub,
+      subTitle: inSub ? (CATS.flatMap((c) => c.items).find((it) => it.id === st.parent) || {}).name : '',
+      back: () => this.setState({ parent: null }),
+      menuTap: () => this.say('Меню: «Настроить параметры системы…», «О программе»'),
+      hl: st.hl, toggleHl: () => this.setState({ hl: !st.hl }),
+      hlBtn: `width:100%;height:36px;border-radius:10px;border:0;display:flex;align-items:center;justify-content:center;gap:8px;font:600 12.5px Inter,sans-serif;background:${st.hl ? 'rgba(255,255,255,.1)' : 'transparent'};color:${st.hl ? '#f2f2f4' : '#a1a1a8'};box-shadow:${st.hl ? 'inset 0 0 0 1px rgba(255,255,255,.12)' : 'none'}`,
+      heroIcon: icon(cur.bg, 54) + ';border-radius:17px;font-size:24px',
+      cur, crumb: par2 ? `${cur.cat} › ${par2.name}` : cur.cat,
+      groups, q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      isWall: cur.custom === 'wall', pv, wTarget, wType, wFit, wGrid,
+      wAdd: () => this.say('Выбор файла: ~/Изображения/Обои — в макете недоступно'),
+      help: () => this.say(`Справка: «${cur.name}» — docs.kde.org`),
+      resetSec: () => { const v = { ...this.state.vals }; groupsOf(cur).forEach((g) => g.rows.forEach((r) => { delete v[r.id]; })); this.setState({ vals: v, wPick: cur.custom === 'wall' ? 4 : this.state.wPick }); this.say(`«${cur.name}»: значения по умолчанию`); },
+      revert: () => { if (!curDirty) return; const v = { ...this.state.vals }; groupsOf(cur).forEach((g) => g.rows.forEach((r) => { if (r.id in this.state.saved) v[r.id] = this.state.saved[r.id]; else delete v[r.id]; })); this.setState({ vals: v, wPick: cur.custom === 'wall' ? null : this.state.wPick }); },
+      apply: () => {
+        if (!anyDirty) return;
+        try { localStorage.setItem('archSettings.v2', JSON.stringify(this.state.vals)); } catch (e) {}
+        if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
+        this.setState({ saved: { ...this.state.vals }, wPick: null });
+        this.say('Изменения применены');
+      },
+      defBtn: btn(true, false), revBtn: btn(curDirty, false), applyBtn: btn(anyDirty, true),
+      toast: `position:absolute;left:50%;bottom:110px;translate:-50% 0;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;background:rgba(17,17,19,.95);border:1px solid #2e2e33;box-shadow:0 14px 40px rgba(0,0,0,.45);opacity:${st.toast ? 1 : 0};transform:translateY(${st.toast ? 0 : 10}px);transition:opacity .25s,transform .35s cubic-bezier(.34,1.4,.6,1);pointer-events:none`,
+      toastText: st.toast || '',
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+# AshenOS
+
+**AshenOS** — дистрибутив на базе **Arch Linux ARM** для кибердека на Raspberry Pi 4
+(экран Waveshare 4,3" DSI 800×480, клавиатура Rii mini X1). Чёрная тема, Plasma 6 на Wayland,
+своя оболочка с «жидкими» панелями из рамки, Dynamic Island и экранной клавиатурой.
+
+![Рабочий стол](design/screens/02-desktop.jpg)
+
+## Что внутри
+
+| | |
+|---|---|
+| База | Arch Linux ARM (aarch64), ядро `linux-rpi` |
+| Окружение | KDE Plasma 6, Wayland, KWin, SDDM |
+| Тема | цветовая схема `AshenOS` (чёрная), Breeze Dark, шрифты Inter и JetBrains Mono |
+| Анимации | как в Plasma: попапы выезжают из панели за 200 мс (OutCubic), списки раскрываются за 100 мс |
+| Ввод | экранная клавиатура (Maliit на рабочем столе, Qt Virtual Keyboard на экране входа) |
+| Экран | оверлей `vc4-kms-dsi-waveshare-800x480`, автоопределение выключено |
+| Сеть | NetworkManager, Bluetooth (bluez), SSH, WayVNC |
+| Терминал | Konsole + `claude` (Claude Code) из npm |
+
+## Скриншоты концепта оболочки
+
+| | |
+|---|---|
+| ![Экран блокировки](design/screens/01-lock.jpg) Экран блокировки: пароль, PIN-код или лицо | ![Календарь](design/screens/03-calendar.jpg) Календарь и погода из рамки |
+| ![Музыка](design/screens/04-music.jpg) Плеер с эквалайзером | ![Сеть](design/screens/05-network.jpg) Wi-Fi и Bluetooth |
+| ![Клавиатура](design/screens/06-keyboard.jpg) Экранная клавиатура | ![Параметры](design/screens/07-settings.jpg) Параметры системы |
+
+Исходники интерактивного прототипа лежат в [`design/prototype`](design/prototype)
+(`System.dc.html` — вся система: блокировка → рабочий стол → окна). Это макет интерфейса,
+он открывается в Claude Design, а не напрямую в браузере.
+
+## Структура
+
+```
+ashenos/
+├── build/
+│   ├── build-image.sh   сборка .img для SD-карты
+│   ├── packages.txt     список пакетов
+│   └── ashenos-info     команда: версия, ядро, температура
+├── airootfs/            файлы, которые накладываются на систему
+│   ├── etc/os-release, hostname, motd, issue
+│   ├── etc/sddm.conf.d/ashenos.conf
+│   ├── etc/xdg/kdeglobals, kwinrc
+│   ├── usr/share/color-schemes/AshenOS.colors
+│   └── boot/config-ashenos.txt   дописывается в /boot/config.txt
+└── design/              скриншоты и исходники прототипа
+```
+
+## Сборка образа
+
+На компьютере с Arch Linux (x86_64):
+
+```bash
+sudo pacman -S --needed arch-install-scripts qemu-user-static-binfmt dosfstools parted wget
+cd ashenos/build
+sudo ./build-image.sh 8G
+sudo dd if=out/ashenos-rpi4-*.img of=/dev/sdX bs=4M status=progress conv=fsync
+```
+
+Скрипт скачивает Arch Linux ARM для Pi 4, размечает образ (boot 512 МБ + root ext4),
+накладывает `airootfs`, ставит пакеты через qemu-chroot и включает `sddm`, `NetworkManager`,
+`bluetooth`, `sshd`. Пользователь по умолчанию — `alarm` / `alarm` (смените пароль после первого входа).
+
+## Установка поверх уже работающего Arch Linux ARM
+
+```bash
+git clone https://github.com/kkostyy/cyberdeck && cd cyberdeck/ashenos
+sudo pacman -Syu --needed $(grep -v '^\s*#' build/packages.txt | grep -v '^\s*$')
+sudo cp -r airootfs/etc airootfs/usr /
+sudo sh -c 'cat airootfs/boot/config-ashenos.txt >> /boot/config.txt'
+sudo install -Dm755 build/ashenos-info /usr/local/bin/ashenos-info
+sudo systemctl enable --now sddm NetworkManager bluetooth
+```
+
+После перезагрузки в «Параметры системы → Оформление → Цвета» выберите схему **AshenOS**.
+
+## Статус
+
+- [x] Концепт оболочки: рамка, Dynamic Island, капли-панели, виджеты, док, экран блокировки
+- [x] Цветовая схема, конфиги SDDM/KWin, оверлей экрана
+- [x] Скрипт сборки образа
+- [ ] Перенос оболочки из прототипа в Quickshell/QML
+- [ ] Свой экран входа SDDM в стиле прототипа

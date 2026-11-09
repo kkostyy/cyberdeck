@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тест острова</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+@keyframes labIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes labCard{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.lab-btn:hover{filter:brightness(1.2)}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Тест острова" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(20,20,23,0.92); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: labIn .5s cubic-bezier(.2,1.1,.3,1) both">
+
+    <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
+      <span aria-hidden="true" style="width: 38px; height: 38px; flex: none; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 90% at 85% 8%, #46464c 0%, #2c2c31 50%, #1c1c1f 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25)">
+        <span style="width: 22px; height: 10px; border-radius: 5px; background: #050506; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.35)"></span>
+      </span>
+      <div style="display: flex; flex-direction: column; line-height: 1.2">
+        <span style="font-size: 15px; font-weight: 600">Тест острова</span>
+        <span style="font-size: 12.5px; color: #a1a1a8">Запускает события, которые обычно приходят из других приложений</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; margin-left: auto">
+        <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="3"></rect></svg></button>
+        <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+    </header>
+
+    <div style="flex: 1; min-height: 0; padding: 6px 20px 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: min-content; gap: 14px; overflow-y: auto">
+      <sc-for list="{{cards}}" as="c" hint-placeholder-count="9">
+        <div style="{{c.style}}">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span aria-hidden="true" style="{{c.icon}}">{{c.glyph}}</span>
+            <span style="display: flex; flex-direction: column; min-width: 0">
+              <span style="font-size: 15px; font-weight: 700">{{c.title}}</span>
+              <span style="font-size: 12.5px; color: #a1a1a8">{{c.app}}</span>
+            </span>
+          </div>
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #c9c9cf">{{c.text}}</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto">
+            <sc-for list="{{c.btns}}" as="b" hint-placeholder-count="2">
+              <button class="lab-btn" onClick="{{b.run}}" style="{{b.style}}">{{b.name}}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"onAction":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const act = (id) => () => { if (this.props.onAction) this.props.onAction(id); };
+    const defs = [
+      { glyph: '⏲', bg: '#3a3a40', title: 'Таймер', app: 'как из «Часов»', text: 'Обратный отсчёт в острове. Когда время выйдет, капсула начнёт пульсировать.', btns: [['10 секунд', 'timer10'], ['1 минута', 'timer60'], ['5 минут', 'timer300']] },
+      { glyph: '◷', bg: '#3a3a40', title: 'Секундомер', app: 'как из «Часов»', text: 'Идёт в острове, в раскрытом виде можно ставить круги и пауза.', btns: [['Запустить', 'sw']] },
+      { glyph: '●', bg: '#e5484d', title: 'Запись экрана', app: 'как из Spectacle / OBS', text: 'Красная точка и время записи. Остановить можно прямо из острова.', btns: [['Начать запись', 'rec']] },
+      { glyph: 'D', bg: '#5865f2', title: 'Голосовой чат', app: 'как из Discord / Telegram', text: 'Кто говорит, волна голоса, кнопки микрофона и сброса.', btns: [['Подключиться', 'call']] },
+      { glyph: '⟳', bg: '#3a3a40', title: 'Обновление системы', app: 'как из терминала: pacman -Syu', text: 'Кольцо прогресса в капсуле, стадии загрузки и установки.', btns: [['pacman -Syu', 'update'], ['Копировать 42 файла', 'copy']] },
+      { glyph: '♪', bg: '#c2412f', title: 'Громкость и яркость', app: 'как с клавиш на клавиатуре', text: 'Короткий индикатор в острове вместо отдельного окна.', btns: [['Громкость −', 'volDown'], ['Громкость +', 'volUp'], ['Яркость −', 'brDown'], ['Яркость +', 'brUp']] },
+      { glyph: '⌨', bg: '#3a3a40', title: 'Раскладка', app: 'как по Alt + Shift', text: 'На секунду показывает текущую раскладку.', btns: [['Переключить', 'lang']] },
+      { glyph: '⧉', bg: '#3a3a40', title: 'Буфер обмена', app: 'как по Ctrl + C', text: 'Показывает «Скопировано» с превью, по наведению — история копий.', btns: [['Скопировать путь', 'clipPath'], ['Скопировать команду', 'clipCmd']] },
+      { glyph: '!', bg: '#f2f2f4', fg: '#0b0b0c', title: 'Уведомления', app: 'как из любого приложения', text: 'Короткое — 3 секунды, длинное — 6, важное остаётся до действия.', btns: [['Короткое', 'nShort'], ['Длинное', 'nLong'], ['Важное', 'nImp']] }
+    ];
+    const cards = defs.map((d, i) => ({
+      ...d,
+      style: `min-height: 210px; display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); animation: labCard .45s ease ${(i * 0.04).toFixed(2)}s both`,
+      icon: `width: 42px; height: 42px; flex: none; border-radius: 13px; display: flex; align-items: center; justify-content: center; font: 700 17px Inter, sans-serif; background: ${d.bg}; color: ${d.fg || '#fff'}; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12)`,
+      btns: d.btns.map(([name, id], k) => ({ name, run: act(id), style: `height: 36px; padding: 0 14px; border-radius: 11px; border: 0; font: 600 13px Inter, sans-serif; background: ${k === 0 ? '#f2f2f4' : 'rgba(255,255,255,0.09)'}; color: ${k === 0 ? '#0b0b0c' : '#f2f2f4'}` }))
+    }));
+    return {
+      cards,
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

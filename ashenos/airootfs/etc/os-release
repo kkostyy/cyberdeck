@@ -1,0 +1,10 @@
+NAME="AshenOS"
+PRETTY_NAME="AshenOS (Arch Linux ARM)"
+ID=ashenos
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;242;242;244"
+HOME_URL="https://github.com/kkostyy/cyberdeck/tree/main/ashenos"
+DOCUMENTATION_URL="https://github.com/kkostyy/cyberdeck/blob/main/ashenos/README.md"
+BUG_REPORT_URL="https://github.com/kkostyy/cyberdeck/issues"
+LOGO=ashenos

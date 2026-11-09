@@ -1,0 +1,7 @@
+
+   ▄▀█ █▀ █ █ █▀▀ █▄ █  █▀█ █▀
+   █▀█ ▄█ █▀█ ██▄ █ ▀█  █▄█ ▄█   Arch Linux ARM · Raspberry Pi 4 · cyberdeck
+
+   sudo pacman -Syu        обновить систему
+   ashenos-info            версия, ядро, температура
+

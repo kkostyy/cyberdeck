@@ -1,0 +1,12 @@
+[General]
+ColorScheme=AshenOS
+font=Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+fixed=JetBrains Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+
+[KDE]
+LookAndFeelPackage=org.kde.breezedark.desktop
+AnimationDurationFactor=1
+widgetStyle=Breeze
+
+[Icons]
+Theme=breeze-dark

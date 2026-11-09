@@ -1,0 +1,50 @@
+# база
+base-devel
+git
+sudo
+networkmanager
+bluez
+bluez-utils
+openssh
+wayvnc
+i2c-tools
+python-smbus2
+
+# Plasma 6 (Wayland)
+plasma-desktop
+plasma-nm
+plasma-pa
+bluedevil
+kscreen
+powerdevil
+kde-gtk-config
+breeze-gtk
+sddm
+sddm-kcm
+kwin
+xdg-desktop-portal-kde
+qt6-virtualkeyboard
+maliit-keyboard
+
+# приложения
+dolphin
+konsole
+ark
+spectacle
+chromium
+
+# звук
+pipewire
+pipewire-pulse
+wireplumber
+
+# шрифты
+inter-font
+ttf-jetbrains-mono
+noto-fonts
+noto-fonts-emoji
+
+# для Claude в терминале
+nodejs
+npm
+ripgrep

@@ -1,0 +1,1743 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Система — прототип</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+[data-sys-root],[data-sys-root] *{cursor:none !important}
+[data-sys-root] button{font:inherit;color:inherit;border:0;background:none;padding:0}
+[data-sys-root] input{font:inherit;color:inherit}
+.isl-scroll{scrollbar-width:none}
+.isl-scroll::-webkit-scrollbar{display:none}
+.rs .arc{opacity:0;transition:opacity .2s}
+.rs:hover .arc{opacity:1}
+.isl-tile:hover{filter:brightness(1.18)}
+.isl-row:hover{background:rgba(255,255,255,.06)}
+.osk-k{transition:background .12s,transform .12s cubic-bezier(.3,1.6,.5,1)}
+.osk-k:active{transform:scale(.9);background:rgba(255,255,255,.3) !important}
+@keyframes sysLockIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes sysLockOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:scale(1.06);filter:blur(10px)}}
+@keyframes sysWinIn{from{opacity:0;transform:translateY(36px) scale(.9);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes sysWinOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:translateY(24px) scale(.9);filter:blur(6px)}}
+@keyframes islPop{0%{opacity:0;transform:translateY(-34px) scale(.42);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none}}
+@keyframes islBack{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-46px) scale(.3);filter:blur(6px)}}
+@keyframes islBump{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
+@keyframes islFade{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
+@keyframes islSpin{to{transform:rotate(360deg)}}
+@keyframes islEq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@keyframes islRow{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes islPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 6px rgba(255,255,255,.28)}}
+@keyframes islBlink{50%{opacity:.25}}
+@keyframes islPower{0%{opacity:0}15%{opacity:1}85%{opacity:1}100%{opacity:0}}
+</style>
+</helmet>
+<div data-sys-root="1" onMouseLeave="{{curHide}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #050506; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none">
+
+  <!-- ============ DESKTOP (wallpaper, widgets, dock) ============ -->
+  <div style="position: absolute; inset: 0">
+    <dc-import name="Desktop" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" hint-size="1440px,900px"></dc-import>
+  </div>
+
+  <!-- minimized stack hover zone -->
+  <div aria-hidden="true" onMouseEnter="{{stackIn}}" onMouseLeave="{{stackOut}}" style="{{stackZone}}"></div>
+
+  <!-- ============ WINDOWS ============ -->
+  <sc-if value="{{win.files.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="files" aria-label="{{win.files.title}}" onMouseDown="{{h.files.down}}" style="{{win.files.box}}">
+      <div data-inner="1" style="{{win.files.inner}}">
+        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.files.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.files.title}}»" onClick="{{h.files.restore}}" onMouseEnter="{{h.files.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.files.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.files.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.files.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.files.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.files.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.files.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+  <sc-if value="{{win.term.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="term" aria-label="{{win.term.title}}" onMouseDown="{{h.term.down}}" style="{{win.term.box}}">
+      <div data-inner="1" style="{{win.term.inner}}">
+        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.term.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.term.title}}»" onClick="{{h.term.restore}}" onMouseEnter="{{h.term.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.term.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.term.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.term.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.term.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.term.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.term.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+  <sc-if value="{{win.music.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="music" aria-label="{{win.music.title}}" onMouseDown="{{h.music.down}}" style="{{win.music.box}}">
+      <div data-inner="1" style="{{win.music.inner}}">
+        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.music.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.music.title}}»" onClick="{{h.music.restore}}" onMouseEnter="{{h.music.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.music.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.music.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.music.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.music.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.music.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.music.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+  <sc-if value="{{win.lab.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="lab" aria-label="{{win.lab.title}}" onMouseDown="{{h.lab.down}}" style="{{win.lab.box}}">
+      <div data-inner="1" style="{{win.lab.inner}}">
+        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.lab.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.lab.title}}»" onClick="{{h.lab.restore}}" onMouseEnter="{{h.lab.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.lab.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.lab.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.lab.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.lab.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.lab.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.lab.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+  <sc-if value="{{win.set.open}}" hint-placeholder-val="{{false}}">
+    <section data-win="set" aria-label="{{win.set.title}}" onMouseDown="{{h.set.down}}" style="{{win.set.box}}">
+      <div data-inner="1" style="{{win.set.inner}}">
+        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" hint-size="1440px,900px"></dc-import>
+      </div>
+      <sc-if value="{{win.set.cover}}" hint-placeholder-val="{{false}}">
+        <button aria-label="Показать окно «{{win.set.title}}»" onClick="{{h.set.restore}}" onMouseEnter="{{h.set.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
+      </sc-if>
+      <sc-if value="{{win.set.pinned}}" hint-placeholder-val="{{false}}">
+        <span aria-label="Закреплено" style="position: absolute; left: 50%; top: 8px; translate: -50% 0; z-index: 6; height: 22px; padding: 0 9px; border-radius: 11px; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; background: rgba(17,17,19,0.85); border: 1px solid #2e2e33; pointer-events: none">
+          <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+          Поверх окон
+        </span>
+      </sc-if>
+      <sc-if value="{{win.set.handles}}" hint-placeholder-val="{{true}}">
+        <div class="rs" aria-hidden="true" data-rs="se" data-cur="nwse" onMouseDown="{{h.set.rs}}" style="position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; right: 6px; bottom: 6px; width: 16px; height: 16px; border-right: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-right-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="sw" data-cur="nesw" onMouseDown="{{h.set.rs}}" style="position: absolute; left: 0; bottom: 0; width: 26px; height: 26px; z-index: 7"><span class="arc" style="position: absolute; left: 6px; bottom: 6px; width: 16px; height: 16px; border-left: 3px solid #fff; border-bottom: 3px solid #fff; border-bottom-left-radius: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="ne" data-cur="nesw" onMouseDown="{{h.set.rs}}" style="position: absolute; right: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; right: 5px; top: 5px; width: 14px; height: 14px; border-right: 3px solid #fff; border-top: 3px solid #fff; border-top-right-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+        <div class="rs" aria-hidden="true" data-rs="nw" data-cur="nwse" onMouseDown="{{h.set.rs}}" style="position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 7"><span class="arc" style="position: absolute; left: 5px; top: 5px; width: 14px; height: 14px; border-left: 3px solid #fff; border-top: 3px solid #fff; border-top-left-radius: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5))"></span></div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <!-- preview actions for a minimized window -->
+  <div role="group" aria-label="Действия с окном" onMouseEnter="{{peekKeep}}" onMouseLeave="{{peekOut}}" style="{{peekBar}}">
+    <button onClick="{{peekRestore}}" style="height: 34px; padding: 0 14px; border-radius: 17px; display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; background: #f2f2f4; color: #0b0b0c">
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v6h6"></path><path d="M20 10V4h-6"></path><path d="M4 20 10.5 13.5"></path><path d="M20 4l-6.5 6.5"></path></svg>
+      Восстановить
+    </button>
+    <button aria-pressed="{{peekPinned}}" onClick="{{peekPin}}" style="{{peekPinBtn}}">
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"></path><path d="M12 15v6"></path></svg>
+      {{peekPinText}}
+    </button>
+    <button onClick="{{peekClose}}" style="height: 34px; padding: 0 14px; border-radius: 17px; display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.09)">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      Закрыть
+    </button>
+  </div>
+
+  <!-- top-edge hot zone (autohide) -->
+  <div aria-hidden="true" onMouseEnter="{{reveal}}" style="{{hotZone}}"></div>
+
+  <!-- ============ ISLANDS ============ -->
+  <div style="{{bar}}">
+
+    <!-- ===== LEFT ISLAND: app + smart menu + search ===== -->
+    <div onMouseEnter="{{barHold}}" style="{{left.box}}">
+      <div style="display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 6px 0 4px; flex: none">
+        <button aria-label="Меню системы" aria-expanded="{{left.open}}" onClick="{{toggleMenu}}" style="{{left.logo}}">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5 21 20H3z"></path><path d="M12 10.5 16.4 18.6H7.6z" fill="currentColor" stroke="none"></path></svg>
+        </button>
+        <span style="{{left.titleBox}}">
+          <span style="font-size: 13px; font-weight: 600; white-space: nowrap">{{left.title}}</span>
+          <span style="font-size: 12px; color: #8b8b93; white-space: nowrap">{{left.sub}}</span>
+        </span>
+        <div style="{{left.acts}}">
+          <sc-if value="{{left.app.files}}" hint-placeholder-val="{{false}}">
+            <button aria-label="Назад" onClick="{{actTap}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+            <button aria-label="Новая папка" onClick="{{actTap}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M12 10v6M9 13h6"></path></svg></button>
+            <button aria-label="Поиск в папке" onClick="{{openSearch}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg></button>
+          </sc-if>
+          <sc-if value="{{left.app.term}}" hint-placeholder-val="{{false}}">
+            <button aria-label="Новая вкладка" onClick="{{actTap}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+            <button aria-label="Разделить панель" onClick="{{actTap}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="3"></rect><path d="M12 4.5v15"></path></svg></button>
+            <button aria-label="Палитра команд" onClick="{{actTap}}" style="{{iconBtn}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 4 4-4 4"></path><path d="M12 16h7"></path></svg></button>
+          </sc-if>
+          <sc-if value="{{left.app.music}}" hint-placeholder-val="{{false}}">
+            <button aria-label="Предыдущий трек" onClick="{{musicPrev}}" style="{{iconBtn}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.2v11.6a1 1 0 0 1-1.5.87L9 13.2V17a1 1 0 0 1-2 0V7a1 1 0 0 1 2 0v3.8l8.5-5.47A1 1 0 0 1 19 6.2z"></path></svg></button>
+            <button aria-label="{{musicPlayLabel}}" onClick="{{musicToggle}}" style="{{iconBtn}}">
+              <sc-if value="{{music.playing}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.2" height="14" rx="1.4"></rect><rect x="13.8" y="5" width="4.2" height="14" rx="1.4"></rect></svg></sc-if>
+              <sc-if value="{{music.paused}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.4-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"></path></svg></sc-if>
+            </button>
+            <button aria-label="Следующий трек" onClick="{{musicNext}}" style="{{iconBtn}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 6.2v11.6a1 1 0 0 0 1.5.87L15 13.2V17a1 1 0 0 0 2 0V7a1 1 0 0 0-2 0v3.8L6.5 5.33A1 1 0 0 0 5 6.2z"></path></svg></button>
+          </sc-if>
+          <sc-if value="{{left.app.desk}}" hint-placeholder-val="{{true}}">
+            <div role="tablist" aria-label="Рабочие столы" style="display: flex; align-items: center; gap: 5px; padding: 0 6px">
+              <sc-for list="{{wsList}}" as="w" hint-placeholder-count="4">
+                <button role="tab" aria-selected="{{w.on}}" aria-label="{{w.label}}" onClick="{{w.pick}}" style="{{w.style}}"></button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- smart menu -->
+      <div style="{{left.menuPane}}">
+        <label style="display: flex; align-items: center; gap: 10px; height: 42px; margin: 4px 10px 0; padding: 0 12px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid #2c2c30">
+          <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8b8b93" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg>
+          <input id="sys-q" aria-label="Универсальный поиск" placeholder="Приложения, файлы, команды…" value="{{q}}" onInput="{{onQ}}" onKeyDown="{{qKey}}" autocomplete="off" style="flex: 1; min-width: 0; height: 40px; border: 0; outline: none; background: transparent; font-size: 14px; color: #f2f2f4">
+          <span style="font: 500 11px 'JetBrains Mono', monospace; color: #8b8b93; padding: 3px 6px; border-radius: 6px; background: rgba(255,255,255,0.06)">Super</span>
+        </label>
+
+        <!-- menu mode -->
+        <div style="{{left.menuBody}}">
+          <div style="font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93; padding: 0 4px">Избранное</div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{favs}}" as="f" hint-placeholder-count="6">
+              <button class="isl-tile" aria-label="{{f.name}}" onClick="{{f.open}}" style="{{f.style}}">
+                <span aria-hidden="true" style="{{f.icon}}">{{f.glyph}}</span>
+                <span style="font-size: 12.5px; font-weight: 500">{{f.name}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93; padding: 4px 4px 0">Недавние</div>
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <sc-for list="{{recent}}" as="r" hint-placeholder-count="3">
+              <button class="isl-row" onClick="{{r.open}}" style="height: 40px; padding: 0 8px; border-radius: 11px; display: flex; align-items: center; gap: 10px; text-align: left">
+                <span aria-hidden="true" style="{{r.icon}}">{{r.ext}}</span>
+                <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+                <span style="font-size: 12px; color: #8b8b93">{{r.when}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93; padding: 4px 4px 0">Профиль оформления</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div role="radiogroup" aria-label="Профиль оформления" style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: rgba(255,255,255,0.05)">
+              <sc-for list="{{profiles}}" as="p" hint-placeholder-count="3">
+                <button role="radio" aria-checked="{{p.on}}" onClick="{{p.pick}}" style="{{p.style}}">{{p.name}}</button>
+              </sc-for>
+            </div>
+            <button role="switch" aria-checked="{{autoProfile}}" aria-label="Автоматическое переключение профиля" onClick="{{toggleAuto}}" style="{{autoBtn}}">
+              <span style="font-size: 11.5px; font-weight: 600">Авто</span>
+              <span aria-hidden="true" style="{{autoKnobTrack}}"><span style="{{autoKnob}}"></span></span>
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding-top: 2px">
+            <button class="isl-tile" onClick="{{lock}}" style="height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11.5px; background: rgba(255,255,255,0.06)">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="3"></rect><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"></path></svg>
+              Блокировка
+            </button>
+            <button class="isl-tile" onClick="{{sleep}}" style="height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11.5px; background: rgba(255,255,255,0.06)">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg>
+              Сон
+            </button>
+            <button class="isl-tile" onClick="{{reboot}}" style="height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11.5px; background: rgba(255,255,255,0.06)">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg>
+              Перезагрузка
+            </button>
+            <button class="isl-tile" onClick="{{testNotif}}" style="height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11.5px; background: rgba(255,255,255,0.06)">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 20.5a2 2 0 0 0 4 0"></path></svg>
+              Уведомление
+            </button>
+          </div>
+        </div>
+
+        <!-- search mode: results left, preview right -->
+        <div style="{{left.searchBody}}">
+          <div role="listbox" aria-label="Результаты поиска" class="isl-scroll" style="width: 330px; flex: none; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; padding-right: 4px">
+            <sc-for list="{{hits}}" as="h" hint-placeholder-count="5">
+              <sc-if value="{{h.head}}" hint-placeholder-val="{{false}}">
+                <div style="padding: 8px 8px 4px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93">{{h.group}}</div>
+              </sc-if>
+              <button role="option" aria-selected="{{h.on}}" onMouseEnter="{{h.hover}}" onClick="{{h.open}}" style="{{h.style}}">
+                <span aria-hidden="true" style="{{h.icon}}">{{h.glyph}}</span>
+                <span style="display: flex; flex-direction: column; min-width: 0; flex: 1; text-align: left">
+                  <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.name}}</span>
+                  <span style="font-size: 12px; color: #8b8b93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.kind}}</span>
+                </span>
+                <span style="{{h.enter}}">↵</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{noHits}}" hint-placeholder-val="{{false}}">
+              <div style="padding: 30px 10px; font-size: 13px; color: #8b8b93; text-align: center">Ничего не найдено</div>
+            </sc-if>
+          </div>
+          <div aria-live="polite" style="{{pv.box}}">
+            <span aria-hidden="true" style="{{pv.icon}}">{{pv.glyph}}</span>
+            <span style="font-size: 17px; font-weight: 700; text-align: center">{{pv.name}}</span>
+            <span style="font-size: 12.5px; color: #a1a1a8">{{pv.kind}}</span>
+            <div style="{{pv.snip}}">{{pv.text}}</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; width: 100%">
+              <sc-for list="{{pv.meta}}" as="m" hint-placeholder-count="2">
+                <div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #8b8b93">{{m.k}}</span><span style="font-weight: 500">{{m.v}}</span></div>
+              </sc-for>
+            </div>
+            <button onClick="{{pv.open}}" style="margin-top: auto; height: 36px; width: 100%; border-radius: 12px; font-size: 13px; font-weight: 600; background: #f2f2f4; color: #0b0b0c">{{pv.action}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DYNAMIC ISLAND: active window + live activities + shelf ===== -->
+    <div onMouseEnter="{{islEnter}}" onMouseLeave="{{pillLeave}}" onDragEnter="{{shDragIn}}" onDragOver="{{shDragOver}}" onDragLeave="{{shDragOut}}" onDrop="{{shDrop}}" style="{{isl.box}}">
+      <div style="{{isl.row}}">
+        <span style="{{isl.win}}">
+          <span aria-hidden="true" style="{{isl.glyph}}">{{isl.glyphText}}</span>
+          <span style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{isl.title}}</span>
+        </span>
+        <span style="{{chip.call}}"><span aria-hidden="true" style="display: flex; align-items: center; gap: 2px; height: 12px"><sc-for list="{{callBars}}" as="b" hint-placeholder-count="4"><span style="{{b}}"></span></sc-for></span><span style="font-size: 12px; font-weight: 600">{{call.who}}</span></span>
+        <span style="{{chip.rec}}"><span aria-hidden="true" style="{{recDot}}"></span><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{rec.text}}</span></span>
+        <span style="{{chip.timer}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2M9.5 2.5h5"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{timer.text}}</span></span>
+        <span style="{{chip.sw}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 13V9M12 2.5v2"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{sw.text}}</span></span>
+        <span style="{{chip.prog}}"><span aria-hidden="true" style="{{prog.ring}}"><span style="width: 8px; height: 8px; border-radius: 50%; background: #000"></span></span><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{prog.pctText}}</span></span>
+        <span style="{{chip.shelf}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L16 13h5"></path><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"></path></svg><span style="font-size: 12px; font-weight: 700">{{shelfCount}}</span></span>
+      </div>
+      <!-- transient: level / clipboard / drag -->
+      <div style="{{isl.flash}}">
+        <span aria-hidden="true" style="font-size: 13px; width: 16px; text-align: center">{{flash.glyph}}</span>
+        <span style="font-size: 12.5px; font-weight: 600; white-space: nowrap">{{flash.label}}</span>
+        <span aria-hidden="true" style="{{flash.track}}"><span style="{{flash.fill}}"></span></span>
+        <span style="{{flash.textStyle}}">{{flash.text}}</span>
+      </div>
+    </div>
+
+    <!-- the island opens as a liquid drop from the line -->
+    <div onMouseEnter="{{islEnter}}" onMouseLeave="{{pillLeave}}" onDragEnter="{{shDragIn}}" onDragOver="{{shDragOver}}" onDragLeave="{{shDragOut}}" onDrop="{{shDrop}}" style="{{isl.drop}}">
+      <div style="{{isl.body}}">
+        <div style="{{isl.big}}">
+
+          <!-- active window -->
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span aria-hidden="true" style="{{isl.glyphBig}}">{{isl.glyphText}}</span>
+            <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+              <span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{isl.title}}</span>
+              <span style="font-size: 12px; color: #8b8b93">{{isl.sub}}</span>
+            </span>
+            <sc-if value="{{isl.hasWin}}" hint-placeholder-val="{{false}}">
+              <button aria-label="Свернуть окно" onClick="{{winMin}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+              <button aria-label="Развернуть окно" onClick="{{winMax}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="3"></rect></svg></button>
+              <button aria-label="Закрыть окно" onClick="{{winClose}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+            </sc-if>
+          </div>
+
+          <!-- call -->
+          <sc-if value="{{call.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}}">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span aria-hidden="true" style="{{call.badge}}">{{call.letter}}</span>
+                <span style="display: flex; flex-direction: column; flex: 1; min-width: 0"><span style="font-size: 13.5px; font-weight: 700">{{call.title}}</span><span style="font-size: 12px; color: #8b8b93">{{call.sub}}</span></span>
+                <button aria-label="{{call.micLabel}}" aria-pressed="{{call.muted}}" onClick="{{callMic}}" style="{{call.micBtn}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
+                <button aria-label="Завершить звонок" onClick="{{callEnd}}" style="width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e5484d"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M3 14.5c4.8-4.6 13.2-4.6 18 0l-2.4 2.6-3.6-1.4v-2.4a12 12 0 0 0-6 0v2.4l-3.6 1.4z"></path></svg></button>
+              </div>
+              <div style="display: flex; gap: 6px">
+                <sc-for list="{{call.people}}" as="u" hint-placeholder-count="3">
+                  <span style="{{u.style}}">{{u.name}}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- screen recording -->
+          <sc-if value="{{rec.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}}">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span aria-hidden="true" style="{{recDotBig}}"></span>
+                <span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13.5px; font-weight: 700">Запись экрана</span><span style="font-size: 12px; color: #8b8b93">{{rec.sub}}</span></span>
+                <span style="font: 700 15px 'JetBrains Mono', monospace">{{rec.text}}</span>
+              </div>
+              <div style="display: flex; gap: 8px">
+                <button onClick="{{recPause}}" style="{{btnSoft}}">{{rec.pauseText}}</button>
+                <button onClick="{{recStop}}" style="{{btnMain}}">Стоп</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- timer -->
+          <sc-if value="{{timer.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}}">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13.5px; font-weight: 700">{{timer.title}}</span><span style="font-size: 12px; color: #8b8b93">{{timer.sub}}</span></span>
+                <span style="font: 700 22px 'JetBrains Mono', monospace">{{timer.text}}</span>
+              </div>
+              <span style="position: relative; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); overflow: hidden"><span style="{{timer.bar}}"></span></span>
+              <div style="display: flex; gap: 8px">
+                <button onClick="{{timerAdd}}" style="{{btnSoft}}">+1 мин</button>
+                <button onClick="{{timerPause}}" style="{{btnSoft}}">{{timer.pauseText}}</button>
+                <button onClick="{{timerStop}}" style="{{btnMain}}">{{timer.stopText}}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- stopwatch -->
+          <sc-if value="{{sw.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}}">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13.5px; font-weight: 700">Секундомер</span><span style="font-size: 12px; color: #8b8b93">{{sw.sub}}</span></span>
+                <span style="font: 700 22px 'JetBrains Mono', monospace">{{sw.textLong}}</span>
+              </div>
+              <div style="display: flex; gap: 8px">
+                <button onClick="{{swToggle}}" style="{{btnSoft}}">{{sw.pauseText}}</button>
+                <button onClick="{{swLap}}" style="{{btnSoft}}">Круг</button>
+                <button onClick="{{swStop}}" style="{{btnMain}}">Сброс</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- progress: update / download / copy -->
+          <sc-if value="{{prog.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}}">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 11px; background: #2e2e33; display: flex; align-items: center; justify-content: center; flex: none; font: 700 11px 'JetBrains Mono', monospace">{{prog.glyph}}</span>
+                <span style="display: flex; flex-direction: column; flex: 1; min-width: 0"><span style="font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{prog.title}}</span><span style="font-size: 12px; color: #8b8b93">{{prog.sub}}</span></span>
+                <button aria-label="Отменить" onClick="{{progCancel}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 12px"><span style="font-weight: 700; font-variant-numeric: tabular-nums; width: 34px">{{prog.pctText}}</span><span style="position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); overflow: hidden"><span style="{{prog.bar}}"></span></span></div>
+            </div>
+          </sc-if>
+
+          <!-- clipboard history -->
+          <sc-if value="{{clip.has}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div style="display: flex; align-items: center; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93"><span style="flex: 1">Буфер обмена</span><button onClick="{{clipClear}}" style="font-size: 11.5px; font-weight: 600; text-transform: none; letter-spacing: 0; color: #a1a1a8">Очистить</button></div>
+              <sc-for list="{{clip.items}}" as="c" hint-placeholder-count="2">
+                <button class="isl-row" onClick="{{c.again}}" style="height: 32px; padding: 0 10px; border-radius: 10px; display: flex; align-items: center; gap: 8px; text-align: left; background: rgba(255,255,255,0.04)">
+                  <span style="flex: 1; min-width: 0; font: 500 12px 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.text}}</span>
+                  <span style="font-size: 11px; color: #8b8b93">{{c.ago}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <!-- shelf -->
+          <sc-if value="{{shelfShow}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div style="display: flex; align-items: center; gap: 8px">
+                <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L16 13h5"></path><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"></path></svg>
+                <span style="font-size: 14px; font-weight: 700">Полка</span>
+                <span style="font-size: 12px; color: #8b8b93">{{shelfSub}}</span>
+                <button onClick="{{shelfClear}}" style="{{shelfClearBtn}}">Очистить</button>
+              </div>
+              <div role="list" aria-label="Файлы на полке острова" style="{{shelfZone}}">
+                <sc-for list="{{shelfItems}}" as="it" hint-placeholder-count="2">
+                  <div role="listitem" draggable="true" onDragStart="{{it.drag}}" onDragEnd="{{it.end}}" title="Перетащите, чтобы забрать" style="{{it.style}}">
+                    <span aria-hidden="true" style="{{it.tile}}">{{it.ext}}</span>
+                    <span style="width: 100%; font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{it.name}}</span>
+                    <button aria-label="Убрать {{it.name}} с полки" onClick="{{it.remove}}" style="position: absolute; right: -4px; top: -4px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #2a2a2e">
+                      <svg aria-hidden="true" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                    </button>
+                  </div>
+                </sc-for>
+                <span style="{{shelfHint}}">{{shelfHintText}}</span>
+              </div>
+            </div>
+          </sc-if>
+
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT ISLAND: control center + calendar ===== -->
+    <div onMouseEnter="{{barHold}}" style="{{right.box}}">
+      <div style="{{right.row}}">
+        <button aria-label="Быстрые настройки" aria-expanded="{{right.ccOpen}}" onClick="{{openCC}}" style="{{right.statusBtn}}">
+          <sc-if value="{{right.full}}" hint-placeholder-val="{{true}}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" style="{{right.wifiIcon}}"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"></path><path d="M12 19.5h.01" stroke-width="3"></path></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="{{right.btIcon}}"><path d="m7 7 10 10-5 4V3l5 4L7 17"></path></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"></path><path d="M16.5 9a4 4 0 0 1 0 6"></path></svg>
+          </sc-if>
+          <span style="display: flex; align-items: center; gap: 5px">
+            <span aria-hidden="true" style="position: relative; width: 22px; height: 11px; border-radius: 3.5px; border: 1.6px solid currentColor; box-sizing: border-box; padding: 1.2px"><span style="{{bat.fill}}"></span><span style="position: absolute; right: -4px; top: 2.5px; width: 2px; height: 4px; border-radius: 0 1px 1px 0; background: currentColor"></span></span>
+            <span style="font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums">{{bat.text}}</span>
+          </span>
+        </button>
+        <button aria-label="Календарь" aria-expanded="{{right.calOpen}}" onClick="{{openCal}}" style="{{right.clockBtn}}">
+          <span style="font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums">{{clock}}</span>
+        </button>
+      </div>
+
+      <!-- control center -->
+      <div style="{{right.ccPane}}">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+            <div style="{{t.box}}">
+              <button aria-pressed="{{t.on}}" onClick="{{t.toggle}}" style="flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 10px; padding: 0 0 0 12px; text-align: left">
+                <span aria-hidden="true" style="{{t.dot}}">{{t.glyph}}</span>
+                <span style="display: flex; flex-direction: column; min-width: 0">
+                  <span style="font-size: 13px; font-weight: 600; white-space: nowrap">{{t.name}}</span>
+                  <span style="font-size: 11.5px; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.sub}}</span>
+                </span>
+              </button>
+              <button aria-label="{{t.moreLabel}}" onClick="{{t.more}}" style="width: 34px; height: 100%; flex: none; display: flex; align-items: center; justify-content: center; border-left: 1px solid rgba(255,255,255,0.08); color: #c9c9cf">
+                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+        <sc-for list="{{sliders}}" as="s" hint-placeholder-count="2">
+          <label style="position: relative; display: flex; align-items: center; height: 40px; border-radius: 14px; background: rgba(255,255,255,0.06); overflow: hidden">
+            <span aria-hidden="true" style="{{s.fill}}"></span>
+            <span aria-hidden="true" style="position: relative; display: flex; align-items: center; gap: 10px; padding: 0 14px; font-size: 13px; font-weight: 600; flex: 1; pointer-events: none">
+              <span style="font-size: 15px; width: 18px; text-align: center">{{s.glyph}}</span>{{s.name}}<span style="margin-left: auto; font-variant-numeric: tabular-nums">{{s.text}}</span>
+            </span>
+            <input type="range" min="0" max="100" value="{{s.val}}" aria-label="{{s.name}}" onInput="{{s.set}}" style="position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0">
+          </label>
+        </sc-for>
+        <div style="display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 14px; border-radius: 14px; background: rgba(255,255,255,0.04)">
+          <span aria-hidden="true" style="position: relative; width: 28px; height: 14px; border-radius: 4px; border: 2px solid #f2f2f4; box-sizing: border-box; padding: 1.5px"><span style="{{bat.fill}}"></span></span>
+          <span style="display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 600">Батарея {{bat.text}}</span><span style="font-size: 11.5px; color: #a1a1a8">{{bat.sub}}</span></span>
+          <button onClick="{{openCal}}" style="margin-left: auto; display: flex; flex-direction: column; align-items: flex-end">
+            <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{clockSec}}</span>
+            <span style="font-size: 11.5px; color: #a1a1a8">{{dateLong}}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- details: Wi-Fi / Bluetooth -->
+      <div style="{{right.detPane}}">
+        <div style="display: flex; align-items: center; gap: 8px; height: 34px">
+          <button aria-label="Назад" onClick="{{ccBack}}" style="width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+          <span style="font-size: 15px; font-weight: 700">{{det.title}}</span>
+          <button role="switch" aria-checked="{{det.on}}" aria-label="{{det.title}}" onClick="{{det.toggle}}" style="{{det.sw}}"><span style="{{det.knob}}"></span></button>
+        </div>
+        <div class="isl-scroll" style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1">
+          <sc-for list="{{det.rows}}" as="d" hint-placeholder-count="4">
+            <button class="isl-row" onClick="{{d.pick}}" style="{{d.style}}">
+              <span aria-hidden="true" style="{{d.dot}}">{{d.glyph}}</span>
+              <span style="display: flex; flex-direction: column; min-width: 0; flex: 1; text-align: left">
+                <span style="font-size: 13px; font-weight: 600">{{d.name}}</span>
+                <span style="font-size: 11.5px; color: #a1a1a8">{{d.sub}}</span>
+              </span>
+              <span style="{{d.badge}}">{{d.state}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; color: #8b8b93; padding: 0 4px">{{det.foot}}</div>
+      </div>
+
+      <!-- calendar -->
+      <div style="{{right.calPane}}">
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span style="font-size: 15px; font-weight: 700; flex: 1">{{cal.title}}</span>
+          <button aria-label="Предыдущий месяц" onClick="{{calPrev}}" style="width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+          <button aria-label="Следующий месяц" onClick="{{calNext}}" style="width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></button>
+        </div>
+        <div role="grid" aria-label="{{cal.title}}" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+          <sc-for list="{{cal.heads}}" as="h" hint-placeholder-count="7"><span style="height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #8b8b93">{{h}}</span></sc-for>
+          <sc-for list="{{cal.cells}}" as="c" hint-placeholder-count="35">
+            <button role="gridcell" aria-label="{{c.label}}" aria-selected="{{c.sel}}" onClick="{{c.pick}}" style="{{c.style}}">{{c.n}}<span style="{{c.dot}}"></span></button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0">
+          <div style="display: flex; align-items: center; font-size: 12px; font-weight: 600; color: #a1a1a8; padding: 0 2px"><span style="flex: 1">{{cal.dayTitle}}</span><span>{{cal.dayCount}}</span></div>
+          <div class="isl-scroll" style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; min-height: 0">
+            <sc-for list="{{cal.events}}" as="e" hint-placeholder-count="2">
+              <div style="{{e.style}}">
+                <span aria-hidden="true" style="{{e.bar}}"></span>
+                <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+                  <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.title}}</span>
+                  <span style="font-size: 11.5px; color: #a1a1a8">{{e.time}} · {{e.src}}</span>
+                </span>
+                <span style="{{e.remind}}">напомнить за 10 мин</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{cal.empty}}" hint-placeholder-val="{{false}}">
+              <div style="padding: 10px 4px; font-size: 12.5px; color: #8b8b93">Событий нет</div>
+            </sc-if>
+          </div>
+          <label style="display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 6px 0 12px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid #2c2c30">
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+            <input id="sys-ev" aria-label="Быстро создать событие" placeholder="{{cal.addHint}}" value="{{evDraft}}" onInput="{{evInput}}" onKeyDown="{{evKey}}" autocomplete="off" style="flex: 1; min-width: 0; height: 36px; border: 0; outline: none; background: transparent; font-size: 13px">
+            <button onClick="{{evAdd}}" style="height: 28px; padding: 0 10px; border-radius: 9px; font-size: 12px; font-weight: 600; background: #f2f2f4; color: #0b0b0c">Добавить</button>
+          </label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1a8">
+          <span style="padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,0.07); color: #e8e8ec; font-weight: 600">Google</span>
+          <span style="padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,0.07); color: #e8e8ec; font-weight: 600">CalDAV</span>
+          <span style="flex: 1; text-align: right">{{syncText}}</span>
+          <button aria-label="Синхронизировать" onClick="{{sync}}" style="width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="{{syncIcon}}"><path d="M20 12a8 8 0 1 1-2.6-5.9"></path><path d="M20 4v5h-5"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NEW NOTIFICATION: temporary third capsule ============ -->
+  <sc-if value="{{toast.show}}" hint-placeholder-val="{{false}}">
+    <div role="status" aria-live="polite" onMouseEnter="{{toastHold}}" onMouseLeave="{{toastRelease}}" onMouseDown="{{toastSwipe}}" data-toast="1" style="{{toast.box}}">
+      <span aria-hidden="true" style="{{toast.icon}}">{{toast.glyph}}</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+        <span style="display: flex; gap: 8px; align-items: baseline"><span style="font-size: 13px; font-weight: 700">{{toast.title}}</span><span style="font-size: 11.5px; color: #8b8b93">{{toast.app}}</span></span>
+        <span style="{{toast.bodyStyle}}">{{toast.body}}</span>
+      </span>
+      <button aria-label="Закрыть уведомление" onClick="{{toastClose}}" style="width: 26px; height: 26px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08)"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+    </div>
+  </sc-if>
+
+  <!-- ============ NOTIFICATION STACK ============ -->
+  <section aria-label="Уведомления" onMouseEnter="{{stackFan}}" onMouseLeave="{{stackFold}}" style="{{nStack.box}}">
+    <div style="display: flex; align-items: center; height: 30px; padding: 0 4px">
+      <span style="font-size: 14px; font-weight: 700; flex: 1">Уведомления</span>
+      <button onClick="{{clearAll}}" style="height: 26px; padding: 0 10px; border-radius: 9px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.08)">Очистить все</button>
+    </div>
+    <div style="{{nStack.list}}">
+      <sc-for list="{{nList}}" as="n" hint-placeholder-count="3">
+        <div data-nid="{{n.id}}" onMouseDown="{{n.swipe}}" style="{{n.style}}">
+          <span aria-hidden="true" style="{{n.icon}}">{{n.glyph}}</span>
+          <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+            <span style="display: flex; gap: 8px; align-items: baseline"><span style="font-size: 13px; font-weight: 700">{{n.title}}</span><span style="font-size: 11.5px; color: #8b8b93">{{n.app}} · {{n.ago}}</span></span>
+            <span style="font-size: 12.5px; color: #c9c9cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.body}}</span>
+          </span>
+          <button aria-label="Закрыть уведомление" onClick="{{n.close}}" style="width: 24px; height: 24px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08)"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+      </sc-for>
+      <sc-if value="{{nEmpty}}" hint-placeholder-val="{{false}}">
+        <div style="padding: 18px 4px; font-size: 13px; color: #8b8b93; text-align: center">Новых уведомлений нет</div>
+      </sc-if>
+    </div>
+    <div style="font-size: 11.5px; color: #8b8b93; text-align: center">Смахните карточку в сторону, чтобы убрать</div>
+  </section>
+
+  <!-- ============ ON-SCREEN KEYBOARD ============ -->
+  <section aria-label="Экранная клавиатура" onMouseDown="{{oskKeep}}" style="{{osk.box}}">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px 8px">
+      <span aria-hidden="true" style="width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.22); margin: 0 auto 0 calc(50% - 20px)"></span>
+    </div>
+    <div style="{{osk.target}}">{{osk.targetText}}</div>
+    <sc-for list="{{osk.rows}}" as="r" hint-placeholder-count="4">
+      <div style="{{r.style}}">
+        <sc-for list="{{r.keys}}" as="k" hint-placeholder-count="10">
+          <button class="osk-k" aria-label="{{k.aria}}" onMouseDown="{{k.down}}" style="{{k.style}}">{{k.label}}</button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </section>
+
+  <!-- power overlay (sleep / reboot) -->
+  <sc-if value="{{power.on}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; z-index: 200; background: #000; display: flex; align-items: center; justify-content: center; animation: islPower 2.4s ease both">
+      <span style="display: flex; align-items: center; gap: 12px; font-size: 15px; color: #a1a1a8"><span style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #3a3a40; border-top-color: #f2f2f4; animation: islSpin .8s linear infinite"></span>{{power.text}}</span>
+    </div>
+  </sc-if>
+
+  <!-- ============ LOCK SCREEN ============ -->
+  <sc-if value="{{showLock}}" hint-placeholder-val="{{true}}">
+    <div style="{{lockStyle}}">
+      <dc-import name="LockScreen" cur-wall="{{curWall}}" on-unlock="{{unlock}}" hint-size="1440px,900px"></dc-import>
+    </div>
+  </sc-if>
+
+  <!-- ============ CURSOR ============ -->
+  <div aria-hidden="true" data-cursor="1" style="{{cursor}}">
+    <svg data-c="arrow" width="30" height="30" viewBox="0 0 24 24" style="position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: transform .16s cubic-bezier(.3,1.4,.5,1), opacity .12s; transform-origin: 3px 3px"><path d="M3.4 3.1 20.3 10.2Q21.6 10.8 20.3 11.4L13.6 13.6 11.4 20.3Q10.8 21.6 10.2 20.3Z" fill="#0b0b0c" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path></svg>
+    <svg data-c="text" width="30" height="30" viewBox="0 0 24 24" style="position: absolute; left: -12px; top: -12px; overflow: visible; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: opacity .12s"><path d="M9 3.5h6M9 20.5h6M12 3.5v17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"></path><path d="M9 3.5h6M9 20.5h6M12 3.5v17" fill="none" stroke="#0b0b0c" stroke-width="2.2" stroke-linecap="round"></path></svg>
+    <svg data-c="resize" width="30" height="30" viewBox="0 0 24 24" style="position: absolute; left: -15px; top: -15px; overflow: visible; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: opacity .12s, transform .16s"><path d="M3.5 3.5 11 6 6 11Z" fill="#0b0b0c" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path><path d="M20.5 20.5 13 18 18 13Z" fill="#0b0b0c" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path></svg>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = {
+    now: new Date(), lock: 'on', power: null,
+    profile: 'work', autoProfile: true, prevProfile: null, barShown: false,
+    menu: false, q: '', hitSel: 0,
+    right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
+    wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
+    ws: 1, oskOn: false, oskLang: 'RU', oskShift: false, oskCaps: false, oskNum: false, oskSym: false, oskTarget: '',
+    music: { on: true, playing: true, pos: 62, dur: 214, idx: 0 },
+    dl: { on: true, pct: 12 }, evHidden: false,
+    hoverPill: null,
+    wins: {}, order: [], focus: null, stackHover: false, peek: null,
+    toast: null, history: [], stackOpen: false, fan: false, bump: 0,
+    events: {}, shelf: [], shDrag: false,
+    timer: null, sw: null, rec: null, call: null, prog: null, flash: null, clip: [], lang: 'RU'
+  };
+
+  tracks = [
+    { title: 'Трек.mp3', artist: 'user · Музыка', a: '#c2412f', b: '#2a3150' },
+    { title: 'Night Drive', artist: 'Synthwave Radio', a: '#4f7fb8', b: '#1d1d2a' },
+    { title: 'Low Light', artist: 'Ambient Works', a: '#8a8a92', b: '#1b1b1e' }
+  ];
+  meta = {
+    files: { title: 'Проводник', sub: '~/Проекты', comp: 'Main' },
+    term: { title: 'Терминал', sub: 'zsh · ~', comp: 'Terminal' },
+    music: { title: 'Музыка', sub: 'Сейчас играет', comp: 'Music' },
+    lab: { title: 'Тест острова', sub: 'Проверка функций', comp: 'Lab' },
+    set: { title: 'Параметры системы', sub: 'Plasma 6.8.1', comp: 'Settings' }
+  };
+  R = 836 / 1368;
+
+  /* ---------------- lifecycle ---------------- */
+  componentDidMount() {
+    const start = new Date(Date.now() + 18 * 60000);
+    start.setSeconds(0, 0);
+    this.evStart = start;
+    const d = new Date();
+    const key = (dd) => `${d.getFullYear()}-${d.getMonth()}-${dd}`;
+    const pad = (n) => String(n).padStart(2, '0');
+    const today = d.getDate();
+    const evs = {};
+    evs[key(today)] = [
+      { title: 'Созвон по дизайну панели', time: `${pad(start.getHours())}:${pad(start.getMinutes())}–${pad((start.getHours() + (start.getMinutes() >= 30 ? 1 : 0)) % 24)}:${pad((start.getMinutes() + 30) % 60)}`, src: 'Google', remind: true },
+      { title: 'Ревью PKGBUILD', time: '18:30–19:00', src: 'CalDAV' }
+    ];
+    const add = (dd, e) => { if (dd >= 1 && dd <= 28) (evs[key(dd)] = evs[key(dd)] || []).push(e); };
+    add(today + 2, { title: 'Релиз 1.0', time: '10:00', src: 'Google' });
+    add(today + 5, { title: 'Обновление AshenOS', time: 'весь день', src: 'CalDAV' });
+    add(today - 3, { title: 'Ретро спринта', time: '15:00–16:00', src: 'Google' });
+    add(today + 11, { title: 'День рождения Ани', time: 'весь день', src: 'Google' });
+    add(today + 16, { title: 'Оплата хостинга', time: '12:00', src: 'CalDAV' });
+    let profile = 'work';
+    try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
+    this.setState({ events: evs, calSel: today, profile });
+    this.tick = setInterval(() => this.onTick(), 1000);
+    window.addEventListener('mousemove', this.onCurMove, true);
+    window.addEventListener('mousedown', this.onCurDown, true);
+    window.addEventListener('mouseup', this.onCurUp, true);
+    window.addEventListener('copy', this.onCopy, true);
+    window.addEventListener('focusin', this.onFocusIn, true);
+    window.addEventListener('dragstart', this.onAnyDrag, true);
+    window.addEventListener('dragenter', this.onAnyDrag, true);
+    window.addEventListener('dragend', this.onDragDone, true);
+    window.addEventListener('drop', this.onDragDone, true);
+    window.addEventListener('dragleave', this.onDragLeaveWin, true);
+  }
+  /* ---------- on-screen keyboard ---------- */
+  onFocusIn = (e) => {
+    const t = e.target;
+    if (!t || !(t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') || t.type === 'range' || t.type === 'checkbox') return;
+    this.oskEl = t;
+    const name = t.getAttribute('aria-label') || t.getAttribute('placeholder') || 'Поле ввода';
+    if (this.state.oskTarget !== name) this.setState({ oskTarget: name });
+  };
+  toggleOsk = () => { this.setState({ oskOn: !this.state.oskOn, oskShift: false }); };
+  oskKeep = (e) => { if (e && e.preventDefault) e.preventDefault(); };
+  oskField() {
+    const el = this.oskEl;
+    if (el && el.isConnected) return el;
+    const a = document.activeElement;
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) return (this.oskEl = a);
+    return null;
+  }
+  oskPress(k) {
+    const st = this.state;
+    if (k === 'shift') { if (st.oskShift && !st.oskCaps) this.setState({ oskCaps: true }); else this.setState({ oskShift: !st.oskShift && !st.oskCaps, oskCaps: false }); return; }
+    if (k === 'num') { this.setState({ oskNum: !st.oskNum, oskSym: false }); return; }
+    if (k === 'sym') { this.setState({ oskSym: !st.oskSym }); return; }
+    if (k === 'lang') { const v = st.oskLang === 'RU' ? 'EN' : 'RU'; this.setState({ oskLang: v, lang: v, oskNum: false }); this.onLevel('lang', v); return; }
+    if (k === 'hide') { this.setState({ oskOn: false }); return; }
+    const el = this.oskField();
+    if (!el) { this.notify({ app: 'Клавиатура', title: 'Нет поля ввода', body: 'Нажмите на поле, куда нужно печатать', kind: 'short', glyph: '⌨' }); return; }
+    if (document.activeElement !== el) { try { el.focus({ preventScroll: true }); } catch (e) {} }
+    const key = (name) => { ['keydown', 'keyup'].forEach((t) => el.dispatchEvent(new KeyboardEvent(t, { key: name, bubbles: true, cancelable: true }))); };
+    if (k === 'enter') { if (el.tagName === 'TEXTAREA') k = '\n'; else { key('Enter'); return; } }
+    if (k === 'left' || k === 'right') { const p = Math.max(0, Math.min(el.value.length, (el.selectionStart || 0) + (k === 'left' ? -1 : 1))); try { el.setSelectionRange(p, p); } catch (e) {} return; }
+    const proto = el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    const set = Object.getOwnPropertyDescriptor(proto, 'value').set;
+    const v = el.value || '';
+    let a = el.selectionStart, b = el.selectionEnd;
+    if (a === null || a === undefined) { a = v.length; b = v.length; }
+    let nv, pos;
+    if (k === 'back') { if (a === b && a === 0) return; const from = a === b ? a - 1 : a; nv = v.slice(0, from) + v.slice(b); pos = from; key('Backspace'); }
+    else { nv = v.slice(0, a) + k + v.slice(b); pos = a + k.length; }
+    set.call(el, nv);
+    try { el.setSelectionRange(pos, pos); } catch (e) {}
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    if (st.oskShift && k !== 'back') this.setState({ oskShift: false });
+  }
+  oskH(k) { this.oskHs = this.oskHs || {}; if (!this.oskHs[k]) this.oskHs[k] = (e) => { if (e && e.preventDefault) e.preventDefault(); this.oskPress(k); }; return this.oskHs[k]; }
+  onCopy = () => {
+    let t = '';
+    try { t = String(window.getSelection() || ''); const a = document.activeElement; if (!t && a && typeof a.selectionStart === 'number') t = a.value.slice(a.selectionStart, a.selectionEnd); } catch (e) {}
+    t = (t || '').trim().replace(/\s+/g, ' ').slice(0, 120);
+    if (!t) return;
+    this.setState({ clip: [{ text: t, at: Date.now() }, ...this.state.clip.filter((c) => c.text !== t)].slice(0, 10), flash: { kind: 'clip', val: t, at: Date.now() } });
+    clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750);
+  };
+  onLevel = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
+  onWaveSet = (v) => { if (this.state.waveOn !== v) this.setState({ waveOn: v }); };
+  onWall = (i) => { if (this.state.curWall !== i) this.setState({ curWall: i }); };
+  labAction = (id) => {
+    const st = this.state, now = Date.now();
+    if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
+    if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
+    const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
+    const clip = (t) => { this.setState({ clip: [{ text: t, at: Date.now() }, ...st.clip.filter((c) => c.text !== t)].slice(0, 10) }); flash('clip', t); };
+    if (id.startsWith('timer')) { const ms = +id.slice(5) * 1000; this.setState({ timer: { end: now + ms, dur: ms, paused: false, left: 0 } }); }
+    else if (id === 'sw') this.setState({ sw: { running: true, start: now, acc: 0, laps: [] } });
+    else if (id === 'rec') this.setState({ rec: { paused: false, start: now, acc: 0 } });
+    else if (id === 'call') this.setState({ call: { muted: false, start: now } });
+    else if (id === 'update') this.setState({ prog: { pct: 0, kind: 'update' } });
+    else if (id === 'copy') this.setState({ prog: { pct: 0, kind: 'copy' } });
+    else if (id === 'volUp' || id === 'volDown') { const v = Math.max(0, Math.min(100, (st.vol || 64) + (id === 'volUp' ? 8 : -8))); this.setState({ vol: v }); flash('vol', v); }
+    else if (id === 'brUp' || id === 'brDown') { const v = Math.max(5, Math.min(100, (st.bright || 72) + (id === 'brUp' ? 10 : -10))); this.setState({ bright: v }); flash('bright', v); }
+    else if (id === 'lang') { const v = st.lang === 'RU' ? 'EN' : 'RU'; this.setState({ lang: v }); flash('lang', v); }
+    else if (id === 'clipPath') clip('~/Проекты/Дизайн/Концепт.fig');
+    else if (id === 'clipCmd') clip('sudo pacman -Syu --noconfirm');
+    else if (id === 'nShort') this.notify({ app: 'Telegram', title: 'Миша', body: 'Ок, жду ссылку', kind: 'short', glyph: 'М' });
+    else if (id === 'nLong') this.notify({ app: 'Почта', title: 'Счёт за ноябрь', body: 'Хостинг: оплатите до 25 ноября, иначе сервер будет приостановлен. Сумма и реквизиты во вложении.', kind: 'long', glyph: '@' });
+    else if (id === 'nImp') this.notify({ app: 'Система', title: 'Батарея 15%', body: 'Подключите зарядку — осталось около 25 минут', kind: 'important', glyph: '!' });
+  };
+  onAnyDrag = (e) => {
+    if (this.fromShelf) return;
+    const t = e.dataTransfer ? Array.from(e.dataTransfer.types || []) : [];
+    if (e.type === 'dragstart' || t.includes('Files') || t.includes('application/x-arch-file')) {
+      clearTimeout(this.dragT);
+      if (!this.state.dragging) this.setState({ dragging: true });
+    }
+  };
+  onDragLeaveWin = (e) => { if (!e.relatedTarget && !this.fromShelf) this.onDragDone(); };
+  onDragDone = () => { clearTimeout(this.dragT); this.dragT = setTimeout(() => this.setState({ dragging: false, shDrag: false }), 250); };
+  componentWillUnmount() {
+    clearInterval(this.tick);
+    ['t', 'at', 'toastT', 'hideT', 'pillT', 'peekT', 'syncT', 'powerT', 'dlT', 'n1', 'n2'].forEach((k) => clearTimeout(this[k]));
+    window.removeEventListener('mousemove', this.onCurMove, true);
+    window.removeEventListener('mousedown', this.onCurDown, true);
+    window.removeEventListener('mouseup', this.onCurUp, true);
+    ['dragstart', 'dragenter'].forEach((ev) => window.removeEventListener(ev, this.onAnyDrag, true));
+    ['dragend', 'drop'].forEach((ev) => window.removeEventListener(ev, this.onDragDone, true));
+    window.removeEventListener('mousemove', this.onDragMove);
+    window.removeEventListener('mouseup', this.onDragUp);
+  }
+  onTick() {
+    const st = this.state;
+    const patch = { now: new Date() };
+    if (st.music.on && st.music.playing) {
+      const pos = st.music.pos + 1;
+      patch.music = pos >= st.music.dur ? { ...st.music, pos: 0, idx: (st.music.idx + 1) % this.tracks.length } : { ...st.music, pos };
+    }
+    if (st.dl.on && st.lock === 'off') {
+      const pct = Math.min(100, st.dl.pct + 3);
+      patch.dl = { ...st.dl, pct };
+      if (pct >= 100 && !this.dlT) {
+        this.dlT = setTimeout(() => {
+          this.dlT = null;
+          this.setState({ dl: { on: false, pct: 100 } });
+          this.notify({ app: 'Загрузки', title: 'Загрузка завершена', body: 'linux-zen-6.17.2 сохранён в ~/Загрузки', kind: 'short', glyph: '↓' });
+        }, 1200);
+      }
+    }
+    if (st.prog && st.prog.pct < 100) patch.prog = { ...st.prog, pct: Math.min(100, st.prog.pct + 3) };
+    if (st.prog && st.prog.pct >= 100 && !this.progT) this.progT = setTimeout(() => { this.progT = null; this.setState({ prog: null }); }, 2500);
+    this.setState(patch);
+  }
+
+  /* ---------------- helpers ---------------- */
+  root() { return document.querySelector('[data-sys-root]'); }
+  scale() { const r = this.root(); return r ? (r.getBoundingClientRect().width / 1440 || 1) : 1; }
+  local(e) {
+    const r = this.root(); if (!r) return { x: 0, y: 0 };
+    const b = r.getBoundingClientRect(), k = b.width / 1440 || 1;
+    return { x: (e.clientX - b.left) / k, y: (e.clientY - b.top) / k };
+  }
+  saveProfile(p) { try { localStorage.setItem('archIslands.profile', p); } catch (e) {} }
+  autohide() { const st = this.state; return st.profile === 'game' || Object.values(st.wins).some((w) => w.max && !w.min && !w.closing); }
+
+  /* ---------------- cursor (moves without re-rendering) ---------------- */
+  cur = { x: -100, y: -100, kind: 'arrow', hidden: true, down: false };
+  paintCursor() {
+    const el = document.querySelector('[data-cursor]');
+    if (!el) return;
+    const c = this.cur;
+    el.style.transform = `translate(${c.x}px, ${c.y}px)`;
+    el.style.opacity = c.hidden ? '0' : '1';
+    const a = el.querySelector('[data-c=arrow]'), t = el.querySelector('[data-c=text]'), r = el.querySelector('[data-c=resize]');
+    const k = c.kind;
+    if (a) { a.style.opacity = (k === 'arrow' || k === 'pointer' || k === 'grab') ? '1' : '0'; a.style.transform = `scale(${k === 'pointer' ? 0.88 : k === 'grab' || c.down ? 0.82 : 1})`; }
+    if (t) t.style.opacity = k === 'text' ? '1' : '0';
+    if (r) { r.style.opacity = k.startsWith('rs') ? '1' : '0'; r.style.transform = `rotate(${k === 'rs-nesw' ? 90 : k === 'rs-ew' ? -45 : k === 'rs-ns' ? 45 : 0}deg)`; }
+  }
+  kindAt(target) {
+    if (this.drag) return this.drag.mode === 'move' ? 'grab' : 'rs-' + this.drag.cur;
+    if (!target || !target.closest) return 'arrow';
+    const rs = target.closest('[data-cur]');
+    if (rs) return 'rs-' + rs.getAttribute('data-cur');
+    const tag = target.tagName;
+    if ((tag === 'INPUT' && target.type !== 'range') || tag === 'TEXTAREA' || target.isContentEditable) return 'text';
+    if (target.closest('button,a,[role=option],[role=tab],[role=slider],input[type=range],label,select')) return 'pointer';
+    return 'arrow';
+  }
+  onCurMove = (e) => {
+    const p = this.local(e);
+    this.cur.x = p.x; this.cur.y = p.y; this.cur.hidden = false;
+    this.cur.kind = this.kindAt(e.target);
+    this.paintCursor();
+    const r0 = this.root();
+    if (r0 && !this.pxRaf) { this.pxRaf = requestAnimationFrame(() => { this.pxRaf = null; r0.style.setProperty('--mx', (this.cur.x / 1440 - 0.5).toFixed(3)); r0.style.setProperty('--my', (this.cur.y / 900 - 0.5).toFixed(3)); }); }
+    /* autohide: reveal at the top edge, hide 2 s after leaving */
+    if (this.autohide() && this.state.lock === 'off') {
+      if (p.y < 8) { clearTimeout(this.hideT); this.hideT = null; if (!this.state.barShown) this.setState({ barShown: true }); }
+      else if (p.y > 110 && this.state.barShown && !this.hideT && !this.state.menu && !this.state.right) {
+        this.hideT = setTimeout(() => { this.hideT = null; this.setState({ barShown: false }); }, 2000);
+      } else if (p.y <= 110 && this.hideT) { clearTimeout(this.hideT); this.hideT = null; }
+    }
+  };
+  onCurDown = () => { this.cur.down = true; this.paintCursor(); };
+  onCurUp = () => { this.cur.down = false; this.paintCursor(); };
+  curHide = () => { this.cur.hidden = true; this.paintCursor(); };
+
+  /* ---------------- lock / power ---------------- */
+  unlock = () => {
+    clearTimeout(this.t);
+    this.setState({ lock: 'out', reveal: (this.state.reveal || 0) + 1 });
+    this.t = setTimeout(() => this.setState({ lock: 'off' }), 700);
+    clearTimeout(this.n1); clearTimeout(this.n2);
+    this.n1 = setTimeout(() => this.notify({ app: 'Telegram', title: 'Аня', body: 'Скинь макет панели, гляну вечером', kind: 'short', glyph: 'А' }), 3500);
+    this.n2 = setTimeout(() => this.notify({ app: 'Обновления', title: 'Доступно 14 пакетов', body: 'Включая linux-zen 6.17.2, mesa 25.2 и plasma-desktop. Установка займёт около трёх минут, перезагрузка не потребуется.', kind: 'long', glyph: '⟳' }), 14000);
+  };
+  lock = () => {
+    clearTimeout(this.t);
+    this.setState({ lock: 'in', menu: false, right: null, q: '', stackOpen: false, toast: null });
+  };
+  sleep = () => this.power('Переход в спящий режим…');
+  reboot = () => this.power('Перезагрузка…');
+  power(text) {
+    clearTimeout(this.powerT);
+    this.setState({ power: text, menu: false, q: '' });
+    this.powerT = setTimeout(() => { this.setState({ power: null, lock: 'in', wins: {}, order: [], focus: null }); }, 2200);
+  }
+
+  /* ---------------- profiles ---------------- */
+  setProfile = (p, auto) => {
+    if (this.state.profile === p) return;
+    this.saveProfile(p);
+    this.setState({ profile: p, barShown: false, prevProfile: auto ? this.state.profile : null });
+    const names = { work: 'Работа', game: 'Игры', min: 'Минимализм' };
+    this.notify({ app: 'Система', title: `Профиль «${names[p]}»`, body: auto ? 'Включён автоматически для полноэкранного окна' : 'Оформление панели обновлено', kind: 'short', glyph: '◐', sys: true });
+  };
+  toggleAuto = () => this.setState({ autoProfile: !this.state.autoProfile });
+
+  /* ---------------- notifications ---------------- */
+  nid = 1;
+  notify(n) {
+    const item = { ...n, id: this.nid++, at: Date.now() };
+    const st = this.state;
+    const silent = st.shadeOpen || st.hoverPill === 'isl' || st.shDrag || ((st.profile === 'game' || st.dnd) && n.kind !== 'important' && !n.sys);
+    if (silent || st.lock !== 'off') { this.setState({ history: [item, ...st.history].slice(0, 30), bump: st.bump + 1 }); return; }
+    if (st.toast) this.finishToast(true);
+    this.setState({ toast: { ...item, phase: 'in' } });
+    this.armToast(item);
+  }
+  armToast(item) {
+    clearTimeout(this.toastT);
+    if (item.kind === 'important') return;
+    this.toastT = setTimeout(() => this.finishToast(false), item.kind === 'long' ? 6000 : 3000);
+  }
+  finishToast(instant) {
+    const t = this.state.toast;
+    if (!t) return;
+    clearTimeout(this.toastT);
+    const done = () => this.setState((s) => ({ toast: null, history: s.history.some((h) => h.id === t.id) ? s.history : [t, ...s.history].slice(0, 30), bump: s.bump + 1 }));
+    if (instant) { done(); return; }
+    this.setState({ toast: { ...t, phase: 'back' } });
+    this.toastT = setTimeout(done, 420);
+  }
+  toastHold = () => clearTimeout(this.toastT);
+  toastRelease = () => { const t = this.state.toast; if (t && t.phase !== 'back' && t.kind !== 'important') { clearTimeout(this.toastT); this.toastT = setTimeout(() => this.finishToast(false), 1800); } };
+  toastClose = () => { clearTimeout(this.toastT); this.setState({ toast: null }); };
+  testIdx = 0;
+  testNotif = () => {
+    const list = [
+      { app: 'Telegram', title: 'Миша', body: 'Ок, жду ссылку', kind: 'short', glyph: 'М' },
+      { app: 'Почта', title: 'Счёт за ноябрь', body: 'Хостинг: оплатите до 25 ноября, иначе сервер будет приостановлен. Сумма и реквизиты во вложении к письму.', kind: 'long', glyph: '@' },
+      { app: 'Система', title: 'Батарея 15%', body: 'Подключите зарядку — осталось около 25 минут', kind: 'important', glyph: '!' }
+    ];
+    this.setState({ menu: false, q: '' });
+    this.notify(list[this.testIdx++ % list.length]);
+  };
+  /* swipe a card sideways to dismiss (DOM moves while dragging, state commits on release) */
+  startSwipe(e, el, onGone) {
+    if (e.button !== 0 || (e.target.closest && e.target.closest('button'))) return;
+    const sx = e.clientX, k = this.scale();
+    let dx = 0;
+    el.style.transition = 'none';
+    const mv = (ev) => { dx = (ev.clientX - sx) / k; el.style.transform = `translateX(${dx}px)`; el.style.opacity = String(Math.max(0.2, 1 - Math.abs(dx) / 260)); };
+    const up = () => {
+      window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up);
+      el.style.transition = 'transform .3s cubic-bezier(.3,1.3,.5,1), opacity .3s';
+      if (Math.abs(dx) > 90) { el.style.transform = `translateX(${dx > 0 ? 420 : -420}px)`; el.style.opacity = '0'; setTimeout(onGone, 260); }
+      else { el.style.transform = ''; el.style.opacity = ''; }
+    };
+    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+  }
+  toastSwipe = (e) => { const el = e.currentTarget; clearTimeout(this.toastT); this.startSwipe(e, el, () => this.setState({ toast: null })); };
+  dismiss = (id) => this.setState({ history: this.state.history.filter((h) => h.id !== id) });
+  clearAll = () => this.setState({ history: [], stackOpen: false });
+  onShade = (open) => { if (open) { clearTimeout(this.toastT); const t = this.state.toast; this.setState((s) => ({ shadeOpen: true, stackOpen: false, toast: null, history: t && !s.history.some((h) => h.id === t.id) ? [t, ...s.history] : s.history })); } else this.setState({ shadeOpen: false }); };
+  toggleStack = () => this.setState({ stackOpen: !this.state.stackOpen, menu: false, right: null, q: '' });
+  stackFan = () => this.setState({ fan: true });
+  stackFold = () => this.setState({ fan: false });
+
+  /* ---------------- windows ---------------- */
+  hs = {};
+  handlers(id) {
+    if (!this.hs[id]) {
+      this.hs[id] = {
+        close: () => this.closeWin(id),
+        min: () => this.minWin(id),
+        max: () => this.maxWin(id),
+        restore: () => this.restoreWin(id),
+        peek: () => { clearTimeout(this.peekT); this.setState({ peek: id, stackHover: true }); },
+        down: (e) => this.winDown(e, id),
+        rs: (e) => this.rsDown(e, id)
+      };
+    }
+    return this.hs[id];
+  }
+  openApp = (id, from) => {
+    if (!this.meta[id]) return;
+    const w = this.state.wins[id];
+    if (w && !w.closing) { if (w.min) this.restoreWin(id); else if (from === 'dock') this.closeWin(id); else this.focusWin(id); return; }
+    const n = Object.keys(this.state.wins).length;
+    const ww = 940, hh = Math.round(ww * this.R);
+    const rect = { x: 250 + n * 40, y: 120 + n * 30, w: ww, h: hh };
+    this.setState({ wins: { ...this.state.wins, [id]: { ...rect, min: false, max: false, pinned: false, closing: false, born: Date.now() } }, order: [...this.state.order.filter((o) => o !== id), id], focus: id, menu: false, q: '', right: null });
+  };
+  focusWin(id) { if (this.state.focus !== id || this.state.order[this.state.order.length - 1] !== id) this.setState({ focus: id, order: [...this.state.order.filter((o) => o !== id), id] }); }
+  patchWin(id, p) { const w = this.state.wins[id]; if (w) this.setState({ wins: { ...this.state.wins, [id]: { ...w, ...p } } }); }
+  closeWin(id) {
+    this.patchWin(id, { closing: true });
+    setTimeout(() => {
+      const wins = { ...this.state.wins }; const was = wins[id]; delete wins[id];
+      const order = this.state.order.filter((o) => o !== id);
+      this.setState({ wins, order, focus: order[order.length - 1] || null, peek: this.state.peek === id ? null : this.state.peek });
+      if (was && was.max) this.leaveFull();
+    }, 260);
+  }
+  minWin(id) {
+    const w = this.state.wins[id]; if (!w) return;
+    this.patchWin(id, { min: true, minAt: Date.now() });
+    const order = this.state.order.filter((o) => o !== id && !this.state.wins[o].min);
+    this.setState({ focus: order[order.length - 1] || null });
+    if (w.max) this.leaveFull();
+  }
+  restoreWin(id) {
+    const w = this.state.wins[id]; if (!w) return;
+    this.setState({ wins: { ...this.state.wins, [id]: { ...w, min: false } }, peek: null, stackHover: false, order: [...this.state.order.filter((o) => o !== id), id], focus: id });
+    if (w.max) this.enterFull();
+  }
+  maxWin(id) {
+    const w = this.state.wins[id]; if (!w) return;
+    const max = !w.max;
+    this.patchWin(id, { max });
+    this.focusWin(id);
+    if (max) this.enterFull(); else this.leaveFull();
+  }
+  enterFull() { if (this.state.autoProfile && this.state.profile !== 'game') this.setProfile('game', true); this.setState({ barShown: false, menu: false, right: null }); }
+  leaveFull() { const p = this.state.prevProfile; if (this.state.autoProfile && p && this.state.profile === 'game') { this.saveProfile(p); this.setState({ profile: p, prevProfile: null }); } }
+  pinWin(id) { const w = this.state.wins[id]; if (w) this.patchWin(id, { pinned: !w.pinned }); }
+  stackIn = () => { clearTimeout(this.peekT); if (!this.state.stackHover) this.setState({ stackHover: true }); };
+  stackOut = () => { clearTimeout(this.peekT); this.peekT = setTimeout(() => this.setState({ stackHover: false, peek: null }), 260); };
+  peekOut = () => { clearTimeout(this.peekT); this.peekT = setTimeout(() => this.setState({ stackHover: false, peek: null }), 300); };
+  peekKeep = () => clearTimeout(this.peekT);
+
+  /* drag & resize: the DOM moves live, state is written once on release */
+  winDown(e, id) {
+    const w = this.state.wins[id];
+    if (!w || w.min || w.closing || e.button !== 0) return;
+    this.focusWin(id);
+    if (w.max) return;
+    const t = e.target;
+    if (t.closest && t.closest('button,input,textarea,a,select,label,[role=option],[role=tab],[role=slider],[data-rs],[draggable=true]')) return;
+    const el = e.currentTarget;
+    const k = this.scale();
+    const yIn = (e.clientY - el.getBoundingClientRect().top) / k;
+    if (yIn > 84 * (w.w / 1368)) return;
+    e.preventDefault();
+    this.drag = { id, mode: 'move', sx: e.clientX, sy: e.clientY, k, o: { x: w.x, y: w.y, w: w.w, h: w.h }, el, tr: el.style.transition };
+    this.live = { id, x: w.x, y: w.y, w: w.w, h: w.h };
+    el.style.transition = 'none';
+    window.addEventListener('mousemove', this.onDragMove);
+    window.addEventListener('mouseup', this.onDragUp);
+  }
+  rsDown(e, id) {
+    const w = this.state.wins[id]; if (!w || e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    this.focusWin(id);
+    const edge = e.currentTarget.getAttribute('data-rs');
+    const el = e.currentTarget.closest('[data-win]');
+    this.drag = { id, mode: 'rs', edge, cur: e.currentTarget.getAttribute('data-cur'), sx: e.clientX, sy: e.clientY, k: this.scale(), o: { x: w.x, y: w.y, w: w.w, h: w.h }, el, tr: el.style.transition };
+    this.live = { id, x: w.x, y: w.y, w: w.w, h: w.h };
+    el.style.transition = 'none';
+    const inner = el.querySelector('[data-inner]'); if (inner) { this.drag.inner = inner; this.drag.itr = inner.style.transition; inner.style.transition = 'none'; }
+    window.addEventListener('mousemove', this.onDragMove);
+    window.addEventListener('mouseup', this.onDragUp);
+  }
+  onDragMove = (e) => {
+    const d = this.drag; if (!d) return;
+    const dx = (e.clientX - d.sx) / d.k, dy = (e.clientY - d.sy) / d.k;
+    const SN = 24, o = d.o;
+    let { x, y, w, h } = o;
+    if (d.mode === 'move') {
+      x = o.x + dx; y = o.y + dy;
+      /* magnetic edges: 24 px */
+      if (Math.abs(x - 8) < SN) x = 8;
+      if (Math.abs(1432 - (x + w)) < SN) x = 1432 - w;
+      if (Math.abs(y - 40) < SN) y = 40;
+      if (Math.abs(892 - (y + h)) < SN) y = 892 - h;
+      x = Math.max(-w + 120, Math.min(1440 - 120, x)); y = Math.max(40, Math.min(900 - 60, y));
+    } else {
+      const sgn = d.edge === 'se' || d.edge === 'ne' ? 1 : -1;
+      w = Math.max(520, Math.min(1440, o.w + sgn * dx));
+      h = Math.round(w * this.R);
+      if (d.edge === 'sw' || d.edge === 'nw') x = o.x + (o.w - w);
+      if (d.edge === 'ne' || d.edge === 'nw') y = o.y + (o.h - h);
+      if (Math.abs(x) < SN) { const nw = w + x; if (d.edge.endsWith('w')) { w = Math.max(520, nw); x = 0; h = Math.round(w * this.R); } }
+      if (Math.abs(1440 - (x + w)) < SN && d.edge.endsWith('e')) { w = 1440 - x; h = Math.round(w * this.R); }
+    }
+    this.live = { id: d.id, x, y, w, h };
+    const el = d.el;
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.width = w + 'px'; el.style.height = h + 'px';
+    el.style.borderRadius = (22 * w / 1368) + 'px';
+    el.style.boxShadow = (x === 8 || y === 40 || x + w === 1432 || y + h === 892) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : '';
+    if (d.inner) d.inner.style.transform = `scale(${w / 1368}) translate(-36px, -32px)`;
+  };
+  onDragUp = () => {
+    const d = this.drag; if (!d) return;
+    window.removeEventListener('mousemove', this.onDragMove);
+    window.removeEventListener('mouseup', this.onDragUp);
+    const l = this.live;
+    d.el.style.transition = d.tr;
+    d.el.style.boxShadow = '';
+    if (d.inner) d.inner.style.transition = d.itr;
+    this.drag = null; this.live = null;
+    const w = this.state.wins[d.id];
+    if (w && l) this.setState({ wins: { ...this.state.wins, [d.id]: { ...w, x: l.x, y: l.y, w: l.w, h: l.h } } });
+  };
+
+  /* ---------------- render ---------------- */
+  renderVals() {
+    const st = this.state;
+    const now = st.now;
+    const pad = (n) => String(n).padStart(2, '0');
+    const prof = st.profile, game = prof === 'game', mini = prof === 'min';
+    const SPR = 'cubic-bezier(.34,1.32,.64,1)', OUT = 'cubic-bezier(.22,1,.36,1)';
+    const D = game ? 0.25 : 0.32;
+    const ISL = `background:rgba(17,17,19,.85);${game ? '' : 'backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);'}border:1px solid #2e2e33;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);`;
+    const hide = this.autohide() && !st.barShown && !st.menu && !st.right;
+    const unlocked = st.lock === 'off';
+
+    /* ---- windows ---- */
+    const ids = ['files', 'term', 'music', 'lab', 'set'];
+    const minimized = st.order.filter((id) => st.wins[id] && st.wins[id].min && !st.wins[id].closing).sort((a, b) => st.wins[a].minAt - st.wins[b].minAt);
+    const TW = 168, TH = Math.round(TW * this.R);
+    const slot = (id) => {
+      const i = minimized.indexOf(id), n = minimized.length;
+      if (st.peek === id) {
+        const pw = 460, ph = Math.round(pw * this.R);
+        const base = st.stackHover ? 300 + i * (TH + 12) : 340 + i * 12;
+        return { x: 1440 - 16 - TW - 24 - pw, y: Math.max(80, Math.min(900 - ph - 70, base - 80)), w: pw, h: ph, z: 80 };
+      }
+      if (st.stackHover) return { x: 1440 - 16 - TW, y: 450 - (n * (TH + 12)) / 2 + i * (TH + 12), w: TW, h: TH, z: 60 + i };
+      const ww = TW - (n - 1 - i) * 10;
+      return { x: 1440 - 16 - ww, y: 360 - (n - 1 - i) * 12, w: ww, h: Math.round(ww * this.R), z: 60 + i };
+    };
+    const win = {}, h = {};
+    ids.forEach((id) => {
+      const w = st.wins[id];
+      h[id] = this.handlers(id);
+      if (!w) { win[id] = { open: false }; return; }
+      let r = (this.live && this.live.id === id) ? this.live : { x: w.x, y: w.y, w: w.w, h: w.h };
+      let z = 20 + st.order.indexOf(id) + (w.pinned ? 20 : 0);
+      if (w.max && !w.min) { r = { x: 0, y: 0, w: 1440, h: 900 }; z = 85; }
+      if (w.min) { const s = slot(id); r = s; z = s.z; }
+      const s = r.w / (w.max && !w.min ? 1368 : 1368);
+      const rad = w.max && !w.min ? 0 : 22 * s;
+      const focused = st.focus === id && !w.min;
+      const tr = `left .46s ${SPR},top .46s ${SPR},width .46s ${SPR},height .46s ${SPR},border-radius .46s ${OUT},box-shadow .3s,opacity .3s`;
+      win[id] = {
+        open: true, title: this.meta[id].title, pinned: w.pinned && !w.min,
+        cover: !!w.min, handles: !w.min && !w.max,
+        box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:#0e0e10;box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .26s ease both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .45s cubic-bezier(.2,1.1,.3,1) both;' : '')}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
+        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform .46s ${SPR};${w.min ? 'pointer-events:none;' : ''}`
+      };
+    });
+    const peekW = st.peek && st.wins[st.peek];
+    const peekRect = peekW ? slot(st.peek) : null;
+
+    /* ---- left island ---- */
+    const top = st.order.filter((id) => st.wins[id] && !st.wins[id].min && !st.wins[id].closing);
+    const active = top[top.length - 1] || 'desk';
+    const leftTitle = active === 'desk' ? 'Рабочий стол' : this.meta[active].title;
+    const leftSub = active === 'desk' ? `Пространство ${st.ws}` : this.meta[active].sub;
+    const searching = st.menu && st.q.trim().length > 0;
+    const textW = (s, px) => Math.round(s.length * px);
+    const actW = active === 'desk' ? 4 * 13 + 24 : 3 * 36;
+    const compactW = mini ? 50 : 4 + 40 + 6 + textW(leftTitle, 7.4) + 8 + textW(leftSub, 6.3) + 10 + actW + 8;
+    const LW = st.menu ? (searching ? 720 : 400) : compactW;
+    const LH = st.menu ? (searching ? 430 : 606) : 40;
+    const left = {
+      open: st.menu,
+      box: `display:none;position:absolute;left:16px;top:0;width:${LW}px;height:${LH}px;border-radius:${st.menu ? 24 : 20}px;overflow:hidden;flex-direction:column;${ISL}transition:width ${st.menu ? D + 0.06 : D - 0.04}s ${st.menu ? SPR : OUT},height ${st.menu ? D + 0.1 : D - 0.04}s ${st.menu ? SPR : OUT},border-radius ${D}s;pointer-events:auto`,
+      logo: `width:32px;height:32px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .3s ${SPR};background:${st.menu ? '#f2f2f4' : 'rgba(255,255,255,.07)'};color:${st.menu ? '#0b0b0c' : '#f2f2f4'};transform:rotate(${st.menu ? 180 : 0}deg)`,
+      titleBox: `display:${mini ? 'none' : 'flex'};align-items:baseline;gap:8px;min-width:0;padding:0 4px;animation:islFade .35s ease both`,
+      title: leftTitle, sub: leftSub,
+      acts: `display:${mini ? 'none' : 'flex'};align-items:center;gap:2px;margin-left:auto`,
+      app: { files: active === 'files', term: active === 'term', music: active === 'music', desk: active === 'desk' },
+      menuPane: `display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;opacity:${st.menu ? 1 : 0};filter:blur(${st.menu ? 0 : 6}px);transform:scale(${st.menu ? 1 : 0.96});transform-origin:0 0;transition:opacity ${st.menu ? '.3s ease .08s' : '.16s ease'},filter ${st.menu ? '.3s ease .08s' : '.16s'},transform .35s ${SPR};pointer-events:${st.menu ? 'auto' : 'none'}`,
+      menuBody: `display:${searching ? 'none' : 'flex'};flex-direction:column;gap:10px;padding:0 12px 12px;animation:islFade .3s ease both`,
+      searchBody: `display:${searching ? 'flex' : 'none'};gap:12px;padding:0 12px 12px;flex:1;min-height:0;animation:islFade .3s ease both`
+    };
+    const iconBtn = 'width:34px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#d6d6dc';
+    const wsList = [1, 2, 3, 4].map((n) => ({ on: st.ws === n, label: `Рабочий стол ${n}`, pick: () => this.setState({ ws: n }), style: `height:7px;border-radius:4px;width:${st.ws === n ? 20 : 7}px;background:${st.ws === n ? '#f2f2f4' : 'rgba(255,255,255,.3)'};transition:width .3s ${SPR}` }));
+
+    const tile = (bg, fg) => `width:34px;height:34px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font:700 12px 'JetBrains Mono',monospace;background:${bg};color:${fg || '#fff'}`;
+    const appGlyph = { files: ['▤', '#3a3a40'], term: ['>_', '#1e1e22'], music: ['♪', '#c2412f'], set: ['⚙', '#3a3a40'], web: ['◎', '#4f7fb8'], steam: ['◈', '#2a3150'] };
+    const favDefs = [
+      { id: 'files', name: 'Проводник' }, { id: 'term', name: 'Терминал' }, { id: 'music', name: 'Музыка' },
+      { id: 'web', name: 'Firefox' }, { id: 'steam', name: 'Steam' }, { id: 'set', name: 'Настройки' }
+    ];
+    const favs = favDefs.map((f) => ({
+      name: f.name, glyph: appGlyph[f.id][0],
+      icon: `${tile(appGlyph[f.id][1])};width:40px;height:40px;border-radius:13px;font-size:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)`,
+      style: 'height:84px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:rgba(255,255,255,.05);transition:filter .2s',
+      open: () => this.meta[f.id] ? this.openApp(f.id) : this.notify({ app: f.name, title: `${f.name} запускается`, body: 'Демонстрация: приложение не входит в макет', kind: 'short', glyph: appGlyph[f.id][0] })
+    }));
+    const extCol = { FIG: '#8a63d2', PDF: '#c2412f', PNG: '#4f7fb8', MP3: '#d0452f', TXT: '#e8d9a8', SH: '#3f9a6b', PKG: '#6b6b73' };
+    const recent = [
+      { name: 'Концепт.fig', ext: 'FIG', when: '12 мин' }, { name: 'Трек.mp3', ext: 'MP3', when: '1 ч' }, { name: 'install.sh', ext: 'SH', when: 'вчера' }
+    ].map((r) => ({ ...r, icon: `${tile(extCol[r.ext], r.ext === 'TXT' ? '#3a3020' : '#fff')};width:28px;height:28px;border-radius:8px;font-size:8.5px`, open: () => this.openApp(r.ext === 'MP3' ? 'music' : r.ext === 'SH' ? 'term' : 'files') }));
+
+    /* ---- universal search ---- */
+    const corpus = [
+      ...favDefs.map((f) => ({ group: 'Приложения', name: f.name, kind: 'Приложение', glyph: appGlyph[f.id][0], bg: appGlyph[f.id][1], app: f.id, text: f.id === 'term' ? 'zsh 5.9 · вкладки, разделение панелей, палитра команд' : f.id === 'files' ? '4 папки и 7 файлов в ~/Проекты' : f.id === 'music' ? 'SoundCloud, Spotify, Apple Music, Яндекс Музыка, YouTube Music' : 'Не входит в макет', meta: [{ k: 'Тип', v: 'Приложение' }, { k: 'Профиль', v: f.id === 'steam' ? 'Игры' : 'Работа' }] })),
+      { group: 'Файлы', name: 'Концепт.fig', kind: 'Макет Figma · 5,6 МБ', glyph: 'FIG', bg: extCol.FIG, app: 'files', text: 'Три островка · Чёрно-графитовая тема · Матовое стекло 85% · Размытие 16 px', meta: [{ k: 'Папка', v: '~/Проекты/Дизайн' }, { k: 'Изменён', v: '12 минут назад' }] },
+      { group: 'Файлы', name: 'Заметки.txt', kind: 'Текст · 18 КБ', glyph: 'TXT', bg: extCol.TXT, fg: '#3a3020', app: 'files', text: '— островки: 40 px, отступ 16\n— анимации 250–350 мс\n— профили: Работа / Игры / Минимализм', mono: true, meta: [{ k: 'Папка', v: '~/Проекты' }, { k: 'Строк', v: '42' }] },
+      { group: 'Файлы', name: 'install.sh', kind: 'Скрипт Bash · 3 КБ', glyph: 'SH', bg: extCol.SH, app: 'term', text: '#!/usr/bin/env bash\nsudo pacman -S --needed quickshell\nsystemctl --user enable islands', mono: true, meta: [{ k: 'Права', v: 'rwxr-xr-x' }, { k: 'Изменён', v: 'вчера' }] },
+      { group: 'Файлы', name: 'Трек.mp3', kind: 'Аудио · 7,2 МБ', glyph: 'MP3', bg: extCol.MP3, app: 'music', text: '3:34 · 320 кбит/с · 44,1 кГц', meta: [{ k: 'Исполнитель', v: 'user' }, { k: 'Альбом', v: 'Демо' }] },
+      { group: 'Файлы', name: 'Презентация.pdf', kind: 'PDF · 12,4 МБ', glyph: 'PDF', bg: extCol.PDF, app: 'files', text: '18 страниц · Концепция рабочего окружения для AshenOS', meta: [{ k: 'Папка', v: '~/Документы' }, { k: 'Страниц', v: '18' }] },
+      { group: 'Команды', name: 'Заблокировать экран', kind: 'Система', glyph: '⏻', bg: '#3a3a40', cmd: 'lock', text: 'Блокирует сеанс, музыка продолжит играть', meta: [{ k: 'Сочетание', v: 'Super + L' }] },
+      { group: 'Команды', name: 'Профиль «Игры»', kind: 'Оформление', glyph: '◐', bg: '#3a3a40', cmd: 'game', text: 'Автоскрытие панели, только важные уведомления, минимум эффектов', meta: [{ k: 'Сейчас', v: { work: 'Работа', game: 'Игры', min: 'Минимализм' }[prof] }] },
+      { group: 'Команды', name: 'Профиль «Минимализм»', kind: 'Оформление', glyph: '◑', bg: '#3a3a40', cmd: 'min', text: 'Компактные островки, меньше постоянной информации', meta: [] },
+      { group: 'Команды', name: 'Обновить систему', kind: 'pacman -Syu', glyph: '⟳', bg: '#3a3a40', cmd: 'update', text: 'Скачает обновления и покажет прогресс в капсуле', meta: [{ k: 'Пакетов', v: '14' }] }
+    ];
+    const ql = st.q.trim().toLowerCase();
+    const found = ql ? corpus.filter((c) => (c.name + ' ' + c.kind + ' ' + c.group).toLowerCase().includes(ql)) : [];
+    const sel = Math.min(st.hitSel, Math.max(0, found.length - 1));
+    const run = (c) => {
+      this.setState({ menu: false, q: '', hitSel: 0 });
+      if (c.cmd === 'lock') this.lock();
+      else if (c.cmd === 'game' || c.cmd === 'min') this.setProfile(c.cmd);
+      else if (c.cmd === 'update') { this.setState({ dl: { on: true, pct: 0 } }); }
+      else if (this.meta[c.app]) this.openApp(c.app);
+      else this.notify({ app: c.name, title: `${c.name} запускается`, body: 'Демонстрация: приложение не входит в макет', kind: 'short', glyph: c.glyph });
+    };
+    this.found = found; this.run = run;
+    let prevGroup = '';
+    const hits = found.map((c, i) => {
+      const head = c.group !== prevGroup; prevGroup = c.group;
+      return {
+        ...c, head, on: i === sel,
+        hover: () => this.setState({ hitSel: i }), open: () => run(c),
+        icon: `${tile(c.bg, c.fg)};font-size:${c.glyph.length > 2 ? 8.5 : 13}px`,
+        style: `height:48px;padding:0 10px;border-radius:12px;display:flex;align-items:center;gap:10px;background:${i === sel ? 'rgba(255,255,255,.1)' : 'transparent'};transition:background .15s`,
+        enter: `font-size:13px;color:#8b8b93;opacity:${i === sel ? 1 : 0}`
+      };
+    });
+    const cur = found[sel];
+    const pv = cur ? {
+      box: 'flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 18px 16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid #2a2a2e;animation:islFade .25s ease both',
+      icon: `${tile(cur.bg, cur.fg)};width:72px;height:72px;border-radius:20px;font-size:${cur.glyph.length > 2 ? 15 : 26}px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 14px 30px rgba(0,0,0,.35)`,
+      glyph: cur.glyph, name: cur.name, kind: cur.kind, text: cur.text, meta: cur.meta,
+      snip: `width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.35);font:${cur.mono ? "500 11.5px 'JetBrains Mono',monospace" : '400 12.5px Inter,sans-serif'};line-height:1.55;color:#c9c9cf;white-space:pre-wrap`,
+      action: cur.cmd ? 'Выполнить' : 'Открыть', open: () => run(cur)
+    } : { box: 'display:none', meta: [] };
+
+    /* ---- center capsule ---- */
+    const tr = this.tracks[st.music.idx];
+    const mins = this.evStart ? Math.ceil((this.evStart - now) / 60000) : 99;
+    const evOn = unlocked && !st.evHidden && mins <= 60 && mins > -30;
+    const segs = { music: false, cal: evOn, dl: st.dl.on };
+    const any = segs.music || segs.cal || segs.dl;
+    const hp = st.hoverPill;
+    const pillDefs = {
+      music: { w: mini ? 64 : 214, bw: 372, bh: 104 },
+      cal: { w: mini ? 64 : 214, bw: 330, bh: 104 },
+      dl: { w: mini ? 64 : 196, bw: 330, bh: 104 },
+      idle: { w: mini ? 96 : 150 },
+      bell: { w: 56 }
+    };
+    const on = { ...segs, idle: !any, bell: st.history.length > 0 && !mini };
+    const order = ['music', 'cal', 'dl', 'idle', 'bell'];
+    const firstOn = order.find((k) => on[k]);
+    const pill = {};
+    order.forEach((k) => {
+      const d = pillDefs[k];
+      const big = hp === k && on[k] && d.bw;
+      const W = on[k] ? (big ? d.bw : d.w) : 0;
+      const H = big ? d.bh : 40;
+      pill[k] = {
+        enter: () => { clearTimeout(this.pillT); if (this.state.hoverPill !== k) this.setState({ hoverPill: k }); },
+        box: `position:relative;flex:none;width:${W}px;height:${H}px;margin-left:${on[k] && k !== firstOn ? 8 : on[k] ? 0 : -8}px;border-radius:${big ? 26 : 20}px;overflow:hidden;${ISL}opacity:${on[k] ? 1 : 0};transform:scale(${on[k] ? 1 : 0.6});filter:blur(${on[k] ? 0 : 4}px);transition:width ${D + 0.04}s ${SPR},height ${D + 0.04}s ${SPR},margin-left ${D}s ${OUT},border-radius ${D}s,opacity ${D}s,transform ${D + 0.04}s ${SPR},filter ${D}s;pointer-events:${on[k] ? 'auto' : 'none'};display:flex;${k === 'bell' ? 'align-items:center;justify-content:center;' : ''}`,
+        small: `position:absolute;left:0;top:0;height:40px;width:${d.w}px;box-sizing:border-box;display:flex;align-items:center;gap:9px;padding:0 ${mini ? 12 : 14}px 0 ${mini ? 12 : 8}px;justify-content:${k === 'idle' || mini ? 'center' : 'flex-start'};opacity:${big ? 0 : 1};transition:opacity .2s`,
+        big: `position:absolute;left:0;top:0;width:${d.bw || 0}px;box-sizing:border-box;padding:14px 14px 12px;display:flex;flex-direction:column;gap:12px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 4}px);transition:opacity ${big ? '.25s ease .1s' : '.12s'},filter .25s;pointer-events:${big ? 'auto' : 'none'}`,
+        label: `display:${mini ? 'none' : 'block'};font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0`
+      };
+    });
+    const center = `position:absolute;left:720px;top:0;translate:-50% 0;display:flex;align-items:flex-start;pointer-events:${searching ? 'none' : 'auto'};opacity:${searching ? 0 : 1};filter:blur(${searching ? 6 : 0}px);transition:opacity .25s,filter .25s`;
+    const fmt = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
+    const music = {
+      title: tr.title, artist: tr.artist, playing: st.music.playing, paused: !st.music.playing,
+      posText: fmt(st.music.pos), durText: fmt(st.music.dur),
+      bar: `position:absolute;left:0;top:0;bottom:0;width:${(st.music.pos / st.music.dur * 100).toFixed(1)}%;border-radius:2px;background:#f2f2f4;transition:width 1s linear`
+    };
+    const art = `width:26px;height:26px;border-radius:50%;flex:none;background:conic-gradient(from 30deg,${tr.a},${tr.b},${tr.a});box-shadow:inset 0 0 0 7px rgba(0,0,0,.35);${mini ? 'display:none;' : ''}animation:islSpin 6s linear infinite;animation-play-state:${st.music.playing ? 'running' : 'paused'}`;
+    const artBig = `width:46px;height:46px;border-radius:13px;flex:none;background:linear-gradient(140deg,${tr.a},${tr.b})`;
+    const eqBars = [0.9, 0.55, 1.1, 0.7].map((sp, i) => `width:3px;height:14px;border-radius:2px;background:#f2f2f4;transform-origin:bottom;animation:islEq ${sp}s ease-in-out ${i * 0.12}s infinite;animation-play-state:${st.music.playing ? 'running' : 'paused'};${st.music.playing ? '' : 'transform:scaleY(.3);'}`);
+    const ctlBtn = 'width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08)';
+    const ctlBtnMain = 'width:34px;height:34px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2f2f4;color:#0b0b0c';
+    const evMon = this.evStart ? this.evStart.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '') : '';
+    const ev = {
+      short: 'Созвон', leftShort: mins > 0 ? `${mins} мин` : 'идёт', title: 'Созвон по дизайну панели',
+      left: mins > 0 ? (mini ? `${mins}м` : `${mins} мин`) : 'идёт',
+      count: mins > 0 ? `через ${mins} мин` : 'идёт сейчас',
+      when: this.evStart ? `${pad(this.evStart.getHours())}:${pad(this.evStart.getMinutes())}` : '',
+      mon: evMon, day: this.evStart ? this.evStart.getDate() : '',
+      bar: `position:absolute;left:0;top:0;bottom:0;width:${Math.max(2, Math.min(100, (1 - Math.max(0, mins) / 60) * 100)).toFixed(1)}%;border-radius:2px;background:#f2f2f4;transition:width 1s linear`
+    };
+    const dl = {
+      name: st.dl.pct >= 100 ? 'Готово' : 'linux-zen-6.17.2', pctText: `${st.dl.pct}%`,
+      meta: st.dl.pct >= 100 ? 'Сохранено в ~/Загрузки' : `pacman · ${(st.dl.pct * 1.42).toFixed(0)} из 142 МБ · 12,4 МБ/с`,
+      ringSm: `width:16px;height:16px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:conic-gradient(#f2f2f4 ${st.dl.pct * 3.6}deg,rgba(255,255,255,.2) 0)`,
+      ring: `width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:conic-gradient(#f2f2f4 ${st.dl.pct * 3.6}deg,rgba(255,255,255,.18) 0)`,
+      bar: `position:absolute;left:0;top:0;bottom:0;width:${st.dl.pct}%;border-radius:2px;background:#f2f2f4;transition:width 1s linear`
+    };
+    const shelfOn = st.shelf.length > 0 || st.shDrag || st.dragging;
+    const dragMode = st.dragging || st.shDrag;
+    const nowMs = Date.now();
+    const fl = st.flash && nowMs - st.flash.at < 1700 ? st.flash : null;
+    const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
+    const glyphOf = { desk: ['◇', '#2e2e33'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2e2e33'], set: ['⚙', '#6d6d73'] };
+    const winT = active === 'desk' ? 'Рабочий стол' : this.meta[active].title;
+    /* live activities */
+    const tm = st.timer, tLeft = tm ? (tm.paused ? tm.left : tm.end - nowMs) : 0, tDone = !!tm && tLeft <= 0;
+    const swE = st.sw ? st.sw.acc + (st.sw.running ? nowMs - st.sw.start : 0) : 0;
+    const recE = st.rec ? st.rec.acc + (st.rec.paused ? 0 : nowMs - st.rec.start) : 0;
+    const people = ['Аня', 'Миша', 'Ты'];
+    const speaker = st.call ? (st.call.muted ? Math.floor(nowMs / 2600) % 2 : Math.floor(nowMs / 2600) % 3) : 0;
+    const chipOn = { call: !!st.call, rec: !!st.rec, timer: !!tm, sw: !!st.sw, prog: !!st.prog, shelf: st.shelf.length > 0 };
+    const chipW = { call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44 };
+    const winW = Math.min(230, 34 + Math.round(winT.length * 7.3));
+    const onChips = Object.keys(chipW).filter((c) => chipOn[c]);
+    const rowW = 24 + winW + onChips.reduce((a2, c) => a2 + chipW[c], 0) + onChips.length * 12;
+    const flashMode = dragMode ? 'drag' : fl ? fl.kind : null;
+    const iW = flashMode === 'drag' ? 196 : flashMode === 'clip' ? 300 : flashMode ? 250 : rowW;
+    const big = (st.hoverPill === 'isl' || st.shDrag) && unlocked;
+    const shelfShow = st.shelf.length > 0 || dragMode;
+    const secs = [36, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
+    const bigH = 28 + secs.reduce((a2, b2) => a2 + b2, 0) + (secs.length - 1) * 14;
+    const chipS = (c) => `display:${chipOn[c] && !flashMode ? 'flex' : 'none'};align-items:center;gap:6px;flex:none;width:${chipW[c]}px;justify-content:center;height:22px;border-radius:11px;background:rgba(255,255,255,.08);animation:islPop .45s ${SPR} both`;
+    const SBI = 60, DW = 384 + SBI * 2, eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
+    const liquidP = (w, h) => {
+      const c = Math.min(SBI, w / 2), f = (n) => n.toFixed(1);
+      const k2 = Math.min(h, 58), R = Math.min(24, Math.max(0, h - k2)), a1 = c * 0.62, a2 = c, b2 = k2 * 0.38;
+      return `M 0 0 C ${f(a1)} 0 ${f(a2)} ${f(b2)} ${f(c)} ${f(k2)} L ${f(c)} ${f(h - R)} Q ${f(c)} ${f(h)} ${f(c + R)} ${f(h)} L ${f(w - c - R)} ${f(h)} Q ${f(w - c)} ${f(h)} ${f(w - c)} ${f(h - R)} L ${f(w - c)} ${f(k2)} C ${f(w - a2)} ${f(b2)} ${f(w - a1)} 0 ${f(w)} 0 Z`;
+    };
+    const g = glyphOf[active];
+    const isl = {
+      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : '#000'};border:1px solid ${tDone ? '#f2f2f4' : '#1f1f23'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
+      row: `position:absolute;left:0;top:0;height:30px;width:${rowW}px;box-sizing:border-box;padding:0 12px;display:flex;align-items:center;gap:12px;opacity:${flashMode ? 0 : 1};filter:blur(${flashMode ? 5 : 0}px);transform:scale(${flashMode ? 0.9 : 1});transition:opacity .22s,filter .22s,transform .3s ${SPR}`,
+      win: `display:flex;align-items:center;gap:8px;flex:none;width:${winW}px;min-width:0`,
+      glyph: `width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font:700 9px 'JetBrains Mono',monospace;background:${g[1]};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)`,
+      glyphBig: `width:36px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;background:${g[1]};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)`,
+      glyphText: g[0], title: winT,
+      sub: active === 'desk' ? `Пространство ${st.ws} · открытых окон нет` : `${this.meta[active].sub} · активное окно`,
+      hasWin: active !== 'desk',
+      flash: `position:absolute;left:0;top:0;height:30px;width:${iW}px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:9px;opacity:${flashMode ? 1 : 0};filter:blur(${flashMode ? 0 : 5}px);transform:scale(${flashMode ? 1 : 1.08});transition:opacity .22s,filter .22s,transform .35s ${SPR};pointer-events:none`,
+      drop: `position:absolute;left:720px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
+      body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
+      big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
+    };
+    const chip = { call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
+    const lvl = fl && (fl.kind === 'vol' || fl.kind === 'bright');
+    const flash = !flashMode ? { glyph: '', label: '', text: '', track: 'display:none', fill: '', textStyle: 'display:none' } : flashMode === 'drag'
+      ? { glyph: '⇣', label: 'Положить на полку', text: '', track: 'display:none', fill: '', textStyle: 'display:none' }
+      : {
+        glyph: { vol: '♪', bright: '☀', lang: '⌨', clip: '⧉' }[fl.kind],
+        label: { vol: 'Громкость', bright: 'Яркость', lang: 'Раскладка', clip: 'Скопировано' }[fl.kind],
+        text: lvl ? `${fl.val}%` : fl.kind === 'lang' ? fl.val : `«${String(fl.val).slice(0, 26)}${String(fl.val).length > 26 ? '…' : ''}»`,
+        track: lvl ? 'position:relative;width:90px;height:5px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;flex:none' : 'display:none',
+        fill: lvl ? `position:absolute;left:0;top:0;bottom:0;width:${fl.val}%;border-radius:3px;background:#f2f2f4;transition:width .2s` : '',
+        textStyle: `font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${fl.kind === 'clip' ? "font-family:'JetBrains Mono',monospace;font-weight:500;color:#c9c9cf;max-width:150px;" : fl.kind === 'lang' ? 'padding:2px 7px;border-radius:6px;background:#f2f2f4;color:#0b0b0c;' : ''}`
+      };
+    const secStyle = 'display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.05);animation:islRow .35s ease both';
+    const btnSoft = 'flex:1;height:32px;border-radius:10px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.09)';
+    const btnMain = 'flex:1;height:32px;border-radius:10px;font-size:12.5px;font-weight:700;background:#f2f2f4;color:#0b0b0c';
+    const callBars = [0.7, 1, 0.55, 0.85].map((sp, i2) => `width:2.5px;height:12px;border-radius:2px;background:#4fd18b;transform-origin:center;animation:islEq ${sp}s ease-in-out ${i2 * 0.1}s infinite;${st.call && st.call.muted && speaker === 2 ? 'animation:none;transform:scaleY(.25);' : ''}`);
+    const call = st.call ? {
+      on: true, who: people[speaker], muted: st.call.muted, title: 'Discord · #дизайн-панели', sub: `${mmss(nowMs - st.call.start)} · 3 участника`, letter: 'D',
+      badge: 'width:34px;height:34px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;background:#5865f2;color:#fff',
+      micLabel: st.call.muted ? 'Включить микрофон' : 'Выключить микрофон',
+      micBtn: `width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${st.call.muted ? '#f2f2f4' : 'rgba(255,255,255,.1)'};color:${st.call.muted ? '#0b0b0c' : '#f2f2f4'}`,
+      people: people.map((n2, i2) => ({ name: n2 === 'Ты' && st.call.muted ? 'Ты · без звука' : n2, style: `height:26px;padding:0 10px;border-radius:13px;display:flex;align-items:center;font-size:12px;font-weight:600;background:${i2 === speaker ? 'rgba(79,209,139,.18)' : 'rgba(255,255,255,.07)'};box-shadow:${i2 === speaker ? 'inset 0 0 0 1.5px #4fd18b' : 'none'};transition:background .3s,box-shadow .3s` }))
+    } : { on: false, people: [] };
+    const rec = st.rec ? { on: true, text: mmss(recE), sub: st.rec.paused ? 'На паузе' : 'Весь экран · 60 к/с', pauseText: st.rec.paused ? 'Продолжить' : 'Пауза' } : { on: false, text: '' };
+    const recDot = `width:8px;height:8px;border-radius:50%;background:#e5484d;${st.rec && !st.rec.paused ? 'animation:islBlink 1s steps(2) infinite' : ''}`;
+    const recDotBig = `width:14px;height:14px;border-radius:50%;flex:none;background:#e5484d;box-shadow:0 0 0 5px rgba(229,72,77,.2);${st.rec && !st.rec.paused ? 'animation:islBlink 1s steps(2) infinite' : ''}`;
+    const timer = tm ? {
+      on: true, text: tDone ? '00:00' : mmss(tLeft + 999), title: tDone ? 'Время вышло' : 'Таймер', sub: tDone ? 'Нажмите «Готово»' : tm.paused ? 'На паузе' : `из ${Math.round(tm.dur / 60000)} мин`,
+      bar: `position:absolute;left:0;top:0;bottom:0;width:${Math.min(100, (1 - Math.max(0, tLeft) / tm.dur) * 100).toFixed(1)}%;border-radius:2px;background:#f2f2f4;transition:width 1s linear`,
+      pauseText: tm.paused ? 'Продолжить' : 'Пауза', stopText: tDone ? 'Готово' : 'Сброс'
+    } : { on: false, text: '' };
+    const sw = st.sw ? { on: true, text: mmss(swE), textLong: `${mmss(swE)}.${Math.floor((swE % 1000) / 100)}`, sub: st.sw.laps.length ? `Кругов: ${st.sw.laps.length} · последний ${mmss(st.sw.laps[st.sw.laps.length - 1])}` : st.sw.running ? 'Идёт' : 'Остановлен', pauseText: st.sw.running ? 'Пауза' : 'Старт' } : { on: false, text: '' };
+    const prog = st.prog ? {
+      on: true, pct: st.prog.pct, pctText: `${st.prog.pct}%`, glyph: st.prog.kind === 'copy' ? '⧉' : '⟳',
+      title: st.prog.kind === 'copy' ? 'Копирование в ~/Загрузки' : st.prog.pct >= 100 ? 'Система обновлена' : 'pacman -Syu',
+      sub: st.prog.kind === 'copy' ? `${Math.round(st.prog.pct * 0.42)} из 42 файлов` : st.prog.pct < 60 ? `Загрузка пакетов · ${Math.round(st.prog.pct / 60 * 14)} из 14` : st.prog.pct < 100 ? 'Установка пакетов…' : '14 пакетов установлено',
+      ring: `width:16px;height:16px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:conic-gradient(#f2f2f4 ${st.prog.pct * 3.6}deg,rgba(255,255,255,.2) 0)`,
+      bar: `position:absolute;left:0;top:0;bottom:0;width:${st.prog.pct}%;border-radius:2px;background:#f2f2f4;transition:width 1s linear`
+    } : { on: false, ring: '' };
+    const clip = { has: st.clip.length > 0, items: st.clip.slice(0, 3).map((c) => ({ text: c.text, ago: Math.round((nowMs - c.at) / 60000) < 1 ? 'сейчас' : `${Math.round((nowMs - c.at) / 60000)} мин`, again: () => this.setState({ flash: { kind: 'clip', val: c.text, at: Date.now() } }) })) };
+    const quickDefs = [
+      { name: 'Таймер 5 мин', glyph: '⏲', on: !!tm, run: () => this.setState({ timer: tm ? null : { end: Date.now() + 5 * 60000, dur: 5 * 60000, paused: false, left: 0 } }) },
+      { name: 'Секундомер', glyph: '◷', on: !!st.sw, run: () => this.setState({ sw: st.sw ? null : { running: true, start: Date.now(), acc: 0, laps: [] } }) },
+      { name: 'Запись экрана', glyph: '●', on: !!st.rec, run: () => this.setState({ rec: st.rec ? null : { paused: false, start: Date.now(), acc: 0 } }) },
+      { name: 'Голосовой чат', glyph: '☏', on: !!st.call, run: () => this.setState({ call: st.call ? null : { muted: false, start: Date.now() } }) },
+      { name: 'Обновить систему', glyph: '⟳', on: !!st.prog, run: () => this.setState({ prog: st.prog ? null : { pct: 0, kind: 'update' } }) },
+      { name: 'Раскладка', glyph: '⌨', on: false, run: () => { const v = st.lang === 'RU' ? 'EN' : 'RU'; this.setState({ lang: v, flash: { kind: 'lang', val: v, at: Date.now() } }); } }
+    ];
+    const quick = quickDefs.map((q) => ({ ...q, style: `height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;background:${q.on ? '#f2f2f4' : 'rgba(255,255,255,.07)'};color:${q.on ? '#0b0b0c' : '#e8e8ec'};transition:background .25s,color .25s` }));
+    const quickWrap = 'display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px';
+    const xcol = { PNG: '#4f7fb8', JPG: '#4f7fb8', MP3: '#d0452f', TXT: '#e8d9a8', PDF: '#c2412f', FIG: '#8a63d2', SH: '#3f9a6b', PKG: '#6b6b73' };
+    const shelfItems = st.shelf.map((f, i) => ({
+      ...f,
+      style: `position:relative;width:70px;flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;border-radius:12px;background:rgba(255,255,255,.06);animation:islPop .45s ${SPR} ${(i * 0.03).toFixed(2)}s both`,
+      tile: `width:34px;height:40px;border-radius:7px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;box-sizing:border-box;font:700 8px 'JetBrains Mono',monospace;color:${f.ext === 'TXT' ? '#3a3020' : '#fff'};background:${xcol[f.ext] || '#6b6b73'};pointer-events:none`,
+      drag: (e) => { try { e.dataTransfer.setData('application/x-arch-file', JSON.stringify(f)); e.dataTransfer.setData('text/plain', f.name); e.dataTransfer.effectAllowed = 'copyMove'; } catch (err) {} this.fromShelf = f.name; },
+      end: (e) => { const took = e.dataTransfer && e.dataTransfer.dropEffect && e.dataTransfer.dropEffect !== 'none'; const name = this.fromShelf; this.fromShelf = null; if (took) this.setState({ shelf: this.state.shelf.filter((x) => x.name !== name) }); },
+      remove: () => this.setState({ shelf: this.state.shelf.filter((x) => x.name !== f.name) })
+    }));
+    const dragHot = st.shDrag;
+    const bell = {
+      label: `Уведомления: ${st.history.length}`, count: String(st.history.length),
+      inner: `display:flex;align-items:center;gap:5px;animation:${st.bump ? `islBump .45s ${SPR}` : 'none'}`
+    };
+
+    /* ---- right island ---- */
+    const rv = st.right;
+    const RW = rv ? 372 : (mini ? 136 : 222);
+    const RH = rv === 'cal' ? 548 : rv ? 372 : 40;
+    const right = {
+      ccOpen: rv === 'cc' || rv === 'det', calOpen: rv === 'cal', full: !mini,
+      box: `display:none;position:absolute;right:16px;top:0;width:${RW}px;height:${RH}px;border-radius:${rv ? 24 : 20}px;overflow:hidden;${ISL}transition:width ${rv ? D + 0.06 : D - 0.04}s ${rv ? SPR : OUT},height ${rv ? D + 0.12 : D - 0.04}s ${rv ? SPR : OUT},border-radius ${D}s;pointer-events:auto`,
+      row: 'position:absolute;right:0;top:0;height:40px;display:flex;align-items:center;gap:2px;padding:0 4px',
+      statusBtn: `height:32px;padding:0 10px;border-radius:12px;display:flex;align-items:center;gap:9px;background:${rv === 'cc' || rv === 'det' ? 'rgba(255,255,255,.1)' : 'transparent'};transition:background .2s`,
+      clockBtn: `height:32px;padding:0 10px;border-radius:12px;display:flex;align-items:center;background:${rv === 'cal' ? 'rgba(255,255,255,.1)' : 'transparent'};transition:background .2s`,
+      wifiIcon: `opacity:${st.wifi ? 1 : 0.35}`, btIcon: `opacity:${st.bt ? 1 : 0.35}`
+    };
+    const pane = (onP) => `position:absolute;left:12px;right:12px;top:48px;bottom:12px;display:flex;flex-direction:column;gap:10px;opacity:${onP ? 1 : 0};filter:blur(${onP ? 0 : 6}px);transform:translateY(${onP ? 0 : -10}px);transition:opacity ${onP ? '.28s ease .1s' : '.14s'},filter ${onP ? '.3s ease .08s' : '.14s'},transform .4s ${SPR};pointer-events:${onP ? 'auto' : 'none'}`;
+    right.ccPane = pane(rv === 'cc');
+    right.detPane = pane(rv === 'det');
+    right.calPane = pane(rv === 'cal');
+    const fill = (on) => `background:linear-gradient(#45454c,#45454c) no-repeat 0 0/${on ? '100% 100%' : '0% 100%'},rgba(255,255,255,.06);transition:background-size .4s ${OUT},filter .2s`;
+    const names = { work: 'Работа', game: 'Игры', min: 'Минимализм' };
+    const nextProf = { work: 'game', game: 'min', min: 'work' };
+    const tiles = [
+      { name: 'Wi-Fi', sub: st.wifi ? st.net : 'Выключено', on: st.wifi, glyph: '◠', toggle: () => this.setState({ wifi: !st.wifi }), more: () => this.setState({ right: 'det', det: 'wifi' }), moreLabel: 'Сети Wi-Fi' },
+      { name: 'Bluetooth', sub: st.bt ? `${Object.values(st.btOn).filter(Boolean).length} устройства` : 'Выключено', on: st.bt, glyph: 'ᛒ', toggle: () => this.setState({ bt: !st.bt }), more: () => this.setState({ right: 'det', det: 'bt' }), moreLabel: 'Устройства Bluetooth' },
+      { name: 'Не беспокоить', sub: st.dnd ? 'Только важные' : 'Выключено', on: st.dnd, glyph: '☾', toggle: () => this.setState({ dnd: !st.dnd }), more: () => this.setState({ dnd: !st.dnd }), moreLabel: 'Режим «Не беспокоить»' },
+      { name: 'Профиль', sub: names[prof], on: prof !== 'work', glyph: '◐', toggle: () => this.setProfile(nextProf[prof]), more: () => this.setState({ right: null, menu: true }), moreLabel: 'Все профили' }
+    ].map((t) => ({ ...t, box: `height:58px;border-radius:16px;display:flex;align-items:stretch;overflow:hidden;${fill(t.on)}`, dot: `width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;background:${t.on ? '#f2f2f4' : 'rgba(255,255,255,.1)'};color:${t.on ? '#0b0b0c' : '#e8e8ec'};transition:background .3s,color .3s` }));
+    const sliders = [
+      { name: 'Яркость', glyph: '☀', val: st.bright, set: (e) => this.setState({ bright: +e.target.value }) },
+      { name: 'Громкость', glyph: '♪', val: st.vol, set: (e) => this.setState({ vol: +e.target.value }) }
+    ].map((s) => ({ ...s, text: `${s.val}%`, fill: `position:absolute;left:0;top:0;bottom:0;width:${s.val}%;background:#45454c;border-radius:14px 0 0 14px;transition:width .25s ${OUT}` }));
+    const battery = 82;
+    const bat = { text: `${battery}%`, sub: 'Осталось ≈ 4 ч 10 мин', fill: `display:block;height:100%;width:${battery}%;border-radius:1.5px;background:currentColor` };
+    const nets = [
+      { name: 'home-5G', sig: 4, lock: true }, { name: 'Kitchen_2.4', sig: 3, lock: true }, { name: 'AshenOS-Guest', sig: 2, lock: false }, { name: 'iPhone (Миша)', sig: 2, lock: true }
+    ];
+    const devs = [
+      { name: 'WH-1000XM5', type: 'Наушники', bat: '72%' }, { name: 'MX Master 3S', type: 'Мышь', bat: '54%' }, { name: 'Keychron K3', type: 'Клавиатура', bat: '—' }
+    ];
+    const isWifi = st.det === 'wifi';
+    const powerOn = isWifi ? st.wifi : st.bt;
+    const det = {
+      title: isWifi ? 'Wi-Fi' : 'Bluetooth', on: powerOn,
+      toggle: () => this.setState(isWifi ? { wifi: !st.wifi } : { bt: !st.bt }),
+      sw: `margin-left:auto;width:42px;height:24px;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${powerOn ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`,
+      knob: `width:18px;height:18px;border-radius:50%;background:${powerOn ? '#0b0b0c' : '#f2f2f4'};transform:translateX(${powerOn ? 18 : 0}px);transition:transform .3s ${SPR},background .25s`,
+      foot: isWifi ? 'Сеть: NetworkManager · WPA3' : 'Видимость: только для сопряжённых',
+      rows: !powerOn ? [] : isWifi ? nets.map((n, i) => {
+        const conn = st.net === n.name, busy = st.netBusy === n.name;
+        return {
+          name: n.name, sub: `${'▂▄▆█'.slice(0, n.sig)} · ${n.lock ? 'WPA2' : 'открытая'}`, glyph: '◠', state: busy ? 'Подключение…' : conn ? 'Подключено' : '',
+          pick: () => { if (conn) return; this.setState({ netBusy: n.name }); setTimeout(() => this.setState({ net: n.name, netBusy: null }), 1100); },
+          style: `height:52px;padding:0 10px;border-radius:13px;display:flex;align-items:center;gap:10px;background:${conn ? 'rgba(255,255,255,.08)' : 'transparent'};animation:islRow .35s ease ${(i * 0.04).toFixed(2)}s both`,
+          dot: `width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;background:${conn ? '#f2f2f4' : 'rgba(255,255,255,.08)'};color:${conn ? '#0b0b0c' : '#e8e8ec'}`,
+          badge: `font-size:11.5px;font-weight:600;color:${conn ? '#f2f2f4' : '#a1a1a8'}`
+        };
+      }) : devs.map((d, i) => {
+        const conn = !!st.btOn[d.name];
+        return {
+          name: d.name, sub: `${d.type}${conn ? ' · ' + d.bat : ''}`, glyph: d.type === 'Наушники' ? '◖' : d.type === 'Мышь' ? '◉' : '⌨', state: conn ? 'Отключить' : 'Подключить',
+          pick: () => this.setState({ btOn: { ...st.btOn, [d.name]: !conn } }),
+          style: `height:52px;padding:0 10px;border-radius:13px;display:flex;align-items:center;gap:10px;background:${conn ? 'rgba(255,255,255,.08)' : 'transparent'};animation:islRow .35s ease ${(i * 0.04).toFixed(2)}s both`,
+          dot: `width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;background:${conn ? '#f2f2f4' : 'rgba(255,255,255,.08)'};color:${conn ? '#0b0b0c' : '#e8e8ec'}`,
+          badge: `font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.08);color:#e8e8ec`
+        };
+      })
+    };
+
+    /* ---- calendar ---- */
+    const view = new Date(now.getFullYear(), now.getMonth() + st.calOff, 1);
+    const y = view.getFullYear(), m = view.getMonth();
+    const first = (new Date(y, m, 1).getDay() + 6) % 7;
+    const days = new Date(y, m + 1, 0).getDate();
+    const isCur = st.calOff === 0;
+    const selDay = st.calSel || 1;
+    const k = (dd) => `${y}-${m}-${dd}`;
+    const cells = [];
+    for (let i = 0; i < first; i++) cells.push({ n: '', label: 'пусто', sel: false, pick: () => {}, style: 'height:34px;visibility:hidden', dot: 'display:none' });
+    for (let dd = 1; dd <= days; dd++) {
+      const has = (st.events[k(dd)] || []).length > 0;
+      const today = isCur && dd === now.getDate();
+      const s = dd === selDay;
+      cells.push({
+        n: String(dd), sel: s, label: `${dd}${has ? ', есть события' : ''}`,
+        pick: () => this.setState({ calSel: dd }),
+        style: `position:relative;height:34px;border-radius:10px;font-size:12.5px;font-weight:${today || s ? 700 : 500};font-variant-numeric:tabular-nums;display:flex;align-items:center;justify-content:center;background:${s ? '#f2f2f4' : has ? '#34343a' : 'transparent'};color:${s ? '#0b0b0c' : '#e8e8ec'};box-shadow:${today && !s ? 'inset 0 0 0 1.5px #f2f2f4' : 'none'};transition:background .2s,color .2s`,
+        dot: has ? `position:absolute;bottom:4px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:${s ? '#0b0b0c' : '#a1a1a8'}` : 'display:none'
+      });
+    }
+    while (cells.length % 7) cells.push({ n: '', label: 'пусто', sel: false, pick: () => {}, style: 'height:34px;visibility:hidden', dot: 'display:none' });
+    const dayEvents = st.events[k(selDay)] || [];
+    const monthName = view.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }).replace(' г.', '');
+    const selDate = new Date(y, m, selDay);
+    const cal = {
+      title: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+      heads: ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'], cells,
+      dayTitle: selDate.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }),
+      dayCount: dayEvents.length ? `${dayEvents.length} соб.` : '',
+      empty: dayEvents.length === 0,
+      addHint: `Новое событие на ${selDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}`,
+      events: dayEvents.map((e, i) => ({ ...e, style: `display:flex;align-items:center;gap:10px;min-height:46px;padding:0 10px;border-radius:12px;background:rgba(255,255,255,.05);animation:islRow .3s ease ${(i * 0.04).toFixed(2)}s both`, bar: `width:3px;align-self:stretch;margin:9px 0;border-radius:2px;background:${e.src === 'Google' ? '#f2f2f4' : '#7a7a82'}`, remind: e.remind ? 'font-size:10.5px;font-weight:600;padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#c9c9cf;white-space:nowrap' : 'display:none' }))
+    };
+    const addEvent = () => {
+      const t = this.state.evDraft.trim(); if (!t) return;
+      const tm = t.match(/(\d{1,2}[:.]\d{2})/);
+      const evs = { ...this.state.events, [k(selDay)]: [...(this.state.events[k(selDay)] || []), { title: t.replace(/\s*(в\s*)?\d{1,2}[:.]\d{2}\s*/, ' ').trim() || t, time: tm ? tm[1].replace('.', ':') : 'весь день', src: 'CalDAV', remind: !!tm }] };
+      this.setState({ events: evs, evDraft: '' });
+    };
+    const agoS = Math.round((Date.now() - st.syncAt) / 1000);
+    const syncText = st.syncing ? 'Синхронизация…' : agoS < 60 ? 'Синхронизировано только что' : `Синхронизировано ${Math.round(agoS / 60)} мин назад`;
+
+    /* ---- toast & stack ---- */
+    const fullTR = this.autohide();
+    let toast = { show: false };
+    if (st.toast && unlocked) {
+      const t = st.toast, long = t.kind !== 'short', imp = t.kind === 'important';
+      const corner = fullTR && imp;
+      toast = {
+        show: true, title: t.title, app: t.app, body: t.body, glyph: t.glyph,
+        box: `position:absolute;${corner ? 'right:16px;top:16px;' : 'right:16px;top:48px;'}z-index:95;width:${long ? 390 : 320}px;min-height:${long ? 84 : 58}px;box-sizing:border-box;padding:10px 10px 10px 12px;border-radius:${long ? 24 : 29}px;display:flex;align-items:${long ? 'flex-start' : 'center'};gap:11px;${ISL}${imp ? 'box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 14px 40px rgba(0,0,0,.45);' : ''}animation:${t.phase === 'back' ? `islBack .42s ${OUT} both` : `islPop .5s ${SPR} both`};transform-origin:100% 0`,
+        icon: `width:36px;height:36px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:${imp ? '#f2f2f4' : '#2e2e33'};color:${imp ? '#0b0b0c' : '#f2f2f4'}`,
+        bodyStyle: `font-size:12.5px;color:#c9c9cf;line-height:1.4;${long ? 'display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'}`
+      };
+    }
+    const fan = st.fan;
+    const hist = st.history;
+    const agoTxt = (at) => { const s = Math.round((Date.now() - at) / 1000); return s < 60 ? 'сейчас' : `${Math.round(s / 60)} мин`; };
+    const CH = 64, GAP = 8;
+    const nList = hist.map((n, i) => ({
+      ...n, ago: agoTxt(n.at),
+      swipe: (e) => { const el = e.currentTarget; this.startSwipe(e, el, () => this.dismiss(n.id)); },
+      close: () => this.dismiss(n.id),
+      icon: `width:34px;height:34px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${n.kind === 'important' ? '#f2f2f4' : '#2e2e33'};color:${n.kind === 'important' ? '#0b0b0c' : '#f2f2f4'}`,
+      style: `position:absolute;left:0;right:0;top:${fan ? i * (CH + GAP) : Math.min(i, 2) * 9}px;height:${CH}px;box-sizing:border-box;padding:0 10px 0 12px;border-radius:18px;display:flex;align-items:center;gap:11px;background:${fan || i === 0 ? '#1d1d20' : i === 1 ? '#19191c' : '#151517'};border:1px solid #2e2e33;z-index:${50 - i};transform:scale(${fan ? 1 : 1 - Math.min(i, 2) * 0.05});opacity:${fan || i < 3 ? 1 : 0};transition:top .38s ${SPR},transform .38s ${SPR},opacity .25s,background .25s`
+    }));
+    const listH = hist.length ? (fan ? hist.length * (CH + GAP) - GAP : CH + Math.min(hist.length - 1, 2) * 9) : 60;
+    const nStack = {
+      box: `position:absolute;right:16px;top:48px;z-index:94;width:400px;box-sizing:border-box;padding:12px;border-radius:24px;display:flex;flex-direction:column;gap:10px;${ISL}opacity:${st.stackOpen && unlocked ? 1 : 0};transform:translateY(${st.stackOpen ? 0 : -14}px) scale(${st.stackOpen ? 1 : 0.94});filter:blur(${st.stackOpen ? 0 : 6}px);transform-origin:100% 0;transition:opacity .25s,transform .4s ${SPR},filter .25s;pointer-events:${st.stackOpen && unlocked ? 'auto' : 'none'}`,
+      list: `position:relative;height:${Math.min(listH, 420)}px;transition:height .38s ${SPR};${fan ? 'overflow-y:auto;' : ''}`
+    };
+
+    /* ---- cursor (position kept outside state) ---- */
+    const c = this.cur;
+    const cursor = `position:absolute;left:0;top:0;z-index:1000;pointer-events:none;width:0;height:0;transform:translate(${c.x}px, ${c.y}px);opacity:${c.hidden ? 0 : 1}`;
+
+    const winHandles = {};
+    ids.forEach((id) => { winHandles[id] = { close: h[id].close, min: h[id].min, max: h[id].max, restore: h[id].restore, peek: h[id].peek, down: h[id].down, rs: h[id].rs }; });
+
+    return {
+      /* lock */
+      showLock: st.lock !== 'off',
+      lockStyle: `position:absolute;inset:0;z-index:300;${st.lock === 'out' ? 'animation:sysLockOut .7s cubic-bezier(.65,0,.35,1) both;pointer-events:none' : st.lock === 'in' ? 'animation:sysLockIn .5s cubic-bezier(.2,1,.3,1) both' : ''}`,
+      toggleOsk: this.toggleOsk, oskOn: !!st.oskOn, oskKeep: this.oskKeep,
+      osk: (() => {
+        const up = st.oskShift || st.oskCaps;
+        const L = st.oskNum
+          ? (st.oskSym ? [['[', ']', '{', '}', '#', '%', '^', '*', '+', '='], ['_', '\\', '|', '~', '<', '>', '€', '$', '£', '•'], ['.', ',', '?', '!', "'"]]
+            : [['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], ['-', '/', ':', ';', '(', ')', '₽', '&', '@', '"'], ['.', ',', '?', '!', "'"]])
+          : st.oskLang === 'RU'
+            ? [['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ'], ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'], ['я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю']]
+            : [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'], ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'], ['z', 'x', 'c', 'v', 'b', 'n', 'm']];
+        const KB = 'height:54px;border-radius:12px;display:flex;align-items:center;justify-content:center;font:500 20px Inter,system-ui,sans-serif;color:#f2f2f4;';
+        const ch = (c) => { const t = up ? c.toUpperCase() : c; return { label: t, aria: t, down: this.oskH(t), style: KB + 'flex:1;min-width:0;background:rgba(255,255,255,.1)' }; };
+        const sp = (label, k, flex, on, aria) => ({ label, aria: aria || label, down: this.oskH(k), style: KB + `flex:${flex};min-width:0;font-size:15px;font-weight:600;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.05)'};color:${on ? '#111113' : '#d6d6db'}` });
+        const row = (keys) => ({ style: 'display:flex;gap:7px;margin-top:7px', keys });
+        const rows = [
+          row(L[0].map(ch)),
+          row(L[1].map(ch)),
+          row([st.oskNum ? sp(st.oskSym ? '123' : '#+=', 'sym', 1.5, false, 'Символы') : sp(st.oskCaps ? '⇪' : '⇧', 'shift', 1.5, up, 'Shift'), ...L[2].map(ch), sp('⌫', 'back', 1.5, false, 'Стереть')]),
+          row([sp(st.oskNum ? 'АБВ' : '123', 'num', 1.4, false, 'Цифры'), sp(st.oskLang === 'RU' ? 'RU' : 'EN', 'lang', 1, false, 'Сменить язык'), sp('‹', 'left', 0.8, false, 'Курсор влево'), { label: st.oskLang === 'RU' ? 'пробел' : 'space', aria: 'Пробел', down: this.oskH(' '), style: KB + 'flex:5;min-width:0;font-size:14px;color:#a1a1a8;background:rgba(255,255,255,.1)' }, sp('›', 'right', 0.8, false, 'Курсор вправо'), sp('↵', 'enter', 1.6, true, 'Ввод'), sp('⌄', 'hide', 1, false, 'Скрыть клавиатуру')])
+        ];
+        return { rows, targetText: st.oskTarget ? `Ввод в: ${st.oskTarget}` : 'Нажмите на поле ввода',
+          target: 'height:18px;margin:-4px 6px 2px;font-size:11.5px;color:#8b8b93;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis',
+          box: `position:absolute;left:50%;bottom:16px;width:920px;margin-left:-460px;z-index:320;padding:10px 12px 14px;border-radius:26px;background:rgba(17,17,19,.86);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);border:1px solid #2e2e33;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);transform:translateY(${st.oskOn ? 0 : 'calc(100% + 40px)'});opacity:${st.oskOn ? 1 : 0};transition:transform .45s cubic-bezier(.32,.72,0,1),opacity .3s ease;pointer-events:${st.oskOn ? 'auto' : 'none'}` };
+      })(),
+      unlock: this.unlock, lock: this.lock, sleep: this.sleep, reboot: this.reboot, openApp: this.openApp,
+      power: { on: !!st.power, text: st.power || '' },
+      /* bar */
+      bar: `position:absolute;left:0;right:0;top:4px;height:0;z-index:96;pointer-events:none;transform:translateY(${hide || !unlocked ? -84 : 0}px);opacity:${hide ? 0 : 1};transition:transform ${D}s ${hide ? OUT : SPR},opacity ${D}s`,
+      hotZone: `position:absolute;left:0;right:0;top:0;height:6px;z-index:89;display:${this.autohide() ? 'block' : 'none'}`,
+      reveal: () => { clearTimeout(this.hideT); this.hideT = null; if (!this.state.barShown) this.setState({ barShown: true }); },
+      barHold: () => { clearTimeout(this.hideT); this.hideT = null; },
+      left, iconBtn, wsList, favs, recent,
+      actTap: () => {},
+      toggleMenu: () => this.setState({ menu: !st.menu, q: '', hitSel: 0, right: null, stackOpen: false }, () => { if (this.state.menu) setTimeout(() => { const i = document.getElementById('sys-q'); if (i) i.focus(); }, 60); }),
+      openSearch: () => this.setState({ menu: true, right: null }, () => setTimeout(() => { const i = document.getElementById('sys-q'); if (i) i.focus(); }, 60)),
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value, hitSel: 0 }),
+      qKey: (e) => {
+        const n = (this.found || []).length;
+        if (e.key === 'ArrowDown') { e.preventDefault(); this.setState({ hitSel: Math.min(n - 1, this.state.hitSel + 1) }); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); this.setState({ hitSel: Math.max(0, this.state.hitSel - 1) }); }
+        else if (e.key === 'Enter') { e.preventDefault(); const c2 = (this.found || [])[Math.min(this.state.hitSel, n - 1)]; if (c2) this.run(c2); }
+        else if (e.key === 'Escape') { e.preventDefault(); this.setState({ menu: false, q: '' }); }
+      },
+      hits, noHits: searching && found.length === 0, pv,
+      profiles: ['work', 'game', 'min'].map((p) => ({ name: names[p], on: prof === p, pick: () => this.setProfile(p), style: `height:30px;border-radius:10px;font-size:12px;font-weight:600;background:${prof === p ? '#f2f2f4' : 'transparent'};color:${prof === p ? '#0b0b0c' : '#d6d6dc'};transition:background .25s,color .25s` })),
+      autoProfile: st.autoProfile, toggleAuto: this.toggleAuto,
+      autoBtn: 'height:38px;padding:0 8px;border-radius:12px;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05)',
+      autoKnobTrack: `width:30px;height:18px;border-radius:9px;padding:2px;box-sizing:border-box;display:flex;background:${st.autoProfile ? '#f2f2f4' : 'rgba(255,255,255,.16)'};transition:background .25s`,
+      autoKnob: `width:14px;height:14px;border-radius:50%;background:${st.autoProfile ? '#0b0b0c' : '#f2f2f4'};transform:translateX(${st.autoProfile ? 12 : 0}px);transition:transform .3s ${SPR}`,
+      testNotif: this.testNotif,
+      /* center */
+      shelfItems, shelfCount: String(st.shelf.length),
+      shelfSub: st.shelf.length ? `${st.shelf.length} · перетащите, чтобы забрать` : '',
+      shelfClear: () => this.setState({ shelf: [] }),
+      shelfClearBtn: `margin-left:auto;height:24px;padding:0 9px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(255,255,255,.08);display:${st.shelf.length ? 'block' : 'none'}`,
+      shelfZone: `position:relative;height:90px;box-sizing:border-box;border-radius:16px;border:2px dashed ${dragHot ? '#f2f2f4' : 'rgba(255,255,255,.28)'};background:${dragHot ? 'rgba(255,255,255,.07)' : 'transparent'};display:flex;align-items:center;gap:8px;padding:0 10px;overflow-x:auto;scrollbar-width:none;transform:scale(${dragHot ? 1.02 : 1});transition:transform .3s ${SPR},border-color .25s,background .25s`,
+      shelfHint: st.shelf.length && !dragHot ? 'display:none' : `position:absolute;left:0;right:0;${st.shelf.length ? 'bottom:4px;font-size:11px;' : 'top:50%;margin-top:-9px;font-size:12.5px;'}text-align:center;font-weight:600;color:${dragHot ? '#f2f2f4' : '#8b8b93'};pointer-events:none`,
+      shelfHintText: dragHot ? 'Отпустите, чтобы положить на полку' : 'Перетащите файл на остров',
+      shDragIn: (e) => { if (this.fromShelf) return; e.preventDefault(); clearTimeout(this.pillT); clearTimeout(this.shT); if (!this.state.shDrag) this.setState({ shDrag: true, hoverPill: 'isl' }); },
+      shDragOver: (e) => { if (this.fromShelf) return; e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; clearTimeout(this.shT); if (!this.state.shDrag) this.setState({ shDrag: true, hoverPill: 'isl' }); },
+      shDragOut: () => { clearTimeout(this.shT); this.shT = setTimeout(() => this.setState({ shDrag: false, hoverPill: null }), 160); },
+      shDrop: (e) => {
+        if (this.fromShelf) return;
+        e.preventDefault(); clearTimeout(this.shT);
+        const dt = e.dataTransfer; let add = [];
+        try { const raw = dt.getData('application/x-arch-file'); if (raw) add.push(JSON.parse(raw)); } catch (err) {}
+        if (!add.length && dt.files && dt.files.length) add = Array.from(dt.files).map((f) => ({ name: f.name, ext: (f.name.split('.').pop() || 'FILE').slice(0, 4).toUpperCase(), size: f.size > 1048576 ? (f.size / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(f.size / 1024)) + ' КБ' }));
+        if (!add.length) { const t = dt.getData('text/plain'); if (t) add.push({ name: t.slice(0, 40), ext: 'TXT', size: 'текст' }); }
+        const names = new Set(add.map((a) => a.name));
+        this.setState({ shelf: [...this.state.shelf.filter((x) => !names.has(x.name)), ...add], shDrag: false, hoverPill: 'isl' });
+      },
+      chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
+      onLevel: this.onLevel, labAction: this.labAction, onWall: this.onWall, reveal: st.reveal || 0, onWaveSet: this.onWaveSet, waveOn: st.waveOn !== false, curWall: typeof st.curWall === 'number' ? st.curWall : 4, wallReq: st.wallReq || '',
+      winMin: () => active !== 'desk' && this.minWin(active), winMax: () => active !== 'desk' && this.maxWin(active), winClose: () => active !== 'desk' && this.closeWin(active),
+      callMic: () => this.setState({ call: { ...st.call, muted: !st.call.muted } }), callEnd: () => this.setState({ call: null }),
+      recPause: () => { const r = st.rec; this.setState({ rec: r.paused ? { ...r, paused: false, start: Date.now() } : { ...r, paused: true, acc: r.acc + Date.now() - r.start } }); },
+      recStop: () => { const sec = Math.round(recE / 1000); this.setState({ rec: null }); this.notify({ app: 'Запись экрана', title: 'Запись сохранена', body: `~/Видео/Запись ${now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}.mp4 · ${mmss(sec * 1000)}`, kind: 'short', glyph: '●' }); },
+      timerAdd: () => this.setState({ timer: tm.paused ? { ...tm, left: Math.max(0, tm.left) + 60000, dur: tm.dur + 60000 } : { ...tm, end: Math.max(Date.now(), tm.end) + 60000, dur: tm.dur + 60000 } }),
+      timerPause: () => { if (tDone) return; this.setState({ timer: tm.paused ? { ...tm, paused: false, end: Date.now() + tm.left } : { ...tm, paused: true, left: tm.end - Date.now() } }); },
+      timerStop: () => this.setState({ timer: null }),
+      swToggle: () => { const w = st.sw; this.setState({ sw: w.running ? { ...w, running: false, acc: w.acc + Date.now() - w.start } : { ...w, running: true, start: Date.now() } }); },
+      swLap: () => this.setState({ sw: { ...st.sw, laps: [...st.sw.laps, swE] } }),
+      swStop: () => this.setState({ sw: null }),
+      progCancel: () => { clearTimeout(this.progT); this.progT = null; this.setState({ prog: null }); },
+      clipClear: () => this.setState({ clip: [] }),
+      isl, islEnter: () => { clearTimeout(this.pillT); if (this.state.hoverPill !== 'isl') this.setState({ hoverPill: 'isl' }); },
+      appTitle: active === 'desk' ? '' : this.meta[active].title,
+      center, pill, pillLeave: () => { clearTimeout(this.pillT); this.pillT = setTimeout(() => this.setState({ hoverPill: null }), 180); },
+      music, art, artBig, eqBars, ctlBtn, ctlBtnMain, ev, dl, bell,
+      musicPlayLabel: st.music.playing ? 'Пауза' : 'Играть',
+      musicToggle: () => this.setState({ music: { ...st.music, on: true, playing: !st.music.playing } }),
+      musicNext: () => this.setState({ music: { ...st.music, on: true, pos: 0, idx: (st.music.idx + 1) % this.tracks.length } }),
+      musicPrev: () => this.setState({ music: { ...st.music, on: true, pos: 0, idx: (st.music.idx + this.tracks.length - 1) % this.tracks.length } }),
+      musicStop: () => this.setState({ music: { ...st.music, on: false, playing: false }, hoverPill: null }),
+      evHide: () => this.setState({ evHidden: true, hoverPill: null }),
+      dlCancel: () => { clearTimeout(this.dlT); this.dlT = null; this.setState({ dl: { on: false, pct: 0 }, hoverPill: null }); },
+      dateShort: now.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' }),
+      stackOpen: st.stackOpen, toggleStack: this.toggleStack, stackFan: this.stackFan, stackFold: this.stackFold, clearAll: this.clearAll,
+      toast, toastHold: this.toastHold, toastRelease: this.toastRelease, toastClose: this.toastClose, toastSwipe: this.toastSwipe,
+      nStack, nList, nEmpty: hist.length === 0,
+      /* right */
+      right, tiles, sliders, bat, det, cal,
+      openCC: () => this.setState({ right: rv === 'cc' || rv === 'det' ? null : 'cc', menu: false, q: '', stackOpen: false }),
+      openCal: () => this.setState({ right: rv === 'cal' ? null : 'cal', menu: false, q: '', stackOpen: false, calOff: 0, calSel: now.getDate() }),
+      ccBack: () => this.setState({ right: 'cc' }),
+      calPrev: () => this.setState({ calOff: st.calOff - 1, calSel: 1 }),
+      calNext: () => this.setState({ calOff: st.calOff + 1, calSel: 1 }),
+      evDraft: st.evDraft, evInput: (e) => this.setState({ evDraft: e.target.value }),
+      evKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); addEvent(); } },
+      evAdd: addEvent,
+      syncText, syncIcon: st.syncing ? 'animation:islSpin .8s linear infinite' : '',
+      sync: () => { this.setState({ syncing: true }); clearTimeout(this.syncT); this.syncT = setTimeout(() => this.setState({ syncing: false, syncAt: Date.now() }), 1400); },
+      clock: `${pad(now.getHours())}:${pad(now.getMinutes())}`,
+      clockSec: `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`,
+      dateLong: now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }),
+      /* windows */
+      win, h: winHandles,
+      stackZone: `position:absolute;right:0;top:220px;width:${minimized.length ? (st.stackHover ? 220 : 200) : 0}px;height:460px;z-index:58`,
+      stackIn: this.stackIn, stackOut: this.stackOut, peekOut: this.peekOut, peekKeep: this.peekKeep,
+      peekBar: peekRect ? `position:absolute;left:${peekRect.x}px;top:${peekRect.y + peekRect.h + 10}px;width:${peekRect.w}px;z-index:81;display:flex;justify-content:center;gap:8px;animation:islFade .3s ease both` : 'display:none',
+      peekPinned: !!(peekW && peekW.pinned),
+      peekPinText: peekW && peekW.pinned ? 'Открепить' : 'Закрепить',
+      peekPinBtn: `height:34px;padding:0 14px;border-radius:17px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;background:${peekW && peekW.pinned ? '#45454c' : 'rgba(255,255,255,.09)'}`,
+      peekRestore: () => st.peek && this.restoreWin(st.peek),
+      peekPin: () => st.peek && this.pinWin(st.peek),
+      peekClose: () => st.peek && this.closeWin(st.peek),
+      cursor, curHide: this.curHide,
+      onShade: this.onShade,
+      extNotes: st.history.map((n) => ({ title: n.title, text: n.body, time: agoTxt(n.at) }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

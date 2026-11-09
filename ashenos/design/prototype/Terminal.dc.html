@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Терминал</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #e8e8ec;outline-offset:2px}
+input::placeholder{color:#6f6f77}
+.tscroll::-webkit-scrollbar{width:8px}.tscroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:8px}
+@keyframes blockIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tWinIn{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+@keyframes palIn{from{opacity:0;transform:translate(-50%,-8px) scale(.97)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes paneIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes blink{50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(130% 90% at 105% 118%, rgba(0,0,0,0) 57%, rgba(255,255,255,0.17) 58.2%, rgba(255,255,255,0.04) 62%, rgba(0,0,0,0) 66%), radial-gradient(110% 80% at -12% -22%, rgba(0,0,0,0) 54%, rgba(255,255,255,0.13) 55.2%, rgba(255,255,255,0.03) 59%, rgba(0,0,0,0) 63%), radial-gradient(50% 40% at 82% 0%, rgba(255,255,255,0.12), rgba(0,0,0,0) 70%), linear-gradient(155deg, #1e1e21 0%, #0b0b0c 60%, #151517 100%)">
+
+  <!-- ================= WINDOW ================= -->
+  <section aria-label="Терминал" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: tWinIn .5s cubic-bezier(.2,1.1,.3,1) both">
+
+    <!-- title bar (explorer style) -->
+    <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
+      <div style="display: flex; align-items: center; gap: 12px; width: 206px; flex: none">
+        <span aria-hidden="true" style="position: relative; width: 38px; height: 38px; flex: none; border-radius: 11px; background: radial-gradient(120% 90% at 85% 8%, #46464c 0%, #2c2c31 50%, #1c1c1f 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25)">
+          <span style="position: absolute; left: 5px; right: 5px; bottom: 5px; height: 15px; border-radius: 8px; background: #141416; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; padding-left: 5px; font: 700 9px/1 'JetBrains Mono', monospace; color: #8e8e93">&gt;_</span>
+        </span>
+        <div style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0">
+          <span style="font-size: 15px; font-weight: 600">Терминал</span>
+          <span style="font-size: 12.5px; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cwd}}</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
+        <button aria-label="Назад" onClick="{{navBack}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
+        </button>
+        <button aria-label="Вперёд" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
+        </button>
+      </div>
+      <div role="tablist" aria-label="Вкладки" style="flex: 1 1 auto; min-width: 0; height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 4px; border-radius: 14px; background: rgba(255,255,255,0.05)">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+          <div style="{{t.wrap}}">
+            <button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 4px 0 12px; font-size: 14px; font-weight: 500">
+              <span aria-hidden="true" style="{{t.dot}}"></span>{{t.name}}
+            </button>
+            <button aria-label="{{t.closeLabel}}" onClick="{{t.close}}" style="width: 26px; height: 26px; margin-right: 4px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+              <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+        </sc-for>
+        <button aria-label="Новая вкладка" onClick="{{newTab}}" style="width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #c9c9cf">
+          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        </button>
+      </div>
+      <button onClick="{{openPal}}" style="position: relative; width: 230px; height: 44px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.05); font-size: 14px; color: #8b8b93; text-align: left">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="flex: 1">Команды и действия</span>
+        <span style="padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.14); font: 11.5px 'JetBrains Mono', monospace; color: #a1a1a8">^K</span>
+      </button>
+      <div role="group" aria-label="Вид" style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
+        <button aria-label="Один экран" aria-pressed="{{single}}" onClick="{{toSingle}}" style="{{viewBtn.single}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"></rect></svg></button>
+        <button aria-label="Разделить экран" aria-pressed="{{split}}" onClick="{{toSplit}}" style="{{viewBtn.split}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"></rect><path d="M12 4.5v15"></path></svg></button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; margin-left: 4px; flex: none">
+        <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
+        <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+    </header>
+
+    <div style="flex: 1; min-height: 0; display: flex; gap: 12px; padding: 0 12px">
+      <!-- sidebar -->
+      <aside aria-label="Сессии и сниппеты" style="width: 232px; flex: none; padding: 10px; display: flex; flex-direction: column; gap: 4px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05)">
+        <span style="padding: 2px 10px 6px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93">Сессии</span>
+        <sc-for list="{{sessions}}" as="s" hint-placeholder-count="3">
+          <button aria-current="{{s.current}}" onClick="{{s.pick}}" style="{{s.style}}">
+            <span aria-hidden="true" style="{{s.dot}}"></span>
+            <span style="display: flex; flex-direction: column; line-height: 1.25; min-width: 0; text-align: left">
+              <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.name}}</span>
+              <span style="font-size: 11.5px; opacity: 0.65; font-family: 'JetBrains Mono', monospace">{{s.sub}}</span>
+            </span>
+          </button>
+        </sc-for>
+        <span style="padding: 16px 10px 6px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8b93">Сниппеты</span>
+        <sc-for list="{{snips}}" as="n" hint-placeholder-count="4">
+          <button onClick="{{n.use}}" style="display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border-radius: 12px; text-align: left; background: rgba(255,255,255,0.03)">
+            <span style="font-size: 12.5px; font-weight: 600">{{n.name}}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.cmd}}</span>
+          </button>
+        </sc-for>
+        <div style="flex: 1"></div>
+        <div style="padding: 10px; border-radius: 14px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 6px; font-size: 12px">
+          <div style="display: flex; justify-content: space-between"><span style="color: #a1a1a8">Оболочка</span><span style="font-family: 'JetBrains Mono', monospace">zsh</span></div>
+          <div style="display: flex; justify-content: space-between"><span style="color: #a1a1a8">Ветка</span><span style="font-family: 'JetBrains Mono', monospace; color: {{accent}}">main</span></div>
+          <div style="display: flex; justify-content: space-between"><span style="color: #a1a1a8">ЦП</span><span style="font-family: 'JetBrains Mono', monospace">{{cpu}}%</span></div>
+        </div>
+      </aside>
+
+      <!-- main area -->
+      <div style="flex: 1; min-width: 0; display: flex; overflow: hidden; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05)">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+          <div id="term-scroll" class="tscroll" role="log" aria-label="Вывод команд" aria-live="polite" style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 8px; display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{blocks}}" as="b" hint-placeholder-count="3">
+              <article style="{{b.card}}">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05)">
+                  <span style="{{b.chip}}">{{b.cwd}}</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #f2f2f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{b.cmd}}</span>
+                  <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #8b8b93">{{b.dur}}</span>
+                  <span role="img" aria-label="{{b.statusLabel}}" style="{{b.dot}}"></span>
+                  <button aria-label="Повторить команду" onClick="{{b.rerun}}" style="width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+                    <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"></path></svg>
+                  </button>
+                </div>
+                <div style="display: flex; gap: 22px; padding: 10px 14px 12px">
+                  <sc-if value="{{b.fetch}}" hint-placeholder-val="{{false}}">
+                    <div aria-hidden="true" style="position: relative; width: 132px; height: 104px; flex: none; margin-top: 4px">
+                      <span style="position: absolute; left: 0; top: 0; width: 40px; height: 31px; transform: scale(3.2); transform-origin: 0 0">
+                        <span style="position: absolute; left: 2px; top: 0; width: 36px; height: 27px; border-radius: 4px; background: #2a2a2e"></span>
+                        <span style="position: absolute; left: 24px; top: 4px; width: 9px; height: 20px; border-radius: 1.5px; background: #e4e4e8"></span>
+                        <span style="position: absolute; left: 18px; top: 2px; width: 10px; height: 22px; border-radius: 1.5px; background: #ececef"></span>
+                        <span style="position: absolute; left: 4px; top: 0; width: 19px; height: 24px; border-radius: 2px; background: #ffffff; transform: rotate(-4deg)"></span>
+                        <span style="position: absolute; left: 0; top: 6px; width: 40px; height: 25px; clip-path: path('M 2 0 H 19 Q 21 0 22 1 L 24 5 Q 25 6 26 6 H 38 Q 40 6 40 8 L 39 23 Q 39 25 37 25 H 3 Q 1 25 1 23 L 0 2 Q 0 0 2 0 Z'); background: linear-gradient(180deg, rgba(150,150,156,0.75), rgba(92,92,98,0.8) 45%, rgba(26,26,29,0.97))"></span>
+                      </span>
+                    </div>
+                  </sc-if>
+                  <div style="flex: 1; min-width: 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7">
+                    <sc-for list="{{b.lines}}" as="l" hint-placeholder-count="3">
+                      <div style="{{l.style}}">{{l.t}}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </article>
+            </sc-for>
+            <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+              <div style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: #8b8b93; font-size: 13px">
+                <span style="font: 700 28px 'JetBrains Mono', monospace; color: #3a3a3f">&gt;_</span>
+                Пусто. Введите команду или нажмите Ctrl K
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- suggestions -->
+          <div style="{{sugWrap}}">
+            <sc-for list="{{sugs}}" as="g" hint-placeholder-count="3">
+              <button onClick="{{g.use}}" style="{{g.style}}"><span style="font-family: 'JetBrains Mono', monospace">{{g.cmd}}</span><span style="color: #8b8b93; font-size: 11.5px">{{g.hint}}</span></button>
+            </sc-for>
+          </div>
+
+          <!-- input capsule -->
+          <div role="group" style="padding: 8px 18px 16px">
+            <div style="{{capsule}}">
+              <span aria-hidden="true" style="font: 700 16px 'JetBrains Mono', monospace; color: {{accent}}; padding-left: 18px; transition: color .4s">&gt;_</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #8b8b93; white-space: nowrap">{{cwd}}</span>
+              <div style="position: relative; flex: 1; min-width: 0; height: 100%">
+                <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; white-space: pre; pointer-events: none"><span style="color: rgba(0,0,0,0)">{{input}}</span><span style="color: #55555c">{{ghost}}</span></span>
+                <label for="term-in" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Команда</label>
+                <input id="term-in" value="{{input}}" onChange="{{onInput}}" onKeyDown="{{onKey}}" autocomplete="off" spellcheck="false" placeholder="Введите команду… (Tab — дополнить, ↑ — история)" style="position: relative; width: 100%; height: 100%; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 14px 'JetBrains Mono', monospace; caret-color: {{accent}}">
+              </div>
+              <span style="font-size: 11.5px; color: #6f6f77; white-space: nowrap">Tab ↹</span>
+              <button type="button" onClick="{{submit}}" aria-label="Выполнить" style="{{runBtn}}">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10 4 15l5 5"></path><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- split pane: system monitor -->
+        <sc-if value="{{split}}" hint-placeholder-val="{{false}}">
+          <section aria-label="Монитор системы" style="width: 400px; flex: none; border-left: 1px solid rgba(255,255,255,0.05); padding: 16px; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; animation: paneIn .4s cubic-bezier(.2,1,.3,1) both">
+            <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-weight: 700; color: {{accent}}">btop</span><span style="color: #8b8b93">обновляется каждую секунду</span></div>
+            <div style="padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 7px">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 2px"><span style="font-weight: 700">ЦП</span><span>{{cpu}}%</span></div>
+              <sc-for list="{{cores}}" as="c" hint-placeholder-count="8">
+                <div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 22px; color: #8b8b93">{{c.n}}</span>
+                  <span style="flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden"><span style="{{c.bar}}"></span></span>
+                  <span style="width: 36px; text-align: right">{{c.v}}%</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 8px">
+              <div style="display: flex; justify-content: space-between"><span style="font-weight: 700">Память</span><span>{{ramGb}} / 16 ГБ</span></div>
+              <span style="height: 10px; border-radius: 5px; background: rgba(255,255,255,0.07); overflow: hidden"><span style="{{ramBar}}"></span></span>
+            </div>
+            <div style="flex: 1; min-height: 0; padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; color: #8b8b93; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.06)"><span style="width: 56px">PID</span><span style="flex: 1">Процесс</span><span style="width: 48px; text-align: right">ЦП</span></div>
+              <sc-for list="{{procs}}" as="p" hint-placeholder-count="6">
+                <div style="display: flex"><span style="width: 56px; color: #8b8b93">{{p.pid}}</span><span style="flex: 1">{{p.name}}</span><span style="width: 48px; text-align: right">{{p.c}}</span></div>
+              </sc-for>
+            </div>
+          </section>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- status bar -->
+    <footer style="height: 44px; flex: none; display: flex; align-items: center; gap: 18px; padding: 0 24px; font-size: 13px; color: #a1a1a8">
+      <span>{{sessionName}}</span><span>zsh</span><span style="color: {{accent}}">main</span>
+      <span style="margin-left: auto">{{lastStatus}}</span><span>{{blockCount}}</span><span>UTF-8</span>
+    </footer>
+
+    <!-- command palette -->
+    <sc-if value="{{pal}}" hint-placeholder-val="{{false}}">
+      <div role="presentation" onClick="{{closePal}}" style="position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.35)"></div>
+      <div role="dialog" aria-label="Палитра команд" style="position: absolute; left: 50%; top: 90px; width: 560px; z-index: 21; padding: 10px; border-radius: 20px; background: rgba(18,18,20,0.96); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 30px 80px rgba(0,0,0,0.6); animation: palIn .25s cubic-bezier(.2,1.2,.3,1) both">
+        <label for="pal-in" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Поиск действия</label>
+        <input id="pal-in" value="{{palQ}}" onChange="{{onPalQ}}" placeholder="Что сделать?" autocomplete="off" style="width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 0; outline: none; background: rgba(255,255,255,0.06); color: #f2f2f4; font: 14px Inter, sans-serif">
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 8px">
+          <sc-for list="{{actions}}" as="a" hint-placeholder-count="6">
+            <button onClick="{{a.run}}" style="height: 40px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; text-align: left; background: rgba(255,255,255,0.02)">
+              <span style="flex: 1">{{a.name}}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #8b8b93">{{a.key}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#5ee39a"]},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = {
+    tabs: [{ name: 'zsh', cwd: '~/Проекты', blocks: null }, { name: 'pacman', cwd: '~', blocks: [] }],
+    tab: 0, input: '', hist: ['fastfetch', 'ls', 'git status'], hi: -1,
+    split: false, pal: false, palQ: '', session: 0,
+    cpu: 23, cores: [12, 30, 8, 44, 19, 27, 5, 33], ram: 41, seq: 10
+  };
+
+  componentDidMount() {
+    this.sys = setInterval(() => {
+      const j = (v, d, lo, hi) => Math.round(Math.min(hi, Math.max(lo, v + (Math.random() * 2 - 1) * d)));
+      this.setState((s) => ({ cpu: j(s.cpu, 6, 3, 90), ram: j(s.ram, 2, 34, 55), cores: s.cores.map((c) => j(c, 14, 1, 99)) }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.sys); }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState && (prevState.tabs !== this.state.tabs || prevState.tab !== this.state.tab)) {
+      const el = document.getElementById('term-scroll');
+      if (el) el.scrollTop = el.scrollHeight;
+    }
+  }
+
+  cmds() {
+    return ['help', 'ls', 'clear', 'date', 'whoami', 'uptime', 'fastfetch', 'git status', 'sudo pacman -Syu', 'paccache -r', 'journalctl -f', 'cd ', 'echo ', 'pwd'];
+  }
+
+  initialBlocks() {
+    return [
+      { id: 1, cwd: '~', cmd: 'fastfetch', dur: '0,08 с', ok: true, fetch: true, lines: this.fetchLines() },
+      { id: 2, cwd: '~/Проекты', cmd: 'ls', dur: '0,01 с', ok: true, lines: [{ t: 'Архив/  Дизайн/  Разработка/  Ресурсы/', c: 'acc' }, { t: 'install.sh  PKGBUILD  Трек.mp3  Заметки.txt' }] },
+      { id: 3, cwd: '~/Проекты', cmd: 'git status', dur: '0,03 с', ok: true, lines: [{ t: 'На ветке main' }, { t: 'Изменения, не проиндексированные для коммита:' }, { t: '    изменено:  PKGBUILD', c: 'err' }, { t: '    изменено:  install.sh', c: 'err' }] }
+    ];
+  }
+
+  fetchLines() {
+    return [
+      { t: 'user@ashenos', c: 'acc' }, { t: '──────────────', c: 'dim' },
+      { t: 'ОС          AshenOS x86_64' }, { t: 'Окружение   KDE Plasma 6 (Wayland)' },
+      { t: 'Терминал    Терминал' }, { t: 'Оболочка    zsh' },
+      { t: 'Память      6,6 / 16 ГБ' }, { t: 'Тема        Стекло' }
+    ];
+  }
+
+  exec(raw) {
+    const cmd = raw.trim();
+    const t = this.state.tabs[this.state.tab];
+    let cwd = t.cwd;
+    let lines = [], ok = true, fetch = false, clear = false;
+    const [head, ...rest] = cmd.split(/\s+/);
+    switch (head) {
+      case 'help': lines = [{ t: 'Доступно: ls, cd, pwd, echo, date, whoami, uptime, fastfetch,' }, { t: 'git status, sudo pacman -Syu, paccache -r, journalctl -f, clear' }, { t: 'Tab — дополнить · ↑/↓ — история · Ctrl K — палитра', c: 'dim' }]; break;
+      case 'ls': lines = [{ t: 'Архив/  Дизайн/  Разработка/  Ресурсы/', c: 'acc' }, { t: 'install.sh  PKGBUILD  Трек.mp3  Заметки.txt' }]; break;
+      case 'clear': clear = true; break;
+      case 'date': lines = [{ t: new Date().toLocaleString('ru-RU', { dateStyle: 'full', timeStyle: 'medium' }) }]; break;
+      case 'whoami': lines = [{ t: 'user' }]; break;
+      case 'pwd': lines = [{ t: cwd.replace('~', '/home/user') }]; break;
+      case 'uptime': lines = [{ t: 'работает 3 ч 12 мин · пользователей: 1 · нагрузка 0,42 0,38 0,31' }]; break;
+      case 'fastfetch': case 'neofetch': fetch = true; lines = this.fetchLines(); break;
+      case 'echo': lines = [{ t: rest.join(' ') }]; break;
+      case 'cd': {
+        const arg = rest.join(' ') || '~';
+        cwd = arg === '~' ? '~' : arg === '..' ? (cwd.includes('/') ? cwd.slice(0, cwd.lastIndexOf('/')) || '~' : '~') : (arg.startsWith('~') ? arg : `${cwd}/${arg}`);
+        break;
+      }
+      case 'git': lines = rest[0] === 'status' ? [{ t: 'На ветке main' }, { t: '    изменено:  PKGBUILD', c: 'err' }, { t: '    изменено:  install.sh', c: 'err' }] : [{ t: `git: «${rest.join(' ')}» — пример не поддерживается`, c: 'dim' }]; break;
+      case 'sudo': case 'pacman':
+        lines = [{ t: ':: Синхронизация базы данных пакетов...', c: 'acc' }, { t: ' core            130,4 КиБ   1,2 МиБ/с' }, { t: ' extra             8,2 МиБ   9,8 МиБ/с' }, { t: ':: Начинается полное обновление системы...', c: 'acc' }, { t: ' нечего обновлять', c: 'ok' }]; break;
+      case 'paccache': lines = [{ t: '==> завершено: удалено 6 пакетов (освобождено 412,7 МиБ)', c: 'ok' }]; break;
+      case 'journalctl': lines = [{ t: 'ноя 09 12:19:02 ashenos systemd[1]: Started Session 2 of User user.' }, { t: 'ноя 09 12:19:04 ashenos kwin_wayland[911]: Applying wallpaper' }, { t: '-- ожидание новых записей (Ctrl C — выход) --', c: 'dim' }]; break;
+      default: ok = false; lines = [{ t: `zsh: команда не найдена: ${head}`, c: 'err' }];
+    }
+    const dur = `${(Math.random() * 0.4 + 0.01).toFixed(2).replace('.', ',')} с`;
+    const tabs = this.state.tabs.map((x, i) => {
+      if (i !== this.state.tab) return x;
+      const cur = x.blocks === null ? this.initialBlocks() : x.blocks;
+      if (clear) return { ...x, cwd, blocks: [] };
+      return { ...x, cwd, blocks: [...cur, { id: this.state.seq + 1, cwd: t.cwd, cmd, dur, ok, fetch, lines }] };
+    });
+    const hist = [...this.state.hist.filter((h) => h !== cmd), cmd];
+    this.setState({ tabs, hist, hi: -1, input: '', seq: this.state.seq + 1 });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const accent = this.props.accent ?? '#ededf0';
+    const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+    const tab = st.tabs[st.tab] || st.tabs[0];
+    const rawBlocks = tab.blocks === null ? this.initialBlocks() : tab.blocks;
+    const col = { acc: accent, err: '#ff8f8a', ok: '#6fd39b', dim: '#6f6f77' };
+    const blocks = rawBlocks.map((b) => ({
+      ...b, fetch: !!b.fetch,
+      statusLabel: b.ok ? 'Успешно' : 'Ошибка',
+      card: `border-radius:16px;background:rgba(255,255,255,.035);border:1px solid ${b.ok ? 'rgba(255,255,255,.06)' : 'rgba(255,143,138,.3)'};animation:blockIn .35s cubic-bezier(.2,1,.3,1) both;flex:none`,
+      chip: `flex:none;padding:3px 9px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:${hexA(accent, .14)};color:${accent}`,
+      dot: `width:8px;height:8px;flex:none;border-radius:50%;background:${b.ok ? '#6fd39b' : '#ff8f8a'}`,
+      rerun: () => this.exec(b.cmd),
+      lines: b.lines.map((l) => ({ t: l.t, style: `white-space:pre-wrap;color:${l.c ? col[l.c] : '#d6d6db'};${l.c === 'acc' ? 'font-weight:600' : ''}` }))
+    }));
+
+    const all = this.cmds();
+    const q = st.input;
+    const match = q ? all.find((c) => c.startsWith(q) && c !== q) : null;
+    const hints = { help: 'справка', ls: 'список файлов', clear: 'очистить', date: 'дата', whoami: 'кто я', uptime: 'время работы', fastfetch: 'о системе', 'git status': 'статус git', 'sudo pacman -Syu': 'обновить систему', 'paccache -r': 'чистка кэша', 'journalctl -f': 'логи', 'cd ': 'перейти', 'echo ': 'вывести', pwd: 'текущая папка' };
+    const sugList = q ? all.filter((c) => c.startsWith(q) && c !== q).slice(0, 4) : [];
+    const sugs = sugList.map((c, i) => ({ cmd: c, hint: hints[c] || '', use: () => this.setState({ input: c }),
+      style: `height:32px;padding:0 12px;border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12.5px;background:${i === 0 ? hexA(accent, .16) : 'rgba(255,255,255,.05)'};border:1px solid ${i === 0 ? hexA(accent, .4) : 'rgba(255,255,255,.06)'}` }));
+
+    const tabsV = st.tabs.map((t, i) => {
+      const on = i === st.tab;
+      return { name: t.name, on, closeLabel: `Закрыть вкладку ${t.name}`,
+        pick: () => this.setState({ tab: i }),
+        close: () => { if (st.tabs.length < 2) return; const tabs = st.tabs.filter((_, k) => k !== i); this.setState({ tabs, tab: Math.min(st.tab, tabs.length - 1) }); },
+        wrap: `height:36px;display:flex;align-items:center;border-radius:11px;background:${on ? 'rgba(255,255,255,.09)' : 'transparent'};color:${on ? '#f2f2f4' : '#a1a1a8'};transition:background .2s`,
+        dot: `width:7px;height:7px;border-radius:50%;background:${on ? accent : 'rgba(255,255,255,.25)'}` };
+    });
+
+    const sess = [{ name: 'Локальная', sub: 'zsh · ashenos' }, { name: 'Сервер', sub: 'ssh · 192.168.1.20' }, { name: 'Raspberry Pi', sub: 'ssh · pi.local' }];
+    const sessions = sess.map((s, i) => ({ ...s, current: st.session === i ? 'true' : 'false',
+      pick: () => this.setState({ session: i }),
+      style: `display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:${st.session === i ? 'rgba(255,255,255,.08)' : 'transparent'}`,
+      dot: `width:8px;height:8px;flex:none;border-radius:50%;background:${i === 0 ? '#6fd39b' : i === 1 ? '#6fd39b' : '#6f6f77'};box-shadow:${st.session === i ? `0 0 0 3px ${hexA(accent, .25)}` : 'none'}` }));
+
+    const snipData = [
+      { name: 'Обновить систему', cmd: 'sudo pacman -Syu' }, { name: 'Почистить кэш', cmd: 'paccache -r' },
+      { name: 'Логи системы', cmd: 'journalctl -f' }, { name: 'О системе', cmd: 'fastfetch' }
+    ];
+    const snips = snipData.map((n) => ({ ...n, use: () => { this.setState({ input: n.cmd }); const el = document.getElementById('term-in'); if (el) el.focus(); } }));
+
+    const acts = [
+      { name: 'Новая вкладка', key: 'Ctrl T', run: () => this.addTab() },
+      { name: st.split ? 'Убрать разделение' : 'Разделить экран (btop)', key: 'Ctrl \\', run: () => this.setState({ split: !st.split, pal: false }) },
+      { name: 'Очистить вывод', key: 'Ctrl L', run: () => { this.setState({ pal: false }); this.exec('clear'); } },
+      { name: 'Показать сведения о системе', key: 'fastfetch', run: () => { this.setState({ pal: false }); this.exec('fastfetch'); } },
+      { name: 'Обновить систему', key: 'pacman -Syu', run: () => { this.setState({ pal: false }); this.exec('sudo pacman -Syu'); } },
+      { name: 'Подключиться к серверу', key: 'ssh', run: () => this.setState({ session: 1, pal: false }) }
+    ];
+    const pq = st.palQ.toLowerCase();
+    const actions = acts.filter((a) => !pq || a.name.toLowerCase().includes(pq));
+
+    const cores = st.cores.map((v, i) => ({ n: String(i), v, bar: `display:block;width:${v}%;height:100%;border-radius:4px;background:${v > 70 ? '#ff8f8a' : accent};transition:width .8s ease` }));
+    const procs = [
+      { pid: '911', name: 'kwin_wayland', c: `${Math.round(st.cpu * 0.3)}%` }, { pid: '1204', name: 'plasmashell', c: `${Math.round(st.cpu * 0.2)}%` },
+      { pid: '2210', name: 'terminal', c: `${Math.round(st.cpu * 0.12)}%` }, { pid: '1880', name: 'pipewire', c: '2%' },
+      { pid: '3021', name: 'firefox', c: `${Math.round(st.cpu * 0.25)}%` }, { pid: '701', name: 'NetworkManager', c: '0%' }
+    ];
+    const last = rawBlocks[rawBlocks.length - 1];
+
+    return {
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
+      accent, tabs: tabsV, sessions, snips, blocks, empty: blocks.length === 0,
+      sugs, sugWrap: `display:${sugs.length ? 'flex' : 'none'};gap:6px;padding:0 18px;flex-wrap:wrap`,
+      input: st.input, ghost: match ? match.slice(q.length) : '',
+      cwd: tab.cwd,
+      onInput: (e) => this.setState({ input: e.target.value, hi: -1 }),
+      onKey: (e) => {
+        const s = this.state;
+        if (e.key === 'Enter') { e.preventDefault(); if (s.input.trim()) this.exec(s.input); return; }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const m = s.input ? this.cmds().find((c) => c.startsWith(s.input) && c !== s.input) : null;
+          if (m) this.setState({ input: m });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const hi = s.hi < 0 ? s.hist.length - 1 : Math.max(0, s.hi - 1);
+          if (s.hist[hi] !== undefined) this.setState({ hi, input: s.hist[hi] });
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (s.hi < 0) return;
+          const hi = s.hi + 1;
+          if (hi >= s.hist.length) this.setState({ hi: -1, input: '' });
+          else this.setState({ hi, input: s.hist[hi] });
+        } else if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K' || e.key === 'л' || e.key === 'Л')) {
+          e.preventDefault();
+          this.setState({ pal: true, palQ: '' });
+        } else if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'д')) {
+          e.preventDefault();
+          this.exec('clear');
+        }
+      },
+      submit: (e) => { if (e && e.preventDefault) e.preventDefault(); if (this.state.input.trim()) this.exec(this.state.input); },
+      capsule: `height:56px;display:flex;align-items:center;gap:12px;padding-right:8px;border-radius:28px;background:linear-gradient(180deg,#0f0f11,#151517);box-shadow:inset 0 3px 8px rgba(0,0,0,.8),0 1px 0 rgba(255,255,255,.07);border:1px solid ${st.input ? hexA(accent, .35) : 'rgba(255,255,255,.05)'};transition:border-color .25s`,
+      runBtn: `width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${st.input ? accent : 'rgba(255,255,255,.06)'};color:${st.input ? '#111113' : '#8b8b93'};transition:background .25s,color .25s`,
+      split: st.split, single: !st.split,
+      toSingle: () => this.setState({ split: false }), toSplit: () => this.setState({ split: true }),
+      viewBtn: {
+        single: `width:40px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:${!st.split ? 'rgba(255,255,255,.12)' : 'transparent'};color:${!st.split ? '#ffffff' : '#b8b8be'}`,
+        split: `width:40px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:${st.split ? 'rgba(255,255,255,.12)' : 'transparent'};color:${st.split ? '#ffffff' : '#b8b8be'}`
+      },
+      navBack: () => this.setState({ tab: Math.max(0, st.tab - 1) }),
+      toggleSplit: () => this.setState({ split: !st.split }),
+      splitBtn: `width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${st.split ? hexA(accent, .18) : 'transparent'};color:${st.split ? accent : '#c9c9cf'}`,
+      newTab: () => this.addTab(),
+      pal: st.pal, palQ: st.palQ, actions,
+      openPal: () => this.setState({ pal: true, palQ: '' }),
+      closePal: () => this.setState({ pal: false }),
+      onPalQ: (e) => this.setState({ palQ: e.target.value }),
+      cpu: st.cpu, cores, procs,
+      ramGb: (st.ram / 100 * 16).toFixed(1).replace('.', ','),
+      ramBar: `display:block;width:${st.ram}%;height:100%;border-radius:5px;background:${accent};transition:width .8s ease`,
+      sessionName: sess[st.session].name,
+      lastStatus: last ? (last.ok ? 'код 0' : 'код 127') : '—',
+      blockCount: `блоков: ${blocks.length}`
+    };
+  }
+
+  addTab() {
+    const tabs = [...this.state.tabs, { name: `zsh ${this.state.tabs.length + 1}`, cwd: '~', blocks: [] }];
+    this.setState({ tabs, tab: tabs.length - 1, pal: false });
+  }
+}
+</script>
+</body>
+</html>

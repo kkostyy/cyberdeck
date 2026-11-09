@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+. /etc/os-release
+t=$(( $(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0) / 1000 ))
+printf '%s\n' "$PRETTY_NAME" "ядро:  $(uname -r)" "плата: $(tr -d '\0' </proc/device-tree/model 2>/dev/null)" "темп.: ${t}°C" "время работы: $(uptime -p)"

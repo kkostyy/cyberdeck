@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Сборка образа AshenOS для Raspberry Pi 4 (aarch64) на основе Arch Linux ARM.
+# Запуск на x86_64 Arch: sudo ./build-image.sh [размер, по умолчанию 8G]
+# Нужно: arch-install-scripts, qemu-user-static-binfmt, dosfstools, parted, wget
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+ROOT_OVERLAY="$HERE/../airootfs"
+SIZE="${1:-8G}"
+OUT="$HERE/out"
+IMG="$OUT/ashenos-rpi4-$(date +%Y.%m.%d)-aarch64.img"
+TARBALL="ArchLinuxARM-rpi-aarch64-latest.tar.gz"
+URL="http://os.archlinuxarm.org/os/$TARBALL"
+MNT="$OUT/mnt"
+
+[[ $EUID -eq 0 ]] || { echo "Запустите через sudo"; exit 1; }
+mkdir -p "$OUT" "$MNT"
+
+echo "==> Скачиваю Arch Linux ARM"
+[[ -f "$OUT/$TARBALL" ]] || wget -O "$OUT/$TARBALL" "$URL"
+
+echo "==> Создаю образ $IMG ($SIZE)"
+rm -f "$IMG"
+truncate -s "$SIZE" "$IMG"
+parted -s "$IMG" mklabel msdos \
+  mkpart primary fat32 1MiB 513MiB \
+  mkpart primary ext4 513MiB 100%
+LOOP="$(losetup --show -fP "$IMG")"
+cleanup() { umount -R "$MNT" 2>/dev/null || true; losetup -d "$LOOP" 2>/dev/null || true; }
+trap cleanup EXIT
+mkfs.vfat -F32 -n ASHEN_BOOT "${LOOP}p1"
+mkfs.ext4 -F -L ashenos "${LOOP}p2"
+
+mount "${LOOP}p2" "$MNT"
+mkdir -p "$MNT/boot"
+mount "${LOOP}p1" "$MNT/boot"
+
+echo "==> Распаковываю корневую систему"
+bsdtar -xpf "$OUT/$TARBALL" -C "$MNT"
+sed -i 's/mmcblk0/mmcblk1/g' "$MNT/etc/fstab" || true
+
+echo "==> Накладываю файлы AshenOS"
+cp -a "$ROOT_OVERLAY/." "$MNT/"
+cat "$MNT/boot/config-ashenos.txt" >> "$MNT/boot/config.txt"
+rm "$MNT/boot/config-ashenos.txt"
+install -Dm755 "$HERE/ashenos-info" "$MNT/usr/local/bin/ashenos-info"
+
+echo "==> Ставлю пакеты (через qemu, это долго)"
+PKGS="$(grep -v '^\s*#' "$HERE/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')"
+arch-chroot "$MNT" /bin/bash -e <<CHROOT
+pacman-key --init
+pacman-key --populate archlinuxarm
+pacman -Syu --noconfirm --needed $PKGS
+systemctl enable sddm NetworkManager bluetooth sshd
+echo 'alarm ALL=(ALL) ALL' > /etc/sudoers.d/alarm
+ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+sed -i 's/^#\(ru_RU.UTF-8\)/\1/; s/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen
+locale-gen
+echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf
+npm install -g @anthropic-ai/claude-code || true
+pacman -Scc --noconfirm
+CHROOT
+
+echo "==> Готово: $IMG"
+echo "    Записать на карту: sudo dd if=$IMG of=/dev/sdX bs=4M status=progress conv=fsync"
