@@ -65,11 +65,11 @@ body{margin:0;background:#050506}
 @keyframes islPower{0%{opacity:0}15%{opacity:1}85%{opacity:1}100%{opacity:0}}
 </style>
 </helmet>
-<div data-sys-root="1" onMouseLeave="{{curHide}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #050506; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none">
+<div data-sys-root="1" onMouseLeave="{{curHide}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: {{thBg}}; transition: background .5s; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none">
 
   <!-- ============ DESKTOP (wallpaper, widgets, dock) ============ -->
   <div style="position: absolute; inset: 0">
-    <dc-import name="Desktop" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" hint-size="1440px,900px"></dc-import>
+    <dc-import name="Desktop" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
   </div>
 
   <!-- minimized stack hover zone -->
@@ -79,7 +79,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.files.open}}" hint-placeholder-val="{{false}}">
     <section data-win="files" aria-label="{{win.files.title}}" onMouseDown="{{h.files.down}}" style="{{win.files.box}}">
       <div data-inner="1" style="{{win.files.inner}}">
-        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.files.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.files.title}}»" onClick="{{h.files.restore}}" onMouseEnter="{{h.files.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -101,7 +101,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.term.open}}" hint-placeholder-val="{{false}}">
     <section data-win="term" aria-label="{{win.term.title}}" onMouseDown="{{h.term.down}}" style="{{win.term.box}}">
       <div data-inner="1" style="{{win.term.inner}}">
-        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.term.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.term.title}}»" onClick="{{h.term.restore}}" onMouseEnter="{{h.term.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -123,7 +123,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.music.open}}" hint-placeholder-val="{{false}}">
     <section data-win="music" aria-label="{{win.music.title}}" onMouseDown="{{h.music.down}}" style="{{win.music.box}}">
       <div data-inner="1" style="{{win.music.inner}}">
-        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.music.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.music.title}}»" onClick="{{h.music.restore}}" onMouseEnter="{{h.music.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -145,7 +145,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.lab.open}}" hint-placeholder-val="{{false}}">
     <section data-win="lab" aria-label="{{win.lab.title}}" onMouseDown="{{h.lab.down}}" style="{{win.lab.box}}">
       <div data-inner="1" style="{{win.lab.inner}}">
-        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.lab.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.lab.title}}»" onClick="{{h.lab.restore}}" onMouseEnter="{{h.lab.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -167,7 +167,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.set.open}}" hint-placeholder-val="{{false}}">
     <section data-win="set" aria-label="{{win.set.title}}" onMouseDown="{{h.set.down}}" style="{{win.set.box}}">
       <div data-inner="1" style="{{win.set.inner}}">
-        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.set.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.set.title}}»" onClick="{{h.set.restore}}" onMouseEnter="{{h.set.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -189,7 +189,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.claude.open}}" hint-placeholder-val="{{false}}">
     <section data-win="claude" aria-label="{{win.claude.title}}" onMouseDown="{{h.claude.down}}" style="{{win.claude.box}}">
       <div data-inner="1" style="{{win.claude.inner}}">
-        <dc-import name="Claude" on-close="{{h.claude.close}}" on-minimize="{{h.claude.min}}" on-maximize="{{h.claude.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Claude" on-close="{{h.claude.close}}" on-minimize="{{h.claude.min}}" on-maximize="{{h.claude.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.claude.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.claude.title}}»" onClick="{{h.claude.restore}}" onMouseEnter="{{h.claude.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -770,6 +770,32 @@ body{margin:0;background:#050506}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+const THEMES = [
+  { id: 'obsidian', name: 'Obsidian', bg: '#050506', surface: '#0e0e10', text: '#f2f2f4', accent: '', dots: ['#f2f2f4', '#d6d6db', '#a1a1a8', '#6f6f77', '#3a3a40'] },
+  { id: 'cyberpunk', name: 'Cyberpunk', bg: '#0a0614', surface: '#140c24', text: '#4fe3ff', accent: '#00e5ff', dots: ['#00e5ff', '#ff2bd6', '#f5e94b', '#7cff6b', '#ff5c5c'] },
+  { id: 'nightowl', name: 'Night Owl', bg: '#011627', surface: '#0b2942', text: '#d6deeb', accent: '#82aaff', dots: ['#82aaff', '#c792ea', '#ffcb8b', '#addb67', '#ef5350'] },
+  { id: 'kanagawa', name: 'Kanagawa Dragon', bg: '#12120f', surface: '#1d1c19', text: '#c5c9c5', accent: '#c4b28a', dots: ['#c5c9c5', '#8ba4b0', '#a292a3', '#c4b28a', '#c4746e'] },
+  { id: 'tokyo', name: 'Tokyo Night', bg: '#16161e', surface: '#1f2335', text: '#c0caf5', accent: '#7aa2f7', dots: ['#7aa2f7', '#bb9af7', '#e0af68', '#9ece6a', '#f7768e'] },
+  { id: 'mocha', name: 'Mocha', bg: '#11111b', surface: '#1e1e2e', text: '#cdd6f4', accent: '#cba6f7', dots: ['#89b4fa', '#cba6f7', '#f5c2e7', '#a6e3a1', '#fab387'] },
+  { id: 'gruvbox', name: 'Gruvbox', bg: '#1d2021', surface: '#282828', text: '#ebdbb2', accent: '#fe8019', dots: ['#fabd2f', '#fe8019', '#fb4934', '#b8bb26', '#83a598'] },
+  { id: 'espresso', name: 'Espresso', bg: '#17120e', surface: '#241c16', text: '#eadbc8', accent: '#d9a066', dots: ['#eadbc8', '#d9a066', '#c46a3a', '#8c6a4f', '#5c4433'] },
+  { id: 'nord', name: 'Nord', bg: '#1e222a', surface: '#2e3440', text: '#e5e9f0', accent: '#88c0d0', dots: ['#88c0d0', '#81a1c1', '#b48ead', '#a3be8c', '#ebcb8b'] },
+  { id: 'dracula', name: 'Dracula', bg: '#1b1c24', surface: '#282a36', text: '#f8f8f2', accent: '#bd93f9', dots: ['#bd93f9', '#ff79c6', '#8be9fd', '#50fa7b', '#ffb86c'] },
+  { id: 'solarized', name: 'Solarized', bg: '#00212b', surface: '#073642', text: '#93a1a1', accent: '#268bd2', dots: ['#268bd2', '#2aa198', '#859900', '#b58900', '#dc322f'] },
+  { id: 'monokai', name: 'Monokai', bg: '#1a1b17', surface: '#272822', text: '#f8f8f2', accent: '#a6e22e', dots: ['#a6e22e', '#66d9ef', '#f92672', '#fd971f', '#e6db74'] },
+  { id: 'ocean', name: 'Material Ocean', bg: '#0b0d15', surface: '#161925', text: '#a6accd', accent: '#84ffff', dots: ['#84ffff', '#82aaff', '#c792ea', '#c3e88d', '#f78c6c'] },
+  { id: 'ayu', name: 'Ayu Dark', bg: '#07090d', surface: '#11151c', text: '#bfbdb6', accent: '#e6b450', dots: ['#e6b450', '#ffb454', '#59c2ff', '#aad94c', '#f07178'] },
+  { id: 'github', name: 'GitHub Dark', bg: '#0b0f15', surface: '#161b22', text: '#e6edf3', accent: '#58a6ff', dots: ['#58a6ff', '#bc8cff', '#3fb950', '#d29922', '#f85149'] },
+  { id: 'everforest', name: 'Everforest', bg: '#1e2326', surface: '#2d353b', text: '#d3c6aa', accent: '#a7c080', dots: ['#a7c080', '#83c092', '#dbbc7f', '#e69875', '#e67e80'] },
+  { id: 'rose', name: 'Rose Dusk', bg: '#141018', surface: '#1f1a24', text: '#e0def4', accent: '#ebbcba', dots: ['#ebbcba', '#f6c177', '#c4a7e7', '#9ccfd8', '#eb6f92'] },
+  { id: 'horizon', name: 'Horizon', bg: '#16161c', surface: '#1c1e26', text: '#e0e0e0', accent: '#e95678', dots: ['#e95678', '#fab795', '#25b0bc', '#29d398', '#b877db'] }
+];
+const TINTS = [
+  ['', 'Из темы'], ['#ff8a3d', 'Оранжевый'], ['#ff5c5c', 'Красный'], ['#ff6fae', 'Розовый'], ['#f5c84b', 'Жёлтый'],
+  ['#59c27a', 'Зелёный'], ['#2ec4b6', 'Бирюзовый'], ['#5aa8ff', 'Голубой'], ['#b48cff', 'Фиолетовый'], ['#f2f2f4', 'Белый']
+];
+const mixHex = (a, b, k) => { const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
+
 class Component extends DCLogic {
   state = {
     now: new Date(), lock: 'on', power: null,
@@ -778,6 +804,7 @@ class Component extends DCLogic {
     right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
     wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
     pet: { on: false, kind: 'px', color: 'ember', x: 1120, y: 744, dir: -1, busy: false, at: Date.now(), hop: 0, say: '', sayAt: 0, walkTo: 0 },
+    theme: { id: 'obsidian', tint: '', level: 0 },
     ws: 1, oskOn: false, oskLang: 'RU', oskShift: false, oskCaps: false, oskNum: false, oskSym: false, oskTarget: '',
     music: { on: true, playing: true, pos: 62, dur: 214, idx: 0 },
     dl: { on: true, pct: 12 }, evHidden: false,
@@ -826,6 +853,7 @@ class Component extends DCLogic {
     let profile = 'work';
     try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
     this.setState({ events: evs, calSel: today, profile });
+    try { const t = JSON.parse(localStorage.getItem('ashenos.theme') || 'null'); if (t && t.id) this.setState({ theme: t }); } catch (e) {}
     this.tick = setInterval(() => this.onTick(), 1000);
     window.addEventListener('mousemove', this.onCurMove, true);
     window.addEventListener('mousedown', this.onCurDown, true);
@@ -1047,6 +1075,16 @@ class Component extends DCLogic {
     if (d.moved) { this.petPatch({ x: d.nx, y: d.ny, at: Date.now(), walkTo: 0 }); this.petSay('Уи-и!', false); }
     else this.petSay(this.PHRASES[Math.floor(Math.random() * this.PHRASES.length)], true);
   };
+  themeVals() {
+    const t = this.state.theme || {};
+    const T = THEMES.find((x) => x.id === t.id) || THEMES[0];
+    const acc = t.tint || T.accent || '';
+    const K = [0, 0.07, 0.16][t.level || 0] || 0;
+    const ka = acc || T.dots[0];
+    const bg = mixHex(T.bg, ka, K), surface = mixHex(T.surface, ka, K * 1.2);
+    const n = parseInt(surface.slice(1), 16);
+    return { id: T.id, accent: acc, bg, surface, text: T.text, level: t.level || 0, tint: t.tint || '', islBg: `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.88)` };
+  }
   labAction = (id) => {
     const st = this.state, now = Date.now();
     if (id.startsWith('pet:')) {
@@ -1068,6 +1106,7 @@ class Component extends DCLogic {
       return;
     }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
+    if (id.startsWith('theme:')) { try { const t = JSON.parse(id.slice(6)); this.setState({ theme: t }); localStorage.setItem('ashenos.theme', JSON.stringify(t)); } catch (e) {} return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
     const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
     const clip = (t) => { this.setState({ clip: [{ text: t, at: Date.now() }, ...st.clip.filter((c) => c.text !== t)].slice(0, 10) }); flash('clip', t); };
@@ -1426,7 +1465,8 @@ class Component extends DCLogic {
     const prof = st.profile, game = prof === 'game', mini = prof === 'min';
     const SPR = 'cubic-bezier(.34,1.32,.64,1)', OUT = 'cubic-bezier(.22,1,.36,1)';
     const D = game ? 0.25 : 0.32;
-    const ISL = `background:rgba(17,17,19,.85);${game ? '' : 'backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);'}border:1px solid #2e2e33;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);`;
+    const THV = this.themeVals();
+    const ISL = `background:${THV.islBg};${game ? '' : 'backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);'}border:1px solid #2e2e33;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);`;
     const hide = this.autohide() && !st.barShown && !st.menu && !st.right;
     const unlocked = st.lock === 'off';
 
@@ -1461,7 +1501,7 @@ class Component extends DCLogic {
       win[id] = {
         open: true, title: this.meta[id].title, pinned: w.pinned && !w.min,
         cover: !!w.min, handles: !w.min && !w.max,
-        box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:#0e0e10;box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .26s ease both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .45s cubic-bezier(.2,1.1,.3,1) both;' : '')}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
+        box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:${THV.surface};box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .26s ease both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .45s cubic-bezier(.2,1.1,.3,1) both;' : '')}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
         inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform .46s ${SPR};${w.min ? 'pointer-events:none;' : ''}`
       };
     });
@@ -1967,6 +2007,7 @@ class Component extends DCLogic {
         this.setState({ shelf: [...this.state.shelf.filter((x) => !names.has(x.name)), ...add], shDrag: false, hoverPill: 'isl' });
       },
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
+      thBg: this.themeVals().bg, thAccent: this.themeVals().accent, thId: this.themeVals().id, thTint: this.themeVals().tint, thLevel: String(this.themeVals().level), thSurface: this.themeVals().surface,
       onLevel: this.onLevel, labAction: this.labAction, onWall: this.onWall, reveal: st.reveal || 0, onWaveSet: this.onWaveSet, waveOn: st.waveOn !== false, curWall: typeof st.curWall === 'number' ? st.curWall : 4, wallReq: st.wallReq || '',
       winMin: () => active !== 'desk' && this.minWin(active), winMax: () => active !== 'desk' && this.maxWin(active), winClose: () => active !== 'desk' && this.closeWin(active),
       callMic: () => this.setState({ call: { ...st.call, muted: !st.call.muted } }), callEnd: () => this.setState({ call: null }),

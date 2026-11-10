@@ -100,7 +100,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 </style>
 </helmet>
 
-<div data-root="1" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #050506; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
+<div data-root="1" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: {{tBg}}; transition: background .5s; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
 
   <!-- ================= SCREEN ================= -->
   <div style="{{screenBox}}">
@@ -260,7 +260,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
     <!-- dock -->
     <div aria-hidden="true" onMouseEnter="{{peekOn}}" style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; z-index: 9"></div>
     <div onMouseEnter="{{peekOn}}" onMouseLeave="{{dockLeave}}" style="{{dockWrap}}">
-      <nav aria-label="Док" style="width: 720px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-evenly; gap: 4px; padding: 7px 14px; border-radius: 19px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)">
+      <nav aria-label="Док" style="width: 720px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-evenly; gap: 4px; padding: 7px 14px; border-radius: 19px; background: {{dockBg}}; transition: background .5s; backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)">
         <button class="dock-btn" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
           <span style="{{dk.files.tip}}">Проводник</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}};background:#1c1c1f">
@@ -1203,7 +1203,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
   </nav>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   /* Plasma calendar: MonthView (InfiniteList, 200 ms), Days/Months/Years swipe */
   calStep(d) {
@@ -1331,7 +1331,8 @@ class Component extends DCLogic {
     const W = this.walls();
     const curWall = st.front === 'A' ? st.wallA : st.wallB;
     const wall = W[curWall];
-    const accent = st.accentOv || wall.accent;
+    const accent = this.props.themeAccent || st.accentOv || wall.accent;
+    const tBg = this.props.themeBg || '#050506', tSurf = this.props.themeSurface || '#141416';
     const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
     const T = 'transition:background .6s ease,color .6s ease,box-shadow .6s ease';
 
@@ -1418,7 +1419,7 @@ class Component extends DCLogic {
       : TT(['width'], 0.7, eOut) + ',' + TT(['height', 'clip-path'], 0.62, eOut);
     const drop = {
       box: `position:absolute;top:40px;left:${bl.toFixed(1)}px;width:${bw}px;height:${bh}px;z-index:44;${this.props.bare ? 'display:none;' : ''}pointer-events:${grown ? 'auto' : 'none'};filter:drop-shadow(0 14px 22px rgba(0,0,0,.35));transition:${boxTr}`,
-      body: `position:absolute;left:0;top:0;width:${bw}px;height:${bh + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquid(bw, bh + 2, exp)}');transition:${bodyTr}`,
+      body: `position:absolute;left:0;top:0;width:${bw}px;height:${bh + 2}px;overflow:hidden;background:${tBg};clip-path:path('${liquid(bw, bh + 2, exp)}');transition:${bodyTr}`,
       fl: 'display:none', fr: 'display:none'
     };
 
@@ -1899,7 +1900,9 @@ class Component extends DCLogic {
       snip: `width:100%;box-sizing:border-box;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.04);font:${cur2.mono ? "500 10px 'JetBrains Mono',monospace" : '400 11px Inter,sans-serif'};line-height:1.45;max-height:58px;overflow:hidden;color:#c9c9cf;white-space:pre-wrap`,
       action: cur2.cmd ? 'Выполнить' : 'Открыть'
     } : { box: 'display:none', meta: [] };
+    const dockBg = (() => { const n = parseInt(tSurf.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.74)`; })();
     return {
+      tBg, dockBg,
       greet, recent, hits, homeHits: hits.length > 0, pv, noHits: !!hq && found.length === 0,
       homeKey: (e) => {
         const n = (this.hFound || []).length;
@@ -1914,7 +1917,7 @@ class Component extends DCLogic {
         const tt = on ? `height .75s ${e2},clip-path .75s ${e2}` : `height .42s ${e3},clip-path .42s ${e3}`;
         return {
           box: `position:absolute;left:${-10 - SS}px;top:40px;width:${w}px;height:${h}px;pointer-events:${on ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${on ? `.75s ${e2}` : `.42s ${e3}`}`,
-          body: `position:absolute;left:0;top:0;width:${w}px;height:${h + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquid(w, h + 2, true)}');transition:${tt}`,
+          body: `position:absolute;left:0;top:0;width:${w}px;height:${h + 2}px;overflow:hidden;background:${tBg};clip-path:path('${liquid(w, h + 2, true)}');transition:${tt}`,
           list: `position:absolute;left:${SS + 6}px;top:8px;width:${cw2 - 12}px;height:${Math.max(0, h - 20)}px;display:flex;gap:8px;opacity:${on ? 1 : 0};filter:blur(${on ? 0 : 6}px);transform:translateY(${on ? 0 : -16}px);transition:opacity ${on ? '.4s ease .2s' : '.14s'},filter ${on ? '.45s ease .18s' : '.14s'},transform ${on ? `.8s ${e2} .06s` : '.3s ease'}`
         };
       })(),
