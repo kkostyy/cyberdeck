@@ -110,7 +110,7 @@ body{margin:0;background:#050506}
         <div style="margin-top: auto; padding: 12px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px">
           <div style="display: flex; align-items: center; gap: 10px">
             <button aria-label="Погладить {{petName}}" onClick="{{petTap}}" style="{{petMini}}">
-              <sc-if value="{{isPx}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="64" height="64" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
+              <sc-if value="{{isCustom}}" hint-placeholder-val="{{false}}"><img alt="" src="{{customSrc}}" style="{{customMini}}"></sc-if><sc-if value="{{isPx}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="64" height="64" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
                 <sc-for list="{{petLayers}}" as="L" hint-placeholder-count="8"><path d="{{L.d}}" fill="{{L.fill}}" style="{{L.style}}"></path></sc-for>
               </svg></sc-if><sc-if value="{{isDrop}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="64" height="64" viewBox="0 0 64 64" style="display: block; overflow: visible; filter: {{dpv.glow}}">
           <ellipse cx="32" cy="60" rx="16" ry="3.2" fill="rgba(0,0,0,.5)"></ellipse>
@@ -139,12 +139,15 @@ body{margin:0;background:#050506}
               <span aria-label="Сытость {{petFood}}%" style="width: 110px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{petFoodBar}}"></span></span>
             </div>
           </div>
-          <div role="radiogroup" aria-label="Питомец" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.05)">
+          <div role="radiogroup" aria-label="Питомец" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.05)">
             <sc-for list="{{kinds}}" as="kd" hint-placeholder-count="2">
               <button role="radio" aria-checked="{{kd.on}}" onClick="{{kd.pick}}" style="{{kd.style}}">{{kd.name}}</button>
             </sc-for>
           </div>
-          <div role="radiogroup" aria-label="Цвет питомца" style="display: flex; gap: 6px">
+          <sc-if value="{{isCustom}}" hint-placeholder-val="{{false}}">
+            <button class="cl-b" onClick="{{customOpen}}" style="height: 28px; border-radius: 9px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.07); color: #e8e8ec; border: 0">Картинки и состояния…</button>
+          </sc-if>
+          <div role="radiogroup" aria-label="Цвет питомца" style="{{colorRow}}">
             <sc-for list="{{petColors}}" as="pc" hint-placeholder-count="4">
               <button role="radio" aria-checked="{{pc.on}}" aria-label="{{pc.name}}" onClick="{{pc.pick}}" style="{{pc.style}}"></button>
             </sc-for>
@@ -319,6 +322,50 @@ body{margin:0;background:#050506}
         </div>
       </aside>
     </div>
+
+    <!-- custom pet dialog -->
+    <sc-if value="{{cp.open}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); animation: clIn .2s ease both">
+        <div role="dialog" aria-label="Свой питомец" style="width: 760px; max-height: 720px; display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 22px; background: #141416; border: 1px solid #2e2e33; box-shadow: 0 40px 100px rgba(0,0,0,0.7); animation: clPop .3s cubic-bezier(.22,1,.36,1) both">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 17px; font-weight: 700">Свой питомец</span>
+              <span style="font-size: 12.5px; color: #8b8b93">Картинки хранятся только в этом браузере и никуда не отправляются</span>
+            </div>
+            <button class="cl-b" aria-label="Закрыть" onClick="{{cp.close}}" style="margin-left: auto; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+            <label class="cl-b" style="height: 36px; padding: 0 14px; border-radius: 11px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; background: #f2f2f4; color: #111113; cursor: pointer">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"></path></svg>
+              Загрузить картинки…
+              <input type="file" accept="image/png,image/gif,image/webp,image/jpeg" multiple onChange="{{cp.upload}}" style="display: none">
+            </label>
+            <button role="switch" aria-checked="{{cp.bg}}" onClick="{{cp.toggleBg}}" style="height: 36px; padding: 0 8px 0 12px; border-radius: 11px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.05); color: #e8e8ec; border: 0">Убрать однотонный фон<span style="{{cp.sw.track}}"><span style="{{cp.sw.knob}}"></span></span></button>
+            <button role="switch" aria-checked="{{cp.px}}" onClick="{{cp.togglePx}}" style="height: 36px; padding: 0 8px 0 12px; border-radius: 11px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.05); color: #e8e8ec; border: 0">Пиксельная графика<span style="{{cp.sw2.track}}"><span style="{{cp.sw2.knob}}"></span></span></button>
+            <button class="cl-b" onClick="{{cp.clear}}" style="margin-left: auto; height: 36px; padding: 0 12px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,123,123,0.12); color: #ff9b9b; border: 0">Удалить всё</button>
+          </div>
+          <span style="font-size: 12.5px; color: #a1a1a8">1. Выберите состояние. 2. Нажмите на картинку для него. Без своей картинки показывается «Ждёт».</span>
+          <div role="radiogroup" aria-label="Состояние" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+            <sc-for list="{{cp.states}}" as="sx" hint-placeholder-count="8">
+              <button role="radio" aria-checked="{{sx.on}}" onClick="{{sx.pick}}" style="{{sx.style}}">
+                <span style="{{sx.thumb}}"><img alt="" src="{{sx.src}}" style="{{sx.img}}"></span>
+                <span style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0"><span style="font-size: 12.5px; font-weight: 600">{{sx.name}}</span><span style="font-size: 11px; color: #8b8b93">{{sx.note}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+          <div class="cl-scroll" style="flex: 1; min-height: 120px; max-height: 330px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; padding: 2px">
+            <sc-for list="{{cp.images}}" as="im" hint-placeholder-count="6">
+              <button aria-label="{{im.name}}" title="{{im.name}}" onClick="{{im.pick}}" style="{{im.style}}"><img alt="" src="{{im.src}}" style="{{im.img}}"><span style="{{im.badge}}">{{im.uses}}</span></button>
+            </sc-for>
+            <sc-if value="{{cp.empty}}" hint-placeholder-val="{{true}}"><span style="grid-column: 1 / -1; padding: 40px 0; text-align: center; font-size: 13px; color: #6f6f77">Загрузите PNG, GIF или WebP. Можно сразу много файлов.</span></sc-if>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="font-size: 12px; color: {{cp.noteColor}}">{{cp.note}}</span>
+            <button class="cl-b" onClick="{{cp.done}}" style="margin-left: auto; height: 38px; padding: 0 18px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
   </section>
 </div>
 </x-dc>
@@ -483,8 +530,82 @@ class Component extends DCLogic {
       glow: busy ? `drop-shadow(0 0 10px ${c1})` : 'none' };
   }
   setPose(p) { if (this.state.pose !== p) { this.setState({ pose: p }); this.act('pet:tool:' + (p || 'none')); } }
+  /* ---------- custom pet: user images, stored only in this browser ---------- */
+  CP_KEY = 'ashenos.customPet.v1';
+  loadPack() { try { const r = localStorage.getItem(this.CP_KEY); if (r) return JSON.parse(r); } catch (e) {} return null; }
+  savePack(pack) {
+    window.__ashenPetPack = pack;
+    let ok = true;
+    try { localStorage.setItem(this.CP_KEY, JSON.stringify(pack)); } catch (e) { ok = false; }
+    this.setState({ pack, cpNote: ok ? `Сохранено: ${pack.images.length} ${pack.images.length === 1 ? 'картинка' : 'картинок'}` : 'Не всё поместилось в память браузера — после перезагрузки страницы картинки придётся загрузить снова', cpWarn: !ok });
+    this.act('pet:custom');
+  }
+  procImage(raw, bg) {
+    return new Promise((res) => {
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 192 / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * k)), h = Math.max(1, Math.round(img.height * k));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const x = c.getContext('2d'); x.imageSmoothingEnabled = k === 1 ? false : true; x.drawImage(img, 0, 0, w, h);
+        if (bg) {
+          const d = x.getImageData(0, 0, w, h), p = d.data;
+          const cs = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]].map(([cx, cy]) => { const i = (cy * w + cx) * 4; return [p[i], p[i + 1], p[i + 2], p[i + 3]]; }).filter((q) => q[3] > 200);
+          if (cs.length) {
+            const [r0, g0, b0] = cs[0];
+            /* flood-fill from the edges so only the outer background is removed */
+            const seen = new Uint8Array(w * h), st = [];
+            for (let i = 0; i < w; i++) { st.push(i, (h - 1) * w + i); }
+            for (let j = 0; j < h; j++) { st.push(j * w, j * w + w - 1); }
+            while (st.length) {
+              const n = st.pop(); if (seen[n]) continue; seen[n] = 1;
+              const i = n * 4; if (Math.abs(p[i] - r0) + Math.abs(p[i + 1] - g0) + Math.abs(p[i + 2] - b0) > 42) continue;
+              p[i + 3] = 0; const cx = n % w, cy = (n / w) | 0;
+              if (cx > 0) st.push(n - 1); if (cx < w - 1) st.push(n + 1); if (cy > 0) st.push(n - w); if (cy < h - 1) st.push(n + w);
+            }
+            x.putImageData(d, 0, 0);
+          }
+        }
+        res(c.toDataURL('image/png'));
+      };
+      img.onerror = () => res(null);
+      img.src = raw;
+    });
+  }
+  onUpload = async (e) => {
+    const files = Array.from((e && e.target && e.target.files) || []);
+    if (!files.length) return;
+    const pack = this.state.pack ? { ...this.state.pack, images: this.state.pack.images.slice(), map: { ...this.state.pack.map } } : { images: [], map: {}, bg: true, px: true };
+    this.setState({ cpNote: `Обрабатываю ${files.length}…`, cpWarn: false });
+    for (const f of files) {
+      const raw0 = await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.onerror = () => r(null); fr.readAsDataURL(f); });
+      if (!raw0) continue;
+      const raw = await this.procImage(raw0, false);
+      const src = pack.bg ? await this.procImage(raw0, true) : raw;
+      if (!raw || !src) continue;
+      const id = 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      pack.images.push({ id, name: f.name.replace(/\.[a-z0-9]+$/i, ''), raw, src });
+      if (!pack.map.idle) pack.map.idle = id;
+    }
+    if (e && e.target) e.target.value = '';
+    this.savePack(pack);
+  };
+  async reprocess(bg) {
+    const p = this.state.pack; if (!p) return;
+    const images = [];
+    for (const im of p.images) images.push({ ...im, src: bg ? await this.procImage(im.raw, true) : im.raw });
+    this.savePack({ ...p, images, bg });
+  }
+  customSrcFor(pose) {
+    const p = this.state.pack; if (!p || !p.images.length) return '';
+    const id = p.map[pose] || p.map.idle || p.images[0].id;
+    const im = p.images.find((x) => x.id === id) || p.images[0];
+    return im.src;
+  }
   componentDidMount() {
     this._len = 0;
+    const pk = this.loadPack(); if (pk) { window.__ashenPetPack = pk; this.setState({ pack: pk }); }
+    try { const k = localStorage.getItem('ashenos.petKind'); if (k && (k !== 'custom' || pk)) this.setState({ petKind: k }); } catch (e) {}
     this.spinTick = setInterval(() => { if (this.state.busy) this.setState({ spinT: this.state.spinT + 1 }); }, 110);
     this.foodTick = setInterval(() => { const f = this.state.food; if (f > 0) this.setState({ food: f - 1 }); }, 9000);
   }
@@ -763,10 +884,43 @@ class Component extends DCLogic {
         style: `width:100%;padding:8px 10px;border-radius:11px;display:flex;flex-direction:column;gap:2px;border:0;color:#e8e8ec;background:${i === st.sess ? 'rgba(255,255,255,.08)' : 'transparent'}` })),
       projects: this.PROJ.map((p, i) => ({ name: p.replace('~/Проекты/', ''), pick: () => { this.setState({ proj: i }); this.push({ k: 'note', text: `Рабочая папка: ${p}`, color: '#a1a1a8' }); },
         style: `height:32px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:8px;font:500 12.5px 'JetBrains Mono',monospace;border:0;color:${i === st.proj ? '#f2f2f4' : '#a1a1a8'};background:${i === st.proj ? 'rgba(255,255,255,.06)' : 'transparent'}` })),
-      isPx: st.petKind !== 'drop', isDrop: st.petKind === 'drop', dpv: this.dropView(st.pose || (st.petHop % 2 && Date.now() - (this._hopAt || 0) < 900 ? 'happy' : 'idle'), st.petColor, false),
-      kinds: [['px', 'Уголёк'], ['drop', 'Капелька']].map(([id, name]) => ({ name, on: st.petKind === id, pick: () => { this.setState({ petKind: id, petColor: id === 'drop' && st.petColor === 'ember' ? 'frost' : st.petColor }); this.act('pet:kind:' + id); if (id === 'drop' && st.petColor === 'ember') this.act('pet:color:frost'); },
+      isPx: st.petKind === 'px' || !st.petKind, isDrop: st.petKind === 'drop', isCustom: st.petKind === 'custom',
+      customSrc: this.customSrcFor(st.pose || (st.petHop % 2 && Date.now() - (this._hopAt || 0) < 900 ? 'happy' : 'idle')) || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+      customMini: `width:64px;height:64px;object-fit:contain;display:block;${st.pack && st.pack.px !== false ? 'image-rendering:pixelated;' : ''}animation:petBob 2.4s ease-in-out infinite;transform-origin:50% 100%`,
+      colorRow: `display:${st.petKind === 'custom' ? 'none' : 'flex'};gap:6px`,
+      customOpen: () => this.setState({ cpOpen: true, cpState: this.state.cpState || 'idle' }),
+      cp: (() => {
+        const pk = st.pack || { images: [], map: {}, bg: true, px: true };
+        const sel = st.cpState || 'idle';
+        const srcOf = (id) => { const im = pk.images.find((x) => x.id === id); return im ? im.src : ''; };
+        const uses = (id) => Object.keys(pk.map).filter((k) => pk.map[k] === id).length;
+        const sw = (on) => ({ track: `width:34px;height:20px;flex:none;border-radius:10px;padding:2px;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:16px;height:16px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 14 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+        const NOTE = { idle: 'основная картинка', work: 'Bash, тесты, код', search: 'Read, Grep', cook: 'Edit, Write', think: 'ждёт разрешения', pay: 'команда /cost', happy: 'готово, погладили', sleep: '40 с без дела' };
+        return { open: !!st.cpOpen, bg: pk.bg !== false, px: pk.px !== false, sw: sw(pk.bg !== false), sw2: sw(pk.px !== false), empty: !pk.images.length,
+          note: st.cpNote || 'Можно загрузить сразу все картинки, а потом раскладывать по состояниям', noteColor: st.cpWarn ? '#ff9b6b' : '#8b8b93',
+          close: () => this.setState({ cpOpen: false }), done: () => { this.setState({ cpOpen: false }); if (this.state.petKind === 'custom') this.act('pet:custom'); },
+          upload: this.onUpload,
+          toggleBg: () => { if (st.pack) this.reprocess(!(st.pack.bg !== false)); },
+          togglePx: () => { if (st.pack) this.savePack({ ...st.pack, px: !(st.pack.px !== false) }); },
+          clear: () => { try { localStorage.removeItem(this.CP_KEY); } catch (e) {} window.__ashenPetPack = null; this.setState({ pack: null, cpNote: 'Удалено' }); this.act('pet:custom'); },
+          states: [['idle', 'Ждёт / отдыхает'], ['work', 'Работает'], ['search', 'Ищет'], ['cook', 'Правит файл'], ['think', 'Думает'], ['pay', 'Считает'], ['happy', 'Радуется'], ['sleep', 'Спит']].map(([id, name]) => {
+            const src = srcOf(pk.map[id]) || srcOf(pk.map.idle);
+            return { name, note: pk.map[id] ? NOTE[id] : (id === 'idle' ? NOTE[id] : 'как «Ждёт»'), on: sel === id, src: src || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+              pick: () => this.setState({ cpState: id }),
+              thumb: `width:34px;height:34px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);overflow:hidden;opacity:${pk.map[id] || id === 'idle' ? 1 : .45}`,
+              img: `width:30px;height:30px;object-fit:contain;${pk.px !== false ? 'image-rendering:pixelated;' : ''}${src ? '' : 'display:none'}`,
+              style: `height:48px;padding:0 8px;border-radius:12px;display:flex;align-items:center;gap:8px;border:0;text-align:left;color:#e8e8ec;background:${sel === id ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)'};box-shadow:${sel === id ? 'inset 0 0 0 1.5px #f2f2f4' : 'none'};transition:background .2s,box-shadow .2s` };
+          }),
+          images: pk.images.map((im) => { const on = pk.map[sel] === im.id; const n = uses(im.id);
+            return { name: im.name, src: im.src, uses: n ? String(n) : '',
+              pick: () => { const p2 = this.state.pack; if (!p2) return; const map = { ...p2.map }; if (map[sel] === im.id && sel !== 'idle') delete map[sel]; else map[sel] = im.id; this.savePack({ ...p2, map }); },
+              img: `width:100%;height:64px;object-fit:contain;${pk.px !== false ? 'image-rendering:pixelated;' : ''}`,
+              badge: `position:absolute;right:4px;top:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;font:700 10px Inter,sans-serif;display:${n ? 'flex' : 'none'};align-items:center;justify-content:center;background:#f2f2f4;color:#111113`,
+              style: `position:relative;padding:6px;border-radius:12px;border:0;background:${on ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.04)'};box-shadow:${on ? 'inset 0 0 0 2px #f2f2f4' : 'none'};transition:background .15s,box-shadow .15s` }; }) };
+      })(), dpv: this.dropView(st.pose || (st.petHop % 2 && Date.now() - (this._hopAt || 0) < 900 ? 'happy' : 'idle'), st.petColor, false),
+      kinds: [['px', 'Уголёк'], ['drop', 'Капелька'], ['custom', 'Свой']].map(([id, name]) => ({ name, on: st.petKind === id, pick: () => { try { localStorage.setItem('ashenos.petKind', id); } catch (e) {} if (id === 'custom' && !(st.pack && st.pack.images.length)) { this.setState({ petKind: id, cpOpen: true, cpState: 'idle' }); this.act('pet:kind:custom'); return; } this.setState({ petKind: id, petColor: id === 'drop' && st.petColor === 'ember' ? 'frost' : st.petColor }); this.act('pet:kind:' + id); if (id === 'drop' && st.petColor === 'ember') this.act('pet:color:frost'); },
         style: `height:28px;border-radius:8px;border:0;font-size:12px;font-weight:600;transition:background .2s,color .2s;background:${st.petKind === id ? '#f2f2f4' : 'transparent'};color:${st.petKind === id ? '#111113' : '#a1a1a8'}` })),
-      pet: { c1: pet[1], c2: pet[2] }, petLayers: this.pxSprite(st.pose || (st.food < 20 ? 'think' : 'idle'), st.petColor, false), petName: st.petKind === 'drop' ? 'Капелька' : pet[0], petMood: mood, petFood: food,
+      pet: { c1: pet[1], c2: pet[2] }, petLayers: this.pxSprite(st.pose || (st.food < 20 ? 'think' : 'idle'), st.petColor, false), petName: st.petKind === 'drop' ? 'Капелька' : st.petKind === 'custom' ? 'Свой питомец' : pet[0], petMood: mood, petFood: food,
       petFoodBar: `display:block;height:100%;width:${food}%;border-radius:3px;background:${food < 25 ? '#ff7b7b' : pet[1]};transition:width .5s,background .3s`,
       petMini: `width:64px;height:64px;flex:none;border:0;background:none;padding:0;${st.petHop ? `animation:clHop .45s cubic-bezier(.3,1.4,.5,1)` : ''}`,
       petColors: Object.keys(this.PETS).map((k) => ({ name: this.PETS[k][0], on: k === st.petColor,

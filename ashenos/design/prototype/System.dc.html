@@ -703,6 +703,9 @@ body{margin:0;background:#050506}
           </sc-for>
         </svg>
         </sc-if>
+        <sc-if value="{{pet.isCustom}}" hint-placeholder-val="{{false}}">
+          <img alt="" src="{{pet.cSrc}}" draggable="false" style="{{pet.cImg}}">
+        </sc-if>
         <sc-if value="{{pet.isDrop}}" hint-placeholder-val="{{false}}">
         <svg aria-hidden="true" width="96" height="96" viewBox="0 0 64 64" style="display: block; overflow: visible; filter: {{pet.dp.glow}}">
           <ellipse cx="32" cy="60" rx="16" ry="3.2" fill="rgba(0,0,0,.5)"></ellipse>
@@ -1008,6 +1011,14 @@ class Component extends DCLogic {
       think: `display:${think ? 'inline' : 'none'}`,
       glow: busy ? `drop-shadow(0 0 10px ${c1})` : 'none' };
   }
+  loadPack() { try { const r = localStorage.getItem('ashenos.customPet.v1'); if (r) return JSON.parse(r); } catch (e) {} return null; }
+  packSrc(pose) {
+    const p = this.customPack || (this.customPack = window.__ashenPetPack || this.loadPack());
+    if (!p || !p.images || !p.images.length) return '';
+    const id = p.map[pose] || p.map.idle || p.images[0].id;
+    const im = p.images.find((x) => x.id === id) || p.images[0];
+    return im.src;
+  }
   PETS = { ember: ['Уголёк', '#ff8a3d', '#ffd27a'], frost: ['Ледок', '#5aa8ff', '#c9e6ff'], moss: ['Мох', '#59c27a', '#c8f0a8'], ash: ['Пепел', '#b9b9c2', '#f2f2f4'] };
   PHRASES = ['Привет!', 'Мур-р', 'Я тёплый', 'Погладь ещё', 'Что делаем?', 'Пепел — это стиль', 'Хочу печеньку'];
   petPatch(p) { this.setState({ pet: { ...this.state.pet, ...p } }); }
@@ -1040,6 +1051,7 @@ class Component extends DCLogic {
     const st = this.state, now = Date.now();
     if (id.startsWith('pet:')) {
       const [, cmd, arg] = id.split(':');
+      if (cmd === 'custom') { this.customPack = window.__ashenPetPack || this.loadPack(); this.forceUpdate(); return; }
       if (cmd === 'on') { this.petPatch({ on: true, color: arg || st.pet.color, at: now }); setTimeout(() => this.petSay('Я тут!', true), 450); }
       else if (cmd === 'off') this.petPatch({ on: false });
       else if (cmd === 'kind') { this.petPatch({ kind: arg }); if (st.pet.on) this.petSay(arg === 'drop' ? 'Я Капелька!' : 'Я Уголёк!', true); }
@@ -1869,7 +1881,9 @@ class Component extends DCLogic {
         const pt = st.pet, P = this.PETS[pt.color] || this.PETS.ember, t = Date.now();
         const walking = pt.walkTo > t, sleeping = !pt.busy && t - pt.at > 40000, saying = pt.say && t - pt.sayAt < 2600;
         const poseNow = sleeping ? 'sleep' : pt.tool ? pt.tool : saying ? 'happy' : 'idle';
-        return { on: !!pt.on && st.lock === 'off', isPx: pt.kind !== 'drop', isDrop: pt.kind === 'drop', dp: this.dropView(poseNow, pt.color, walking && !pt.tool), name: pt.kind === 'drop' ? 'Капелька' : P[0], c1: P[1], c2: P[2], say: pt.say,
+        return { on: !!pt.on && st.lock === 'off', isPx: pt.kind === 'px' || !pt.kind || (pt.kind === 'custom' && !this.packSrc('idle')), isDrop: pt.kind === 'drop', isCustom: pt.kind === 'custom' && !!this.packSrc('idle'),
+          cSrc: pt.kind === 'custom' ? this.packSrc(poseNow) || 'data:image/gif;base64,R0lGODlhAQABAAAAACw=' : 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+          cImg: `width:96px;height:96px;object-fit:contain;display:block;pointer-events:none;${(this.customPack || {}).px !== false ? 'image-rendering:pixelated;' : ''}transform-origin:50% 100%;animation:${walking && !pt.tool ? 'petWalk .45s' : sleeping ? 'petBob 4s' : pt.tool && pt.tool !== 'think' ? 'petBob .9s' : saying ? 'petJig .5s' : 'petBob 2.4s'} ease-in-out infinite;filter:drop-shadow(0 6px 6px rgba(0,0,0,.45))`, dp: this.dropView(poseNow, pt.color, walking && !pt.tool), name: pt.kind === 'drop' ? 'Капелька' : P[0], c1: P[1], c2: P[2], say: pt.say,
           box: `position:absolute;left:${pt.x}px;top:${pt.y - 12}px;width:96px;height:96px;z-index:95;cursor:grab;transition:left 2.6s linear,top .6s ease;animation:petIn .5s cubic-bezier(.3,1.5,.5,1) both;filter:drop-shadow(0 0 ${pt.busy ? 18 : 10}px ${P[1]}${pt.busy ? 'aa' : '55'})`,
           flip: `width:96px;height:96px;transform:scaleX(${pt.dir < 0 ? -1 : 1});transition:transform .25s;${pt.hop ? `animation:${pt.hop % 2 ? 'petHopA' : 'petHopB'} .7s cubic-bezier(.3,1.2,.5,1) both` : ''}`,
           layers: this.pxSprite(sleeping ? 'sleep' : pt.tool ? pt.tool : saying ? 'happy' : 'idle', pt.color, walking && !pt.tool),
