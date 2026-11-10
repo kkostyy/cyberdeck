@@ -165,4 +165,13 @@ Item {
             font.family: Theme.mono
         }
     }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 0
+        visible: root.which === "user"
+        T { text: root.st.user; font.weight: Font.Bold }
+        T { Layout.fillWidth: true; text: "@" + root.st.host; color: Theme.dim }
+    }
 }

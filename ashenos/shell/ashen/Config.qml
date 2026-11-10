@@ -34,6 +34,7 @@ Singleton {
             property int lockAfter: 300                     // seconds, 0 — never
             property int screenOffAfter: 450
             property bool dnd: false                        // notifications go to the list only
+            property bool warm: false                       // warm tint over the screen ("Тёплый")
             property bool barClaude: true
             property bool barSysmon: true
             // weather location; 0/0 — detect by IP

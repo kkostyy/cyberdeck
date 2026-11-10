@@ -14,7 +14,7 @@ PanelWindow {
     screen: modelData
 
     anchors { top: true; left: true; right: true }
-    implicitHeight: Theme.barH + 300
+    implicitHeight: Theme.barH + 360
     exclusiveZone: Theme.barH
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Top
@@ -30,11 +30,12 @@ PanelWindow {
 
     // [panel width, panel height, strip width]
     readonly property var spec: ({
-        clock: [440, 182, 170],
+        clock: [600, 206, 170],
         vol: [250, 132, 160],
         music: [270, 150, 200],
-        net: [250, 118, 170],
-        bt: [250, 70 + 34 * Math.min(3, Math.max(1, st.btDevices.length)), 170],
+        net: [300, 230, 170],
+        bt: [300, 230, 170],
+        user: [300, 318, 140],
         wx: [270, 150, 200],
         notif: [300, 210, 260],
         bright: [0, 0, 150],
@@ -45,28 +46,30 @@ PanelWindow {
     readonly property var cur: spec[hov || last]
     readonly property bool open: hov !== ""
 
+    // Hover pours a short strip; a click opens the panel, and it stays open
+    // until the same item is clicked again (or another item is clicked).
     function enter(id, item) {
         closer.stop();
+        if (exp) return;                             // a clicked panel is open — hovering doesn't touch it
         let p = item.mapToItem(barArea, item.width / 2, 0);
-        if (hov === "find" && exp) return;           // typing — don't steal the drop
-        if (hov !== id) exp = false;
         ax = p.x;
         hov = id;
         last = id;
     }
     function tap(id, item) {
         closer.stop();
+        if (exp && hov === id) { close(); return; }  // second click closes
         let p = item.mapToItem(barArea, item.width / 2, 0);
         ax = p.x;
-        exp = !(exp && hov === id);
+        exp = true;
         hov = id;
         last = id;
     }
     function close() { hov = ""; exp = false; }
-    function leave() { if (!(hov === "find" && exp)) closer.restart(); }
+    function leave() { if (!exp) closer.restart(); }  // only hover strips drain on their own
     // for keybinds and tests: `quickshell ipc call ashen open clock true`
     function itemFor(id) {
-        return ({ sys: sysItem, music: musicItem, vol: volItem, bright: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem,
+        return ({ sys: sysItem, music: musicItem, vol: volItem, bright: volItem, net: netItem, bt: netItem, wx: clockItem, clock: clockItem, user: userItem,
                   find: searchPill, clip: searchPill, notif: island })[id];
     }
     IpcHandler {
@@ -75,8 +78,8 @@ PanelWindow {
         function open(id: string, expanded: bool): void {
             let it = bar.itemFor(id);
             if (!it || !it.visible) return;
-            bar.enter(id, it);
-            if (expanded) bar.tap(id, it);
+            if (expanded) { if (!(bar.exp && bar.hov === id)) bar.tap(id, it); }
+            else bar.enter(id, it);
         }
         function close(): void { bar.close(); }
         // open the panel, or close it if it's already open
@@ -85,7 +88,6 @@ PanelWindow {
             if (id === "clip") bar.st.refreshClips();
             let it = bar.itemFor(id);
             if (!it || !it.visible) return;
-            bar.enter(id, it);
             bar.tap(id, it);
         }
         function volume(cmd: string): void {
@@ -346,12 +348,52 @@ PanelWindow {
                     Ring { value: bar.st.ram; Layout.rightMargin: -2 }
                     Ring { value: bar.st.temp / 85 }
                 }
+                // music: cover, title, little equalizer (prototype)
                 Item_ {
                     id: musicItem
                     dropId: "music"
                     visible: bar.st.player !== null
-                    Glyph { text: bar.st.playing ? "󰎈" : "󰏤"; font.pixelSize: 12 }
-                    Label { text: bar.st.trackTitle; Layout.maximumWidth: 90 }
+                    Rectangle {
+                        implicitWidth: 14; implicitHeight: 14; radius: 7
+                        color: Theme.cardSolid
+                        clip: true
+                        Image {
+                            anchors.fill: parent
+                            source: bar.st.trackArt
+                            sourceSize.width: 28
+                            fillMode: Image.PreserveAspectCrop
+                            visible: status === Image.Ready
+                        }
+                    }
+                    Label { text: bar.st.trackTitle; font.weight: Font.DemiBold; Layout.maximumWidth: 80 }
+                    Row {
+                        spacing: 1.5
+                        Layout.alignment: Qt.AlignVCenter
+                        Repeater {
+                            model: 3
+                            Rectangle {
+                                required property int index
+                                width: 2; height: 10; radius: 1
+                                anchors.bottom: parent.bottom
+                                color: Theme.text
+                                transformOrigin: Item.Bottom
+                                scale: 0.35
+                                SequentialAnimation on scale {
+                                    running: bar.st.playing
+                                    loops: Animation.Infinite
+                                    NumberAnimation { to: 1; duration: 380 + index * 140; easing.type: Easing.InOutSine }
+                                    NumberAnimation { to: 0.35; duration: 380 + index * 140; easing.type: Easing.InOutSine }
+                                }
+                            }
+                        }
+                    }
+                }
+                // on-screen keyboard; the layout letter replaces the icon when there are two layouts
+                Item_ {
+                    id: kbItem
+                    onActivated: Quickshell.execDetached(["bash", "-c", "if command -v osk >/dev/null; then osk toggle; else ~/.local/bin/osk toggle; fi"])
+                    Glyph { text: "󰌌"; font.pixelSize: 13; visible: bar.st.layout === "" || bar.st.layout === "EN" }
+                    Label { text: bar.st.layout; font.pixelSize: 10; font.weight: Font.Bold; visible: bar.st.layout !== "" && bar.st.layout !== "EN" }
                 }
                 Item_ {
                     id: volItem
@@ -359,26 +401,7 @@ PanelWindow {
                     Glyph { text: bar.st.muted ? "󰖁" : bar.st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
                     Label { text: Math.round(bar.st.volume * 100) + "%" }
                 }
-                // keyboard: shows the layout (Super+Space switches it); click — on-screen keyboard
-                Item_ {
-                    id: kbItem
-                    onActivated: Quickshell.execDetached(["bash", "-c", "if command -v osk >/dev/null; then osk toggle; else ~/.local/bin/osk toggle; fi"])
-                    Glyph { text: "󰌌"; font.pixelSize: 13; visible: bar.st.layout === "" }
-                    Label { text: bar.st.layout; font.pixelSize: 10; font.weight: Font.Bold; visible: bar.st.layout !== "" }
-                }
-                Item_ {
-                    id: wxItem
-                    dropId: "wx"
-                    visible: bar.st.weather !== null
-                    Glyph { text: bar.st.weather ? bar.st.wmoGlyph(bar.st.weather.code, bar.st.weather.day) : ""; font.pixelSize: 13 }
-                    Label { text: bar.st.weather ? Math.round(bar.st.weather.temp) + "°" : "" }
-                }
-                Item_ {
-                    id: btItem
-                    dropId: "bt"
-                    visible: bar.st.bt !== null
-                    Glyph { text: bar.st.btIcon; font.pixelSize: 13 }
-                }
+                // network and Bluetooth share one drop, as in the prototype
                 Item_ {
                     id: netItem
                     dropId: "net"
@@ -392,6 +415,30 @@ PanelWindow {
                         font.family: Theme.mono
                         font.pixelSize: 12
                         font.weight: Font.DemiBold
+                    }
+                }
+                // avatar → control centre
+                Item_ {
+                    id: userItem
+                    dropId: "user"
+                    Rectangle {
+                        implicitWidth: 17; implicitHeight: 17; radius: 9
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0; color: "#7a3a3a" }
+                            GradientStop { position: 0.5; color: "#3d5c8a" }
+                            GradientStop { position: 1; color: "#5b7fb0" }
+                        }
+                        border.color: Qt.rgba(1, 1, 1, 0.3)
+                        clip: true
+                        Image {
+                            anchors.fill: parent
+                            anchors.margins: 1
+                            visible: bar.st.face !== "" && status === Image.Ready
+                            source: bar.st.face !== "" ? "file://" + bar.st.face : ""
+                            sourceSize.width: 34
+                            fillMode: Image.PreserveAspectCrop
+                        }
                     }
                 }
             }

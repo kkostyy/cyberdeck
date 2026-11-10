@@ -2,6 +2,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 
 // AshenOS shell: black bezel frame, top bar with the island, and liquid drops.
 ShellRoot {
@@ -20,6 +21,17 @@ ShellRoot {
             Frame { screen: perScreen.modelData }
             Bar { modelData: perScreen.modelData; st: status }
             Dock { modelData: perScreen.modelData }
+            // "Тёплый": a click-through warm tint over everything (like the prototype's display filter)
+            PanelWindow {
+                screen: perScreen.modelData
+                visible: Config.data.warm
+                anchors { top: true; bottom: true; left: true; right: true }
+                exclusionMode: ExclusionMode.Ignore
+                color: Qt.rgba(1, 0.55, 0.15, 0.12)
+                mask: Region {}
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.namespace: "ashen-warm"
+            }
         }
     }
 

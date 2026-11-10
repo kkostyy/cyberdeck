@@ -3,21 +3,20 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// AshenOS black by default; if serpantinum's matugen palette exists, it is used
-// instead and updates live with the wallpaper.
+// Colours follow serpantinum's matugen palette and update live with the wallpaper.
 Singleton {
     id: theme
 
-    property color bg: "#050506"
-    property color panel: "#0b0b0d"
-    property color card: "#161619"
-    property color cardHi: "#222226"
-    property color border: "#3a3a40"
-    property color text: "#e8e8ec"
-    property color sub: "#a1a1a8"
-    property color dim: "#8b8b93"
-    property color accent: "#f2f2f4"
-    property color accentDeep: "#3a3a40"
+    property color bg: "#130d07"
+    property color panel: "#19120c"
+    property color card: "#261e18"
+    property color cardHi: "#312822"
+    property color border: "#3c332c"
+    property color text: "#efe0d5"
+    property color sub: "#d5c3b6"
+    property color dim: "#9e8e82"
+    property color accent: "#feb877"
+    property color accentDeep: "#6b3b03"
     property color error: "#ffb4ab"
     property color ok: "#c2cb98"
 

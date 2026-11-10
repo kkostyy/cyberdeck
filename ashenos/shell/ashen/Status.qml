@@ -44,22 +44,54 @@ Scope {
         onTriggered: if (st.player) st.player.positionChanged()
     }
 
-    // Wi-Fi via nmcli: "yes:SSID:SIGNAL"
+    // ── Wi-Fi via nmcli -t (fields split on unescaped ':') ──
     property string ssid: ""
     property int signal: 0
     property bool wifiOn: true
+    property string freq: ""
+    property string security: ""
+    property string ip: ""
+    property var networks: []          // [{ssid, signal, secure, active}] strongest first
+    property bool scanning: false
     readonly property string wifiIcon: !wifiOn ? "󰤮" : ssid === "" ? "󰤯"
         : signal > 75 ? "󰤨" : signal > 50 ? "󰤥" : signal > 25 ? "󰤢" : "󰤟"
+    function _nmSplit(line) {
+        let out = [], cur = "";
+        for (let i = 0; i < line.length; i++) {
+            let ch = line[i];
+            if (ch === "\\" && i + 1 < line.length) { cur += line[++i]; continue; }
+            if (ch === ":") { out.push(cur); cur = ""; continue; }
+            cur += ch;
+        }
+        out.push(cur);
+        return out;
+    }
     Process {
         id: wifiProc
-        command: ["bash", "-c", "export LC_ALL=C; nmcli -t -f WIFI radio; nmcli -t -f ACTIVE,SSID,SIGNAL dev wifi 2>/dev/null | grep '^yes:' | head -1"]
+        command: ["bash", "-c", "export LC_ALL=C; nmcli -t -f WIFI radio; nmcli -t -f ACTIVE,SSID,SIGNAL,FREQ,SECURITY dev wifi 2>/dev/null; echo ---; nmcli -g IP4.ADDRESS dev show $(nmcli -t -f DEVICE,TYPE dev | awk -F: '$2==\"wifi\"{print $1; exit}') 2>/dev/null | head -1"]
         stdout: StdioCollector {
             onStreamFinished: {
-                let lines = this.text.trim().split("\n");
+                let parts = this.text.split("---");
+                let lines = parts[0].trim().split("\n");
                 st.wifiOn = lines[0] === "enabled";
-                let a = (lines[1] || "").split(":");
-                st.ssid = a.length >= 3 ? a.slice(1, a.length - 1).join(":") : "";
-                st.signal = a.length >= 3 ? parseInt(a[a.length - 1]) || 0 : 0;
+                let seen = {}, nets = [], act = null;
+                for (let i = 1; i < lines.length; i++) {
+                    let f = st._nmSplit(lines[i]);
+                    if (f.length < 5) continue;
+                    let n = { active: f[0] === "yes", ssid: f[1], signal: parseInt(f[2]) || 0, freq: f[3], secure: f[4] !== "" && f[4] !== "--", security: f[4] };
+                    if (n.active) act = n;
+                    if (n.ssid === "" || seen[n.ssid]) continue;
+                    seen[n.ssid] = true;
+                    nets.push(n);
+                }
+                nets.sort((a, b) => (b.active - a.active) || (b.signal - a.signal));
+                st.networks = nets;
+                st.ssid = act ? act.ssid : "";
+                st.signal = act ? act.signal : 0;
+                st.freq = act ? act.freq : "";
+                st.security = act ? act.security : "";
+                st.ip = (parts[1] || "").trim().replace(/\/\d+$/, "");
+                st.scanning = false;
             }
         }
     }
@@ -69,7 +101,44 @@ Scope {
         st.wifiOn = on;
         wifiRefresh.restart();
     }
-    Timer { id: wifiRefresh; interval: 2500; onTriggered: wifiProc.running = true }
+    function scanWifi() {
+        st.scanning = true;
+        Quickshell.execDetached(["nmcli", "dev", "wifi", "rescan"]);
+        wifiRefresh.interval = 4000;
+        wifiRefresh.restart();
+    }
+    // known network: just connect; new secured one needs the password
+    function connectWifi(ssid, password) {
+        let cmd = ["nmcli", "dev", "wifi", "connect", ssid];
+        if (password) cmd.push("password", password);
+        Quickshell.execDetached(cmd);
+        wifiRefresh.interval = 6000;
+        wifiRefresh.restart();
+    }
+    Timer { id: wifiRefresh; interval: 2500; onTriggered: { interval = 2500; wifiProc.running = true; } }
+
+    // ── who and how long ──
+    readonly property string user: Quickshell.env("USER") || "user"
+    property string host: "ashenos"
+    property int uptime: 0                         // seconds
+    property string face: ""                       // ~/.face if present
+    Process {
+        id: whoProc
+        command: ["bash", "-c", "cat /etc/hostname; cut -d. -f1 /proc/uptime; for f in \"$HOME/.face\" \"$HOME/.face.icon\"; do [ -s \"$f\" ] && { echo \"$f\"; break; }; done"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let l = this.text.trim().split("\n");
+                if (l[0]) st.host = l[0].trim();
+                st.uptime = parseInt(l[1]) || 0;
+                st.face = l[2] || "";
+            }
+        }
+    }
+    Timer { interval: 60000; running: true; repeat: true; triggeredOnStart: true; onTriggered: whoProc.running = true }
+    readonly property string uptimeText: {
+        let h = Math.floor(uptime / 3600), m = Math.floor(uptime % 3600 / 60);
+        return "работает " + (h > 0 ? h + " ч " : "") + m + " мин";
+    }
 
     // ── notifications: we are the notification server ──
     signal notified(var n)
