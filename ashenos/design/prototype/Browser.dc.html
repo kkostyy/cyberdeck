@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Браузер</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+.bw-b{transition:background .15s,transform .2s cubic-bezier(.3,1.6,.5,1),color .15s}
+.bw-b:hover{background:rgba(255,255,255,.08)}
+.bw-b:active{transform:scale(.93)}
+.bw-tile{transition:transform .25s cubic-bezier(.3,1.4,.5,1),background .2s}
+.bw-tile:hover{transform:translateY(-4px);background:rgba(255,255,255,.08)}
+.bw-in::placeholder{color:#6f6f77}
+.bw-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+@keyframes bwPageA{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes bwPageB{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes bwLoadA{0%{transform:scaleX(0);opacity:1}70%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes bwLoadB{0%{transform:scaleX(0);opacity:1}70%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes bwTab{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 0%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Браузер" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(16,16,18,0.97); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+
+    <!-- tabs -->
+    <div style="height: 48px; flex: none; display: flex; align-items: flex-end; gap: 4px; padding: 0 10px 0 14px">
+      <div role="tablist" aria-label="Вкладки" style="flex: 1; min-width: 0; display: flex; align-items: flex-end; gap: 4px; height: 40px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+          <div role="tab" aria-selected="{{t.on}}" style="{{t.style}}">
+            <button onClick="{{t.pick}}" style="flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 8px; background: none; border: 0; color: inherit; padding: 0; text-align: left">
+              <span aria-hidden="true" style="{{t.ico}}">{{t.glyph}}</span>
+              <span style="flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.title}}</span>
+            </button>
+            <button class="bw-b" aria-label="Закрыть вкладку {{t.title}}" onClick="{{t.close}}" style="width: 22px; height: 22px; flex: none; border-radius: 7px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #8b8b93"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+        </sc-for>
+        <button class="bw-b" aria-label="Новая вкладка" onClick="{{newTab}}" style="width: 32px; height: 32px; margin-bottom: 4px; flex: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #c9c9cf"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2px; padding-bottom: 4px">
+        <button class="bw-b" aria-label="Свернуть" onClick="{{minApp}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        <button class="bw-b" aria-label="Развернуть" onClick="{{maxApp}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="3"></rect></svg></button>
+        <button class="bw-b" aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+    </div>
+
+    <!-- toolbar -->
+    <div style="height: 56px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); position: relative">
+      <button class="bw-b" aria-label="Назад" onClick="{{back}}" style="{{backSt}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></button>
+      <button class="bw-b" aria-label="Вперёд" onClick="{{fwd}}" style="{{fwdSt}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg></button>
+      <button class="bw-b" aria-label="Обновить" onClick="{{reload}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #e8e8ec"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"></path></svg></button>
+      <button class="bw-b" aria-label="Домой" onClick="{{home}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #e8e8ec"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></button>
+      <div style="flex: 1; min-width: 0; position: relative; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 14px; border-radius: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08)">
+        <span aria-label="{{shieldLabel}}" title="{{shieldLabel}}" style="{{shieldSt}}">{{shieldTx}}</span>
+        <input id="bw-url" class="bw-in" aria-label="Адрес или поиск" placeholder="Введите адрес или запрос" value="{{urlDraft}}" onInput="{{onUrl}}" onKeyDown="{{onUrlKey}}" onFocus="{{urlFocus}}" autocomplete="off" spellcheck="false" style="flex: 1; min-width: 0; height: 100%; background: none; border: 0; outline: none; color: #f2f2f4; font: 500 13.5px 'JetBrains Mono', monospace">
+        <button class="bw-b" aria-label="{{starLabel}}" aria-pressed="{{starred}}" onClick="{{toggleStar}}" style="{{starSt}}">★</button>
+        <span aria-hidden="true" style="{{loadBar}}"></span>
+      </div>
+      <button class="bw-b" aria-label="Загрузки" onClick="{{goDownloads}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #e8e8ec"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg></button>
+      <button class="bw-b" aria-label="История" onClick="{{goHistory}}" style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: none; border: 0; color: #e8e8ec"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg></button>
+      <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+    </div>
+
+    <!-- bookmarks -->
+    <div style="{{bmBar}}">
+      <sc-for list="{{bookmarks}}" as="b" hint-placeholder-count="4">
+        <button class="bw-b" onClick="{{b.go}}" style="height: 28px; padding: 0 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: #c9c9cf; background: none; border: 0; white-space: nowrap"><span aria-hidden="true" style="{{b.ico}}">{{b.glyph}}</span>{{b.title}}</button>
+      </sc-for>
+      <sc-if value="{{bmEmpty}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; color: #6f6f77; padding: 0 8px">Нажмите ★ в адресной строке, чтобы добавить закладку</span></sc-if>
+    </div>
+
+    <!-- page -->
+    <main class="bw-scroll" style="{{pageWrap}}">
+      <div style="{{pageAnim}}">
+        <sc-if value="{{pg.start}}" hint-placeholder-val="{{true}}">
+          <div style="max-width: 760px; margin: 0 auto; padding: 70px 20px 40px; display: flex; flex-direction: column; align-items: center; gap: 26px">
+            <span style="font: 700 44px Inter, sans-serif; letter-spacing: -0.03em">{{greet}}</span>
+            <div style="width: 100%; position: relative">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b8b93" stroke-width="2.2" stroke-linecap="round" style="position: absolute; left: 18px; top: 17px"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+              <input class="bw-in" aria-label="Поиск" placeholder="Поиск по AshenOS — заметки, документация, приложения" value="{{q}}" onInput="{{onQ}}" onKeyDown="{{onQKey}}" autocomplete="off" style="width: 100%; box-sizing: border-box; height: 52px; padding: 0 18px 0 48px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #f2f2f4; font-size: 15px; outline: none">
+            </div>
+            <div style="width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+              <sc-for list="{{dial}}" as="d" hint-placeholder-count="8">
+                <button class="bw-tile" onClick="{{d.go}}" style="height: 104px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); color: #e8e8ec">
+                  <span aria-hidden="true" style="{{d.ico}}">{{d.glyph}}</span>
+                  <span style="font-size: 13px; font-weight: 600">{{d.title}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{pg.doc}}" hint-placeholder-val="{{false}}">
+          <article style="max-width: calc(760px + var(--w, 0) * 340px); margin: 0 auto; padding: 44px 20px 60px; display: flex; flex-direction: column; gap: 14px">
+            <span style="font: 600 12px 'JetBrains Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: #8b8b93">{{doc.kicker}}</span>
+            <h1 style="margin: 0; font-size: 36px; letter-spacing: -0.02em">{{doc.title}}</h1>
+            <sc-for list="{{doc.blocks}}" as="bl" hint-placeholder-count="5">
+              <sc-if value="{{bl.h}}" hint-placeholder-val="{{false}}"><h2 style="margin: 14px 0 0; font-size: 20px">{{bl.text}}</h2></sc-if>
+              <sc-if value="{{bl.p}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 15.5px; line-height: 1.7; color: #c9c9cf">{{bl.text}}</p></sc-if>
+              <sc-if value="{{bl.code}}" hint-placeholder-val="{{false}}"><pre style="margin: 0; padding: 14px 16px; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.07); font: 500 13px/1.7 'JetBrains Mono', monospace; color: #d6d6db; white-space: pre-wrap">{{bl.text}}</pre></sc-if>
+              <sc-if value="{{bl.link}}" hint-placeholder-val="{{false}}"><button onClick="{{bl.go}}" style="align-self: flex-start; height: 38px; padding: 0 16px; border-radius: 11px; font-size: 13.5px; font-weight: 600; background: rgba(255,255,255,0.08); color: #f2f2f4; border: 0">{{bl.text}} →</button></sc-if>
+            </sc-for>
+          </article>
+        </sc-if>
+        <sc-if value="{{pg.list}}" hint-placeholder-val="{{false}}">
+          <div style="max-width: calc(820px + var(--w, 0) * 300px); margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px"><h1 style="margin: 0; font-size: 30px; letter-spacing: -0.02em; flex: 1">{{lst.title}}</h1>
+              <sc-if value="{{lst.canClear}}" hint-placeholder-val="{{false}}"><button class="bw-b" onClick="{{lst.clear}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,123,123,0.12); color: #ff9b9b; border: 0">{{lst.clearLabel}}</button></sc-if>
+            </div>
+            <sc-for list="{{lst.rows}}" as="r" hint-placeholder-count="5">
+              <button class="bw-b" onClick="{{r.go}}" style="height: 56px; padding: 0 16px; border-radius: 13px; display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.035); border: 0; color: #e8e8ec; text-align: left">
+                <span aria-hidden="true" style="{{r.ico}}">{{r.glyph}}</span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span><span style="font: 500 11.5px 'JetBrains Mono', monospace; color: #8b8b93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span>
+                <span style="font-size: 12px; color: #8b8b93; white-space: nowrap">{{r.meta}}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{lst.empty}}" hint-placeholder-val="{{false}}"><span style="padding: 50px 0; text-align: center; color: #6f6f77">{{lst.emptyText}}</span></sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{pg.offline}}" hint-placeholder-val="{{false}}">
+          <div style="max-width: 560px; margin: 0 auto; padding: 120px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center">
+            <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 22px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); font-size: 32px">⌁</span>
+            <span style="font-size: 22px; font-weight: 700">Сайт недоступен в прототипе</span>
+            <span style="font: 500 13px 'JetBrains Mono', monospace; color: #a1a1a8; word-break: break-all">{{offUrl}}</span>
+            <span style="font-size: 14px; color: #8b8b93; line-height: 1.6">Это макет AshenOS: он открывает только встроенные страницы. На настоящем Raspberry Pi здесь будет обычный Chromium.</span>
+            <button class="bw-b" onClick="{{home}}" style="height: 40px; padding: 0 18px; border-radius: 12px; font-size: 13.5px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">На стартовую</button>
+          </div>
+        </sc-if>
+      </div>
+    </main>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
+
+  </section>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  CFG_KEY = 'ashenos.browser.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Запуск' },
+    { k: 'home', type: 'seg', name: 'Домашняя страница', opts: [['ashen://start', 'Стартовая'], ['ashen://docs', 'Документация']], def: 'ashen://start' },
+    { k: 'restore', type: 'sw', name: 'Восстанавливать вкладки', note: 'Открывать вкладки прошлого раза', def: true },
+    { type: 'head', name: 'Вид' },
+    { k: 'bm', type: 'sw', name: 'Панель закладок', note: 'Строка закладок под адресом', def: true },
+    { k: 'width', type: 'seg', name: 'Ширина страниц', opts: [['narrow', 'Узкие'], ['wide', 'Широкие']], def: 'narrow' },
+    { type: 'head', name: 'Приватность' },
+    { k: 'block', type: 'sw', name: 'Блокировать трекеры', note: 'Щит в адресной строке показывает, сколько заблокировано', def: true },
+    { k: 'hist', type: 'sw', name: 'Сохранять историю', note: 'Если выключено — история не пишется', def: true }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+
+  PAGES = {
+    'ashen://start': { title: 'Новая вкладка', glyph: '◐', col: '#3a3a40' },
+    'ashen://docs': { title: 'Документация AshenOS', glyph: '▤', col: '#2f6fd6', kicker: 'Документация', blocks: [
+      ['p', 'AshenOS — дистрибутив на базе Arch Linux ARM для кибердека на Raspberry Pi 4. Plasma 6, Wayland, чёрная тема и своя оболочка с каплями-панелями.'],
+      ['h', 'Обновление системы'], ['code', 'sudo pacman -Syu'],
+      ['h', 'Сборка образа'], ['code', 'cd ashenos/build\nsudo ./build-image.sh 8G'],
+      ['h', 'Горячие клавиши'], ['p', 'Super — поиск, Super+T — терминал, Super+L — блокировка, Ctrl+Alt+K — экранная клавиатура.'],
+      ['link', 'Что нового', 'ashen://news']] },
+    'ashen://news': { title: 'Что нового', glyph: '✦', col: '#c4602c', kicker: 'Новости проекта', blocks: [
+      ['h', 'Ноябрь'], ['p', 'Темы и оттенки в Параметрах, приложение «Заметки», новые виджеты: календарь, помодоро, батарея, сеть и диск.'],
+      ['h', 'Октябрь'], ['p', 'Экран блокировки с паролем, PIN-кодом и входом по лицу. Экранная клавиатура. Приложение Claude с питомцами.'],
+      ['link', 'К документации', 'ashen://docs']] },
+    'ashen://pacman': { title: 'Пакеты', glyph: '⬢', col: '#3a8e52', kicker: 'Шпаргалка', blocks: [
+      ['code', 'pacman -Ss запрос      # найти пакет\nsudo pacman -S пакет   # установить\nsudo pacman -Rns пакет # удалить с зависимостями\npacman -Qe             # что установлено вручную\npaccache -r            # почистить кэш'],
+      ['link', 'К документации', 'ashen://docs']] },
+    'ashen://history': { title: 'История', glyph: '◷', col: '#5c5c64' },
+    'ashen://downloads': { title: 'Загрузки', glyph: '↓', col: '#5c5c64' },
+    'ashen://bookmarks': { title: 'Закладки', glyph: '★', col: '#c99a1e' }
+  };
+  DOWN = [['ashenos-rpi4.img.xz', '1,9 ГБ', 'сегодня'], ['kaplya.zip', '700 КБ', 'вчера'], ['quickshell-0.2.tar.gz', '8,4 МБ', '3 нояб.']];
+  state = { tabs: [{ id: 1, stack: ['ashen://start'], i: 0 }], cur: 1, urlDraft: null, q: '', hist: [], bms: ['ashen://docs', 'ashen://news', 'ashen://pacman'], loadN: 0, cfgOpen: false, blocked: 0 };
+  componentDidMount() {
+    this.cfgLoad();
+    try { const b = JSON.parse(localStorage.getItem('ashenos.browser.data') || 'null'); if (b) { const p = {}; if (Array.isArray(b.bms)) p.bms = b.bms; if (Array.isArray(b.hist)) p.hist = b.hist; if (b.tabs && b.tabs.length && (!this.state.cfg || this.state.cfg.restore !== false)) { p.tabs = b.tabs; p.cur = b.cur; } this.setState(p); } } catch (e) {}
+  }
+  save() { const s = this.state; try { localStorage.setItem('ashenos.browser.data', JSON.stringify({ bms: s.bms, hist: s.hist.slice(0, 60), tabs: s.tabs, cur: s.cur })); } catch (e) {} }
+  tab() { return this.state.tabs.find((t) => t.id === this.state.cur) || this.state.tabs[0]; }
+  url() { const t = this.tab(); return t.stack[t.i]; }
+  open(u) {
+    let url = u.trim();
+    if (!url) return;
+    if (!/^[a-z]+:\/\//i.test(url)) url = /\.[a-zа-я]{2,}(\/|$)/i.test(url) && !/\s/.test(url) ? 'https://' + url : 'ashen://search?q=' + encodeURIComponent(url);
+    const tabs = this.state.tabs.map((t) => t.id === this.state.cur ? { ...t, stack: [...t.stack.slice(0, t.i + 1), url], i: t.i + 1 } : t);
+    const hist = this.cfgGet('hist') && !/^ashen:\/\/(start|history)/.test(url) ? [{ url, at: Date.now() }, ...this.state.hist.filter((h) => h.url !== url)].slice(0, 60) : this.state.hist;
+    const blocked = this.cfgGet('block') && /^https?:/.test(url) ? this.state.blocked + 3 + Math.floor(Math.random() * 9) : this.state.blocked;
+    this.setState({ tabs, urlDraft: null, loadN: this.state.loadN + 1, hist, blocked }, () => this.save());
+    setTimeout(() => this.save(), 0);
+  }
+  title(u) { const p = this.PAGES[u.split('?')[0]]; if (p) return p.title; if (u.startsWith('ashen://search')) return 'Поиск: ' + decodeURIComponent((u.split('q=')[1] || '')); return u.replace(/^https?:\/\//, '').split('/')[0]; }
+  glyph(u) { const p = this.PAGES[u.split('?')[0]]; return p ? [p.glyph, p.col] : u.startsWith('ashen://search') ? ['⌕', '#5c5c64'] : ['⌁', '#3a3a40']; }
+  renderVals() {
+    const st = this.state;
+    const t = this.tab(), url = t.stack[t.i], base = url.split('?')[0];
+    const P = this.PAGES[base];
+    const ico = (g) => `width:22px;height:22px;flex:none;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;background:${g[1]}`;
+    const nb = (on) => `width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:${on ? '#e8e8ec' : '#4a4a50'}`;
+    const isStart = base === 'ashen://start', isDoc = !!(P && P.blocks), isSearch = base === 'ashen://search', isList = ['ashen://history', 'ashen://downloads', 'ashen://bookmarks'].includes(base) || isSearch;
+    const offline = !P && !isSearch;
+    const starred = st.bms.includes(url);
+    const h = new Date().getHours();
+    let lst = { title: '', rows: [], empty: false, emptyText: '', canClear: false, clear: () => {}, clearLabel: '' };
+    if (base === 'ashen://history') lst = { title: 'История', rows: st.hist.map((x) => { const g = this.glyph(x.url); return { title: this.title(x.url), sub: x.url, meta: new Date(x.at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), glyph: g[0], ico: ico(g), go: () => this.open(x.url) }; }), empty: !st.hist.length, emptyText: this.cfgGet('hist') ? 'История пуста' : 'История отключена в настройках', canClear: st.hist.length > 0, clearLabel: 'Очистить историю', clear: () => { this.setState({ hist: [] }); setTimeout(() => this.save(), 0); } };
+    if (base === 'ashen://downloads') lst = { title: 'Загрузки', rows: this.DOWN.map(([n, s, w]) => ({ title: n, sub: '~/Загрузки/' + n, meta: `${s} · ${w}`, glyph: '↓', ico: ico(['↓', '#2f6fd6']), go: () => { if (this.props.onAction) this.props.onAction('open:files:down'); } })), empty: false, emptyText: '', canClear: false };
+    if (base === 'ashen://bookmarks') lst = { title: 'Закладки', rows: st.bms.map((u) => { const g = this.glyph(u); return { title: this.title(u), sub: u, meta: '', glyph: g[0], ico: ico(g), go: () => this.open(u) }; }), empty: !st.bms.length, emptyText: 'Закладок нет', canClear: false };
+    if (isSearch) {
+      const q = decodeURIComponent(url.split('q=')[1] || '').toLowerCase();
+      let notes = []; try { notes = JSON.parse(localStorage.getItem('ashenos.notes.v1') || '[]') || []; } catch (e) {}
+      const docs = Object.keys(this.PAGES).filter((k) => this.PAGES[k].blocks).map((k) => ({ title: this.PAGES[k].title, sub: k, text: this.PAGES[k].blocks.map((b) => b[1]).join(' '), go: () => this.open(k), g: [this.PAGES[k].glyph, this.PAGES[k].col], meta: 'страница' }));
+      const nts = notes.map((n) => ({ title: n.title || 'Без названия', sub: 'Заметки', text: n.title + ' ' + n.body, go: () => { if (this.props.onAction) this.props.onAction('open:notes'); }, g: ['✎', '#c99a1e'], meta: 'заметка' }));
+      const rows = [...docs, ...nts].filter((x) => !q || x.text.toLowerCase().includes(q) || x.title.toLowerCase().includes(q)).map((x) => ({ title: x.title, sub: x.sub, meta: x.meta, glyph: x.g[0], ico: ico(x.g), go: x.go }));
+      lst = { title: `Результаты: «${decodeURIComponent(url.split('q=')[1] || '')}»`, rows, empty: !rows.length, emptyText: 'Ничего не найдено в документации и заметках', canClear: false };
+    }
+    const doc = isDoc ? { kicker: P.kicker, title: P.title, blocks: P.blocks.map(([k, a, b]) => ({ h: k === 'h', p: k === 'p', code: k === 'code', link: k === 'link', text: a, go: () => this.open(b) })) } : { kicker: '', title: '', blocks: [] };
+    return {
+      minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); },
+      maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
+      closeApp: () => { if (this.props.onClose) this.props.onClose(); },
+      tabs: st.tabs.map((x) => { const u = x.stack[x.i], g = this.glyph(u), on = x.id === st.cur; return { title: this.title(u), glyph: g[0], ico: ico(g).replace('22px;height:22px', '18px;height:18px'), on,
+        pick: () => this.setState({ cur: x.id, urlDraft: null }),
+        close: () => { const left = st.tabs.filter((y) => y.id !== x.id); if (!left.length) { if (this.props.onClose) this.props.onClose(); return; } this.setState({ tabs: left, cur: on ? left[Math.max(0, st.tabs.indexOf(x) - 1)].id : st.cur }); setTimeout(() => this.save(), 0); },
+        style: `height:38px;width:210px;min-width:90px;flex:0 1 210px;padding:0 6px 0 12px;box-sizing:border-box;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:6px;color:${on ? '#f2f2f4' : '#a1a1a8'};background:${on ? 'rgba(255,255,255,.07)' : 'transparent'};animation:bwTab .25s cubic-bezier(.22,1,.36,1) both` }; }),
+      newTab: () => { const id = Date.now(); this.setState({ tabs: [...st.tabs, { id, stack: [this.cfgGet('home')], i: 0 }], cur: id, urlDraft: null }); setTimeout(() => this.save(), 0); },
+      back: () => { if (t.i > 0) this.setState({ tabs: st.tabs.map((x) => x.id === t.id ? { ...x, i: x.i - 1 } : x), urlDraft: null, loadN: st.loadN + 1 }); }, backSt: nb(t.i > 0),
+      fwd: () => { if (t.i < t.stack.length - 1) this.setState({ tabs: st.tabs.map((x) => x.id === t.id ? { ...x, i: x.i + 1 } : x), urlDraft: null, loadN: st.loadN + 1 }); }, fwdSt: nb(t.i < t.stack.length - 1),
+      reload: () => this.setState({ loadN: st.loadN + 1 }),
+      home: () => this.open(this.cfgGet('home')),
+      goDownloads: () => this.open('ashen://downloads'), goHistory: () => this.open('ashen://history'),
+      urlDraft: st.urlDraft !== null ? st.urlDraft : (isStart ? '' : url),
+      onUrl: (e) => this.setState({ urlDraft: e.target.value }),
+      onUrlKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.open(e.target.value); } if (e.key === 'Escape') this.setState({ urlDraft: null }); },
+      urlFocus: (e) => { try { e.target.select(); } catch (er) {} },
+      starred, starLabel: starred ? 'Убрать закладку' : 'Добавить в закладки',
+      toggleStar: () => { this.setState({ bms: starred ? st.bms.filter((b) => b !== url) : [...st.bms, url] }); setTimeout(() => this.save(), 0); },
+      starSt: `width:30px;height:30px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;background:none;border:0;color:${starred ? '#f5c84b' : '#6f6f77'};transition:color .2s,transform .3s cubic-bezier(.3,1.8,.5,1);transform:scale(${starred ? 1.15 : 1})`,
+      shieldTx: this.cfgGet('block') ? '⛨' : '○', shieldLabel: this.cfgGet('block') ? `Заблокировано трекеров: ${st.blocked}` : 'Защита от трекеров выключена',
+      shieldSt: `font-size:15px;color:${this.cfgGet('block') ? '#6fd39b' : '#6f6f77'};flex:none`,
+      loadBar: `position:absolute;left:12px;right:12px;bottom:-1px;height:2px;border-radius:1px;background:#f2f2f4;transform-origin:0 50%;opacity:0;${st.loadN ? `animation:${st.loadN % 2 ? 'bwLoadA' : 'bwLoadB'} .7s cubic-bezier(.22,1,.36,1) both` : ''}`,
+      bmBar: `height:${this.cfgGet('bm') ? 40 : 0}px;flex:none;overflow:hidden;display:flex;align-items:center;gap:2px;padding:0 12px;border-bottom:${this.cfgGet('bm') ? '1px solid rgba(255,255,255,.05)' : '0'};transition:height .3s cubic-bezier(.22,1,.36,1)`,
+      bookmarks: st.bms.map((u) => { const g = this.glyph(u); return { title: this.title(u), glyph: g[0], ico: ico(g).replace('22px;height:22px', '16px;height:16px').replace('font-size:12px', 'font-size:9px'), go: () => this.open(u) }; }),
+      bmEmpty: !st.bms.length,
+      pageWrap: 'flex:1;min-height:0;overflow-y:auto',
+      pageAnim: `${this.cfgGet('width') === 'wide' ? '--w:1;' : ''}animation:${st.loadN % 2 ? 'bwPageA' : 'bwPageB'} .35s cubic-bezier(.22,1,.36,1) both`,
+      pg: { start: isStart, doc: isDoc, list: isList, offline }, offUrl: url, doc, lst,
+      greet: h < 6 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер',
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value }), onQKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.open(e.target.value); this.setState({ q: '' }); } },
+      dial: [['ashen://docs'], ['ashen://news'], ['ashen://pacman'], ['ashen://bookmarks'], ['ashen://history'], ['ashen://downloads']].map(([u]) => { const g = this.glyph(u); return { title: this.title(u), glyph: g[0], ico: ico(g).replace('22px;height:22px', '40px;height:40px').replace('border-radius:7px', 'border-radius:12px').replace('font-size:12px', 'font-size:18px'), go: () => this.open(u) }; })
+        .concat([{ title: 'Заметки', glyph: '✎', ico: ico(['✎', '#c99a1e']).replace('22px;height:22px', '40px;height:40px').replace('border-radius:7px', 'border-radius:12px').replace('font-size:12px', 'font-size:18px'), go: () => { if (this.props.onAction) this.props.onAction('open:notes'); } },
+                 { title: 'Терминал', glyph: '>_', ico: ico(['>_', '#232327']).replace('22px;height:22px', '40px;height:40px').replace('border-radius:7px', 'border-radius:12px').replace('font-size:12px', 'font-size:15px'), go: () => { if (this.props.onAction) this.props.onAction('open:term'); } }]),
+      cfg: this.cfgView('Настройки браузера'), cfgOpen: () => this.setState({ cfgOpen: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

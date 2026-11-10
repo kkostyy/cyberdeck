@@ -24,6 +24,9 @@ body{margin:0;background:#050506}
 @keyframes ntA{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes ntB{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes ntSaved{0%{opacity:0;transform:scale(.6)}40%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
 </style>
 </helmet>
 
@@ -37,6 +40,7 @@ body{margin:0;background:#050506}
         <span style="font-size: 12px; color: #8b8b93">{{countText}}</span>
       </div>
       <div style="display: flex; align-items: center; gap: 2px; margin-left: auto">
+        <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
         <button class="nt-b" aria-label="Свернуть" onClick="{{minApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
         <button class="nt-b" aria-label="Развернуть" onClick="{{maxApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="3"></rect></svg></button>
         <button class="nt-b" aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
@@ -91,12 +95,12 @@ body{margin:0;background:#050506}
             <div role="radiogroup" aria-label="Цвет заметки" style="display: flex; gap: 6px; margin-left: 6px">
               <sc-for list="{{colors}}" as="c" hint-placeholder-count="5"><button role="radio" aria-checked="{{c.on}}" aria-label="{{c.name}}" onClick="{{c.pick}}" style="{{c.style}}"></button></sc-for>
             </div>
-            <button class="nt-b" onClick="{{del}}" style="margin-left: auto; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600; background: rgba(255,123,123,0.1); color: #ff9b9b; border: 0">Удалить</button>
+            <button class="nt-b" onClick="{{del}}" style="margin-left: auto; height: 34px; padding: 0 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600; background: rgba(255,123,123,0.1); color: #ff9b9b; border: 0">{{delLabel}}</button>
           </div>
           <div style="{{paper}}">
             <input class="nt-in" aria-label="Заголовок заметки" placeholder="Заголовок" value="{{cur.title}}" onInput="{{onTitle}}" autocomplete="off" style="width: 100%; box-sizing: border-box; background: none; border: 0; outline: none; color: #f2f2f4; font: 700 28px Inter, sans-serif; letter-spacing: -0.02em; padding: 0">
             <sc-if value="{{editing}}" hint-placeholder-val="{{true}}">
-              <textarea id="nt-body" class="nt-in nt-scroll" aria-label="Текст заметки" placeholder="Начните писать…" onInput="{{onBody}}" spellcheck="false" style="flex: 1; min-height: 0; width: 100%; box-sizing: border-box; resize: none; background: none; border: 0; outline: none; color: #d6d6db; font: 400 15.5px/1.7 Inter, sans-serif; padding: 0">{{cur.body}}</textarea>
+              <textarea id="nt-body" class="nt-in nt-scroll" aria-label="Текст заметки" placeholder="Начните писать…" onInput="{{onBody}}" spellcheck="false" style="{{bodyStyle}}">{{cur.body}}</textarea>
             </sc-if>
             <sc-if value="{{viewing}}" hint-placeholder-val="{{false}}">
               <div class="nt-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px">
@@ -104,7 +108,7 @@ body{margin:0;background:#050506}
                   <sc-if value="{{l.h}}" hint-placeholder-val="{{false}}"><div style="{{l.style}}">{{l.text}}</div></sc-if>
                   <sc-if value="{{l.check}}" hint-placeholder-val="{{false}}"><button role="checkbox" aria-checked="{{l.done}}" onClick="{{l.toggle}}" style="display: flex; align-items: center; gap: 12px; min-height: 36px; background: none; border: 0; padding: 0; color: #d6d6db; text-align: left"><span aria-hidden="true" style="{{l.box}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></span><span style="{{l.style}}">{{l.text}}</span></button></sc-if>
                   <sc-if value="{{l.bullet}}" hint-placeholder-val="{{false}}"><div style="display: flex; gap: 12px; font-size: 15.5px; line-height: 1.7; color: #d6d6db"><span aria-hidden="true" style="color: #8b8b93">•</span><span>{{l.text}}</span></div></sc-if>
-                  <sc-if value="{{l.p}}" hint-placeholder-val="{{true}}"><div style="font-size: 15.5px; line-height: 1.7; color: #d6d6db; min-height: 14px; white-space: pre-wrap">{{l.text}}</div></sc-if>
+                  <sc-if value="{{l.p}}" hint-placeholder-val="{{true}}"><div style="font-size: {{fs}}px; line-height: 1.7; color: #d6d6db; min-height: 14px; white-space: pre-wrap">{{l.text}}</div></sc-if>
                 </sc-for>
               </div>
             </sc-if>
@@ -122,6 +126,40 @@ body{margin:0;background:#050506}
         </sc-if>
       </main>
     </div>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
   </section>
 </div>
 </x-dc>
@@ -140,8 +178,40 @@ class Component extends DCLogic {
       { id: 'n4', title: 'Команды pacman', body: '# Часто нужные\n- sudo pacman -Syu — обновить всё\n- pacman -Qe — что я ставил сам\n- pacman -Rns пакет — удалить с зависимостями\n- paccache -r — почистить кэш', tag: 'work', color: '#7fb8ff', pin: false, at: t - 2e8 }
     ];
   }
-  state = { notes: null, sel: null, tag: 'all', q: '', mode: 'edit', savedAt: 0, rev: 0 };
+  CFG_KEY = 'ashenos.notes.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Текст' },
+    { k: 'size', type: 'seg', name: 'Размер текста', opts: [[14, 'Мелкий'], [15.5, 'Обычный'], [18, 'Крупный']], def: 15.5 },
+    { k: 'mono', type: 'sw', name: 'Моноширинный шрифт', note: 'Удобно для команд и кода', def: false },
+    { type: 'head', name: 'Список' },
+    { k: 'sort', type: 'seg', name: 'Сортировка', opts: [['date', 'По дате'], ['title', 'По названию']], def: 'date' },
+    { k: 'open', type: 'seg', name: 'Открывать заметку в режиме', opts: [['edit', 'Правка'], ['view', 'Просмотр']], def: 'edit' },
+    { k: 'confirm', type: 'sw', name: 'Спрашивать перед удалением', note: 'Кнопку «Удалить» нужно нажать дважды', def: true }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+  state = { notes: null, sel: null, tag: 'all', q: '', mode: 'edit', savedAt: 0, rev: 0, cfgOpen: false, delAsk: false };
   componentDidMount() {
+    this.cfgLoad(); setTimeout(() => this.setState({ mode: this.cfgGet('open') }), 0);
     let notes = null;
     try { notes = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) {}
     if (!Array.isArray(notes)) notes = this.seed();
@@ -153,7 +223,7 @@ class Component extends DCLogic {
     const key = this.state.sel + ':' + this.state.mode + ':' + this.state.rev;
     if (key !== this._tk) { this._tk = key; const el = document.getElementById('nt-body'); const n = this.cur(); if (el && n && el.value !== n.body) el.value = n.body; }
   }
-  sorted(notes) { return notes.slice().sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.at - a.at); }
+  sorted(notes) { const byT = this.state && this.state.cfg && this.state.cfg.sort === 'title'; return notes.slice().sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || (byT ? (a.title || '').localeCompare(b.title || '', 'ru') : b.at - a.at)); }
   cur() { return (this.state.notes || []).find((n) => n.id === this.state.sel) || null; }
   persist(notes, quiet) {
     try { localStorage.setItem(this.KEY, JSON.stringify(notes)); } catch (e) {}
@@ -200,7 +270,7 @@ class Component extends DCLogic {
       q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
       add: () => { const n = { id: 'n' + Date.now().toString(36), title: '', body: '', tag: st.tag === 'all' || st.tag === 'pin' ? 'personal' : st.tag, color: '#f5c84b', pin: false, at: Date.now() }; const nn = [n, ...notes]; this.setState({ notes: nn, sel: n.id, mode: 'edit', q: '' }); this.persist(nn); },
       list: list.map((n, i) => ({ title: n.title || 'Без названия', snip: n.body.replace(/^#+ /gm, '').replace(/^\[( |x)\] /gm, '· ').replace(/\n+/g, '  ') || 'Пусто', when: when(n.at), tag: tagName(n.tag), prog: checks(n.body), on: n.id === st.sel,
-        pick: () => this.setState({ sel: n.id }),
+        pick: () => this.setState({ sel: n.id, mode: this.cfgGet('open'), delAsk: false }),
         bar: `width:4px;align-self:stretch;border-radius:2px;background:${n.color || '#f5c84b'};flex:none`,
         pin: `font-size:8px;color:#f5c84b;display:${n.pin ? 'inline' : 'none'}`,
         style: `display:flex;gap:10px;padding:11px 12px;border-radius:14px;border:0;color:#e8e8ec;background:${n.id === st.sel ? 'rgba(255,255,255,.1)' : 'rgba(255,255,255,.035)'};animation:ntIn .3s cubic-bezier(.22,1,.36,1) ${(i * 0.03).toFixed(2)}s both` })),
@@ -216,11 +286,14 @@ class Component extends DCLogic {
       cycleTag: () => { const ids = ['personal', 'work', 'ideas']; this.patch({ tag: ids[(ids.indexOf(cur.tag) + 1) % ids.length] }); },
       colors: this.COLORS.map(([c, name]) => ({ name, on: cur && cur.color === c, pick: () => this.patch({ color: c }),
         style: `width:20px;height:20px;border-radius:50%;border:0;background:${c};box-shadow:0 0 0 2px #121214,0 0 0 ${cur && cur.color === c ? 4 : 2}px ${cur && cur.color === c ? '#f2f2f4' : 'rgba(255,255,255,.1)'};transition:box-shadow .2s` })),
-      del: () => { const nn = notes.filter((n) => n.id !== st.sel); const nx = this.sorted(nn)[0]; this.setState({ notes: nn, sel: nx ? nx.id : null }); this.persist(nn); },
+      delLabel: st.delAsk ? 'Точно удалить?' : 'Удалить',
+      del: () => { if (this.cfgGet('confirm') && !st.delAsk) { this.setState({ delAsk: true }); clearTimeout(this.daT); this.daT = setTimeout(() => this.setState({ delAsk: false }), 3000); return; } this.setState({ delAsk: false }); const nn = notes.filter((n) => n.id !== st.sel); const nx = this.sorted(nn)[0]; this.setState({ notes: nn, sel: nx ? nx.id : null }); this.persist(nn); },
       onTitle: (e) => this.patch({ title: e.target.value }),
       onBody: (e) => this.patch({ body: e.target.value }),
       paper: `flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;padding:26px 34px 18px;border-left:3px solid ${cur ? cur.color || '#f5c84b' : 'transparent'};transition:border-color .3s;animation:${st.sel && (st.sel.length + (notes.findIndex((n) => n.id === st.sel))) % 2 ? 'ntA' : 'ntB'} .3s cubic-bezier(.22,1,.36,1) both`,
-      lines,
+      lines, fs: this.cfgGet('size'),
+      cfg: this.cfgView('Настройки заметок'), cfgOpen: () => this.setState({ cfgOpen: true }),
+      bodyStyle: `flex:1;min-height:0;width:100%;box-sizing:border-box;resize:none;background:none;border:0;outline:none;color:#d6d6db;font:400 ${this.cfgGet('size')}px/1.7 ${this.cfgGet('mono') ? "'JetBrains Mono',monospace" : 'Inter,sans-serif'};padding:0`,
       stats: `${words} ${words % 10 === 1 && words % 100 !== 11 ? 'слово' : 'слов'} · ${body.length} знаков${checks(body) ? ' · дел ' + checks(body) : ''}`,
       savedStyle: `margin-left:auto;color:#6fd39b;opacity:${st.savedAt && Date.now() - st.savedAt < 60000 ? 1 : 0};${st.savedAt ? 'animation:ntSaved .4s ease both' : ''}`
     };

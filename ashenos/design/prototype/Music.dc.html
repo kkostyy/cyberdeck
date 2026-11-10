@@ -24,6 +24,9 @@ input[type=range]{margin:0;cursor:pointer}
 @keyframes mRowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes mWinIn{from{opacity:0;transform:scale(.95) translateY(14px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
 </style>
 </helmet>
 
@@ -42,7 +45,7 @@ input[type=range]{margin:0;cursor:pointer}
         <button aria-label="Назад" onClick="{{navBack}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
         </button>
-        <button aria-label="Вперёд" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+        <button aria-label="Вперёд" onClick="{{navFwd}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: {{fwdColor}}">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
         </button>
       </div>
@@ -71,6 +74,7 @@ input[type=range]{margin:0;cursor:pointer}
         </button>
       </div>
       <div style="display: flex; align-items: center; gap: 2px; margin-left: 4px; flex: none">
+        <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
         <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
         <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
         <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
@@ -293,23 +297,95 @@ input[type=range]{margin:0;cursor:pointer}
         <input type="range" min="0" max="100" value="{{vol}}" onChange="{{setVol}}" style="flex: 1; accent-color: {{accent}}">
       </label>
     </footer>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
   </section>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#e2b0ef"]},"onClose":{"editor":null},"onAction":{"editor":null},"waveOn":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
+  CFG_KEY = 'ashenos.music.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Воспроизведение' },
+    { k: 'auto', type: 'sw', name: 'Автовоспроизведение', note: 'Включать следующий трек, когда закончится текущий', def: true },
+    { k: 'quality', type: 'seg', name: 'Качество', opts: [['norm', 'Обычное'], ['high', 'Высокое'], ['lossless', 'Без потерь']], def: 'high' },
+    { k: 'fade', type: 'seg', name: 'Плавный переход', opts: [[0, 'Выкл'], [3, '3 с'], [6, '6 с']], def: 0 },
+    { type: 'head', name: 'Вид' },
+    { k: 'queue', type: 'sw', name: 'Очередь справа', note: 'Показывать при открытии', def: true },
+    { k: 'wave', type: 'sw', name: 'Волна на рабочем столе', note: 'Виджет-аудиоволна внизу экрана', def: true }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+  cfgChanged(k, v) {
+    if (k === 'queue') this.setState({ queueOn: v });
+    if (k === 'wave' && this.props.onAction) this.props.onAction(v ? 'wave:1' : 'wave:0');
+    if (k === '*') { this.setState({ queueOn: true }); if (this.props.onAction) this.props.onAction('wave:1'); }
+  }
   state = {
+    cfgOpen: false, navStack: [],
     conn: { sc: true, sp: true, am: false, ym: true, yt: false, loc: true }, busy: null,
     src: 'all', q: '', cur: 1, pos: 64, playing: true, liked: { 1: true, 5: true }, popId: null,
     shuffle: false, repeat: false, vol: 70, lib: 'all', queueOn: true
   };
 
   componentDidMount() {
+    this.cfgLoad(); setTimeout(() => this.setState({ queueOn: this.cfgGet('queue') }), 0);
     this.timer = setInterval(() => {
       const s = this.state;
       if (!s.playing) return;
       const t = this.allTracks().find((x) => x.id === s.cur);
-      if (s.pos + 1 >= t.dur) { if (s.repeat) this.setState({ pos: 0 }); else this.step(1); }
+      if (s.pos + 1 >= t.dur) { if (s.repeat) this.setState({ pos: 0 }); else if (this.cfgGet('auto')) this.step(1); else this.setState({ pos: 0, playing: false }); }
       else this.setState({ pos: s.pos + 1 });
     }, 1000);
   }
@@ -448,11 +524,13 @@ class Component extends DCLogic {
       closeApp: () => { if (this.props.onClose) this.props.onClose(); },
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
-      connCount: `${connN} из ${SRC.length} источников`,
+      connCount: `${connN} из ${SRC.length} источников · ${({ norm: '128 кбит/с', high: '320 кбит/с', lossless: 'FLAC' })[this.cfgGet('quality')]}${this.cfgGet('fade') ? ' · переход ' + this.cfgGet('fade') + ' с' : ''}`,
       crumbLib: st.lib === 'liked' ? 'Избранное' : 'Все треки',
       crumbSrc: st.src === 'all' ? 'Все сервисы' : srcName(st.src),
       pageTitle: st.src === 'all' ? (st.lib === 'liked' ? 'Избранное' : 'Все треки') : srcName(st.src),
-      navBack: () => this.setState({ src: 'all', lib: 'all', q: '' }),
+      navBack: () => { if (st.src === 'all' && st.lib === 'all' && !st.q) return; this.setState({ navStack: [{ src: st.src, lib: st.lib, q: st.q }, ...st.navStack].slice(0, 10), src: 'all', lib: 'all', q: '' }); },
+      navFwd: () => { const [n, ...rest] = st.navStack; if (n) this.setState({ ...n, navStack: rest }); }, fwdColor: st.navStack.length ? '#e8e8ec' : '#5c5c64',
+      cfg: this.cfgView('Настройки музыки'), cfgOpen: () => this.setState({ cfgOpen: true }),
       playFirst: () => { const v = this.visible(); if (v.length) this.play(v[0].id); },
       queueOn: st.queueOn, toggleQueue: () => this.setState({ queueOn: !st.queueOn }),
       waveOn: this.props.waveOn !== false && this.props.waveOn !== '' ? !!(this.props.waveOn === undefined ? true : this.props.waveOn) : false,

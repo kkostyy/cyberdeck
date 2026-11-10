@@ -401,7 +401,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.claude.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Браузер" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
+        <button class="dock-btn" aria-label="Браузер" onClick="{{openWeb}}" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
           <span style="{{dk.web.tip}}">Браузер</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}};background:radial-gradient(80% 80% at 30% 20%,#7fb8ff,#2f6fd6 60%,#1d4796)">
             <svg width="58%" height="58%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"></path></svg>
@@ -480,8 +480,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
               <span style="padding: 0 6px; color: #c9c9cf">Настройки</span><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6f6f77" stroke-width="2" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg><span aria-current="page" style="height: 30px; padding: 0 10px; display: flex; align-items: center; border-radius: 9px; background: rgba(255,255,255,0.08); font-weight: 600">{{secName}}</span>
             </nav>
             <div style="display: flex; align-items: center; gap: 2px; flex: none">
-              <button aria-label="Свернуть" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-              <button aria-label="Развернуть" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
+              <button aria-label="Свернуть" onClick="{{closeWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+              <button aria-label="Развернуть" onClick="{{expandWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
               <button aria-label="Закрыть настройки" onClick="{{closeWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
             </div>
           </header>
@@ -558,8 +558,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
             <span aria-hidden="true" style="position: relative; width: 34px; height: 34px; flex: none; border-radius: 10px; background: radial-gradient(120% 90% at 85% 8%, #46464c 0%, #2c2c31 50%, #1c1c1f 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25)"><span style="position: absolute; left: 4px; right: 4px; bottom: 4px; height: 13px; border-radius: 7px; background: #141416; display: flex; align-items: center; padding-left: 4px; font: 700 8px/1 'JetBrains Mono', monospace; color: #8e8e93">&gt;_</span></span>
             <div style="flex: 1; display: flex; flex-direction: column; line-height: 1.2"><span style="font-size: 15px; font-weight: 600">Терминал</span><span style="font-size: 12.5px; color: #a1a1a8">user@ashenos: ~</span></div>
             <div style="display: flex; align-items: center; gap: 2px; flex: none">
-              <button aria-label="Свернуть" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-              <button aria-label="Развернуть" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
+              <button aria-label="Свернуть" onClick="{{closeWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+              <button aria-label="Развернуть" onClick="{{expandWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
               <button aria-label="Закрыть терминал" onClick="{{closeWin}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
             </div>
           </header>
@@ -669,7 +669,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           <button aria-label="Заблокировать" onClick="{{lockNow}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)">
             <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
           </button>
-          <button aria-label="Выключение" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,90,54,0.18); color: #ffb4a8">
+          <button aria-label="Выключение" onClick="{{powerOff}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,90,54,0.18); color: #ffb4a8">
             <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"></path><path d="M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg>
           </button>
         </div>
@@ -1266,7 +1266,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           <button aria-label="Заблокировать" onClick="{{lockNow}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06)">
             <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path></svg>
           </button>
-          <button aria-label="Выключение" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,90,54,0.18); color: #ffb4a8">
+          <button aria-label="Выключение" onClick="{{powerOff}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,90,54,0.18); color: #ffb4a8">
             <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"></path><path d="M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg>
           </button>
         </div>
@@ -1313,7 +1313,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
   </nav>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"onPower":{"editor":null},"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   /* Plasma calendar: MonthView (InfiniteList, 200 ms), Days/Months/Years swipe */
   calStep(d) {
@@ -2256,6 +2256,9 @@ class Component extends DCLogic {
       winSettings: st.win === 'settings', winTerm: st.win === 'term',
       winAnim: st.winClosing ? 'animation:winOut .22s ease both' : 'animation:winIn .42s cubic-bezier(.2,1.12,.3,1) both',
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
+      openWeb: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('web', 'dock'); } },
+      expandWin: () => { const w = st.win; closeWin(); if (this.props.onOpenApp) this.props.onOpenApp(w === 'term' ? 'term' : 'set', 'place'); },
+      powerOff: () => { this.setState({ shade: false, hov: null }); if (this.props.onPower) this.props.onPower(); else if (this.props.onLock) this.props.onLock(); },
       openNotes: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('notes', 'dock'); } },
       openDown: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('files:down', 'place'); } },
       openTrash: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('files:trash', 'place'); } },
