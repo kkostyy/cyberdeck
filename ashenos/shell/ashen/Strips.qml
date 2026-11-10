@@ -130,4 +130,26 @@ Item {
                 : "Ничего не подключено"
         }
     }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 8
+        visible: root.which === "bright"
+        G { text: "󰃠" }
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: 4
+            radius: 2
+            color: Qt.rgba(1, 1, 1, 0.14)
+            Rectangle {
+                width: parent.width * root.st.brightness
+                height: parent.height
+                radius: 2
+                color: Theme.accent
+                Behavior on width { NumberAnimation { duration: 200 } }
+            }
+        }
+        T { text: Math.round(root.st.brightness * 100) + "%"; font.family: Theme.mono }
+    }
 }

@@ -139,6 +139,49 @@ Scope {
     }
     Timer { interval: 15 * 60 * 1000; running: true; repeat: true; triggeredOnStart: true; onTriggered: wxProc.running = true }
 
+    // ── volume / brightness steps (keys) ──
+    function stepVolume(d) { setVolume(Math.round((volume + d) * 20) / 20); }
+    property real brightness: 0
+    Process {
+        id: brProc
+        command: ["brightnessctl", "-m", "-c", "backlight"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let f = this.text.trim().split("\n")[0].split(",");
+                if (f.length >= 5) st.brightness = parseInt(f[2]) / parseInt(f[4]);
+            }
+        }
+    }
+    function stepBrightness(d) {
+        let v = Math.max(0.01, Math.min(1, Math.round((brightness + d) * 20) / 20));
+        brightness = v;
+        Quickshell.execDetached(["brightnessctl", "-q", "-c", "backlight", "set", Math.round(v * 100) + "%"]);
+    }
+    function setBrightness(v) {
+        brightness = Math.max(0.01, Math.min(1, v));
+        Quickshell.execDetached(["brightnessctl", "-q", "-c", "backlight", "set", Math.round(brightness * 100) + "%"]);
+    }
+
+    // ── clipboard history (cliphist) ──
+    property var clips: []
+    Process {
+        id: clipProc
+        command: ["bash", "-c", "cliphist list 2>/dev/null | head -n 8"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                st.clips = this.text.split("\n").filter(l => l !== "").map(l => {
+                    let i = l.indexOf("\t");
+                    let t = l.substring(i + 1);
+                    return { id: l.substring(0, i), text: /^\[\[ binary data/.test(t) ? "󰋩  изображение" : t };
+                });
+            }
+        }
+    }
+    function refreshClips() { clipProc.running = true; }
+    function pasteClip(id) {
+        Quickshell.execDetached(["bash", "-c", "cliphist decode \"$1\" | wl-copy", "ashen", id]);
+    }
+
     // keyboard layout from sway
     property string layout: ""
     Process {
@@ -159,5 +202,5 @@ Scope {
         command: ["swaymsg", "-t", "subscribe", "-m", "[\"input\"]"]
         stdout: SplitParser { onRead: kbProc.running = true }
     }
-    Component.onCompleted: kbProc.running = true
+    Component.onCompleted: { kbProc.running = true; brProc.running = true; }
 }

@@ -187,7 +187,7 @@ Item {
         visible: root.which === "vol"
         RowLayout {
             Layout.fillWidth: true
-            T { text: "Звук"; font.pixelSize: 13; font.weight: Font.Bold }
+            T { text: "Звук и экран"; font.pixelSize: 13; font.weight: Font.Bold }
             T {
                 Layout.fillWidth: true
                 text: root.st.sink ? (root.st.sink.description || root.st.sink.name) : "нет устройства"
@@ -202,6 +202,61 @@ Item {
             Slider { Layout.fillWidth: true; value: root.st.muted ? 0 : root.st.volume; onMoved: v => root.st.setVolume(v) }
             T { text: Math.round(root.st.volume * 100) + "%"; font.family: Theme.mono; Layout.preferredWidth: 32 }
         }
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            Btn { glyph: "󰃠" }
+            Slider { Layout.fillWidth: true; value: root.st.brightness; onMoved: v => root.st.setBrightness(v) }
+            T { text: Math.round(root.st.brightness * 100) + "%"; font.family: Theme.mono; Layout.preferredWidth: 32 }
+        }
+    }
+
+    // ── clipboard ──
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        anchors.topMargin: 6
+        spacing: 4
+        visible: root.which === "clip"
+        RowLayout {
+            Layout.fillWidth: true
+            T { text: "Буфер обмена"; font.pixelSize: 13; font.weight: Font.Bold; Layout.fillWidth: true }
+            T { text: "клик — скопировать"; color: Theme.dim; font.pixelSize: 9 }
+        }
+        T {
+            visible: root.st.clips.length === 0
+            Layout.fillWidth: true
+            Layout.topMargin: 20
+            horizontalAlignment: Text.AlignHCenter
+            text: "Пусто"
+            color: Theme.dim
+        }
+        Repeater {
+            model: root.st.clips.slice(0, 6)
+            Rectangle {
+                id: clip
+                required property var modelData
+                Layout.fillWidth: true
+                implicitHeight: 24
+                radius: 8
+                color: cm.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : Theme.cardSolid
+                T {
+                    anchors.fill: parent
+                    anchors.leftMargin: 9
+                    anchors.rightMargin: 9
+                    verticalAlignment: Text.AlignVCenter
+                    text: clip.modelData.text.replace(/\s+/g, " ")
+                    font.family: clip.modelData.text.charAt(0) === "󰋩" ? Theme.icons : Theme.font
+                }
+                MouseArea {
+                    id: cm
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: { root.st.pasteClip(clip.modelData.id); root.closeRequested(); }
+                }
+            }
+        }
+        Item { Layout.fillHeight: true }
     }
 
     // ── music ──

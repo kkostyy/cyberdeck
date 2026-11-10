@@ -1,0 +1,54 @@
+# AshenOS: клавиши оболочки. Подключите в конфиге sway ПОСЛЕ остальных клавиш:
+#   include ~/.config/sway/ashen-keys
+# (повторные bindsym заменяют прежние, sway лишь предупредит об этом)
+
+bindsym $mod+S exec ashen toggle find
+bindsym $mod+R exec ashen toggle find
+bindsym $mod+V exec ashen toggle clip
+bindsym $mod+N exec ashen toggle net
+bindsym $mod+B exec ashen toggle bt
+bindsym $mod+Alt+D exec ashen toggle clock
+bindsym $mod+Shift+V exec ashen toggle vol
+bindsym $mod+Alt+M exec ashen toggle music
+bindsym $mod+A exec ashen toggle notif
+bindsym $mod+L exec ashen lock
+bindsym XF86PowerOff exec ashen lock
+bindsym $mod+Shift+R exec ashen reload
+
+bindsym Print exec ashen screenshot
+bindsym $mod+Shift+S exec ashen screenshot
+bindsym Shift+Print exec ashen screenshot --edit
+bindsym $mod+Print exec ashen screenshot --full
+bindsym $mod+Shift+Print exec ashen screenshot --full --edit
+
+bindsym XF86AudioRaiseVolume exec ashen volume raise
+bindsym XF86AudioLowerVolume exec ashen volume lower
+bindsym XF86AudioMute exec ashen volume mute
+bindsym XF86AudioMicMute exec ashen mic
+bindsym XF86MonBrightnessUp exec ashen brightness raise
+bindsym XF86MonBrightnessDown exec ashen brightness lower
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioPause exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10

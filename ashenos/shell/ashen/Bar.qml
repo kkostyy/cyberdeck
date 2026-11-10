@@ -30,12 +30,14 @@ PanelWindow {
     // [panel width, panel height, strip width]
     readonly property var spec: ({
         clock: [440, 182, 170],
-        vol: [250, 96, 160],
+        vol: [250, 132, 160],
         music: [270, 150, 200],
         net: [250, 118, 170],
         bt: [250, 70 + 34 * Math.min(3, Math.max(1, st.btDevices.length)), 170],
         wx: [270, 150, 200],
         notif: [300, 210, 260],
+        bright: [0, 0, 150],
+        clip: [300, 196, 0],
         find: [320, 214, 0]
     })
     readonly property var cur: spec[hov || last]
@@ -62,7 +64,8 @@ PanelWindow {
     function leave() { if (!(hov === "find" && exp)) closer.restart(); }
     // for keybinds and tests: `quickshell ipc call ashen open clock true`
     function itemFor(id) {
-        return ({ music: musicItem, vol: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem, find: searchPill, notif: island })[id];
+        return ({ music: musicItem, vol: volItem, bright: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem,
+                  find: searchPill, clip: searchPill, notif: island })[id];
     }
     IpcHandler {
         target: "ashen"
@@ -74,6 +77,41 @@ PanelWindow {
             if (expanded) bar.tap(id, it);
         }
         function close(): void { bar.close(); }
+        // open the panel, or close it if it's already open
+        function toggle(id: string): void {
+            if (bar.hov === id && bar.exp) { bar.close(); return; }
+            if (id === "clip") bar.st.refreshClips();
+            let it = bar.itemFor(id);
+            if (!it || !it.visible) return;
+            bar.enter(id, it);
+            bar.tap(id, it);
+        }
+        function volume(cmd: string): void {
+            if (cmd === "raise") bar.st.stepVolume(0.05);
+            else if (cmd === "lower") bar.st.stepVolume(-0.05);
+            else if (cmd === "mute") bar.st.toggleMute();
+            bar.osd("vol");             // also at 0 % / 100 %, when nothing changes
+        }
+        function brightness(cmd: string): void {
+            bar.st.stepBrightness(cmd === "lower" ? -0.05 : 0.05);
+            bar.osd("bright");
+        }
+    }
+
+    // short "OSD" strip after volume/brightness keys (not while that panel is open)
+    property bool osdReady: false
+    Timer { interval: 2500; running: true; onTriggered: bar.osdReady = true }
+    function osd(id) {
+        if (!osdReady || (exp && hov !== "")) return;
+        if (hov !== "" && hov !== id && hov !== "vol" && hov !== "bright") return;
+        enter(id, itemFor(id));
+        osdHide.restart();
+    }
+    Timer { id: osdHide; interval: 1600; onTriggered: if ((bar.hov === "vol" || bar.hov === "bright") && !bar.exp && !hoverAll.hovered) bar.close() }
+    Connections {
+        target: bar.st
+        function onVolumeChanged() { bar.osd("vol"); }
+        function onMutedChanged() { bar.osd("vol"); }
     }
     // a new notification pours out of the island for a few seconds
     Connections {
@@ -102,7 +140,8 @@ PanelWindow {
     // status item in the bezel
     component Item_: Rectangle {
         id: it
-        property string dropId: ""
+        property string dropId: ""          // "" — plain button, emits activated()
+        signal activated()
         default property alias content: row.data
         implicitWidth: row.implicitWidth + 12
         implicitHeight: 22
@@ -114,8 +153,8 @@ PanelWindow {
             id: mouse
             anchors.fill: parent
             hoverEnabled: true
-            onEntered: bar.enter(it.dropId, it)
-            onClicked: bar.tap(it.dropId, it)
+            onEntered: if (it.dropId !== "") bar.enter(it.dropId, it)
+            onClicked: it.dropId !== "" ? bar.tap(it.dropId, it) : it.activated()
         }
     }
 
@@ -262,6 +301,18 @@ PanelWindow {
                     dropId: "vol"
                     Glyph { text: bar.st.muted ? "󰖁" : bar.st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
                     Label { text: Math.round(bar.st.volume * 100) + "%" }
+                }
+                // keyboard: layout (click — next layout) and the on-screen keyboard
+                Item_ {
+                    id: kbItem
+                    visible: bar.st.layout !== ""
+                    onActivated: Quickshell.execDetached(["swaymsg", "input type:keyboard xkb_switch_layout next"])
+                    Label { text: bar.st.layout; font.pixelSize: 10; font.weight: Font.Bold }
+                }
+                Item_ {
+                    id: oskItem
+                    onActivated: Quickshell.execDetached(["bash", "-c", "if command -v osk >/dev/null; then osk toggle; else ~/.local/bin/osk toggle; fi"])
+                    Glyph { text: "󰌌"; font.pixelSize: 14 }
                 }
                 Item_ {
                     id: wxItem
