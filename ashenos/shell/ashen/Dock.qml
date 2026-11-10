@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
-// Bottom dock: pinned apps (~/.config/ashen/dock.json), then running unpinned apps,
+// Bottom dock: pinned apps (Config.data.dock), then running unpinned apps,
 // then Downloads and Trash. A dot marks running apps; tiles spring back after a tap.
 PanelWindow {
     id: dock
@@ -22,14 +22,9 @@ PanelWindow {
     mask: Region { item: bg }
 
     readonly property int tileSize: 36
-    property var pinned: ["claude-desk", "chromium", "org.gnome.Nautilus", "kitty", "org.kde.konsole", "pavucontrol"]
+    readonly property var pinned: Config.data.dock || []
     property string tip: ""
     property real tipX: 0
-
-    FileView {
-        path: Quickshell.env("HOME") + "/.config/ashen/dock.json"
-        onLoaded: { try { let a = JSON.parse(text()); if (Array.isArray(a)) dock.pinned = a; } catch (e) {} }
-    }
 
     function entryFor(id) { return DesktopEntries.byId(id) || DesktopEntries.heuristicLookup(id); }
     function windowsOf(entry) {
@@ -192,6 +187,11 @@ PanelWindow {
                 }
             }
             Rectangle { implicitWidth: 1; implicitHeight: dock.tileSize - 10; color: Qt.rgba(1, 1, 1, 0.12); Layout.alignment: Qt.AlignTop; Layout.topMargin: 5 }
+            Tile {
+                name: "Параметры"
+                glyph: "󰒓"
+                onActivated: Quickshell.execDetached(["quickshell", "ipc", "-p", Qt.resolvedUrl("shell.qml").toString().replace(/^file:\/\//, ""), "call", "ashen-settings", "open", ""])
+            }
             Tile {
                 name: "Загрузки"
                 glyph: "󰇚"

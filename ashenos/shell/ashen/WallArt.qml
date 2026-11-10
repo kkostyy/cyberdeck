@@ -1,11 +1,16 @@
 import QtQuick
 import QtQuick.Shapes
+import QtMultimedia
 
 // AshenOS background art: near-black gradient, soft light arcs, waves at the bottom.
-// Used by the wallpaper and the lock screen. Set `image` to use a picture instead.
+// Used by the wallpaper and the lock screen. `source` may be a picture or a video (live wallpaper).
 Item {
     id: wall
-    property string image: ""
+    property string source: Config.data.wallpaper
+    property string fill: Config.data.wallpaperFill
+    property bool paused: false
+    readonly property bool isVideo: /\.(mp4|webm|mkv|mov)$/i.test(source)
+    readonly property int fillMode: fill === "fit" ? 1 : fill === "center" ? 2 : 0
     clip: true
 
     Rectangle {
@@ -79,9 +84,27 @@ Item {
     }
     Image {
         anchors.fill: parent
-        visible: wall.image !== ""
-        source: wall.image
-        fillMode: Image.PreserveAspectCrop
+        visible: wall.source !== "" && !wall.isVideo && status === Image.Ready
+        source: wall.source !== "" && !wall.isVideo ? "file://" + wall.source : ""
+        fillMode: [Image.PreserveAspectCrop, Image.PreserveAspectFit, Image.Pad][wall.fillMode]
         asynchronous: true
+        sourceSize.width: wall.width
     }
+
+    // live wallpaper: muted loop, paused while windows cover the desktop
+    MediaPlayer {
+        id: player
+        source: wall.isVideo ? "file://" + wall.source : ""
+        loops: MediaPlayer.Infinite
+        videoOutput: video
+        onSourceChanged: if (source != "" && !wall.paused) play()
+        Component.onCompleted: if (source != "" && !wall.paused) play()
+    }
+    VideoOutput {
+        id: video
+        anchors.fill: parent
+        visible: wall.isVideo
+        fillMode: [VideoOutput.PreserveAspectCrop, VideoOutput.PreserveAspectFit, VideoOutput.PreserveAspectFit][wall.fillMode]
+    }
+    onPausedChanged: if (isVideo) { if (paused) player.pause(); else player.play(); }
 }

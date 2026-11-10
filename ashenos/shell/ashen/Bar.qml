@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.I3
 import Quickshell.Io
+import QtQuick.Shapes
 
 // Top bezel of the AshenOS frame: search, workspaces, the island and status items.
 // Hovering an item pours a thin "drop" strip out of the bezel; clicking turns it into a panel.
@@ -37,6 +38,7 @@ PanelWindow {
         wx: [270, 150, 200],
         notif: [300, 210, 260],
         bright: [0, 0, 150],
+        sys: [240, 96, 200],
         clip: [300, 196, 0],
         find: [320, 214, 0]
     })
@@ -64,7 +66,7 @@ PanelWindow {
     function leave() { if (!(hov === "find" && exp)) closer.restart(); }
     // for keybinds and tests: `quickshell ipc call ashen open clock true`
     function itemFor(id) {
-        return ({ music: musicItem, vol: volItem, bright: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem,
+        return ({ sys: sysItem, music: musicItem, vol: volItem, bright: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem,
                   find: searchPill, clip: searchPill, notif: island })[id];
     }
     IpcHandler {
@@ -117,6 +119,7 @@ PanelWindow {
     Connections {
         target: bar.st
         function onNotified(n) {
+            if (Config.data.dnd) return;                          // do not disturb: list only
             if (bar.hov !== "" && bar.hov !== "notif") return;   // don't hijack an open drop
             bar.enter("notif", island);
             notifHide.restart();
@@ -137,18 +140,36 @@ PanelWindow {
         color: Theme.text
         elide: Text.ElideRight
     }
+    // tiny gauge ring
+    component Ring: Item {
+        id: ring
+        property real value: 0
+        implicitWidth: 13; implicitHeight: 13
+        Shape {
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                strokeColor: Qt.rgba(1, 1, 1, 0.18); strokeWidth: 2; fillColor: "transparent"
+                PathAngleArc { centerX: 6.5; centerY: 6.5; radiusX: 5.5; radiusY: 5.5; startAngle: 0; sweepAngle: 360 }
+            }
+            ShapePath {
+                strokeColor: Theme.accent; strokeWidth: 2; fillColor: "transparent"; capStyle: ShapePath.RoundCap
+                PathAngleArc { centerX: 6.5; centerY: 6.5; radiusX: 5.5; radiusY: 5.5; startAngle: -90; sweepAngle: 360 * Math.max(0.02, Math.min(1, ring.value)) }
+            }
+        }
+    }
     // status item in the bezel
     component Item_: Rectangle {
         id: it
         property string dropId: ""          // "" — plain button, emits activated()
         signal activated()
         default property alias content: row.data
-        implicitWidth: row.implicitWidth + 12
+        implicitWidth: row.implicitWidth + 9
         implicitHeight: 22
         radius: 7
         color: bar.hov === dropId ? Theme.hover : mouse.containsMouse ? Qt.rgba(1, 1, 1, 0.06) : "transparent"
         Behavior on color { ColorAnimation { duration: 200 } }
-        RowLayout { id: row; anchors.centerIn: parent; spacing: 5 }
+        RowLayout { id: row; anchors.centerIn: parent; spacing: 4 }
         MouseArea {
             id: mouse
             anchors.fill: parent
@@ -174,6 +195,7 @@ PanelWindow {
 
             // left: search + workspaces
             RowLayout {
+                id: leftRow
                 anchors.left: parent.left
                 anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
@@ -196,6 +218,30 @@ PanelWindow {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: bar.tap("find", searchPill)
+                    }
+                }
+
+                // Claude: opens/hides the Claude app
+                Rectangle {
+                    visible: Config.data.barClaude
+                    implicitWidth: 24; implicitHeight: 21; radius: 7
+                    color: cm.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : Qt.rgba(1, 1, 1, 0.04)
+                    Behavior on color { ColorAnimation { duration: 150 } }
+                    scale: cm.pressed ? 0.85 : 1
+                    Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutBack; easing.overshoot: 3 } }
+                    readonly property string icon: Quickshell.iconPath("claude-desk", true)
+                    Image {
+                        anchors.centerIn: parent
+                        visible: parent.icon !== ""
+                        source: parent.icon
+                        sourceSize.width: 15; sourceSize.height: 15
+                    }
+                    Glyph { anchors.centerIn: parent; visible: parent.icon === ""; text: "✳"; color: "#d97757" }
+                    MouseArea {
+                        id: cm
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: Quickshell.execDetached(["bash", "-lc", "claude-console"])
                     }
                 }
 
@@ -235,7 +281,9 @@ PanelWindow {
                 id: island
                 anchors.centerIn: parent
                 height: 22
-                width: Math.min(islandRow.implicitWidth + 18, parent.width * 0.3)
+                // as wide as the title, but never over the side groups
+                readonly property real room: 2 * Math.min(parent.width / 2 - leftRow.x - leftRow.width, rightRow.x - parent.width / 2) - 16
+                width: Math.max(60, Math.min(islandRow.implicitWidth + 18, parent.width * 0.3, room))
                 radius: 11
                 color: "#000000"
                 border.color: Qt.rgba(1, 1, 1, 0.08)
@@ -284,11 +332,20 @@ PanelWindow {
 
             // right: status items
             RowLayout {
+                id: rightRow
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 2
 
+                Item_ {
+                    id: sysItem
+                    dropId: "sys"
+                    visible: Config.data.barSysmon
+                    Ring { value: bar.st.cpu; Layout.rightMargin: -2 }
+                    Ring { value: bar.st.ram; Layout.rightMargin: -2 }
+                    Ring { value: bar.st.temp / 85 }
+                }
                 Item_ {
                     id: musicItem
                     dropId: "music"
@@ -302,17 +359,12 @@ PanelWindow {
                     Glyph { text: bar.st.muted ? "󰖁" : bar.st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
                     Label { text: Math.round(bar.st.volume * 100) + "%" }
                 }
-                // keyboard: layout (click — next layout) and the on-screen keyboard
+                // keyboard: shows the layout (Super+Space switches it); click — on-screen keyboard
                 Item_ {
                     id: kbItem
-                    visible: bar.st.layout !== ""
-                    onActivated: Quickshell.execDetached(["swaymsg", "input type:keyboard xkb_switch_layout next"])
-                    Label { text: bar.st.layout; font.pixelSize: 10; font.weight: Font.Bold }
-                }
-                Item_ {
-                    id: oskItem
                     onActivated: Quickshell.execDetached(["bash", "-c", "if command -v osk >/dev/null; then osk toggle; else ~/.local/bin/osk toggle; fi"])
-                    Glyph { text: "󰌌"; font.pixelSize: 14 }
+                    Glyph { text: "󰌌"; font.pixelSize: 13; visible: bar.st.layout === "" }
+                    Label { text: bar.st.layout; font.pixelSize: 10; font.weight: Font.Bold; visible: bar.st.layout !== "" }
                 }
                 Item_ {
                     id: wxItem

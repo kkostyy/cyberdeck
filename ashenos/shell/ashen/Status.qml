@@ -138,6 +138,70 @@ Scope {
         }
     }
     Timer { interval: 15 * 60 * 1000; running: true; repeat: true; triggeredOnStart: true; onTriggered: wxProc.running = true }
+    // after a city change: give the config a moment to be written, then fetch
+    function refreshWeather() { wxRefresh.restart(); }
+    Timer { id: wxRefresh; interval: 1200; onTriggered: { wxProc.running = false; wxProc.running = true; } }
+
+    // ── system stats: cpu %, ram %, temperature °C ──
+    property real cpu: 0
+    property real ram: 0
+    property real temp: 0
+    property var _prev: null
+    Process {
+        id: sys
+        command: ["bash", "-c", "head -1 /proc/stat; grep -E '^(MemTotal|MemAvailable):' /proc/meminfo; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let l = this.text.trim().split("\n");
+                let c = l[0].trim().split(/\s+/).slice(1).map(Number);
+                let idle = c[3] + (c[4] || 0), total = c.reduce((a, b) => a + b, 0);
+                if (st._prev) {
+                    let dt = total - st._prev[1], di = idle - st._prev[0];
+                    if (dt > 0) st.cpu = Math.max(0, Math.min(1, 1 - di / dt));
+                }
+                st._prev = [idle, total];
+                let mt = parseInt(l[1].split(/\s+/)[1]), ma = parseInt(l[2].split(/\s+/)[1]);
+                if (mt > 0) st.ram = 1 - ma / mt;
+                st.temp = (parseInt(l[3]) || 0) / 1000;
+            }
+        }
+    }
+    Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true; onTriggered: sys.running = true }
+
+    // ── screen time: seconds per app per day, ~/.local/state/ashen/usage.json (14 days) ──
+    property var usage: ({})
+    property bool away: false            // idle for 2 min or locked — not counted
+    property bool locked: false
+    readonly property string today: Qt.formatDate(clock.date, "yyyy-MM-dd")
+    IdleMonitor { timeout: 120; respectInhibitors: false; onIsIdleChanged: st.away = isIdle }
+    FileView {
+        id: usageFile
+        path: Quickshell.env("HOME") + "/.local/state/ashen/usage.json"
+        onLoaded: { try { st.usage = JSON.parse(text()); } catch (e) { st.usage = {}; } }
+    }
+    Process { running: true; command: ["mkdir", "-p", Quickshell.env("HOME") + "/.local/state/ashen"] }
+    property int _sinceSave: 0
+    Timer {
+        interval: 10000
+        running: true
+        repeat: true
+        onTriggered: {
+            let w = ToplevelManager.activeToplevel;
+            if (st.away || st.locked || !w || !w.appId) return;
+            let u = Object.assign({}, st.usage);
+            let day = Object.assign({}, u[st.today] || {});
+            day[w.appId] = (day[w.appId] || 0) + 10;
+            u[st.today] = day;
+            let days = Object.keys(u).sort();
+            while (days.length > 14) delete u[days.shift()];
+            st.usage = u;
+            if (++st._sinceSave >= 6) { st._sinceSave = 0; usageFile.setText(JSON.stringify(u)); }
+        }
+    }
+    function usageFor(day) {
+        let d = usage[day] || {};
+        return Object.keys(d).map(k => ({ app: k, secs: d[k] })).sort((a, b) => b.secs - a.secs);
+    }
 
     // ── volume / brightness steps (keys) ──
     function stepVolume(d) { setVolume(Math.round((volume + d) * 20) / 20); }

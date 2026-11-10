@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 
-// Session lock + idle: lock after 5 min, screen off after 7.5 min (not while music plays).
+// Session lock + idle: lock and screen-off timeouts from Config (not while music plays).
 //   quickshell ipc call ashen-lock lock      — lock now
 //   quickshell ipc call ashen-lock preview   — show the lock screen in a normal window
 Scope {
@@ -14,6 +14,7 @@ Scope {
     WlSessionLock {
         id: sessionLock
         locked: false
+        onLockedChanged: root.st.locked = locked
         surface: Component {
             WlSessionLockSurface {
                 color: Theme.bezel
@@ -44,14 +45,14 @@ Scope {
     }
 
     IdleMonitor {
-        timeout: 300
-        enabled: !root.st.playing && !sessionLock.locked
+        timeout: Math.max(1, Config.data.lockAfter)
+        enabled: Config.data.lockAfter > 0 && !root.st.playing && !sessionLock.locked
         respectInhibitors: true
         onIsIdleChanged: if (isIdle) sessionLock.locked = true
     }
     IdleMonitor {
-        timeout: 450
-        enabled: !root.st.playing
+        timeout: Math.max(1, Config.data.screenOffAfter)
+        enabled: Config.data.screenOffAfter > 0 && !root.st.playing
         respectInhibitors: true
         onIsIdleChanged: Quickshell.execDetached(["swaymsg", "output * power " + (isIdle ? "off" : "on")])
     }

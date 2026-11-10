@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Weather for the AshenOS shell (open-meteo, no key). Prints one JSON object.
 
+  weather.py --geocode <город>   → [{city, lat, lon, where}] for the settings page
+
 Location: ~/.config/ashen/config.json {"lat":..,"lon":..,"city":".."} if set,
 otherwise found once by IP (ipapi.co) and cached in ~/.cache/ashen/location.json.
 """
@@ -25,7 +27,7 @@ def location():
         try:
             with open(path, encoding="utf-8") as f:
                 d = json.load(f)
-            if "lat" in d and "lon" in d:
+            if d.get("lat") and d.get("lon"):
                 return d
         except (OSError, ValueError):
             pass
@@ -55,7 +57,22 @@ def main():
     }, ensure_ascii=False))
 
 
+def geocode(name):
+    """City search for the settings page: up to 5 matches."""
+    from urllib.parse import quote
+    r = get("https://geocoding-api.open-meteo.com/v1/search?count=5&language=ru&name=" + quote(name))
+    print(json.dumps([{"city": x["name"], "lat": x["latitude"], "lon": x["longitude"],
+                       "where": ", ".join(v for v in (x.get("admin1"), x.get("country")) if v)}
+                      for x in r.get("results", [])], ensure_ascii=False))
+
+
 if __name__ == "__main__":
+    if sys.argv[1:2] == ["--geocode"]:
+        try:
+            geocode(" ".join(sys.argv[2:]))
+        except Exception:
+            print("[]")
+        sys.exit(0)
     try:
         main()
     except Exception as e:  # network down etc. — the shell keeps the last value

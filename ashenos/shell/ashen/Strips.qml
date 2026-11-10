@@ -152,4 +152,17 @@ Item {
         }
         T { text: Math.round(root.st.brightness * 100) + "%"; font.family: Theme.mono }
     }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 7
+        visible: root.which === "sys"
+        G { text: "󰍛" }
+        T {
+            Layout.fillWidth: true
+            text: "ЦП " + Math.round(root.st.cpu * 100) + "% · ОЗУ " + Math.round(root.st.ram * 100) + "% · " + Math.round(root.st.temp) + "°"
+            font.family: Theme.mono
+        }
+    }
 }

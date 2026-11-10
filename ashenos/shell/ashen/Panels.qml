@@ -211,6 +211,41 @@ Item {
         }
     }
 
+    // ── system ──
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 12
+        anchors.topMargin: 6
+        spacing: 6
+        visible: root.which === "sys"
+        Repeater {
+            model: [
+                { l: "ЦП", v: root.st.cpu, t: Math.round(root.st.cpu * 100) + "%" },
+                { l: "ОЗУ", v: root.st.ram, t: Math.round(root.st.ram * 100) + "%" },
+                { l: "Темп.", v: root.st.temp / 85, t: Math.round(root.st.temp) + "°" }
+            ]
+            RowLayout {
+                required property var modelData
+                Layout.fillWidth: true
+                spacing: 8
+                T { text: modelData.l; color: Theme.sub; Layout.preferredWidth: 34 }
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: 8
+                    radius: 4
+                    color: Qt.rgba(1, 1, 1, 0.1)
+                    Rectangle {
+                        width: parent.width * Math.max(0, Math.min(1, parent.parent.modelData.v))
+                        height: parent.height; radius: 4
+                        color: parent.parent.modelData.v > 0.85 ? "#ff8a8a" : Theme.accent
+                        Behavior on width { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
+                    }
+                }
+                T { text: modelData.t; font.family: Theme.mono; Layout.preferredWidth: 32; horizontalAlignment: Text.AlignRight }
+            }
+        }
+    }
+
     // ── clipboard ──
     ColumnLayout {
         anchors.fill: parent

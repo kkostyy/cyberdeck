@@ -24,32 +24,6 @@ PanelWindow {
     readonly property color paper: "#ececf0"
     readonly property color ink: "#0b0b0c"
 
-    // ── system stats: cpu %, ram %, temperature °C ──
-    property real cpu: 0
-    property real ram: 0
-    property real temp: 0
-    property var _prev: null
-    Process {
-        id: sys
-        command: ["bash", "-c", "head -1 /proc/stat; grep -E '^(MemTotal|MemAvailable):' /proc/meminfo; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                let l = this.text.trim().split("\n");
-                let c = l[0].trim().split(/\s+/).slice(1).map(Number);
-                let idle = c[3] + (c[4] || 0), total = c.reduce((a, b) => a + b, 0);
-                if (w._prev) {
-                    let dt = total - w._prev[1], di = idle - w._prev[0];
-                    if (dt > 0) w.cpu = Math.max(0, Math.min(1, 1 - di / dt));
-                }
-                w._prev = [idle, total];
-                let mt = parseInt(l[1].split(/\s+/)[1]), ma = parseInt(l[2].split(/\s+/)[1]);
-                if (mt > 0) w.ram = 1 - ma / mt;
-                w.temp = (parseInt(l[3]) || 0) / 1000;
-            }
-        }
-    }
-    Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true; onTriggered: sys.running = true }
-
     // ── pieces ──
     component Card: Rectangle {
         default property alias content: inner.data
@@ -171,11 +145,11 @@ PanelWindow {
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
                 Layout.rightMargin: 10
-                Bar_ { value: w.cpu; label: "ЦП"; valueText: Math.round(w.cpu * 100) + "%" }
+                Bar_ { value: w.st.cpu; label: "ЦП"; valueText: Math.round(w.st.cpu * 100) + "%" }
                 Item { Layout.fillWidth: true }
-                Bar_ { value: w.ram; label: "ОЗУ"; valueText: Math.round(w.ram * 100) + "%" }
+                Bar_ { value: w.st.ram; label: "ОЗУ"; valueText: Math.round(w.st.ram * 100) + "%" }
                 Item { Layout.fillWidth: true }
-                Bar_ { value: Math.min(1, w.temp / 85); label: "Темп."; valueText: Math.round(w.temp) + "°" }
+                Bar_ { value: Math.min(1, w.st.temp / 85); label: "Темп."; valueText: Math.round(w.st.temp) + "°" }
             }
         }
 
