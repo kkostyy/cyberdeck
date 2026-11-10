@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Сборка образа AshenOS для Raspberry Pi 4 (aarch64) на основе Arch Linux ARM.
 # Запуск на x86_64 Arch: sudo ./build-image.sh [размер, по умолчанию 8G]
-# Нужно: arch-install-scripts, qemu-user-static-binfmt, dosfstools, parted, wget
+# Нужно: arch-install-scripts, qemu-user-static-binfmt, dosfstools, parted, wget, git
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -58,14 +58,52 @@ for home in "$MNT/etc/skel" "$MNT/home/alarm"; do
   cp "$ROOT_OVERLAY/etc/skel/.local/state/claude-desk/prefs.json" "$home/.local/state/claude-desk/"
 done
 
+echo "==> Ставлю оболочку serpantinum (sway + Quickshell)"
+# desktop/ — настроенная панель AshenOS, если её положили в репозиторий; иначе чистый serpantinum
+SERP_TAG=v2.2.14
+DESK="$HERE/../desktop"
+H="$MNT/home/alarm"
+if [[ -d "$DESK/serpantinum/src" ]]; then
+  SERP="$DESK/serpantinum"
+else
+  rm -rf "$OUT/serpantinum"
+  git clone --depth 1 --branch "$SERP_TAG" https://github.com/ilyamiro/serpantinum "$OUT/serpantinum"
+  SERP="$OUT/serpantinum"
+fi
+mkdir -p "$H/.local/share/serpantinum" "$H/.local/bin" "$H/.config"
+cp -a "$SERP/bin" "$SERP/src" "$H/.local/share/serpantinum/"
+[[ -f "$SERP/version.txt" ]] && cp "$SERP/version.txt" "$H/.local/share/serpantinum/"
+for b in serpantinum serpantinumd; do
+  ln -sf "/home/alarm/.local/share/serpantinum/bin/$b" "$H/.local/bin/$b"
+  ln -sf "/home/alarm/.local/share/serpantinum/bin/$b" "$MNT/usr/local/bin/$b"
+done
+# сначала стандартные конфиги serpantinum, поверх — свои из desktop/home
+[[ -d "$SERP/compositors/sway" ]] && mkdir -p "$H/.config/sway" && cp -a "$SERP/compositors/sway/." "$H/.config/sway/"
+if [[ -d "$SERP/config" ]]; then
+  for c in "$SERP"/config/*; do
+    n="$(basename "$c")"
+    [[ "$n" == sddm ]] && continue
+    mkdir -p "$H/.config/$n" && cp -a "$c/." "$H/.config/$n/"
+  done
+fi
+cp "$ROOT_OVERLAY/etc/skel/.bash_profile" "$H/.bash_profile"
+[[ -d "$DESK/home" ]] && cp -a "$DESK/home/." "$H/"
+# экран кибердека: 800×480, крупнее в 1.15 раза
+if [[ -f "$H/.config/sway/config" ]] && ! grep -q "DSI-1" -r "$H/.config/sway"; then
+  printf '\n# AshenOS: экран Waveshare 4,3" DSI\noutput DSI-1 mode 800x480 scale 1.15\n' >> "$H/.config/sway/config"
+fi
+
 echo "==> Ставлю пакеты (через qemu, это долго)"
 PKGS="$(grep -v '^\s*#' "$HERE/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')"
 arch-chroot "$MNT" /bin/bash -e <<CHROOT
 pacman-key --init
 pacman-key --populate archlinuxarm
 pacman -Syu --noconfirm --needed $PKGS
-systemctl enable sddm NetworkManager bluetooth sshd
+systemctl enable NetworkManager bluetooth sshd power-profiles-daemon
 chown -R alarm:alarm /home/alarm
+# стандартный пароль alarm работает один раз: при первом входе (и по SSH) система попросит новый
+chage -d 0 alarm
+passwd -l root
 echo 'alarm ALL=(ALL) ALL' > /etc/sudoers.d/alarm
 ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
 sed -i 's/^#\(ru_RU.UTF-8\)/\1/; s/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen
