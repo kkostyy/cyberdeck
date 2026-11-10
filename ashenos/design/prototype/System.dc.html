@@ -79,7 +79,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.files.open}}" hint-placeholder-val="{{false}}">
     <section data-win="files" aria-label="{{win.files.title}}" onMouseDown="{{h.files.down}}" style="{{win.files.box}}">
       <div data-inner="1" style="{{win.files.inner}}">
-        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Main" on-close="{{h.files.close}}" on-minimize="{{h.files.min}}" on-maximize="{{h.files.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.files.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.files.title}}»" onClick="{{h.files.restore}}" onMouseEnter="{{h.files.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -101,7 +101,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.term.open}}" hint-placeholder-val="{{false}}">
     <section data-win="term" aria-label="{{win.term.title}}" onMouseDown="{{h.term.down}}" style="{{win.term.box}}">
       <div data-inner="1" style="{{win.term.inner}}">
-        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Terminal" on-close="{{h.term.close}}" on-minimize="{{h.term.min}}" on-maximize="{{h.term.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.term.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.term.title}}»" onClick="{{h.term.restore}}" onMouseEnter="{{h.term.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -123,7 +123,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.music.open}}" hint-placeholder-val="{{false}}">
     <section data-win="music" aria-label="{{win.music.title}}" onMouseDown="{{h.music.down}}" style="{{win.music.box}}">
       <div data-inner="1" style="{{win.music.inner}}">
-        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Music" on-close="{{h.music.close}}" on-minimize="{{h.music.min}}" on-maximize="{{h.music.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.music.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.music.title}}»" onClick="{{h.music.restore}}" onMouseEnter="{{h.music.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -145,7 +145,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.lab.open}}" hint-placeholder-val="{{false}}">
     <section data-win="lab" aria-label="{{win.lab.title}}" onMouseDown="{{h.lab.down}}" style="{{win.lab.box}}">
       <div data-inner="1" style="{{win.lab.inner}}">
-        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Lab" on-close="{{h.lab.close}}" on-minimize="{{h.lab.min}}" on-maximize="{{h.lab.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.lab.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.lab.title}}»" onClick="{{h.lab.restore}}" onMouseEnter="{{h.lab.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -167,7 +167,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.set.open}}" hint-placeholder-val="{{false}}">
     <section data-win="set" aria-label="{{win.set.title}}" onMouseDown="{{h.set.down}}" style="{{win.set.box}}">
       <div data-inner="1" style="{{win.set.inner}}">
-        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Settings" on-close="{{h.set.close}}" on-minimize="{{h.set.min}}" on-maximize="{{h.set.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.set.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.set.title}}»" onClick="{{h.set.restore}}" onMouseEnter="{{h.set.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -189,7 +189,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.claude.open}}" hint-placeholder-val="{{false}}">
     <section data-win="claude" aria-label="{{win.claude.title}}" onMouseDown="{{h.claude.down}}" style="{{win.claude.box}}">
       <div data-inner="1" style="{{win.claude.inner}}">
-        <dc-import name="Claude" on-close="{{h.claude.close}}" on-minimize="{{h.claude.min}}" on-maximize="{{h.claude.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Claude" on-close="{{h.claude.close}}" on-minimize="{{h.claude.min}}" on-maximize="{{h.claude.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.claude.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.claude.title}}»" onClick="{{h.claude.restore}}" onMouseEnter="{{h.claude.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -211,7 +211,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.notes.open}}" hint-placeholder-val="{{false}}">
     <section data-win="notes" aria-label="{{win.notes.title}}" onMouseDown="{{h.notes.down}}" style="{{win.notes.box}}">
       <div data-inner="1" style="{{win.notes.inner}}">
-        <dc-import name="Notes" on-close="{{h.notes.close}}" on-minimize="{{h.notes.min}}" on-maximize="{{h.notes.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Notes" on-close="{{h.notes.close}}" on-minimize="{{h.notes.min}}" on-maximize="{{h.notes.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.notes.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.notes.title}}»" onClick="{{h.notes.restore}}" onMouseEnter="{{h.notes.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -233,7 +233,7 @@ body{margin:0;background:#050506}
   <sc-if value="{{win.web.open}}" hint-placeholder-val="{{false}}">
     <section data-win="web" aria-label="{{win.web.title}}" onMouseDown="{{h.web.down}}" style="{{win.web.box}}">
       <div data-inner="1" style="{{win.web.inner}}">
-        <dc-import name="Browser" on-close="{{h.web.close}}" on-minimize="{{h.web.min}}" on-maximize="{{h.web.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
+        <dc-import name="Browser" on-close="{{h.web.close}}" on-minimize="{{h.web.min}}" on-maximize="{{h.web.max}}" on-action="{{labAction}}" cur-wall="{{curWall}}" wave-on="{{waveOn}}" pet-on="{{petOn}}" place-req="{{filesPlace}}" theme-id="{{thId}}" theme-win="{{thWin}}" theme-tint="{{thTint}}" theme-level="{{thLevel}}" hint-size="1440px,900px"></dc-import>
       </div>
       <sc-if value="{{win.web.cover}}" hint-placeholder-val="{{false}}">
         <button aria-label="Показать окно «{{win.web.title}}»" onClick="{{h.web.restore}}" onMouseEnter="{{h.web.peek}}" onMouseLeave="{{peekOut}}" style="position: absolute; inset: 0; z-index: 5; background: transparent"></button>
@@ -801,7 +801,7 @@ body{margin:0;background:#050506}
   <!-- ============ LOCK SCREEN ============ -->
   <sc-if value="{{showLock}}" hint-placeholder-val="{{true}}">
     <div style="{{lockStyle}}">
-      <dc-import name="LockScreen" cur-wall="{{curWall}}" on-unlock="{{unlock}}" hint-size="1440px,900px"></dc-import>
+      <dc-import name="LockScreen" cur-wall="{{curWall}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" on-unlock="{{unlock}}" hint-size="1440px,900px"></dc-import>
     </div>
   </sc-if>
 
@@ -2058,6 +2058,7 @@ class Component extends DCLogic {
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
       filesPlace: st.filesPlace || '',
       powerOff: this.powerOff,
+      thWin: (() => { const v = this.themeVals(); if (v.id === 'obsidian' && !v.level) return ''; const n = parseInt(v.surface.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.9)`; })(),
       thBg: this.themeVals().bg, thAccent: this.themeVals().accent, thId: this.themeVals().id, thTint: this.themeVals().tint, thLevel: String(this.themeVals().level), thSurface: this.themeVals().surface,
       onLevel: this.onLevel, labAction: this.labAction, onWall: this.onWall, reveal: st.reveal || 0, onWaveSet: this.onWaveSet, waveOn: st.waveOn !== false, curWall: typeof st.curWall === 'number' ? st.curWall : 4, wallReq: st.wallReq || '',
       winMin: () => active !== 'desk' && this.minWin(active), winMax: () => active !== 'desk' && this.maxWin(active), winClose: () => active !== 'desk' && this.closeWin(active),

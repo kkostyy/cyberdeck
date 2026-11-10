@@ -25,7 +25,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: #050506; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
+  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
 
     <div style="flex: 1; min-height: 0; display: flex">
       <!-- ===== sidebar ===== -->
@@ -299,7 +299,7 @@ body{margin:0;background:#050506}
   <div role="status" aria-live="polite" style="{{toast}}">{{toastText}}</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"curWall":{"editor":null},"themeId":{"editor":null},"themeTint":{"editor":null},"themeLevel":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"curWall":{"editor":null},"themeId":{"editor":null},"themeWin":{"editor":null},"themeTint":{"editor":null},"themeLevel":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 const SECTIONS = [
   { cat: 'Внешний вид', items: [
     { id: 'look', name: 'Оформление', glyph: '◐', bg: '#3a3a40', sub: 'Тема, цвета, шрифты, значки', groups: [
@@ -1065,6 +1065,7 @@ class Component extends DCLogic {
       heroIcon: icon(cur.bg, 54) + ';border-radius:17px;font-size:24px',
       cur, crumb: par2 ? `${cur.cat} › ${par2.name}` : cur.cat,
       groups, q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      winTheme: (() => { const tid = st.thId || this.props.themeId || 'obsidian'; const T = THEMES.find((x) => x.id === tid) || THEMES[0]; const tint = st.thTint !== undefined ? st.thTint : (this.props.themeTint || ''); const lvl = st.thLevel !== undefined ? st.thLevel : (+this.props.themeLevel || 0); if (tid === 'obsidian' && !lvl) return '#050506'; return mixHex(T.bg, tint || T.accent || T.dots[0], [0, .07, .16][lvl] || 0); })(),
       isTheme: cur.custom === 'theme',
       th: (() => {
         const tid = st.thId || this.props.themeId || 'obsidian';

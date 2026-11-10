@@ -32,7 +32,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 0%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Браузер" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(16,16,18,0.97); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+  <section aria-label="Браузер" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
 
     <!-- tabs -->
     <div style="height: 48px; flex: none; display: flex; align-items: flex-end; gap: 4px; padding: 0 10px 0 14px">
@@ -177,7 +177,7 @@ body{margin:0;background:#050506}
 </div>
 </x-dc>
 
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   CFG_KEY = 'ashenos.browser.cfg';
   CFG_DEFS = [
@@ -264,7 +264,8 @@ class Component extends DCLogic {
     const starred = st.bms.includes(url);
     const h = new Date().getHours();
     let lst = { title: '', rows: [], empty: false, emptyText: '', canClear: false, clear: () => {}, clearLabel: '' };
-    if (base === 'ashen://history') lst = { title: 'История', rows: st.hist.map((x) => { const g = this.glyph(x.url); return { title: this.title(x.url), sub: x.url, meta: new Date(x.at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), glyph: g[0], ico: ico(g), go: () => this.open(x.url) }; }), empty: !st.hist.length, emptyText: this.cfgGet('hist') ? 'История пуста' : 'История отключена в настройках', canClear: st.hist.length > 0, clearLabel: 'Очистить историю', clear: () => { this.setState({ hist: [] }); setTimeout(() => this.save(), 0); } };
+    if (base === 'ashen://history') lst = { title: 'История', rows: st.hist.map((x) => { const g = this.glyph(x.url); return {
+      winTheme: this.props.themeWin || 'rgba(16,16,18,0.97)', title: this.title(x.url), sub: x.url, meta: new Date(x.at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), glyph: g[0], ico: ico(g), go: () => this.open(x.url) }; }), empty: !st.hist.length, emptyText: this.cfgGet('hist') ? 'История пуста' : 'История отключена в настройках', canClear: st.hist.length > 0, clearLabel: 'Очистить историю', clear: () => { this.setState({ hist: [] }); setTimeout(() => this.save(), 0); } };
     if (base === 'ashen://downloads') lst = { title: 'Загрузки', rows: this.DOWN.map(([n, s, w]) => ({ title: n, sub: '~/Загрузки/' + n, meta: `${s} · ${w}`, glyph: '↓', ico: ico(['↓', '#2f6fd6']), go: () => { if (this.props.onAction) this.props.onAction('open:files:down'); } })), empty: false, emptyText: '', canClear: false };
     if (base === 'ashen://bookmarks') lst = { title: 'Закладки', rows: st.bms.map((u) => { const g = this.glyph(u); return { title: this.title(u), sub: u, meta: '', glyph: g[0], ico: ico(g), go: () => this.open(u) }; }), empty: !st.bms.length, emptyText: 'Закладок нет', canClear: false };
     if (isSearch) {

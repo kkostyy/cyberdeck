@@ -31,7 +31,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
   <div aria-hidden="true" style="{{wallStyle}}"></div>
 
   <!-- WINDOW -->
-  <div style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden">
+  <div style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; border-radius: 22px; background: {{winTheme}}; backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden">
 
     <!-- TITLE BAR -->
     <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
@@ -411,7 +411,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"placeReq":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"placeReq":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   CFG_KEY = 'ashenos.files.cfg';
   CFG_DEFS = [
@@ -580,6 +580,7 @@ class Component extends DCLogic {
       const on = st.sel === id;
       const L = st.look[id];
       return {
+      winTheme: this.props.themeWin || 'rgba(20,20,23,0.74)',
         ...meta[id], id, selected: on,
         pick: () => this.setState({ sel: id, file: '' }),
         p: this.folderParts(1, L.s, L.c, true),

@@ -269,7 +269,7 @@ input::placeholder{color:#6f6f77}
   </section>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#5ee39a"]},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#5ee39a"]},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   CFG_KEY = 'ashenos.term.cfg';
   CFG_DEFS = [
@@ -399,7 +399,7 @@ class Component extends DCLogic {
       chip: `flex:none;padding:3px 9px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:${hexA(accent, .14)};color:${accent}`,
       dot: `width:8px;height:8px;flex:none;border-radius:50%;background:${b.ok ? '#6fd39b' : '#ff8f8a'}`,
       rerun: () => this.exec(b.cmd),
-      lines: b.lines.map((l) => ({ t: l.t, style: `white-space:pre-wrap;color:${l.c ? col[l.c] : '#d6d6db'};${l.c === 'acc' ? 'font-weight:600' : ''}` }))
+      lines: b.lines.map((l) => ({ t: l.t, style: `white-space:pre-wrap;color:${l.c ? col[l.c] : 'var(--tc, #d6d6db)'};${l.c === 'acc' ? 'font-weight:600' : ''}` }))
     }));
 
     const all = this.cmds();
@@ -498,7 +498,7 @@ class Component extends DCLogic {
       cfg: this.cfgView('Настройки терминала'), cfgOpen: () => this.setState({ cfgOpen: true }),
       termVars: `--tf:${this.cfgGet('font')}px;--tc:${({ ash: '#d6d6db', matrix: '#7cff6b', amber: '#ffb454', ice: '#9fd8ff' })[this.cfgGet('scheme')]}`,
       monSt: this.cfgGet('mon') ? '' : 'display:none',
-      winBg: this.cfgGet('alpha') < 1 ? `background:rgba(16,16,18,${this.cfgGet('alpha')})` : '',
+      winBg: (() => { const tw = this.props.themeWin, al = this.cfgGet('alpha'); if (tw) { const m = tw.match(/rgba\((\d+),(\d+),(\d+)/); return `background:rgba(${m[1]},${m[2]},${m[3]},${Math.min(.92, al)})`; } return al < 1 ? `background:rgba(16,16,18,${al})` : ''; })(),
       toggleSplit: () => this.setState({ split: !st.split }),
       splitBtn: `width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${st.split ? hexA(accent, .18) : 'transparent'};color:${st.split ? accent : '#c9c9cf'}`,
       newTab: () => this.addTab(),

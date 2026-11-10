@@ -53,7 +53,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Claude" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(16,16,18,0.96); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+  <section aria-label="Claude" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
 
     <!-- header -->
     <header style="height: 60px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
@@ -408,7 +408,7 @@ body{margin:0;background:#050506}
 </div>
 </x-dc>
 
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"petOn":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"petOn":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   CFG_KEY = 'ashenos.claude.cfg';
   CFG_DEFS = [
@@ -904,7 +904,8 @@ class Component extends DCLogic {
         const lines = (m.lines || []).map((t, i) => {
           const sign = m.diff || m.name === 'Edit' || m.name === 'Write' ? t[0] : ' ';
           const add = sign === '+', del = sign === '-';
-          return { t: (add || del) ? t.slice(1) : t, n: m.name === 'Bash' || m.name === 'Grep' ? '' : (add ? '+' : del ? '−' : ' '),
+          return {
+      winTheme: this.props.themeWin || 'rgba(16,16,18,0.96)', t: (add || del) ? t.slice(1) : t, n: m.name === 'Bash' || m.name === 'Grep' ? '' : (add ? '+' : del ? '−' : ' '),
             gut: `display:inline-block;width:${m.name === 'Bash' || m.name === 'Grep' ? 0 : 22}px;color:${add ? '#6fd39b' : del ? '#ff7b7b' : '#4a4a50'}`,
             style: `padding:0 12px;background:${add ? 'rgba(111,211,155,.1)' : del ? 'rgba(255,123,123,.1)' : 'transparent'};color:${add ? '#c8f0d8' : del ? '#ffc9c9' : '#c9c9cf'}` };
         });

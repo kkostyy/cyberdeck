@@ -31,7 +31,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 0% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Заметки" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(16,16,18,0.96); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+  <section aria-label="Заметки" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
 
     <header style="height: 60px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
       <span aria-hidden="true" style="width: 36px; height: 36px; flex: none; border-radius: 11px; display: flex; flex-direction: column; overflow: hidden; background: #fbf7ea; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6)"><span style="height: 10px; background: #f5c84b"></span><span style="flex: 1; background: repeating-linear-gradient(#fbf7ea 0 5px, #d9d2bd 5px 6px); margin: 3px 6px"></span></span>
@@ -164,7 +164,7 @@ body{margin:0;background:#050506}
 </div>
 </x-dc>
 
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   KEY = 'ashenos.notes.v1';
   TAGS = [['all', 'Все заметки', '#f2f2f4'], ['pin', 'Закреплённые', '#f5c84b'], ['personal', 'Личное', '#7fb8ff'], ['work', 'Работа', '#6fd39b'], ['ideas', 'Идеи', '#b48cff']];
@@ -250,7 +250,8 @@ class Component extends DCLogic {
     const srcLines = body.split('\n');
     const lines = srcLines.map((raw, i) => {
       const hm = raw.match(/^(#{1,3}) (.*)$/), cm = raw.match(/^\[( |x)\] (.*)$/), bm = raw.match(/^[-*] (.*)$/);
-      if (hm) return { h: true, text: hm[2], style: `font-size:${[24, 19, 16][hm[1].length - 1]}px;font-weight:700;color:#f2f2f4;margin:${i ? 12 : 0}px 0 4px;letter-spacing:-.01em` };
+      if (hm) return {
+      winTheme: this.props.themeWin || 'rgba(16,16,18,0.96)', h: true, text: hm[2], style: `font-size:${[24, 19, 16][hm[1].length - 1]}px;font-weight:700;color:#f2f2f4;margin:${i ? 12 : 0}px 0 4px;letter-spacing:-.01em` };
       if (cm) { const done = cm[1] === 'x'; return { check: true, done, text: cm[2],
         toggle: () => { const L = this.cur().body.split('\n'); L[i] = (done ? '[ ] ' : '[x] ') + cm[2]; this.patch({ body: L.join('\n') }, true); },
         box: `width:22px;height:22px;flex:none;border-radius:7px;display:flex;align-items:center;justify-content:center;border:2px solid ${done ? (cur.color || '#f2f2f4') : '#5c5c64'};background:${done ? (cur.color || '#f2f2f4') : 'transparent'};color:${done ? '#111113' : 'transparent'};transition:background .2s,border-color .2s`,
