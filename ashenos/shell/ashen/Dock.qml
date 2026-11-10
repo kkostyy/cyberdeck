@@ -42,6 +42,8 @@ PanelWindow {
     }
     // pinned entries, then apps that run but aren't pinned
     readonly property var apps: {
+        // .desktop files load asynchronously — depend on the list so we recompute when it arrives
+        let loaded = DesktopEntries.applications.values.length;
         let out = [], seen = {};
         for (let i = 0; i < pinned.length; i++) {
             let e = entryFor(pinned[i]);

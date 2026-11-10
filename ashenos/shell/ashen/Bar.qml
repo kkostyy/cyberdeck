@@ -33,6 +33,9 @@ PanelWindow {
         vol: [250, 96, 160],
         music: [270, 150, 200],
         net: [250, 118, 170],
+        bt: [250, 70 + 34 * Math.min(3, Math.max(1, st.btDevices.length)), 170],
+        wx: [270, 150, 200],
+        notif: [300, 210, 260],
         find: [320, 214, 0]
     })
     readonly property var cur: spec[hov || last]
@@ -59,7 +62,7 @@ PanelWindow {
     function leave() { if (!(hov === "find" && exp)) closer.restart(); }
     // for keybinds and tests: `quickshell ipc call ashen open clock true`
     function itemFor(id) {
-        return ({ music: musicItem, vol: volItem, net: netItem, clock: clockItem, find: searchPill })[id];
+        return ({ music: musicItem, vol: volItem, net: netItem, bt: btItem, wx: wxItem, clock: clockItem, find: searchPill, notif: island })[id];
     }
     IpcHandler {
         target: "ashen"
@@ -72,6 +75,16 @@ PanelWindow {
         }
         function close(): void { bar.close(); }
     }
+    // a new notification pours out of the island for a few seconds
+    Connections {
+        target: bar.st
+        function onNotified(n) {
+            if (bar.hov !== "" && bar.hov !== "notif") return;   // don't hijack an open drop
+            bar.enter("notif", island);
+            notifHide.restart();
+        }
+    }
+    Timer { id: notifHide; interval: 5000; onTriggered: if (bar.hov === "notif" && !bar.exp && !hoverAll.hovered) bar.close() }
     Timer { id: closer; interval: bar.exp ? 650 : 320; onTriggered: bar.close() }
 
     // ── shared widgets ──
@@ -111,7 +124,7 @@ PanelWindow {
     // whole interactive area: leaving it drains the drop
     Item {
         anchors.fill: parent
-        HoverHandler { onHoveredChanged: if (!hovered) bar.leave(); else closer.stop() }
+        HoverHandler { id: hoverAll; onHoveredChanged: if (!hovered) bar.leave(); else closer.stop() }
 
         // ── bezel ──
         Rectangle {
@@ -188,6 +201,7 @@ PanelWindow {
                 color: "#000000"
                 border.color: Qt.rgba(1, 1, 1, 0.08)
                 Behavior on width { NumberAnimation { duration: 420; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.easeOut } }
+                MouseArea { anchors.fill: parent; onClicked: bar.tap("notif", island) }
                 RowLayout {
                     id: islandRow
                     anchors.centerIn: parent
@@ -208,6 +222,23 @@ PanelWindow {
                         font.pixelSize: 11
                         font.weight: Font.DemiBold
                         color: "#c9c9cf"
+                    }
+                    // unread notifications
+                    Rectangle {
+                        visible: bar.st.notifs.length > 0
+                        implicitWidth: Math.max(14, cnt.implicitWidth + 8)
+                        implicitHeight: 14
+                        radius: 7
+                        color: Theme.accent
+                        Text {
+                            id: cnt
+                            anchors.centerIn: parent
+                            text: bar.st.notifs.length
+                            font.family: Theme.font
+                            font.pixelSize: 9
+                            font.weight: Font.Bold
+                            color: Theme.accentInk
+                        }
                     }
                 }
             }
@@ -231,6 +262,19 @@ PanelWindow {
                     dropId: "vol"
                     Glyph { text: bar.st.muted ? "󰖁" : bar.st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
                     Label { text: Math.round(bar.st.volume * 100) + "%" }
+                }
+                Item_ {
+                    id: wxItem
+                    dropId: "wx"
+                    visible: bar.st.weather !== null
+                    Glyph { text: bar.st.weather ? bar.st.wmoGlyph(bar.st.weather.code, bar.st.weather.day) : ""; font.pixelSize: 13 }
+                    Label { text: bar.st.weather ? Math.round(bar.st.weather.temp) + "°" : "" }
+                }
+                Item_ {
+                    id: btItem
+                    dropId: "bt"
+                    visible: bar.st.bt !== null
+                    Glyph { text: bar.st.btIcon; font.pixelSize: 13 }
                 }
                 Item_ {
                     id: netItem

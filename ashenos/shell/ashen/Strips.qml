@@ -90,4 +90,44 @@ Item {
         }
         T { visible: root.st.ssid !== ""; text: root.st.signal + "%"; color: Theme.dim; font.family: Theme.mono }
     }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 7
+        visible: root.which === "notif"
+        readonly property var n: root.st.notifs.length > 0 ? root.st.notifs[0] : null
+        G { text: "󰂚"; color: Theme.accent }
+        T {
+            Layout.fillWidth: true
+            text: parent.n ? (parent.n.summary || parent.n.appName) + (parent.n.body ? " — " + parent.n.body.replace(/\s+/g, " ") : "") : "Уведомлений нет"
+        }
+    }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 7
+        visible: root.which === "wx"
+        readonly property var w: root.st.weather
+        G { text: parent.w ? root.st.wmoGlyph(parent.w.code, parent.w.day) : "" }
+        T {
+            Layout.fillWidth: true
+            text: parent.w ? Math.round(parent.w.temp) + "°, " + root.st.weatherText + " · ощущается " + Math.round(parent.w.feels) + "°" : ""
+        }
+    }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.bottomMargin: 2
+        spacing: 7
+        visible: root.which === "bt"
+        G { text: root.st.btIcon }
+        T {
+            Layout.fillWidth: true
+            text: !root.st.btOn ? "Bluetooth выключен"
+                : root.st.btConnected.length > 0 ? root.st.btConnected.map(d => d.name).join(", ")
+                : "Ничего не подключено"
+        }
+    }
 }

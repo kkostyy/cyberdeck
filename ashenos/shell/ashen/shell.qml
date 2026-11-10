@@ -7,6 +7,7 @@ import Quickshell.Io
 ShellRoot {
     id: root
     Status { id: status }
+    Lock { st: status }
 
     Variants {
         model: Quickshell.screens

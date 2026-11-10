@@ -272,6 +272,192 @@ Item {
         }
     }
 
+    // ── notifications ──
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 10
+        anchors.topMargin: 6
+        spacing: 6
+        visible: root.which === "notif"
+        RowLayout {
+            Layout.fillWidth: true
+            T { text: "Уведомления"; font.pixelSize: 13; font.weight: Font.Bold; Layout.fillWidth: true }
+            Btn { visible: root.st.notifs.length > 0; label: "Очистить"; implicitHeight: 22; onClicked: root.st.clearNotifs() }
+        }
+        T {
+            visible: root.st.notifs.length === 0
+            Layout.fillWidth: true
+            Layout.topMargin: 30
+            horizontalAlignment: Text.AlignHCenter
+            text: "Пока тихо"
+            color: Theme.dim
+            font.pixelSize: 12
+        }
+        ListView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            spacing: 4
+            model: root.st.notifs
+            delegate: Rectangle {
+                id: nItem
+                required property var modelData
+                width: ListView.view.width
+                implicitHeight: nCol.implicitHeight + 12
+                radius: 10
+                color: nm.containsMouse ? Qt.rgba(1, 1, 1, 0.1) : Theme.cardSolid
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: 6
+                    anchors.leftMargin: 8
+                    spacing: 8
+                    Image {
+                        Layout.alignment: Qt.AlignTop
+                        Layout.preferredWidth: 20
+                        Layout.preferredHeight: 20
+                        sourceSize.width: 20; sourceSize.height: 20
+                        source: nItem.modelData.image || (nItem.modelData.appIcon ? Quickshell.iconPath(nItem.modelData.appIcon, true) : "")
+                        visible: source != ""
+                    }
+                    ColumnLayout {
+                        id: nCol
+                        Layout.fillWidth: true
+                        spacing: 1
+                        T { Layout.fillWidth: true; text: nItem.modelData.summary || nItem.modelData.appName; font.weight: Font.Bold }
+                        T {
+                            Layout.fillWidth: true
+                            visible: text !== ""
+                            text: nItem.modelData.body
+                            color: Theme.sub
+                            wrapMode: Text.Wrap
+                            maximumLineCount: 2
+                        }
+                        T { text: nItem.modelData.appName; color: Theme.dim; font.pixelSize: 9 }
+                    }
+                    G {
+                        Layout.alignment: Qt.AlignTop
+                        text: "󰅖"; font.pixelSize: 12; color: Theme.dim
+                        MouseArea { anchors.fill: parent; anchors.margins: -4; onClicked: nItem.modelData.dismiss() }
+                    }
+                }
+                MouseArea {
+                    id: nm
+                    anchors.fill: parent
+                    anchors.rightMargin: 24
+                    hoverEnabled: true
+                    onClicked: { root.st.activate(nItem.modelData); root.closeRequested(); }
+                }
+            }
+        }
+    }
+
+    // ── weather ──
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 12
+        anchors.topMargin: 6
+        spacing: 8
+        id: wxp
+        visible: root.which === "wx"
+        readonly property var w: root.st.weather
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            T { text: wxp.w ? Math.round(wxp.w.temp) + "°" : "—"; font.pixelSize: 34; font.weight: Font.Bold }
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                T { Layout.fillWidth: true; text: wxp.w ? wxp.w.city : ""; font.weight: Font.Bold; font.pixelSize: 12 }
+                T { Layout.fillWidth: true; text: root.st.weatherText; color: Theme.sub }
+                T {
+                    Layout.fillWidth: true
+                    text: wxp.w ? "ощущается " + Math.round(wxp.w.feels) + "° · ветер " + Math.round(wxp.w.wind) + " м/с · " + wxp.w.humidity + "%" : ""
+                    color: Theme.dim
+                    font.pixelSize: 10
+                }
+            }
+            G { text: wxp.w ? root.st.wmoGlyph(wxp.w.code, wxp.w.day) : ""; font.pixelSize: 30 }
+        }
+        // hourly bars
+        RowLayout {
+            id: hours
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 0
+            readonly property var hrs: wxp.w ? wxp.w.hours : []
+            readonly property real lo: hrs.length ? Math.min.apply(null, hrs.map(h => h.temp)) : 0
+            readonly property real hi: hrs.length ? Math.max.apply(null, hrs.map(h => h.temp)) : 1
+            Repeater {
+                model: hours.hrs
+                ColumnLayout {
+                    id: hr
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 2
+                    T { Layout.alignment: Qt.AlignHCenter; text: Math.round(hr.modelData.temp) + "°"; font.pixelSize: 9; font.weight: Font.Bold }
+                    Item { Layout.fillHeight: true }
+                    Rectangle {
+                        Layout.alignment: Qt.AlignHCenter
+                        implicitWidth: 12
+                        implicitHeight: 6 + 24 * (hours.hi > hours.lo ? (hr.modelData.temp - hours.lo) / (hours.hi - hours.lo) : 0.5)
+                        radius: 5
+                        color: Theme.accent
+                    }
+                    T { Layout.alignment: Qt.AlignHCenter; text: hr.modelData.t.substring(0, 2); font.pixelSize: 9; color: Theme.dim }
+                }
+            }
+        }
+    }
+
+    // ── bluetooth ──
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 12
+        anchors.topMargin: 6
+        spacing: 6
+        visible: root.which === "bt"
+        RowLayout {
+            Layout.fillWidth: true
+            G { text: root.st.btIcon; font.pixelSize: 20 }
+            T { Layout.fillWidth: true; text: "Bluetooth"; font.pixelSize: 13; font.weight: Font.Bold }
+            Btn { glyph: "󰂯"; on: root.st.btOn; onClicked: if (root.st.bt) root.st.bt.enabled = !root.st.bt.enabled }
+        }
+        T {
+            visible: root.st.btOn && root.st.btDevices.length === 0
+            Layout.fillWidth: true
+            text: "Нет сопряжённых устройств"
+            color: Theme.dim
+        }
+        Repeater {
+            model: root.st.btOn ? root.st.btDevices.slice(0, 3) : []
+            Rectangle {
+                id: dev
+                required property var modelData
+                Layout.fillWidth: true
+                implicitHeight: 28
+                radius: 9
+                color: dm.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : Theme.cardSolid
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: 9
+                    anchors.rightMargin: 9
+                    spacing: 7
+                    G { text: dev.modelData.connected ? "󰂱" : "󰂯"; font.pixelSize: 12; color: dev.modelData.connected ? Theme.accent : Theme.sub }
+                    T { Layout.fillWidth: true; text: dev.modelData.name || dev.modelData.address }
+                    T { visible: dev.modelData.batteryAvailable; text: Math.round(dev.modelData.battery * 100) + "%"; color: Theme.dim }
+                    T { text: dev.modelData.connected ? "откл." : "подкл."; color: Theme.dim; font.pixelSize: 10 }
+                }
+                MouseArea {
+                    id: dm
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: dev.modelData.connected ? dev.modelData.disconnect() : dev.modelData.connect()
+                }
+            }
+        }
+        Item { Layout.fillHeight: true }
+    }
+
     // ── app search ──
     ColumnLayout {
         id: finder

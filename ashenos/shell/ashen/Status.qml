@@ -4,6 +4,8 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
+import Quickshell.Services.Notifications
+import Quickshell.Bluetooth
 
 // Everything the bar shows: time, window, sound, music, Wi-Fi, keyboard layout.
 Scope {
@@ -68,6 +70,74 @@ Scope {
         wifiRefresh.restart();
     }
     Timer { id: wifiRefresh; interval: 2500; onTriggered: wifiProc.running = true }
+
+    // ── notifications: we are the notification server ──
+    signal notified(var n)
+    readonly property var notifs: server.trackedNotifications.values.slice().reverse()
+    NotificationServer {
+        id: server
+        keepOnReload: true
+        bodySupported: true
+        bodyMarkupSupported: false
+        actionsSupported: true
+        imageSupported: true
+        persistenceSupported: true
+        onNotification: n => { n.tracked = true; st.notified(n); }
+    }
+    function clearNotifs() {
+        let all = server.trackedNotifications.values.slice();
+        for (let i = 0; i < all.length; i++) all[i].dismiss();
+    }
+    function activate(n) {
+        let acts = n.actions || [];
+        let def = acts.find(a => a.identifier === "default") || (acts.length === 1 ? acts[0] : null);
+        if (def) def.invoke();
+        else n.dismiss();
+    }
+
+    // ── bluetooth ──
+    readonly property var bt: Bluetooth.defaultAdapter
+    readonly property bool btOn: bt !== null && bt.enabled
+    readonly property var btDevices: bt ? bt.devices.values.filter(d => d.paired || d.connected) : []
+    readonly property var btConnected: btDevices.filter(d => d.connected)
+    readonly property string btIcon: !btOn ? "󰂲" : btConnected.length > 0 ? "󰂱" : "󰂯"
+
+    // ── weather (weather.py, every 15 min) ──
+    property var weather: null
+    readonly property string weatherText: weather ? st.wmoText(weather.code) : ""
+    function wmoText(c) {
+        if (c === 0) return "ясно";
+        if (c <= 2) return "переменная облачность";
+        if (c === 3) return "облачно";
+        if (c <= 48) return "туман";
+        if (c <= 57) return "морось";
+        if (c <= 67) return "дождь";
+        if (c <= 77) return "снег";
+        if (c <= 82) return "ливень";
+        if (c <= 86) return "снегопад";
+        return "гроза";
+    }
+    function wmoGlyph(c, day) {
+        if (c === 0) return day === false ? "󰖔" : "󰖙";
+        if (c <= 2) return day === false ? "󰼱" : "󰖕";
+        if (c === 3) return "󰖐";
+        if (c <= 48) return "󰖑";
+        if (c <= 67) return "󰖗";
+        if (c <= 77) return "󰖘";
+        if (c <= 82) return "󰖖";
+        if (c <= 86) return "󰼶";
+        return "󰖓";
+    }
+    Process {
+        id: wxProc
+        command: ["python3", "-I", Qt.resolvedUrl("weather.py").toString().replace(/^file:\/\//, "")]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try { let w = JSON.parse(this.text); if (!w.error) st.weather = w; } catch (e) {}
+            }
+        }
+    }
+    Timer { interval: 15 * 60 * 1000; running: true; repeat: true; triggeredOnStart: true; onTriggered: wxProc.running = true }
 
     // keyboard layout from sway
     property string layout: ""
