@@ -11,9 +11,9 @@
 | | |
 |---|---|
 | База | Arch Linux ARM (aarch64), ядро `linux-rpi` |
-| Окружение | sway (Wayland) + оболочка [serpantinum](https://github.com/ilyamiro/serpantinum) 2.2.14 на Quickshell, вход автологином на tty1 |
+| Окружение | sway (Wayland) + своя оболочка на Quickshell ([`shell/ashen`](shell/ashen)): рамка, остров, капли, док, виджеты; вход автологином на tty1 |
 | Тема | цветовая схема `AshenOS` (чёрная) для Qt/KDE-приложений, шрифты Iosevka Nerd, Inter и JetBrains Mono |
-| Анимации | попапы календаря, сети, Bluetooth и музыки из serpantinum (исходники — в `shell/animations`) |
+| Анимации | «жидкие» капли из рамки по кривым прототипа; попапы serpantinum для справки — в `shell/animations` |
 | Ввод | клавиатура Rii mini X1; экранная клавиатура — в планах (сейчас ставится отдельно) |
 | Экран | оверлей `vc4-kms-dsi-waveshare-800x480`, автоопределение выключено |
 | Сеть | NetworkManager, Bluetooth (bluez), SSH, WayVNC |
@@ -66,10 +66,9 @@ sudo dd if=out/ashenos-rpi4-*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
 Скрипт скачивает Arch Linux ARM для Pi 4, размечает образ (boot 512 МБ + root ext4),
-накладывает `airootfs`, ставит пакеты, оболочку serpantinum и приложение Claude через qemu-chroot
-и включает `NetworkManager`, `bluetooth`, `sshd`. Если в репозитории есть каталог `desktop/`
-(своя настроенная панель: `desktop/serpantinum` и `desktop/home`), берётся он, иначе — чистый
-serpantinum `v2.2.14` с настройкой экрана 800×480. Разделы монтируются по меткам (`ASHEN_BOOT`, `ashenos`). Пользователь — `alarm`, вход автоматический. Стандартный пароль `alarm` действует один раз:
+накладывает `airootfs`, ставит пакеты, оболочку AshenOS (`shell/ashen` с её конфигом sway) и приложение
+Claude через qemu-chroot и включает `NetworkManager`, `bluetooth`, `sshd`. При первой загрузке корневой
+раздел сам растягивается на всю карту, а если Claude ещё не вошёл в аккаунт — придёт подсказка. Разделы монтируются по меткам (`ASHEN_BOOT`, `ashenos`). Пользователь — `alarm`, вход автоматический. Стандартный пароль `alarm` действует один раз:
 при первом входе (в том числе по SSH) система попросит придумать новый. Вход под `root` закрыт, есть `sudo`.
 
 ## Установка поверх уже работающего Arch Linux ARM
@@ -82,10 +81,16 @@ sudo sh -c 'cat airootfs/boot/config-ashenos.txt >> /boot/config.txt'
 sudo install -Dm755 build/ashenos-info /usr/local/bin/ashenos-info
 apps/claude-desk/install.sh          # приложение Claude для текущего пользователя
 sudo systemctl enable --now NetworkManager bluetooth
+# оболочка AshenOS: файлы и конфиг sway (старый конфиг сохранится как config.pre-ashenos)
+mkdir -p ~/.local/share/ashen ~/.config/sway && cp -a shell/ashen/. ~/.local/share/ashen/
+[ -f ~/.config/sway/config ] && mv ~/.config/sway/config ~/.config/sway/config.pre-ashenos
+cp shell/ashen/sway/config ~/.config/sway/config
+sudo ln -sf ~/.local/share/ashen/bin/ashen /usr/local/bin/ashen
 ```
 
-Оболочку serpantinum ставьте его собственным установщиком (см. [README serpantinum](https://github.com/ilyamiro/serpantinum),
-композитор — sway), затем включите автологин: `sudo systemctl daemon-reload` и перезагрузка.
+После перезагрузки автологин на tty1 запустит sway с оболочкой. Если у вас уже есть свой sway
+и оболочка (например, serpantinum), вместо замены конфига можно переключаться командой
+`shell/ashen/bin/ashen-default on|off`.
 
 ## Если на Pi осталась Plasma
 
@@ -105,5 +110,5 @@ bash ashenos/build/apply-on-sway.sh
 - [x] Цветовая схема, оверлей экрана, автологин в sway
 - [x] Скрипт сборки образа
 - [x] Приложение Claude (claude-desk) в образе
-- [ ] Перенос оболочки из прототипа в Quickshell/QML (заготовки анимаций — в `shell/animations`)
+- [x] Оболочка из прототипа на Quickshell: рамка, остров, капли, док, виджеты, уведомления, блокировка, настройки
 - [ ] Экран блокировки в стиле прототипа (вход — автологин, блокировка — serpantinum)

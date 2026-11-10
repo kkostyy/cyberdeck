@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Первый запуск AshenOS: подсказать, что Claude ещё не вошёл в аккаунт.
+sleep 8
+if command -v claude >/dev/null && [ ! -s "$HOME/.claude/.credentials.json" ]; then
+  notify-send -a "AshenOS" -i claude-desk "Войдите в Claude" \
+    "Откройте терминал (Super+Enter) и выполните: claude — он покажет ссылку для входа."
+fi

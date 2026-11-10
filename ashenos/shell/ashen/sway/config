@@ -1,0 +1,62 @@
+# AshenOS — конфиг sway для образа. Оболочка (рамка, полоса, док, виджеты) — Quickshell.
+set $mod Mod4
+set $terminal kitty
+set $shell ~/.local/share/ashen
+
+# экран кибердека: Waveshare 4,3" DSI 800×480, крупнее в 1.15 раза
+output DSI-1 mode 800x480 scale 1.15
+output * bg #050506 solid_color
+
+input type:keyboard {
+    xkb_layout us,ru
+    xkb_options grp:win_space_toggle
+    repeat_delay 400
+    repeat_rate 30
+}
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    click_method clickfinger
+}
+
+# внешний вид: окна без рамок, небольшие зазоры внутри чёрной рамки оболочки
+default_border none
+default_floating_border none
+gaps inner 4
+gaps outer 0
+seat * xcursor_theme breeze_cursors 24
+# маленький экран: плавающие окна целиком на экране
+floating_maximum_size 685 x 305
+for_window [floating] move position center
+for_window [app_id="pavucontrol"] floating enable
+for_window [app_id="nm-connection-editor"] floating enable
+
+# автозапуск
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP
+exec wl-paste --type text --watch cliphist store
+exec wl-paste --type image --watch cliphist store
+exec quickshell -p $shell/shell.qml
+exec $shell/bin/ashen-autopause
+exec $shell/bin/ashenos-firstrun
+
+# окна
+bindsym $mod+Return exec $terminal
+bindsym Ctrl+Alt+T exec $terminal
+bindsym $mod+E exec nautilus
+bindsym $mod+Q kill
+bindsym Alt+F4 kill
+bindsym $mod+Up fullscreen toggle
+bindsym $mod+Shift+F floating toggle
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Right move right
+bindsym Alt+Tab focus next
+bindsym Alt+Shift+Tab focus prev
+bindsym $mod+Ctrl+Left workspace prev
+bindsym $mod+Ctrl+Right workspace next
+bindsym $mod+Shift+E exec swaynag -t warning -m 'Выйти из сеанса?' -B 'Выйти' 'swaymsg exit'
+floating_modifier $mod normal
+
+# клавиши оболочки: поиск, панели, громкость, яркость, скриншоты, рабочие столы
+include $shell/sway/ashen-keys

@@ -10,7 +10,7 @@ wayvnc
 i2c-tools
 # python-модуль smbus для OLED входит в i2c-tools (python-smbus2 есть только в AUR)
 
-# окружение: sway (Wayland) + оболочка serpantinum на Quickshell
+# окружение: sway (Wayland) + оболочка AshenOS на Quickshell (shell/ashen)
 sway
 xorg-xwayland
 xdg-desktop-portal-wlr
@@ -24,7 +24,7 @@ qt5ct
 qt6ct
 wayvnc
 
-# что нужно serpantinum (список из его установщика, без пакетов AUR)
+# что нужно оболочке и её командам (обои-видео, буфер, скриншоты, яркость…)
 kitty
 cava
 zbar
