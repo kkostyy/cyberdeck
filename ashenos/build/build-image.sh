@@ -68,6 +68,10 @@ for home in "$MNT/etc/skel" "$H"; do
 done
 cp "$ROOT_OVERLAY/etc/skel/.bash_profile" "$H/.bash_profile"
 ln -sf /home/alarm/.local/share/ashen/bin/ashen "$MNT/usr/local/bin/ashen"
+# Press Start 2P (OFL) for the LED text, Проводник entry and icon
+install -Dm644 "$SH/fonts/PressStart2P-Regular.ttf" "$MNT/usr/share/fonts/TTF/PressStart2P-Regular.ttf"
+install -Dm644 "$SH/share/ashenos-files.desktop" "$MNT/usr/share/applications/ashenos-files.desktop"
+install -Dm644 "$SH/share/ashenos-files.svg" "$MNT/usr/share/icons/hicolor/scalable/apps/ashenos-files.svg"
 
 echo "==> Ставлю пакеты (через qemu, это долго)"
 PKGS="$(grep -v '^\s*#' "$HERE/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')"

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pam
 
 // Lock screen UI (design/screens/01-lock.jpg). Password goes through PAM ("login" stack).
@@ -16,13 +17,55 @@ Item {
     property bool busy: false
     property string pending: ""
 
+    // «Пароль» goes through PAM; «PIN-код» checks the salted hash from pin.py; «Лицо» needs a camera
+    property string method: "password"          // password | pin | face
+    property bool pinSet: false
+    property int pinFails: 0
+    property bool pinLocked: false
+    readonly property string helper: Qt.resolvedUrl("pin.py").toString().replace(/^file:\/\//, "")
+    Process {
+        running: true
+        command: ["python3", "-I", lc.helper, "status"]
+        stdout: StdioCollector { onStreamFinished: lc.pinSet = this.text.trim() === "set" }
+    }
+    Process {
+        id: pinCheck
+        stdinEnabled: true
+        command: ["python3", "-I", lc.helper, "check"]
+        onExited: code => {
+            lc.busy = false;
+            pw.text = "";
+            if (code === 0) { lc.pinFails = 0; lc.unlocked(); return; }
+            lc.pinFails++;
+            shake.restart();
+            if (lc.pinFails >= 5) { lc.pinLocked = true; pinCool.restart(); lc.status = "PIN заблокирован на минуту — войдите паролем"; }
+            else lc.status = "Неверный PIN-код";
+        }
+    }
+    Timer { id: pinCool; interval: 60000; onTriggered: { lc.pinLocked = false; lc.pinFails = 0; lc.status = ""; } }
+    // a real camera is /dev/video0…9 (video10+ on the Pi are the hardware codecs)
+    property bool hasCamera: false
+    Process {
+        running: true
+        command: ["bash", "-c", "ls /dev/video[0-9] >/dev/null 2>&1 && echo yes"]
+        stdout: StdioCollector { onStreamFinished: lc.hasCamera = this.text.trim() === "yes" }
+    }
+
     function submit() {
         if (busy) return;
         if (preview) { unlocked(); return; }
+        if (method === "face") return;
         if (pw.text === "") return;
+        status = "";
+        if (method === "pin") {
+            if (!pinSet || pinLocked) return;
+            busy = true;
+            pinCheck.running = true;
+            pinCheck.write(pw.text + "\n");
+            return;
+        }
         pending = pw.text;
         busy = true;
-        status = "";
         pam.start();
     }
 
@@ -202,16 +245,26 @@ Item {
                     Layout.fillWidth: true
                     property bool reveal: false
                     echoMode: reveal ? TextInput.Normal : TextInput.Password
+                    validator: RegularExpressionValidator { regularExpression: lc.method === "pin" ? /[0-9]{0,8}/ : /.*/ }
+                    inputMethodHints: lc.method === "pin" ? Qt.ImhDigitsOnly : Qt.ImhNone
                     passwordCharacter: "●"
                     font.family: Theme.font
                     font.pixelSize: 12
                     color: Theme.text
                     clip: true
                     focus: true
-                    enabled: !lc.busy
+                    enabled: !lc.busy && lc.method !== "face" && !(lc.method === "pin" && (!lc.pinSet || lc.pinLocked))
                     onAccepted: lc.submit()
                     onTextChanged: if (text !== "") lc.status = ""
-                    T { anchors.verticalCenter: parent.verticalCenter; visible: pw.text === ""; text: "Пароль"; color: Theme.dim; font.pixelSize: 12 }
+                    T {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: pw.text === ""
+                        text: lc.method === "password" ? "Пароль"
+                            : lc.method === "pin" ? (lc.pinSet ? "PIN-код" : "PIN не задан — Параметры → Экран и сон")
+                            : (lc.hasCamera ? "Посмотрите в камеру…" : "Камера не найдена")
+                        color: Theme.dim
+                        font.pixelSize: lc.method === "password" || lc.pinSet ? 12 : 10
+                    }
                 }
                 G {
                     text: pw.reveal ? "󰈉" : "󰈈"
@@ -241,6 +294,44 @@ Item {
             opacity: text !== "" ? 1 : 0
             font.pixelSize: 11
             color: lc.preview ? Theme.dim : "#ff8a8a"
+        }
+        // ways to unlock, as in the design
+        Rectangle {
+            Layout.alignment: Qt.AlignHCenter
+            implicitWidth: methods.implicitWidth + 8
+            implicitHeight: 30
+            radius: 15
+            color: Qt.rgba(1, 1, 1, 0.06)
+            border.color: Qt.rgba(1, 1, 1, 0.1)
+            Row {
+                id: methods
+                anchors.centerIn: parent
+                spacing: 2
+                Repeater {
+                    model: [{ id: "password", g: "•••", t: "Пароль" }, { id: "pin", g: "#", t: "PIN-код" }, { id: "face", g: "◉", t: "Лицо" }]
+                    Rectangle {
+                        id: mtab
+                        required property var modelData
+                        readonly property bool on: lc.method === modelData.id
+                        width: mrow.implicitWidth + 20; height: 24; radius: 12
+                        color: on ? Theme.accent : mm.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
+                        Behavior on color { ColorAnimation { duration: 160 } }
+                        Row {
+                            id: mrow
+                            anchors.centerIn: parent
+                            spacing: 5
+                            T { text: mtab.modelData.g; font.pixelSize: 10; font.weight: Font.Bold; color: mtab.on ? Theme.accentInk : Theme.text }
+                            T { text: mtab.modelData.t; font.pixelSize: 10; font.weight: Font.DemiBold; color: mtab.on ? Theme.accentInk : Theme.text }
+                        }
+                        MouseArea {
+                            id: mm
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: { lc.method = mtab.modelData.id; pw.text = ""; lc.status = ""; pw.forceActiveFocus(); }
+                        }
+                    }
+                }
+            }
         }
     }
 

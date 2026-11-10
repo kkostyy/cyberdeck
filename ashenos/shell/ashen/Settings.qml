@@ -405,6 +405,53 @@ Scope {
                             }
                         }
 
+                        // PIN for the lock screen (pin.py: salted hash, mode 600)
+                        ColumnLayout {
+                            visible: root.section === "screen"
+                            Layout.fillWidth: true
+                            spacing: 6
+                            Process {
+                                id: pinStatus
+                                property bool isSet: false
+                                running: root.section === "screen"
+                                command: ["python3", "-I", Qt.resolvedUrl("pin.py").toString().replace(/^file:\/\//, ""), "status"]
+                                stdout: StdioCollector { onStreamFinished: pinStatus.isSet = this.text.trim() === "set" }
+                            }
+                            Process {
+                                id: pinSet
+                                stdinEnabled: true
+                                command: ["python3", "-I", Qt.resolvedUrl("pin.py").toString().replace(/^file:\/\//, ""), "set"]
+                                onExited: code => { pinNote.text = code === 0 ? "PIN сохранён" : "Нужно 4–8 цифр"; pinStatus.running = true; }
+                            }
+                            Row_ {
+                                title: "PIN-код на экране блокировки"
+                                hint: pinStatus.isSet ? "Задан. После 5 ошибок PIN блокируется на минуту" : "Не задан — разблокировка только паролем"
+                                Row {
+                                    spacing: 4
+                                    Rectangle {
+                                        width: 80; height: 24; radius: 8
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+                                        TextInput {
+                                            id: pinIn
+                                            anchors.fill: parent; anchors.leftMargin: 8
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            echoMode: TextInput.Password
+                                            validator: RegularExpressionValidator { regularExpression: /[0-9]{0,8}/ }
+                                            font.family: Theme.font; font.pixelSize: 11; color: Theme.text
+                                            T { visible: pinIn.text === ""; anchors.verticalCenter: parent.verticalCenter; text: "новый PIN"; color: Theme.dim }
+                                        }
+                                    }
+                                    Pill { label: "Задать"; onClicked: { pinSet.running = true; pinSet.write(pinIn.text + "\n"); pinIn.text = ""; } }
+                                    Pill {
+                                        visible: pinStatus.isSet
+                                        label: "Убрать"
+                                        onClicked: { Quickshell.execDetached(["python3", "-I", Qt.resolvedUrl("pin.py").toString().replace(/^file:\/\//, ""), "clear"]); pinNote.text = "PIN убран"; pinStatus.isSet = false; }
+                                    }
+                                }
+                            }
+                            T { id: pinNote; color: Theme.dim; text: "" }
+                        }
+
                         // ── notifications ──
                         ColumnLayout {
                             visible: root.section === "notif"

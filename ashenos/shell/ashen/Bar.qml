@@ -247,9 +247,9 @@ PanelWindow {
                     }
                 }
 
-                // workspaces: a wide pill for the active one
+                // window title + workspaces in one pill (design board «Рабочий стол»)
                 Rectangle {
-                    implicitWidth: wsRow.implicitWidth + 14
+                    implicitWidth: wsRow.implicitWidth + 18
                     implicitHeight: 21
                     radius: 7
                     color: Qt.rgba(1, 1, 1, 0.04)
@@ -257,6 +257,15 @@ PanelWindow {
                         id: wsRow
                         anchors.centerIn: parent
                         spacing: 4
+                        Label {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: bar.st.windowTitle
+                            width: Math.min(implicitWidth, 120)
+                            font.pixelSize: 10
+                            font.weight: Font.DemiBold
+                            color: "#c9c9cf"
+                            rightPadding: 4
+                        }
                         Repeater {
                             model: I3.workspaces
                             Rectangle {
@@ -283,6 +292,12 @@ PanelWindow {
                 id: island
                 anchors.centerIn: parent
                 height: 22
+                readonly property bool live: bar.hov === "notif" || bar.st.notifs.length > 0 || bar.st.islandText !== ""
+                opacity: live ? 1 : 0
+                scale: live ? 1 : 0.6
+                visible: opacity > 0.01
+                Behavior on opacity { NumberAnimation { duration: 260 } }
+                Behavior on scale { NumberAnimation { duration: 420; easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
                 // as wide as the title, but never over the side groups
                 readonly property real room: 2 * Math.min(parent.width / 2 - leftRow.x - leftRow.width, rightRow.x - parent.width / 2) - 16
                 width: Math.max(60, Math.min(islandRow.implicitWidth + 18, parent.width * 0.3, room))
@@ -307,7 +322,7 @@ PanelWindow {
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: bar.st.windowTitle
+                        text: bar.st.islandText !== "" ? bar.st.islandText : bar.st.notifs.length > 0 ? (bar.st.notifs[0].summary || bar.st.notifs[0].appName) : "Уведомления"
                         font.pixelSize: 11
                         font.weight: Font.DemiBold
                         color: "#c9c9cf"

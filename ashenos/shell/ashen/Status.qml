@@ -140,6 +140,9 @@ Scope {
         return "работает " + (h > 0 ? h + " ч " : "") + m + " мин";
     }
 
+    // short status shown in the island by events (timer, recording, layout…)
+    property string islandText: ""
+
     // ── notifications: we are the notification server ──
     signal notified(var n)
     readonly property var notifs: server.trackedNotifications.values.slice().reverse()

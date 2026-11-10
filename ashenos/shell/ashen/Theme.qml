@@ -18,6 +18,7 @@ Singleton {
     readonly property string font: "Inter"
     readonly property string mono: "JetBrains Mono"
     readonly property string icons: "Iosevka Nerd Font"
+    readonly property string pixel: "Press Start 2P"        // LED-board text (fonts/, OFL)
 
     // frame
     readonly property int barH: 30
