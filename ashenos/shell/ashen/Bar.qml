@@ -66,7 +66,7 @@ PanelWindow {
         enabled: bar.screen === Quickshell.screens[0]
         function open(id: string, expanded: bool): void {
             let it = bar.itemFor(id);
-            if (!it) return;
+            if (!it || !it.visible) return;
             bar.enter(id, it);
             if (expanded) bar.tap(id, it);
         }
@@ -106,8 +106,7 @@ PanelWindow {
         }
     }
 
-    // ── state sources ──
-    Status { id: st }
+    required property var st
 
     // whole interactive area: leaving it drains the drop
     Item {
@@ -200,12 +199,12 @@ PanelWindow {
                         Rectangle {
                             anchors.centerIn: parent
                             width: 4; height: 4; radius: 2
-                            color: st.playing ? Theme.accent : Theme.sub
+                            color: bar.st.playing ? Theme.accent : Theme.sub
                         }
                     }
                     Label {
                         Layout.fillWidth: true
-                        text: st.windowTitle
+                        text: bar.st.windowTitle
                         font.pixelSize: 11
                         font.weight: Font.DemiBold
                         color: "#c9c9cf"
@@ -223,26 +222,26 @@ PanelWindow {
                 Item_ {
                     id: musicItem
                     dropId: "music"
-                    visible: st.player !== null
-                    Glyph { text: st.playing ? "󰎈" : "󰏤"; font.pixelSize: 12 }
-                    Label { text: st.trackTitle; Layout.maximumWidth: 90 }
+                    visible: bar.st.player !== null
+                    Glyph { text: bar.st.playing ? "󰎈" : "󰏤"; font.pixelSize: 12 }
+                    Label { text: bar.st.trackTitle; Layout.maximumWidth: 90 }
                 }
                 Item_ {
                     id: volItem
                     dropId: "vol"
-                    Glyph { text: st.muted ? "󰖁" : st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
-                    Label { text: Math.round(st.volume * 100) + "%" }
+                    Glyph { text: bar.st.muted ? "󰖁" : bar.st.volume > 0.5 ? "󰕾" : "󰖀"; font.pixelSize: 13 }
+                    Label { text: Math.round(bar.st.volume * 100) + "%" }
                 }
                 Item_ {
                     id: netItem
                     dropId: "net"
-                    Glyph { text: st.wifiIcon; font.pixelSize: 13 }
+                    Glyph { text: bar.st.wifiIcon; font.pixelSize: 13 }
                 }
                 Item_ {
                     id: clockItem
                     dropId: "clock"
                     Label {
-                        text: Qt.formatTime(st.clock.date, "HH:mm")
+                        text: Qt.formatTime(bar.st.clock.date, "HH:mm")
                         font.family: Theme.mono
                         font.pixelSize: 12
                         font.weight: Font.DemiBold
@@ -286,7 +285,7 @@ PanelWindow {
                 clip: true
                 opacity: shown ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: strip.shown ? 400 : 180 } }
-                Strips { anchors.fill: parent; which: bar.last; st: st }
+                Strips { anchors.fill: parent; which: bar.last; st: bar.st }
             }
 
             // expanded panel
@@ -306,7 +305,7 @@ PanelWindow {
                 Panels {
                     anchors.fill: parent
                     which: bar.last
-                    st: st
+                    st: bar.st
                     active: pane.shown
                     onCloseRequested: bar.close()
                 }

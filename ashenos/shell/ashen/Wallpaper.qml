@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
 
@@ -25,8 +26,8 @@ PanelWindow {
     // two long glowing arcs drifting very slowly
     Repeater {
         model: [
-            { y: 0.18, h: 1.15, o: 0.07, d: 46000 },
-            { y: 0.34, h: 1.35, o: 0.045, d: 61000 }
+            { y: 0.18, h: 1.15, o: 0.035, d: 46000 },
+            { y: 0.34, h: 1.35, o: 0.025, d: 61000 }
         ]
         Rectangle {
             required property var modelData
@@ -34,7 +35,7 @@ PanelWindow {
             height: wall.height * modelData.h
             radius: height / 2
             color: "transparent"
-            border.width: wall.height * 0.05
+            border.width: wall.height * 0.035
             border.color: Qt.rgba(1, 1, 1, modelData.o)
             y: wall.height * modelData.y
             x: -wall.width * 0.4
@@ -42,6 +43,43 @@ PanelWindow {
                 from: -wall.width * 0.55; to: -wall.width * 0.25
                 duration: modelData.d; loops: Animation.Infinite
                 easing.type: Easing.InOutSine
+            }
+        }
+    }
+    // soft waves behind the dock: two layers drifting at different speeds
+    Repeater {
+        model: [
+            { amp: 16, base: 46, len: 1.0, o: 0.10, d: 24000 },
+            { amp: 11, base: 30, len: 0.7, o: 0.16, d: 17000 }
+        ]
+        Item {
+            id: wave
+            required property var modelData
+            anchors.bottom: parent.bottom
+            width: wall.width * 2
+            height: modelData.base + modelData.amp
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: Qt.rgba(1, 1, 1, wave.modelData.o)
+                    strokeWidth: -1
+                    PathPolyline {
+                        path: {
+                            let pts = [], w = wave.width, h = wave.height, m = wave.modelData;
+                            let period = wall.width * m.len;
+                            for (let x = 0; x <= w; x += 8)
+                                pts.push(Qt.point(x, h - m.base + m.amp * Math.sin(x / period * 2 * Math.PI)));
+                            pts.push(Qt.point(w, h), Qt.point(0, h));
+                            return pts;
+                        }
+                    }
+                }
+            }
+            NumberAnimation on x {
+                from: 0; to: -wall.width * wave.modelData.len
+                duration: wave.modelData.d
+                loops: Animation.Infinite
             }
         }
     }
