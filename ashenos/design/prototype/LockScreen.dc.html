@@ -33,7 +33,7 @@ a{color:#c9c9cf}a:hover{color:#ffffff}
 </style>
 </helmet>
 
-<div onMouseMove="{{px}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #050506; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
+<div onMouseMove="{{px}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: {{tBg}}; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
 
   <!-- ===== SCREEN (wallpaper inside the black frame) ===== -->
   <div style="position: absolute; left: 8px; right: 8px; top: 40px; bottom: 8px; border-radius: 20px; overflow: hidden">
@@ -158,7 +158,7 @@ a{color:#c9c9cf}a:hover{color:#ffffff}
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"wall":{"editor":"enum","options":["Апельсин","Лава","Шёлк","Радуга","Волны"],"default":"Волны"},"onUnlock":{"editor":null},"curWall":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeBg":{"editor":null},"themeAccent":{"editor":null},"wall":{"editor":"enum","options":["Апельсин","Лава","Шёлк","Радуга","Волны"],"default":"Волны"},"onUnlock":{"editor":null},"curWall":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 const WALLS = [
       { name: 'Апельсин', accent: '#ff9a4d', css: 'radial-gradient(70% 60% at 88% 78%,#ef7d2c 0%,rgba(239,125,44,0) 70%),radial-gradient(60% 60% at 10% 25%,#9c3218 0%,rgba(156,50,24,0) 70%),linear-gradient(160deg,#6e2412 0%,#b84a1c 40%,#d9661f 72%,#b4481a 100%)' },
       { name: 'Лава', accent: '#ff8f8a', css: 'radial-gradient(55% 50% at 82% 88%,#e3381f 0%,rgba(227,56,31,0) 65%),radial-gradient(45% 45% at 70% 60%,rgba(240,74,42,.7) 0%,rgba(240,74,42,0) 60%),radial-gradient(45% 55% at 12% 20%,#3f6f78 0%,rgba(63,111,120,0) 72%),radial-gradient(60% 50% at 40% 0%,#2b4e57 0%,rgba(0,0,0,0) 70%),linear-gradient(160deg,#16252a,#0b0d0f)' },
@@ -186,7 +186,8 @@ class Component extends DCLogic {
     const names = WALLS.map((w) => w.name);
     const wi = typeof this.props.curWall === 'number' ? this.props.curWall : Math.max(0, names.indexOf(this.props.wall ?? 'Волны'));
     const wall = WALLS[wi] || WALLS[4];
-    const accent = wall.accent;
+    const accent = this.props.themeAccent || wall.accent;
+    const tBg = this.props.themeBg || '#050506';
     const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
     const pad = (n) => String(n).padStart(2, '0');
     const now = st.now;
@@ -244,11 +245,12 @@ class Component extends DCLogic {
     const eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
     const drop = {
       box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:25;width:${DW}px;height:${DH}px;pointer-events:${st.open ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.5));transition:height ${st.open ? `.75s ${eS}` : `.42s ${eI}`}`,
-      body: `position:absolute;left:0;top:0;width:${DW}px;height:${DH + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquid(DW, DH + 2)}');transition:${st.open ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
+      body: `position:absolute;left:0;top:0;width:${DW}px;height:${DH + 2}px;overflow:hidden;background:${tBg};clip-path:path('${liquid(DW, DH + 2)}');transition:${st.open ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
       inner: `position:absolute;left:${SB}px;top:0;width:${CW}px;padding:14px 4px 12px;display:flex;flex-direction:column;gap:12px;opacity:${st.open ? 1 : 0};filter:blur(${st.open ? 0 : 6}px);transform:translateY(${st.open ? 0 : -24}px);transition:opacity ${st.open ? '.45s ease .24s' : '.14s'},filter ${st.open ? '.5s ease .2s' : '.14s'},transform ${st.open ? `.9s ${eS} .08s` : '.3s ease'}`
     };
     const focusPw = () => setTimeout(() => { const i = document.getElementById('lock-pw'); if (i) i.focus(); }, 380);
     return {
+      tBg,
       px: (e) => { const el = e.currentTarget; const b = el.getBoundingClientRect(); if (this.pxR) return; this.pxR = requestAnimationFrame(() => { this.pxR = null; el.style.setProperty('--mx', ((e.clientX - b.left) / b.width - 0.5).toFixed(3)); el.style.setProperty('--my', ((e.clientY - b.top) / b.height - 0.5).toFixed(3)); }); },
       m: { pw: st.method === 'pw', pin: st.method === 'pin', face: st.method === 'face', notFace: st.method !== 'face' },
       methods: [['pw', 'Пароль', '•••'], ['pin', 'PIN-код', '#'], ['face', 'Лицо', '◉']].map(([id, name, glyph]) => ({ name, glyph, on: st.method === id,

@@ -18,6 +18,12 @@ button:focus-visible,input:focus-visible{outline:2px solid #e8e8ec;outline-offse
 input::placeholder{color:#8b8b93}
 a{color:#d6d6db}a:hover{color:#ffffff}
 .scroll::-webkit-scrollbar{width:8px}.scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+@keyframes plIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes plRow{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+@keyframes mToast{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </helmet>
 
@@ -25,7 +31,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
   <div aria-hidden="true" style="{{wallStyle}}"></div>
 
   <!-- WINDOW -->
-  <div style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden">
+  <div style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; border-radius: 22px; background: {{winTheme}}; backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); display: flex; flex-direction: column; overflow: hidden">
 
     <!-- TITLE BAR -->
     <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
@@ -39,48 +45,48 @@ a{color:#d6d6db}a:hover{color:#ffffff}
         </div>
         <div style="display: flex; flex-direction: column; line-height: 1.2">
           <span style="font-size: 15px; font-weight: 600">Проводник</span>
-          <span style="font-size: 12.5px; color: #a1a1a8">~/Проекты</span>
+          <span style="font-size: 12.5px; color: #a1a1a8">{{pl.path}}</span>
         </div>
       </div>
 
       <div style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
-        <button aria-label="Назад" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+        <button aria-label="Назад" onClick="{{hBack}}" style="{{hBackSt}}">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
         </button>
-        <button aria-label="Вперёд" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+        <button aria-label="Вперёд" onClick="{{hFwd}}" style="{{hFwdSt}}">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
         </button>
-        <button aria-label="На уровень выше" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
+        <button aria-label="На уровень выше" onClick="{{hUp}}" style="{{hUpSt}}">
           <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m-6 6 6-6 6 6"></path></svg>
         </button>
       </div>
 
       <nav aria-label="Путь" style="flex: 1 1 auto; min-width: 0; height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 8px; border-radius: 14px; background: rgba(255,255,255,0.05); font-size: 14.5px">
-        <a href="#" aria-label="Корень файловой системы" style="height: 32px; padding: 0 8px; display: flex; align-items: center; border-radius: 9px; text-decoration: none; color: #a1a1a8; font-family: 'JetBrains Mono', monospace; font-size: 14px">/</a>
-        <a href="#" style="height: 32px; padding: 0 8px; display: flex; align-items: center; gap: 8px; border-radius: 9px; text-decoration: none; color: #c9c9cf">
+        <a href="#" aria-label="Корень файловой системы" onClick="{{crumbHome}}" style="height: 32px; padding: 0 8px; display: flex; align-items: center; border-radius: 9px; text-decoration: none; color: #a1a1a8; font-family: 'JetBrains Mono', monospace; font-size: 14px">/</a>
+        <a href="#" onClick="{{crumbHome}}" style="height: 32px; padding: 0 8px; display: flex; align-items: center; gap: 8px; border-radius: 9px; text-decoration: none; color: #c9c9cf">
           <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg>
           home
         </a>
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6f6f77" stroke-width="2" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg>
-        <a href="#" style="height: 32px; padding: 0 8px; display: flex; align-items: center; border-radius: 9px; text-decoration: none; color: #c9c9cf">user</a>
+        <a href="#" onClick="{{crumbHome}}" style="height: 32px; padding: 0 8px; display: flex; align-items: center; border-radius: 9px; text-decoration: none; color: #c9c9cf">user</a>
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6f6f77" stroke-width="2" stroke-linecap="round"><path d="m9 5 7 7-7 7"></path></svg>
-        <span aria-current="page" style="height: 32px; padding: 0 10px; display: flex; align-items: center; border-radius: 9px; background: rgba(255,255,255,0.08); font-weight: 600">Проекты</span>
+        <span aria-current="page" style="height: 32px; padding: 0 10px; display: flex; align-items: center; border-radius: 9px; background: rgba(255,255,255,0.08); font-weight: 600">{{pl.title}}</span>
       </nav>
 
       <label style="position: relative; display: flex; align-items: center; width: 230px; height: 44px; flex: none">
         <svg aria-hidden="true" style="position: absolute; left: 14px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-        <input type="search" aria-label="Поиск в папке Проекты" placeholder="Поиск в «Проекты»" style="width: 100%; height: 44px; padding: 0 44px 0 42px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.05); color: #f2f2f4; font: 14px Inter, sans-serif; outline: none">
+        <input type="search" aria-label="{{pl.search}}" placeholder="{{pl.search}}" value="{{fq}}" onInput="{{onFq}}" style="width: 100%; height: 44px; padding: 0 44px 0 42px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.05); color: #f2f2f4; font: 14px Inter, sans-serif; outline: none">
         <span aria-hidden="true" style="position: absolute; right: 10px; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.14); font: 11.5px 'JetBrains Mono', monospace; color: #a1a1a8">^F</span>
       </label>
 
       <div role="group" aria-label="Вид" style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 14px; background: rgba(255,255,255,0.05); flex: none">
-        <button aria-label="Значки" aria-pressed="true" style="width: 40px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.12); color: #ffffff">
+        <button aria-label="Значки" aria-pressed="{{vGrid}}" onClick="{{setGrid}}" style="{{vGridSt}}">
           <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"></rect><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"></rect><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"></rect><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"></rect></svg>
         </button>
-        <button aria-label="Подробности" aria-pressed="false" style="width: 40px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #b8b8be">
+        <button aria-label="Подробности" aria-pressed="{{vList}}" onClick="{{setList}}" style="{{vListSt}}">
           <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"></path><circle cx="4.5" cy="6" r=".6"></circle><circle cx="4.5" cy="12" r=".6"></circle><circle cx="4.5" cy="18" r=".6"></circle></svg>
         </button>
-        <button aria-label="Разделить окно" aria-pressed="false" style="width: 40px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #b8b8be">
+        <button aria-label="Разделить окно" aria-pressed="{{split}}" onClick="{{toggleSplit}}" style="{{splitSt}}">
           <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"></rect><path d="M12 4.5v15"></path></svg>
         </button>
       </div>
@@ -88,7 +94,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
       <button aria-label="Оформление папки" aria-pressed="{{panel}}" onClick="{{togglePanel}}" style="{{panelBtnStyle}}">
         <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1.2-1-1.5-1-2.5s.8-2 2-2H17a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"></path><circle cx="7.5" cy="11" r="1"></circle><circle cx="12" cy="7.5" r="1"></circle><circle cx="16.5" cy="10" r="1"></circle></svg>
       </button>
-      <button aria-label="Меню" style="width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #e8e8ec; flex: none">
+      <button aria-label="Меню" aria-expanded="{{menu}}" onClick="{{toggleMenu}}" style="position: relative; width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #e8e8ec; flex: none; background: {{menuBg}}">
         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="12" cy="19" r="1.7"></circle></svg>
       </button>
 
@@ -152,16 +158,16 @@ a{color:#d6d6db}a:hover{color:#ffffff}
             <svg aria-hidden="true" style="flex: none" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d6d6db" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="10" height="12" rx="2"></rect><path d="M9 9V3h6v6M11 5.5h.01M13 5.5h.01"></path></svg>
             <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3">
               <span style="font-size: 14px; font-weight: 500">USB-накопитель</span>
-              <span style="font-size: 12px; color: #a1a1a8">14,2 ГБ · exFAT</span>
+              <span style="font-size: 12px; color: #a1a1a8">{{usbText}}</span>
             </div>
-            <button aria-label="Извлечь USB-накопитель" style="width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: rgba(255,255,255,0.05)">
+            <button aria-label="{{usbLabel}}" onClick="{{toggleUsb}}" style="width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: rgba(255,255,255,0.05)">
               <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 14h14L12 6z"></path><path d="M5 18.5h14" stroke-linecap="round"></path></svg>
             </button>
           </div>
         </div>
 
         <div style="flex: 1"></div>
-        <button style="display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 14px; border-radius: 12px; font-size: 15px; color: #cfcfd4">
+        <button aria-label="Настройки Проводника" onClick="{{cfgOpen}}" style="display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 14px; border-radius: 12px; font-size: 15px; color: #cfcfd4">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
           Настройки
         </button>
@@ -172,23 +178,23 @@ a{color:#d6d6db}a:hover{color:#ffffff}
         <main style="flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding: 24px 26px 0; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05); overflow: hidden">
           <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px">
             <div style="display: flex; flex-direction: column; gap: 4px">
-              <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">Проекты</h1>
-              <span style="font-size: 14px; color: #a1a1a8">4 папки, 7 файлов · 5,9 ГБ</span>
+              <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">{{pl.title}}</h1>
+              <span style="font-size: 14px; color: #a1a1a8">{{pl.sub}}</span>
             </div>
             <div style="display: flex; gap: 8px">
-              <button style="height: 44px; padding: 0 16px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: #e8e8ec; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07)">
+              <button onClick="{{cycleSort}}" style="height: 44px; padding: 0 16px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: #e8e8ec; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07)">
                 <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"></path></svg>
-                По имени
+                {{sortLabel}}
               </button>
-              <button style="height: 44px; padding: 0 18px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; color: #111113; background: #ededf0">
-                <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-                Создать
-              </button>
+              <sc-if value="{{pl.hasSel}}" hint-placeholder-val="{{false}}">
+                <button onClick="{{pl.selAct}}" style="height: 44px; padding: 0 16px; border-radius: 13px; display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 600; color: #e8e8ec; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.08); animation: plIn .25s cubic-bezier(.3,1.4,.5,1) both">{{pl.selLabel}}</button>
+              </sc-if>
+              <button onClick="{{pl.act}}" style="{{pl.actStyle}}">{{pl.actLabel}}</button>
             </div>
           </div>
 
           <!-- FOLDERS -->
-          <div role="listbox" aria-label="Папки" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; flex: none">
+          <div role="listbox" aria-label="Папки" style="{{pl.folders}}">
             <sc-for list="{{folders}}" as="f" hint-placeholder-count="4">
               <button role="option" aria-selected="{{f.selected}}" onClick="{{f.pick}}" style="{{f.cardStyle}}">
                 <sc-if value="{{f.selected}}" hint-placeholder-val="{{false}}">
@@ -224,7 +230,8 @@ a{color:#d6d6db}a:hover{color:#ffffff}
               <span style="font-weight: 600; color: #e8e8ec">Файлы</span>
               <span>{{fileInfo}}</span>
             </div>
-            <div class="scroll" role="listbox" aria-label="Файлы" onDragOver="{{dropOver}}" onDragLeave="{{dropOut}}" onDrop="{{dropIn}}" style="{{dropRing}}flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 8px 0 16px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-content: start">
+            <div class="scroll" role="listbox" aria-label="Файлы" onDragOver="{{dropOver}}" onDragLeave="{{dropOut}}" onDrop="{{dropIn}}" style="{{gridSt}}">
+              <sc-if value="{{pl.empty}}" hint-placeholder-val="{{false}}"><span style="grid-column: 1 / -1; padding: 60px 0; text-align: center; font-size: 14px; color: #6f6f77">{{pl.emptyText}}</span></sc-if>
               <sc-for list="{{files}}" as="r" hint-placeholder-count="7">
                 <button role="option" draggable="true" onDragStart="{{r.drag}}" aria-selected="{{r.selected}}" aria-label="{{r.label}}" onClick="{{r.pick}}" style="{{r.cardStyle}}">
                   <span aria-hidden="true" style="position: relative; display: block; width: 72px; height: 64px; flex: none">
@@ -235,8 +242,8 @@ a{color:#d6d6db}a:hover{color:#ffffff}
                       <span style="position: absolute; left: 7px; bottom: 5px; font: 600 9px 'JetBrains Mono', monospace; letter-spacing: 0.04em; color: rgba(255,255,255,0.9)">{{r.ext}}</span>
                     </span>
                   </span>
-                  <span style="width: 100%; font-size: 13px; font-weight: 500; color: #f2f2f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
-                  <span style="font-size: 12px; color: #a1a1a8">{{r.size}}</span>
+                  <span style="{{r.nameSt}}">{{r.shown}}</span>
+                  <span style="{{r.metaSt}}">{{r.meta}}</span>
                 </button>
               </sc-for>
             </div>
@@ -347,14 +354,113 @@ a{color:#d6d6db}a:hover{color:#ffffff}
         <span style="padding: 1px 6px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.14); font: 11px 'JetBrains Mono', monospace; color: #a1a1a8">F4</span>
       </button>
     </footer>
+    <sc-if value="{{menu}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{closeMenu}}" style="position: absolute; inset: 0; z-index: 50"></div>
+      <div role="menu" aria-label="Меню Проводника" style="position: absolute; top: 74px; right: 160px; z-index: 51; width: 260px; padding: 6px; border-radius: 16px; background: #141416; border: 1px solid #2e2e33; box-shadow: 0 24px 60px rgba(0,0,0,0.6); animation: cfgIn .25s cubic-bezier(.22,1,.36,1) both">
+        <sc-for list="{{menuItems}}" as="mi" hint-placeholder-count="6">
+          <button role="menuitem" onClick="{{mi.act}}" style="width: 100%; height: 38px; padding: 0 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: #e8e8ec; background: none; border: 0; text-align: left"><span aria-hidden="true" style="width: 18px; text-align: center; color: #a1a1a8">{{mi.icon}}</span><span style="flex: 1">{{mi.name}}</span><span style="font: 500 11px 'JetBrains Mono', monospace; color: #6f6f77">{{mi.key}}</span></button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{split}}" hint-placeholder-val="{{false}}">
+      <aside aria-label="Второе окно" style="position: absolute; top: 84px; bottom: 56px; right: 18px; width: 300px; z-index: 30; display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 18px; background: #141416; border: 1px solid #2e2e33; box-shadow: -20px 0 50px rgba(0,0,0,0.5); animation: cfgIn .3s cubic-bezier(.22,1,.36,1) both">
+        <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 14px; font-weight: 700">Второе окно</span>
+          <div role="radiogroup" aria-label="Папка" style="margin-left: auto; display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(255,255,255,0.06)"><sc-for list="{{split2.tabs}}" as="t" hint-placeholder-count="3"><button role="radio" aria-checked="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.name}}</button></sc-for></div>
+        </div>
+        <span style="font-size: 12px; color: #8b8b93">Перетащите файл сюда, чтобы переместить</span>
+        <div onDragOver="{{split2.over}}" onDrop="{{split2.drop}}" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 4px">
+          <sc-for list="{{split2.files}}" as="f" hint-placeholder-count="5"><div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 10px; border-radius: 10px; background: rgba(255,255,255,0.04); font-size: 13px"><span style="font: 700 10px 'JetBrains Mono', monospace; color: #8b8b93; width: 34px">{{f.ext}}</span><span style="flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{f.size}}</span></div></sc-for>
+        </div>
+      </aside>
+    </sc-if>
+    <div role="status" aria-live="polite" style="{{toastSt}}">{{toastTx}}</div>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"placeReq":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
+  CFG_KEY = 'ashenos.files.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Вид' },
+    { k: 'view', type: 'seg', name: 'Вид по умолчанию', opts: [['grid', 'Значки'], ['list', 'Список']], def: 'grid' },
+    { k: 'icon', type: 'seg', name: 'Размер значков', opts: [['s', 'Мелкие'], ['m', 'Средние'], ['l', 'Крупные']], def: 'm' },
+    { k: 'sort', type: 'seg', name: 'Сортировка', opts: [['name', 'Имя'], ['size', 'Размер'], ['type', 'Тип']], def: 'name' },
+    { type: 'head', name: 'Файлы' },
+    { k: 'hidden', type: 'sw', name: 'Показывать скрытые файлы', note: 'Файлы, имя которых начинается с точки', def: false },
+    { k: 'ext', type: 'sw', name: 'Показывать расширения', note: '«Концепт.fig» вместо «Концепт»', def: true },
+    { k: 'confirm', type: 'sw', name: 'Спрашивать перед удалением', note: 'Кнопку «В корзину» нужно нажать дважды', def: true },
+    { type: 'head', name: 'Окно' },
+    { k: 'panel', type: 'sw', name: 'Панель «Оформление папки»', note: 'Показывать справа при открытии', def: true }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+  cfgChanged(k, v) { if (k === 'view') this.setState({ view: v }); if (k === 'sort') this.setState({ sortBy: v }); if (k === 'panel') this.setState({ panel: v }); if (k === '*') this.setState({ view: 'grid', sortBy: 'name', panel: true }); }
+  componentDidMount() { this.cfgLoad(); setTimeout(() => this.setState({ view: this.cfgGet('view'), sortBy: this.cfgGet('sort'), panel: this.cfgGet('panel') }), 0); }
+  toast(t) { clearTimeout(this.tT); this.setState({ toastTx: t, toastAt: Date.now() }); this.tT = setTimeout(() => this.setState({ toastTx: '' }), 2200); }
+  goPlace(id) { if (id === this.state.place) return; const h = (this.state.hist || ['proj']).slice(0, (this.state.hi || 0) + 1).concat(id); this.setState({ place: id, file: '', hist: h, hi: h.length - 1, fq: '' }); }
   state = {
+    hist: ['proj'], hi: 0, view: 'grid', sortBy: 'name', split: false, split2: 'down', menu: false, usb: true, fq: '', confirmDel: '', toastTx: '', cfgOpen: false,
     added: [], dropHot: false,
-    sel: 'design', place: 'proj', panel: true, term: false, bg: 0, file: '',
+    sel: 'design', place: 'proj', panel: true, term: false, bg: 0, file: '', gone: {},
+    trash: [
+      { name: 'Старый-конфиг.txt', type: 'Удалён 2 дня назад', size: '4 КБ', kind: 'txt', ext: 'TXT', from: 'docs' },
+      { name: 'Черновик.fig', type: 'Удалён вчера', size: '3,1 МБ', kind: 'fig', ext: 'FIG', from: 'proj' },
+      { name: 'screenshot-001.png', type: 'Удалён вчера', size: '1,2 МБ', kind: 'png', ext: 'PNG', from: 'pics' },
+      { name: 'test.sh', type: 'Удалён сегодня', size: '1 КБ', kind: 'sh', ext: 'SH', from: 'proj' }
+    ],
     look: { design: { s: 1, c: 0 }, dev: { s: 0, c: 0 }, res: { s: 3, c: 0 }, arch: { s: 2, c: 0 } }
   };
 
@@ -474,6 +580,7 @@ class Component extends DCLogic {
       const on = st.sel === id;
       const L = st.look[id];
       return {
+      winTheme: this.props.themeWin || 'rgba(20,20,23,0.74)',
         ...meta[id], id, selected: on,
         pick: () => this.setState({ sel: id, file: '' }),
         p: this.folderParts(1, L.s, L.c, true),
@@ -481,7 +588,21 @@ class Component extends DCLogic {
       };
     });
 
-    const fileData = [
+    /* dock → «Загрузки» / «Корзина» */
+    const pr = this.props.placeReq;
+    if (pr && pr !== this._pr) { this._pr = pr; const want = String(pr).split(':')[0]; if (want !== st.place) setTimeout(() => this.goPlace(want), 0); }
+    const PLACE = { home: ['Домашняя папка', '~'], desk: ['Рабочий стол', '~/Рабочий стол'], docs: ['Документы', '~/Документы'], down: ['Загрузки', '~/Загрузки'], music: ['Музыка', '~/Музыка'], pics: ['Изображения', '~/Изображения'], proj: ['Проекты', '~/Проекты'], trash: ['Корзина', 'Корзина'] };
+    const DOWN = [
+      { name: 'ashenos-rpi4.img.xz', type: 'Образ диска', size: '1,9 ГБ', kind: 'pkg', ext: 'IMG' },
+      { name: 'kaplya.zip', type: 'Архив ZIP', size: '700 КБ', kind: 'pkg', ext: 'ZIP' },
+      { name: 'quickshell-0.2.tar.gz', type: 'Архив tar.gz', size: '8,4 МБ', kind: 'pkg', ext: 'TGZ' },
+      { name: 'Обои-пепел.png', type: 'Изображение PNG', size: '6,1 МБ', kind: 'png', ext: 'PNG' },
+      { name: 'Счёт-ноябрь.pdf', type: 'Документ PDF', size: '212 КБ', kind: 'pdf', ext: 'PDF' },
+      { name: 'claude-setup.sh', type: 'Скрипт Bash', size: '2 КБ', kind: 'sh', ext: 'SH' },
+      { name: 'Подкаст.mp3', type: 'Аудио MP3', size: '48 МБ', kind: 'mp3', ext: 'MP3' }
+    ];
+    const isTrash = st.place === 'trash', isDown = st.place === 'down';
+    const fileData = (isTrash ? st.trash : isDown ? DOWN : [
       { name: 'Концепт.fig', type: 'Макет Figma', size: '5,6 МБ', kind: 'fig', ext: 'FIG' },
       { name: 'Презентация.pdf', type: 'Документ PDF', size: '12,4 МБ', kind: 'pdf', ext: 'PDF' },
       { name: 'Интерфейс.png', type: 'Изображение PNG', size: '4,8 МБ', kind: 'png', ext: 'PNG' },
@@ -489,13 +610,24 @@ class Component extends DCLogic {
       { name: 'Заметки.txt', type: 'Текстовый файл', size: '18 КБ', kind: 'txt', ext: 'TXT' },
       { name: 'PKGBUILD', type: 'Сценарий сборки', size: '2 КБ', kind: 'pkg', ext: 'PKG' },
       { name: 'install.sh', type: 'Скрипт Bash', size: '3 КБ', kind: 'sh', ext: 'SH' }
-    ];
+    ]).filter((f) => isTrash || !st.gone[(isDown ? 'down' : 'proj') + ':' + f.name]).map((f) => ({ ...f }));
     const kinds = { FIG: 'fig', PDF: 'pdf', PNG: 'png', MP3: 'mp3', TXT: 'txt', SH: 'sh', PKG: 'pkg' };
-    st.added.forEach((a) => { if (!fileData.some((f) => f.name === a.name)) fileData.push({ name: a.name, type: 'С полки', size: a.size || '—', kind: a.kind || kinds[a.ext] || 'txt', ext: a.ext || 'FILE' }); });
+    if (this.cfgGet('hidden') && !isTrash) fileData.push({ name: '.config', type: 'Скрытая папка', size: '—', kind: 'txt', ext: 'DIR' }, { name: '.bashrc', type: 'Скрытый файл', size: '1 КБ', kind: 'sh', ext: 'SH' }, { name: '.gitignore', type: 'Скрытый файл', size: '96 Б', kind: 'txt', ext: 'TXT' });
+    if (!isTrash && !isDown) st.added.forEach((a) => { if (!fileData.some((f) => f.name === a.name)) fileData.push({ name: a.name, type: 'С полки', size: a.size || '—', kind: a.kind || kinds[a.ext] || 'txt', ext: a.ext || 'FILE' }); });
+    const szN = (z) => { const m = String(z).replace(',', '.').match(/([\d.]+)\s*(Б|КБ|МБ|ГБ)/); if (!m) return 0; return parseFloat(m[1]) * { 'Б': 1, 'КБ': 1e3, 'МБ': 1e6, 'ГБ': 1e9 }[m[2]]; };
+    const sb = st.sortBy || 'name';
+    fileData.sort((a, b) => sb === 'size' ? szN(b.size) - szN(a.size) : sb === 'type' ? (a.ext || '').localeCompare(b.ext || '') || a.name.localeCompare(b.name) : a.name.replace(/^\./, '').localeCompare(b.name.replace(/^\./, ''), 'ru'));
+    const fq = (st.fq || '').trim().toLowerCase();
+    if (fq) for (let i = fileData.length - 1; i >= 0; i--) if (!fileData[i].name.toLowerCase().includes(fq)) fileData.splice(i, 1);
+    const listV = st.view === 'list', showExt = this.cfgGet('ext'), iconK = { s: 9, m: 7, l: 5 }[this.cfgGet('icon')] || 7;
     const files = fileData.map((f) => {
       const on = st.file === f.name;
       return {
         ...f, selected: on,
+        shown: showExt || f.name.startsWith('.') ? f.name : f.name.replace(/\.[^.]+$/, ''),
+        meta: listV ? `${f.type} · ${f.size}` : f.size,
+        nameSt: `width:100%;font-size:${listV ? 14 : 13}px;font-weight:500;color:#f2f2f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:${listV ? 'left' : 'center'};opacity:${f.name.startsWith('.') ? .6 : 1}`,
+        metaSt: `font-size:12px;color:#a1a1a8;${listV ? 'margin-left:auto;white-space:nowrap;flex:none' : ''}`,
         label: `${f.name}, ${f.type}, ${f.size}`,
         item: this.fileItem(f.kind),
         pick: () => this.setState({ file: f.name }),
@@ -504,11 +636,30 @@ class Component extends DCLogic {
           try { e.dataTransfer.setData('application/x-arch-file', data); e.dataTransfer.setData('text/plain', f.name); e.dataTransfer.effectAllowed = 'copy'; } catch (err) {}
           this.setState({ file: f.name });
         },
-        cardStyle: `display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:14px 8px 10px;border-radius:14px;text-align:center;background:${on ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,0)'};border:1.5px solid ${on ? 'rgba(255,255,255,.7)' : 'rgba(255,255,255,0)'}`
+        cardStyle: listV ? `display:flex;flex-direction:row;align-items:center;gap:14px;min-width:0;padding:4px 12px;height:58px;border-radius:12px;text-align:left;background:${on ? 'rgba(255,255,255,.08)' : 'transparent'};transition:background .15s` : `display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;padding:14px 8px 10px;border-radius:14px;text-align:center;background:${on ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,0)'};border:1.5px solid ${on ? 'rgba(255,255,255,.7)' : 'rgba(255,255,255,0)'}`
       };
     });
     const sel = fileData.find((f) => f.name === st.file);
     const fileInfo = sel ? `${sel.type} · ${sel.size}` : 'По имени';
+    const nF = fileData.length, plural = (n, a, b, c) => n % 10 === 1 && n % 100 !== 11 ? a : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? b : c;
+    const srcKey = isDown ? 'down' : 'proj';
+    const pl = {
+      title: PLACE[st.place][0], path: PLACE[st.place][1], search: `Поиск в «${PLACE[st.place][0]}»`,
+      sub: isTrash ? (nF ? `${nF} ${plural(nF, 'объект', 'объекта', 'объектов')} · хранятся 30 дней` : 'Корзина пуста') : isDown ? `${nF} ${plural(nF, 'файл', 'файла', 'файлов')} · 2,0 ГБ` : `4 папки, ${nF} ${plural(nF, 'файл', 'файла', 'файлов')} · 5,9 ГБ`,
+      folders: isTrash || isDown ? 'display:none' : 'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;flex:none',
+      hasSel: !!sel, selLabel: isTrash ? 'Восстановить' : st.confirmDel === (sel && sel.name) ? 'Точно удалить?' : 'В корзину',
+      selAct: () => {
+        if (!sel) return;
+        if (!isTrash && this.cfgGet('confirm') && st.confirmDel !== sel.name) { this.setState({ confirmDel: sel.name }); this.toast('Нажмите ещё раз, чтобы удалить «' + sel.name + '»'); return; }
+        this.setState({ confirmDel: '' });
+        if (isTrash) { const gone = { ...st.gone }; delete gone[(sel.from === 'down' ? 'down' : 'proj') + ':' + sel.name]; this.setState({ trash: st.trash.filter((f) => f.name !== sel.name), gone, file: '' }); }
+        else this.setState({ trash: [{ ...sel, type: 'Удалён только что', from: srcKey }, ...st.trash.filter((f) => f.name !== sel.name)], gone: { ...st.gone, [srcKey + ':' + sel.name]: true }, added: st.added.filter((a) => a.name !== sel.name), file: '' });
+      },
+      actLabel: isTrash ? 'Очистить корзину' : isDown ? 'Открыть в терминале' : '+ Создать',
+      act: () => { if (isTrash) { this.setState({ trash: [], file: '' }); this.toast('Корзина очищена'); } else if (isDown) this.setState({ term: true }); else { const n = st.added.filter((a) => /^Новый файл/.test(a.name)).length + 1; this.setState({ added: [...st.added, { name: `Новый файл ${n}.txt`, size: '0 Б', ext: 'TXT', kind: 'txt' }], file: `Новый файл ${n}.txt` }); this.toast('Создан «Новый файл ' + n + '.txt»'); } },
+      actStyle: `height:44px;padding:0 18px;border-radius:13px;display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:600;border:0;transition:background .25s,color .25s,opacity .25s;${isTrash ? `color:#ffb4b4;background:rgba(255,92,92,.16);opacity:${nF ? 1 : .45};pointer-events:${nF ? 'auto' : 'none'}` : 'color:#111113;background:#ededf0'}`,
+      empty: nF === 0, emptyText: isTrash ? 'В корзине ничего нет' : 'Папка пуста'
+    };
 
     const L = st.look[st.sel];
     const styles = this.styles().map((s, i) => ({
@@ -533,7 +684,7 @@ class Component extends DCLogic {
     navIds.forEach((id) => {
       const on = st.place === id;
       nav[id] = `display:flex;align-items:center;gap:14px;width:100%;height:42px;padding:0 14px;border-radius:12px;font-size:15px;text-align:left;flex:none;background:${on ? 'rgba(255,255,255,.09)' : 'transparent'};color:${on ? '#ffffff' : '#cfcfd4'};font-weight:${on ? 600 : 450}`;
-      go[id] = () => this.setState({ place: id });
+      go[id] = () => this.goPlace(id);
     });
 
     const pill = (on) => `height:44px;padding:0 ${on === null ? 0 : 14}px;border-radius:12px;display:flex;align-items:center;gap:8px;font-size:13px;flex:none;background:${on ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)'};color:${on ? '#ffffff' : '#c9c9cf'}`;
@@ -547,7 +698,49 @@ class Component extends DCLogic {
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
       wallStyle: `position:absolute;inset:0;background:${this.walls()[st.bg].css}`,
-      folders, files, fileInfo, styles, colors, bgs, nav, go,
+      folders, files, fileInfo, pl, styles, colors, bgs, nav, go,
+      ...(() => {
+        const H = st.hist || ['proj'], hi = st.hi || 0;
+        const nb = (on) => `width:44px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:${on ? '#e8e8ec' : '#5c5c64'};transition:color .2s`;
+        const vb = (on) => `width:40px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:0;transition:background .2s,color .2s;background:${on ? 'rgba(255,255,255,.12)' : 'transparent'};color:${on ? '#ffffff' : '#b8b8bf'}`;
+        const SL = { name: 'По имени', size: 'По размеру', type: 'По типу' };
+        const otherId = st.split2 || 'down';
+        const OTHER = { down: [['ashenos-rpi4.img.xz', 'IMG', '1,9 ГБ'], ['kaplya.zip', 'ZIP', '700 КБ'], ['Обои-пепел.png', 'PNG', '6,1 МБ'], ['Счёт-ноябрь.pdf', 'PDF', '212 КБ']], docs: [['Резюме.pdf', 'PDF', '180 КБ'], ['Договор.docx', 'DOC', '64 КБ'], ['Список.txt', 'TXT', '2 КБ']], usb: [['backup-2026-11.tar', 'TAR', '3,2 ГБ'], ['photos', 'DIR', '—']] };
+        const moved = (st.moved || {})[otherId] || [];
+        return {
+          hBack: () => { if (hi > 0) this.setState({ hi: hi - 1, place: H[hi - 1], file: '' }); }, hBackSt: nb(hi > 0),
+          hFwd: () => { if (hi < H.length - 1) this.setState({ hi: hi + 1, place: H[hi + 1], file: '' }); }, hFwdSt: nb(hi < H.length - 1),
+          hUp: () => this.goPlace('home'), hUpSt: nb(st.place !== 'home'),
+          crumbHome: (e) => { if (e && e.preventDefault) e.preventDefault(); this.goPlace('home'); },
+          fq: st.fq || '', onFq: (e) => this.setState({ fq: e.target.value }),
+          vGrid: !listV, vList: listV, vGridSt: vb(!listV), vListSt: vb(listV),
+          setGrid: () => this.setState({ view: 'grid' }), setList: () => this.setState({ view: 'list' }),
+          split: !!st.split, splitSt: vb(!!st.split), toggleSplit: () => this.setState({ split: !st.split }),
+          split2: {
+            tabs: [['down', 'Загрузки'], ['docs', 'Документы'], ['usb', 'USB']].filter((t) => t[0] !== 'usb' || st.usb).map(([id, name]) => ({ name, on: otherId === id, pick: () => this.setState({ split2: id }),
+              style: `height:26px;padding:0 9px;border-radius:7px;border:0;font-size:11.5px;font-weight:600;background:${otherId === id ? '#f2f2f4' : 'transparent'};color:${otherId === id ? '#111113' : '#a1a1a8'}` })),
+            files: OTHER[otherId].map(([name, ext, size]) => ({ name, ext, size })).concat(moved),
+            over: (e) => { e.preventDefault(); },
+            drop: (e) => { e.preventDefault(); let d = null; try { d = JSON.parse(e.dataTransfer.getData('application/x-arch-file')); } catch (er) {} if (!d) return; const mv = { ...(st.moved || {}) }; mv[otherId] = [...(mv[otherId] || []), { name: d.name, ext: d.ext || 'FILE', size: d.size || '—' }]; this.setState({ moved: mv }); this.toast(`«${d.name}» скопирован в «${{ down: 'Загрузки', docs: 'Документы', usb: 'USB' }[otherId]}»`); }
+          },
+          menu: !!st.menu, menuBg: st.menu ? 'rgba(255,255,255,.1)' : 'transparent',
+          toggleMenu: () => this.setState({ menu: !st.menu }), closeMenu: () => this.setState({ menu: false }),
+          menuItems: [
+            { icon: '+', name: 'Новый файл', key: 'Ctrl+N', act: () => { this.setState({ menu: false }); if (st.place !== 'proj') this.goPlace('proj'); setTimeout(() => { const n = this.state.added.filter((a) => /^Новый файл/.test(a.name)).length + 1; this.setState({ added: [...this.state.added, { name: `Новый файл ${n}.txt`, size: '0 Б', ext: 'TXT', kind: 'txt' }] }); this.toast('Создан «Новый файл ' + n + '.txt»'); }, 0); } },
+            { icon: '◌', name: this.cfgGet('hidden') ? 'Скрыть скрытые файлы' : 'Показать скрытые файлы', key: 'Ctrl+H', act: () => { this.setState({ menu: false }); this.cfgSet('hidden', !this.cfgGet('hidden')); } },
+            { icon: '▣', name: 'Выделить первый файл', key: 'Ctrl+A', act: () => this.setState({ menu: false, file: fileData[0] ? fileData[0].name : '' }) },
+            { icon: '>_', name: st.term ? 'Скрыть терминал' : 'Открыть терминал', key: 'F4', act: () => this.setState({ menu: false, term: !st.term }) },
+            { icon: '⇅', name: 'Обновить', key: 'F5', act: () => { this.setState({ menu: false, fq: '' }); this.toast('Папка обновлена'); } },
+            { icon: '⚙', name: 'Настройки Проводника', key: '', act: () => this.setState({ menu: false, cfgOpen: true }) }
+          ],
+          usbLabel: st.usb ? 'Извлечь USB-накопитель' : 'Подключить USB-накопитель', usbText: st.usb ? '14,2 ГБ · exFAT' : 'Извлечён — можно отключать',
+          toggleUsb: () => { this.setState({ usb: !st.usb, split2: !st.usb ? st.split2 : (st.split2 === 'usb' ? 'down' : st.split2) }); this.toast(st.usb ? 'USB-накопитель можно безопасно отключить' : 'USB-накопитель подключён'); },
+          sortLabel: SL[st.sortBy || 'name'], cycleSort: () => { const k = ['name', 'size', 'type']; const n = k[(k.indexOf(st.sortBy || 'name') + 1) % 3]; this.setState({ sortBy: n }); },
+          gridSt: `border-radius:16px;transition:box-shadow .25s,background .25s;box-shadow:${st.dropHot ? 'inset 0 0 0 2px rgba(255,255,255,.7)' : 'none'};background:${st.dropHot ? 'rgba(255,255,255,.04)' : 'transparent'};flex:1 1 auto;min-height:0;overflow-y:auto;padding:8px 0 16px;display:grid;grid-template-columns:${listV ? '1fr' : `repeat(${iconK},minmax(0,1fr))`};gap:${listV ? 2 : 10}px;align-content:start`,
+          cfg: this.cfgView('Настройки Проводника'), cfgOpen: () => this.setState({ cfgOpen: true, menu: false }),
+          toastTx: st.toastTx || '', toastSt: `position:absolute;left:50%;bottom:70px;z-index:70;padding:10px 16px;border-radius:12px;background:#f2f2f4;color:#111113;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none;display:${st.toastTx ? 'block' : 'none'};animation:mToast .3s cubic-bezier(.3,1.4,.5,1) both;transform:translate(-50%,0)`
+        };
+      })(),
       cur: meta[st.sel],
       panel: st.panel, term: st.term,
       statusSel: st.file ? st.file : `${meta[st.sel].name} (${meta[st.sel].count})`,

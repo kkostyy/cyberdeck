@@ -23,13 +23,16 @@ input::placeholder{color:#6f6f77}
 @keyframes paneIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
 @keyframes blink{50%{opacity:0}}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
 </style>
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(130% 90% at 105% 118%, rgba(0,0,0,0) 57%, rgba(255,255,255,0.17) 58.2%, rgba(255,255,255,0.04) 62%, rgba(0,0,0,0) 66%), radial-gradient(110% 80% at -12% -22%, rgba(0,0,0,0) 54%, rgba(255,255,255,0.13) 55.2%, rgba(255,255,255,0.03) 59%, rgba(0,0,0,0) 63%), radial-gradient(50% 40% at 82% 0%, rgba(255,255,255,0.12), rgba(0,0,0,0) 70%), linear-gradient(155deg, #1e1e21 0%, #0b0b0c 60%, #151517 100%)">
 
   <!-- ================= WINDOW ================= -->
-  <section aria-label="Терминал" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: tWinIn .5s cubic-bezier(.2,1.1,.3,1) both">
+  <section aria-label="Терминал" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: tWinIn .5s cubic-bezier(.2,1.1,.3,1) both; {{winBg}}">
 
     <!-- title bar (explorer style) -->
     <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
@@ -46,7 +49,7 @@ input::placeholder{color:#6f6f77}
         <button aria-label="Назад" onClick="{{navBack}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #e8e8ec">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>
         </button>
-        <button aria-label="Вперёд" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
+        <button aria-label="Вперёд" onClick="{{navFwd}}" style="width: 44px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: {{fwdColor}}">
           <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"></path></svg>
         </button>
       </div>
@@ -75,6 +78,7 @@ input::placeholder{color:#6f6f77}
         <button aria-label="Разделить экран" aria-pressed="{{split}}" onClick="{{toSplit}}" style="{{viewBtn.split}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"></rect><path d="M12 4.5v15"></path></svg></button>
       </div>
       <div style="display: flex; align-items: center; gap: 2px; margin-left: 4px; flex: none">
+        <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
         <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
         <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
         <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
@@ -112,12 +116,12 @@ input::placeholder{color:#6f6f77}
       <!-- main area -->
       <div style="flex: 1; min-width: 0; display: flex; overflow: hidden; border-radius: 18px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05)">
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
-          <div id="term-scroll" class="tscroll" role="log" aria-label="Вывод команд" aria-live="polite" style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 8px; display: flex; flex-direction: column; gap: 10px">
+          <div id="term-scroll" class="tscroll" role="log" aria-label="Вывод команд" aria-live="polite" style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px 8px; display: flex; flex-direction: column; gap: 10px; {{termVars}}">
             <sc-for list="{{blocks}}" as="b" hint-placeholder-count="3">
               <article style="{{b.card}}">
                 <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05)">
                   <span style="{{b.chip}}">{{b.cwd}}</span>
-                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #f2f2f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{b.cmd}}</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: var(--tf, 13px); font-weight: 600; color: #f2f2f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{b.cmd}}</span>
                   <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #8b8b93">{{b.dur}}</span>
                   <span role="img" aria-label="{{b.statusLabel}}" style="{{b.dot}}"></span>
                   <button aria-label="Повторить команду" onClick="{{b.rerun}}" style="width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8b8b93">
@@ -136,7 +140,7 @@ input::placeholder{color:#6f6f77}
                       </span>
                     </div>
                   </sc-if>
-                  <div style="flex: 1; min-width: 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7">
+                  <div style="flex: 1; min-width: 0; font-family: 'JetBrains Mono', monospace; font-size: var(--tf, 13px); line-height: 1.7; color: var(--tc, inherit)">
                     <sc-for list="{{b.lines}}" as="l" hint-placeholder-count="3">
                       <div style="{{l.style}}">{{l.t}}</div>
                     </sc-for>
@@ -165,7 +169,7 @@ input::placeholder{color:#6f6f77}
               <span aria-hidden="true" style="font: 700 16px 'JetBrains Mono', monospace; color: {{accent}}; padding-left: 18px; transition: color .4s">&gt;_</span>
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #8b8b93; white-space: nowrap">{{cwd}}</span>
               <div style="position: relative; flex: 1; min-width: 0; height: 100%">
-                <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; white-space: pre; pointer-events: none"><span style="color: rgba(0,0,0,0)">{{input}}</span><span style="color: #55555c">{{ghost}}</span></span>
+                <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; white-space: pre; pointer-events: none"><span style="color: rgba(0,0,0,0)">{{input}}</span><span style="color: #55555c">{{ghostShown}}</span></span>
                 <label for="term-in" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Команда</label>
                 <input id="term-in" value="{{input}}" onChange="{{onInput}}" onKeyDown="{{onKey}}" autocomplete="off" spellcheck="false" placeholder="Введите команду… (Tab — дополнить, ↑ — история)" style="position: relative; width: 100%; height: 100%; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 14px 'JetBrains Mono', monospace; caret-color: {{accent}}">
               </div>
@@ -179,7 +183,7 @@ input::placeholder{color:#6f6f77}
 
         <!-- split pane: system monitor -->
         <sc-if value="{{split}}" hint-placeholder-val="{{false}}">
-          <section aria-label="Монитор системы" style="width: 400px; flex: none; border-left: 1px solid rgba(255,255,255,0.05); padding: 16px; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; animation: paneIn .4s cubic-bezier(.2,1,.3,1) both">
+          <section aria-label="Монитор системы" style="width: 400px; flex: none; border-left: 1px solid rgba(255,255,255,0.05); padding: 16px; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; animation: paneIn .4s cubic-bezier(.2,1,.3,1) both; {{monSt}}">
             <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-weight: 700; color: {{accent}}">btop</span><span style="color: #8b8b93">обновляется каждую секунду</span></div>
             <div style="padding: 12px; border-radius: 16px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 7px">
               <div style="display: flex; justify-content: space-between; margin-bottom: 2px"><span style="font-weight: 700">ЦП</span><span>{{cpu}}%</span></div>
@@ -228,12 +232,78 @@ input::placeholder{color:#6f6f77}
         </div>
       </div>
     </sc-if>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
   </section>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#5ee39a"]},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"accent":{"editor":"color","default":"#ededf0","options":["#ededf0","#ff9a4d","#9cc0ee","#5ee39a"]},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
+  CFG_KEY = 'ashenos.term.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Текст' },
+    { k: 'font', type: 'seg', name: 'Размер шрифта', opts: [[12, '12'], [13, '13'], [14, '14'], [16, '16']], def: 13 },
+    { k: 'scheme', type: 'seg', name: 'Цвет вывода', note: 'Цвет текста команд и результатов', opts: [['ash', 'Пепел'], ['matrix', 'Зелёный'], ['amber', 'Янтарь'], ['ice', 'Лёд']], def: 'ash' },
+    { k: 'ghost', type: 'sw', name: 'Подсказки при вводе', note: 'Серое продолжение команды, Tab — принять', def: true },
+    { type: 'head', name: 'Окно' },
+    { k: 'mon', type: 'sw', name: 'Монитор системы', note: 'Панель с ЦП и памятью справа', def: true },
+    { k: 'alpha', type: 'seg', name: 'Прозрачность окна', opts: [[1, 'Нет'], [0.9, 'Лёгкая'], [0.78, 'Сильная']], def: 1 }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
   state = {
+    cfgOpen: false,
     tabs: [{ name: 'zsh', cwd: '~/Проекты', blocks: null }, { name: 'pacman', cwd: '~', blocks: [] }],
     tab: 0, input: '', hist: ['fastfetch', 'ls', 'git status'], hi: -1,
     split: false, pal: false, palQ: '', session: 0,
@@ -241,6 +311,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    this.cfgLoad();
     this.sys = setInterval(() => {
       const j = (v, d, lo, hi) => Math.round(Math.min(hi, Math.max(lo, v + (Math.random() * 2 - 1) * d)));
       this.setState((s) => ({ cpu: j(s.cpu, 6, 3, 90), ram: j(s.ram, 2, 34, 55), cores: s.cores.map((c) => j(c, 14, 1, 99)) }));
@@ -328,7 +399,7 @@ class Component extends DCLogic {
       chip: `flex:none;padding:3px 9px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:${hexA(accent, .14)};color:${accent}`,
       dot: `width:8px;height:8px;flex:none;border-radius:50%;background:${b.ok ? '#6fd39b' : '#ff8f8a'}`,
       rerun: () => this.exec(b.cmd),
-      lines: b.lines.map((l) => ({ t: l.t, style: `white-space:pre-wrap;color:${l.c ? col[l.c] : '#d6d6db'};${l.c === 'acc' ? 'font-weight:600' : ''}` }))
+      lines: b.lines.map((l) => ({ t: l.t, style: `white-space:pre-wrap;color:${l.c ? col[l.c] : 'var(--tc, #d6d6db)'};${l.c === 'acc' ? 'font-weight:600' : ''}` }))
     }));
 
     const all = this.cmds();
@@ -385,7 +456,7 @@ class Component extends DCLogic {
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
       accent, tabs: tabsV, sessions, snips, blocks, empty: blocks.length === 0,
       sugs, sugWrap: `display:${sugs.length ? 'flex' : 'none'};gap:6px;padding:0 18px;flex-wrap:wrap`,
-      input: st.input, ghost: match ? match.slice(q.length) : '',
+      input: st.input, ghostShown: this.cfgGet('ghost') === false ? '' : (match ? match.slice(q.length) : ''), ghost: match ? match.slice(q.length) : '',
       cwd: tab.cwd,
       onInput: (e) => this.setState({ input: e.target.value, hi: -1 }),
       onKey: (e) => {
@@ -423,6 +494,11 @@ class Component extends DCLogic {
         split: `width:40px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:${st.split ? 'rgba(255,255,255,.12)' : 'transparent'};color:${st.split ? '#ffffff' : '#b8b8be'}`
       },
       navBack: () => this.setState({ tab: Math.max(0, st.tab - 1) }),
+      navFwd: () => this.setState({ tab: Math.min(st.tabs.length - 1, st.tab + 1) }), fwdColor: st.tab < st.tabs.length - 1 ? '#e8e8ec' : '#5c5c64',
+      cfg: this.cfgView('Настройки терминала'), cfgOpen: () => this.setState({ cfgOpen: true }),
+      termVars: `--tf:${this.cfgGet('font')}px;--tc:${({ ash: '#d6d6db', matrix: '#7cff6b', amber: '#ffb454', ice: '#9fd8ff' })[this.cfgGet('scheme')]}`,
+      monSt: this.cfgGet('mon') ? '' : 'display:none',
+      winBg: (() => { const tw = this.props.themeWin, al = this.cfgGet('alpha'); if (tw) { const m = tw.match(/rgba\((\d+),(\d+),(\d+)/); return `background:rgba(${m[1]},${m[2]},${m[3]},${Math.min(.92, al)})`; } return al < 1 ? `background:rgba(16,16,18,${al})` : ''; })(),
       toggleSplit: () => this.setState({ split: !st.split }),
       splitBtn: `width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:${st.split ? hexA(accent, .18) : 'transparent'};color:${st.split ? accent : '#c9c9cf'}`,
       newTab: () => this.addTab(),

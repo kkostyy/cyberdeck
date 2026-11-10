@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Питомец Уголёк</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+@keyframes pxBob{0%,49.9%{transform:translateY(0)}50%,100%{transform:translateY(-1px)}}
+@keyframes pxBlink{0%,93%{opacity:1}93.1%,98%{opacity:0}98.1%,100%{opacity:1}}
+@keyframes pxBlinkC{0%,93%{opacity:0}93.1%,98%{opacity:1}98.1%,100%{opacity:0}}
+@keyframes pxStepA{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes pxStepB{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+@keyframes pxRise{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(-6px);opacity:0}}
+@keyframes pxZ{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(-2px,-5px);opacity:0}}
+@keyframes pxTw{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes pxHop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes pxSwing{0%,49.9%{transform:translate(0,0)}50%,100%{transform:translate(-1px,1px)}}
+@keyframes pxFlip{0%,59.9%{transform:translateY(0)}60%,80%{transform:translateY(-1px)}80.1%,100%{transform:translateY(0)}}
+@keyframes pxCur{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes pxPeek{0%,49.9%{transform:translateY(0)}50%,100%{transform:translateY(-1px)}}
+
+@keyframes petBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.03,.97)}}
+@keyframes petWalk{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@keyframes petJig{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-3px)}}
+@keyframes petEye{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes petSpark{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+@keyframes dropZ{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(10px,-20px) scale(1.1)}}
+@keyframes dropDot{0%,100%{opacity:.25}50%{opacity:1}}
+
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.pcard{transition:transform .3s cubic-bezier(.3,1.5,.5,1),background .2s}
+.pcard:hover{transform:translateY(-4px);background:rgba(255,255,255,.06)}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; background: radial-gradient(120% 90% at 0% 0%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <header style="position: absolute; left: 64px; top: 48px; right: 64px; display: flex; align-items: flex-end; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font: 600 12px 'JetBrains Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: #8b8b93">AshenOS · питомец</span>
+      <span style="font-size: 40px; font-weight: 700; letter-spacing: -0.02em">{{name}}</span>
+      <span style="font-size: 15px; color: #a1a1a8">{{sub}}</span>
+    </div>
+    <div role="radiogroup" aria-label="Питомец" style="margin-left: auto; display: flex; gap: 4px; padding: 6px; border-radius: 16px; background: rgba(255,255,255,0.05)">
+      <sc-for list="{{kinds}}" as="k" hint-placeholder-count="2">
+        <button role="radio" aria-checked="{{k.on}}" onClick="{{k.pick}}" style="{{k.style}}">{{k.name}}</button>
+      </sc-for>
+    </div>
+    <div role="radiogroup" aria-label="Цвет" style=" display: flex; gap: 10px; padding: 8px; border-radius: 16px; background: rgba(255,255,255,0.05)">
+      <sc-for list="{{colors}}" as="c" hint-placeholder-count="4">
+        <button role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="{{c.style}}"><span style="{{c.dot}}"></span>{{c.name}}</button>
+      </sc-for>
+    </div>
+  </header>
+  <div style="position: absolute; left: 64px; right: 64px; top: 200px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+    <sc-for list="{{poses}}" as="p" hint-placeholder-count="8">
+      <div class="pcard" style="{{p.card}}">
+        <sc-if value="{{isPx}}" hint-placeholder-val="{{true}}"><svg aria-label="{{p.title}}" role="img" width="192" height="192" viewBox="0 0 32 32" shape-rendering="crispEdges" style="display: block; overflow: visible">
+          <ellipse cx="16" cy="29.6" rx="9" ry="1.1" fill="rgba(0,0,0,.55)"></ellipse>
+          <sc-for list="{{p.layers}}" as="L" hint-placeholder-count="8">
+            <path d="{{L.d}}" fill="{{L.fill}}" style="{{L.style}}"></path>
+          </sc-for>
+        </svg></sc-if><sc-if value="{{isDrop}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="192" height="192" viewBox="0 0 64 64" style="display: block; overflow: visible; filter: {{p.dp.glow}}">
+          <ellipse cx="32" cy="60" rx="16" ry="3.2" fill="rgba(0,0,0,.5)"></ellipse>
+          <g style="{{p.dp.body}}">
+            <path d="M32 6 C 38 16 52 26 52 41 C 52 52 43 58 32 58 C 21 58 12 52 12 41 C 12 26 26 16 32 6 Z" fill="{{p.dp.c1}}"></path>
+            <path d="M32 26 C 42 26 47 33 47 42 C 47 51 40 55 32 55 C 24 55 17 51 17 42 C 17 33 22 26 32 26 Z" fill="{{p.dp.c2}}" opacity=".55"></path>
+            <ellipse cx="23" cy="24" rx="3" ry="5" fill="#fff" opacity=".45" transform="rotate(25 23 24)"></ellipse>
+            <g style="{{p.dp.eyes}}"><ellipse cx="25" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><ellipse cx="39" cy="40" rx="2.8" ry="3.6" fill="#141416"></ellipse><circle cx="26" cy="38.6" r="1" fill="#fff"></circle><circle cx="40" cy="38.6" r="1" fill="#fff"></circle></g>
+            <g style="{{p.dp.shut}}"><path d="M22 40 Q 25 42.5 28 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path><path d="M36 40 Q 39 42.5 42 40" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path></g>
+            <g style="{{p.dp.smile}}"><path d="M22 41 Q 25 37.5 28 41" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path><path d="M36 41 Q 39 37.5 42 41" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path></g>
+            <circle cx="20" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle><circle cx="44" cy="46" r="2.6" fill="#ff8fa0" opacity=".5"></circle>
+            <path d="M29 47 Q 32 50 35 47" stroke="#141416" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+            <ellipse cx="24" cy="57.5" rx="4.5" ry="2.2" fill="{{p.dp.c1}}" style="{{p.dp.footL}}"></ellipse>
+            <ellipse cx="40" cy="57.5" rx="4.5" ry="2.2" fill="{{p.dp.c1}}" style="{{p.dp.footR}}"></ellipse>
+          </g>
+          <circle cx="16" cy="16" r="1.7" fill="{{p.dp.c2}}" style="{{p.dp.spark1}}"></circle>
+          <circle cx="49" cy="11" r="1.4" fill="{{p.dp.c2}}" style="{{p.dp.spark2}}"></circle>
+          <circle cx="40" cy="4" r="1.1" fill="{{p.dp.c2}}" style="{{p.dp.spark3}}"></circle>
+          <g style="{{p.dp.z}}"><text x="48" y="22" font-family="Inter, sans-serif" font-weight="700" font-size="9" fill="{{p.dp.c2}}" style="animation: dropZ 2.4s ease-out infinite">z</text><text x="52" y="14" font-family="Inter, sans-serif" font-weight="700" font-size="12" fill="{{p.dp.c2}}" style="animation: dropZ 2.4s ease-out 1.2s infinite">Z</text></g>
+          <g style="{{p.dp.think}}"><ellipse cx="50" cy="8" rx="12" ry="7" fill="#f2f2f4"></ellipse><circle cx="41" cy="18" r="2.2" fill="#f2f2f4"></circle><circle cx="44" cy="8" r="1.8" fill="{{p.dp.c1}}" style="animation: dropDot 1.2s infinite"></circle><circle cx="50" cy="8" r="1.8" fill="{{p.dp.c1}}" style="animation: dropDot 1.2s .3s infinite"></circle><circle cx="56" cy="8" r="1.8" fill="{{p.dp.c1}}" style="animation: dropDot 1.2s .6s infinite"></circle></g>
+        </svg></sc-if>
+        <span style="font-size: 16px; font-weight: 700">{{p.title}}</span>
+        <span style="font-size: 12.5px; color: #8b8b93; text-align: center; line-height: 1.45">{{p.when}}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = { color: 'ember', kind: 'px' };
+  /* ---------- pixel pet «Уголёк»: 32×32 sprite, every pose built from rects ---------- */
+  pxSprite(pose, colorKey, walking) {
+    const PAL = { ember: ['#f08a4b', '#c4602c', '#ffc07a'], frost: ['#5aa0f0', '#3a74c0', '#b4dcff'], moss: ['#5cbf74', '#3a8e52', '#bdf0a8'], ash: ['#b4b4bd', '#85858f', '#efeff3'] };
+    const [M, D, L] = PAL[colorKey] || PAL.ember;
+    const out = [];
+    const R = (x, y, w = 1, h = 1) => `M${x} ${y}h${w}v${h}h-${w}z`;
+    const add = (fill, rects, style) => { if (rects.length) out.push({ d: rects.map((r) => R(...r)).join(''), fill, style: style || '' }); };
+    const sleep = pose === 'sleep';
+    const bob = `animation:pxBob ${sleep ? '2.6s' : walking ? '.36s' : pose === 'work' ? '.8s' : '1.3s'} linear infinite`;
+    /* body: a flame-drop with a tip leaning right */
+    const BODY = { 8: [17, 17], 9: [16, 17], 10: [15, 17], 11: [14, 17], 12: [13, 18], 13: [12, 19], 14: [11, 20], 15: [10, 21], 16: [9, 22], 17: [9, 22], 18: [8, 23], 19: [8, 23], 20: [8, 23], 21: [8, 23], 22: [8, 23], 23: [8, 23], 24: [9, 22], 25: [9, 22], 26: [10, 21], 27: [11, 20] };
+    const rows = Object.keys(BODY).map(Number);
+    add(M, rows.map((y) => [BODY[y][0], y, BODY[y][1] - BODY[y][0] + 1, 1]), bob);
+    add(D, rows.filter((y) => y >= 12).map((y) => [BODY[y][1], y, 1, 1]).concat([[11, 27, 10, 1], [10, 26, 1, 1]]), bob);
+    add(L, [[11, 21, 8, 1], [10, 22, 10, 2], [11, 24, 8, 1], [12, 25, 6, 1], [13, 14, 1, 1], [12, 15, 1, 1], [11, 16, 1, 1], [16, 9, 1, 1]], bob + ';opacity:.85');
+    /* feet */
+    if (walking) {
+      add(D, [[11, 28, 3, 1], [18, 28, 3, 1]], 'animation:pxStepA .36s linear infinite');
+      add(D, [[10, 28, 3, 1], [19, 28, 3, 1]], 'animation:pxStepB .36s linear infinite');
+    } else add(D, [[11, 28, 3, 1], [18, 28, 3, 1]], '');
+    /* face */
+    const EYE = '#17121a';
+    const happy = pose === 'cook' || pose === 'happy';
+    if (sleep) add(EYE, [[12, 19, 2, 1], [18, 19, 2, 1]], bob);
+    else if (happy) add(EYE, [[11, 19, 1, 1], [12, 18, 1, 1], [13, 19, 1, 1], [18, 19, 1, 1], [19, 18, 1, 1], [20, 19, 1, 1]], bob);
+    else if (pose === 'search') { add(EYE, [[12, 18, 2, 2]], bob); add(EYE, [[18, 19, 2, 1]], bob); }
+    else {
+      add(EYE, [[12, 18, 2, 2], [18, 18, 2, 2]], bob + ';animation-name:pxBob,pxBlink;animation-duration:' + (walking ? '.36s' : pose === 'work' ? '.8s' : '1.3s') + ',3.6s;animation-timing-function:linear;animation-iteration-count:infinite');
+      add(EYE, [[12, 19, 2, 1], [18, 19, 2, 1]], 'animation:pxBlinkC 3.6s linear infinite');
+      add('#ffffff', [[12, 18, 1, 1], [18, 18, 1, 1]], bob + ';opacity:.7');
+    }
+    add('#ff8fa0', [[10, 21, 1, 1], [21, 21, 1, 1]], bob + ';opacity:.6');
+    add(EYE, pose === 'think' ? [[15, 22, 1, 1]] : [[15, 21, 2, 1]], bob + ';opacity:.85');
+    /* hats */
+    if (sleep) {
+      add('#7f8fd0', [[16, 9, 6, 1], [14, 10, 9, 1], [12, 11, 10, 1], [11, 12, 10, 1], [22, 11, 3, 1], [23, 12, 3, 1], [24, 13, 2, 1], [25, 14, 2, 2]], bob);
+      add('#5f6fb0', [[21, 12, 1, 1], [22, 12, 1, 1], [25, 13, 1, 1], [26, 15, 1, 1], [20, 9, 2, 1]], bob);
+      add('#f4efe6', [[10, 13, 12, 2], [25, 16, 3, 2]], bob);
+      add('#d8cfc0', [[10, 14, 12, 1], [26, 17, 2, 1]], bob);
+    }
+    if (pose === 'cook') {
+      add('#f4f1ea', [[9, 6, 4, 6], [13, 4, 5, 8], [18, 6, 5, 6], [10, 11, 12, 2]], bob);
+      add('#d9d3c8', [[10, 12, 12, 1], [12, 7, 1, 4], [17, 6, 1, 5], [22, 8, 1, 3]], bob);
+    }
+    if (pose === 'search') {
+      add('#7a6250', [[12, 8, 8, 1], [10, 9, 12, 3]], bob);
+      add('#9a8168', [[11, 9, 1, 1], [13, 10, 1, 1], [15, 9, 1, 1], [17, 10, 1, 1], [19, 9, 1, 1], [21, 10, 1, 1], [14, 8, 1, 1], [18, 8, 1, 1]], bob);
+      add('#4e3e33', [[7, 12, 18, 1], [9, 13, 14, 1], [15, 6, 1, 2], [17, 6, 1, 2]], bob);
+    }
+    /* props + fx */
+    if (pose === 'work') {
+      add('#efe6d6', [[2, 20, 5, 5]], '');
+      add('#cdbfa8', [[2, 24, 5, 1], [6, 20, 1, 4], [1, 21, 1, 3]], '');
+      add('#4a2e1e', [[3, 20, 3, 1]], '');
+      add('#e9dcc6', [[3, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) infinite');
+      add('#e9dcc6', [[5, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) .55s infinite');
+      add('#e9dcc6', [[4, 17, 1, 1]], 'animation:pxRise 1.6s steps(5) 1.1s infinite');
+      add('#232328', [[19, 19, 10, 8]], '');
+      add('#33333a', [[19, 19, 10, 1], [28, 20, 1, 7]], '');
+      add('#121215', [[14, 27, 16, 2]], '');
+      add('#3a3a42', [[14, 27, 16, 1]], '');
+      add('#9a9aa5', [[22, 22, 1, 1], [23, 23, 1, 1], [22, 24, 1, 1]], '');
+      add('#9a9aa5', [[24, 24, 2, 1]], 'animation:pxCur 1s steps(1) infinite');
+    }
+    if (pose === 'pay') {
+      add('#7cc46a', [[23, 14, 5, 4]], 'animation:pxPeek 1.4s steps(2) infinite');
+      add('#4f9a45', [[25, 15, 1, 2], [23, 14, 5, 1]], 'animation:pxPeek 1.4s steps(2) infinite');
+      add('#7a4a2c', [[22, 17, 8, 7]], '');
+      add('#5a341e', [[22, 23, 8, 1], [29, 17, 1, 7], [22, 17, 8, 1]], '');
+      add('#a0683f', [[24, 19, 4, 1]], '');
+      add('#e0b04a', [[28, 20, 1, 2]], '');
+      add('#f5c542', [[29, 10, 1, 3], [28, 11, 3, 1]], 'animation:pxTw 1.2s steps(3) infinite');
+      add('#f5c542', [[25, 7, 1, 3], [24, 8, 3, 1]], 'animation:pxTw 1.2s steps(3) .6s infinite');
+    }
+    if (pose === 'search') {
+      const ring = [[25, 15, 3, 1], [24, 16, 1, 1], [28, 16, 1, 1], [23, 17, 1, 3], [29, 17, 1, 3], [24, 20, 1, 1], [28, 20, 1, 1], [25, 21, 3, 1]];
+      add('#cfe6ff', [[25, 16, 3, 5], [24, 17, 5, 3]], 'opacity:.55;animation:pxSwing 1.6s linear infinite');
+      add('#2a2a30', ring.concat([[23, 22, 1, 1], [22, 23, 1, 1], [21, 24, 1, 1]]), 'animation:pxSwing 1.6s linear infinite');
+      add('#ffffff', [[25, 17, 1, 1]], 'animation:pxSwing 1.6s linear infinite');
+    }
+    if (pose === 'cook') {
+      add('#3a3a42', [[17, 22, 5, 1]], 'animation:pxFlip 1s linear infinite');
+      add('#26262b', [[22, 21, 9, 2], [23, 23, 7, 1]], 'animation:pxFlip 1s linear infinite');
+      add('#f5c542', [[25, 18, 2, 1]], 'animation:pxHop 1s steps(4) infinite');
+      add('#f5c542', [[28, 17, 1, 1]], 'animation:pxHop 1s steps(4) .25s infinite');
+      add('#ffd86a', [[23, 16, 1, 1]], 'animation:pxHop 1s steps(4) .5s infinite');
+    }
+    if (pose === 'think') {
+      add('#f2f2f4', [[21, 1, 7, 1], [20, 2, 9, 1], [19, 3, 11, 3], [20, 6, 9, 1], [21, 7, 7, 1], [18, 9, 2, 2], [17, 12, 1, 1]], '');
+      add('#c9c9cf', [[20, 6, 9, 1], [19, 5, 1, 1], [29, 5, 1, 1]], 'opacity:.6');
+      add(M, [[21, 4, 2, 1]], 'animation:pxTw 1.2s steps(2) infinite');
+      add(M, [[24, 4, 2, 1]], 'animation:pxTw 1.2s steps(2) .3s infinite');
+      add(M, [[27, 4, 1, 1]], 'animation:pxTw 1.2s steps(2) .6s infinite');
+    }
+    if (sleep) {
+      const Z = (x, y, s) => s === 1 ? [[x, y, 2, 1], [x + 1, y + 1, 1, 1], [x, y + 2, 2, 1]] : [[x, y, 3, 1], [x + 2, y + 1, 1, 1], [x + 1, y + 2, 1, 1], [x, y + 3, 1, 1], [x, y + 4, 3, 1]];
+      add('#8f9de0', Z(5, 14, 1), 'animation:pxZ 2.4s steps(6) infinite');
+      add('#8f9de0', Z(3, 9, 2), 'animation:pxZ 2.4s steps(6) .8s infinite');
+      add('#8f9de0', Z(6, 3, 2), 'animation:pxZ 2.4s steps(6) 1.6s infinite');
+    }
+    return out;
+  }
+
+  /* ---------- «Капелька»: smooth vector droplet ---------- */
+  dropView(pose, colorKey, walking) {
+    const PAL = { ember: ['#ff8a3d', '#ffd27a'], frost: ['#5aa8ff', '#c9e6ff'], moss: ['#59c27a', '#c8f0a8'], ash: ['#b9b9c2', '#f2f2f4'] };
+    const [c1, c2] = PAL[colorKey] || PAL.frost;
+    const sleep = pose === 'sleep', busy = ['work', 'search', 'cook', 'pay'].includes(pose), think = pose === 'think', happy = pose === 'happy';
+    return { c1, c2,
+      body: `transform-origin:32px 58px;animation:${walking ? 'petWalk .45s' : sleep ? 'petBob 4s' : busy ? 'petBob .9s' : happy ? 'petJig .5s' : 'petBob 2.4s'} ease-in-out infinite`,
+      eyes: `transform-origin:32px 40px;animation:petEye 4s infinite;display:${sleep || happy ? 'none' : 'inline'}`,
+      shut: `display:${sleep ? 'inline' : 'none'}`,
+      smile: `display:${happy ? 'inline' : 'none'}`,
+      footL: walking ? 'animation:petWalk .45s ease-in-out infinite' : '', footR: walking ? 'animation:petWalk .45s ease-in-out -.22s infinite' : '',
+      spark1: `animation:petSpark ${busy ? '.8s' : '1.8s'} ease-out infinite`, spark2: `animation:petSpark ${busy ? '1s' : '2.3s'} ease-out .4s infinite`, spark3: `animation:petSpark ${busy ? '1.2s' : '2.9s'} ease-out .8s infinite`,
+      z: `display:${sleep ? 'inline' : 'none'}`,
+      think: `display:${think ? 'inline' : 'none'}`,
+      glow: busy ? `drop-shadow(0 0 10px ${c1})` : 'none' };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const C = [['ember', 'Уголёк', '#f08a4b'], ['frost', 'Ледок', '#5aa0f0'], ['moss', 'Мох', '#5cbf74'], ['ash', 'Пепел', '#b4b4bd']];
+    const P = [
+      ['idle', 'Ждёт', 'Ничего не происходит: моргает и покачивается'],
+      ['walk', 'Гуляет', 'Сам ходит по рабочему столу, его можно перетащить'],
+      ['sleep', 'Спит', 'Через 40 секунд без дела надевает колпак'],
+      ['work', 'Работает', 'Claude выполняет команду в терминале'],
+      ['search', 'Ищет', 'Claude читает файлы и ищет по коду'],
+      ['cook', 'Готовит', 'Claude вносит правку в файл'],
+      ['think', 'Думает', 'Ждёт вашего разрешения'],
+      ['pay', 'Считает', 'Команда /cost — стоимость сессии']
+    ];
+    const drop = st.kind === 'drop';
+    const name = drop ? 'Капелька' : C.find((c) => c[0] === st.color)[1];
+    return {
+      name, isPx: !drop, isDrop: drop,
+      sub: drop ? 'Гладкая капля. Покачивается, моргает, засыпает и думает вместе с Claude.' : 'Пиксельный огонёк 32×32. Меняет позу по тому, что делает Claude, и гуляет по рабочему столу.',
+      kinds: [['px', 'Уголёк · пиксели'], ['drop', 'Капелька']].map(([id, n]) => ({ name: n, on: st.kind === id, pick: () => this.setState({ kind: id, color: id === 'drop' && st.color === 'ember' ? 'frost' : st.color }), style: `height:36px;padding:0 14px;border-radius:11px;border:0;font:600 13px Inter,sans-serif;color:${st.kind === id ? '#111113' : '#e8e8ec'};background:${st.kind === id ? '#f2f2f4' : 'transparent'};transition:background .2s,color .2s` })),
+      colors: C.map(([id, n, col]) => ({ name: drop ? ({ ember: 'Огонь', frost: 'Вода', moss: 'Листик', ash: 'Пепел' })[id] : n, on: id === st.color, pick: () => this.setState({ color: id }),
+        style: `height:36px;padding:0 14px 0 10px;border-radius:11px;display:flex;align-items:center;gap:8px;border:0;font:600 13px Inter,sans-serif;color:${id === st.color ? '#111113' : '#e8e8ec'};background:${id === st.color ? '#f2f2f4' : 'transparent'};transition:background .2s,color .2s`,
+        dot: `width:14px;height:14px;background:${col};box-shadow:inset -2px -2px 0 rgba(0,0,0,.25)` })),
+      poses: (drop ? P.filter((x) => ['idle', 'walk', 'sleep', 'work', 'think'].includes(x[0])).map((x) => x[0] === 'sleep' ? ['sleep', 'Спит', 'Через 40 секунд без дела закрывает глаза'] : x[0] === 'work' ? ['work', 'Работает', 'Светится, пока Claude что-то делает'] : x).concat([['happy', 'Радуется', 'Погладили или покормили']]) : P).map(([id, title, when], i) => ({ title, when, dp: this.dropView(id === 'walk' ? 'idle' : id, st.color, id === 'walk'), layers: this.pxSprite(id === 'walk' ? 'idle' : id, st.color, id === 'walk'),
+        card: `box-sizing:border-box;height:310px;padding:16px 16px;border-radius:24px;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);animation:cardIn .5s cubic-bezier(.22,1,.36,1) ${(i * 0.05).toFixed(2)}s both` }))
+    };
+  }
+}
+</script>
+</body>
+</html>

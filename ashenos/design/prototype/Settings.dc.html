@@ -25,7 +25,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: #050506; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
+  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
 
     <div style="flex: 1; min-height: 0; display: flex">
       <!-- ===== sidebar ===== -->
@@ -87,6 +87,61 @@ body{margin:0;background:#050506}
               <span style="font-size: 13px; color: #8b8b93">{{crumb}}</span>
             </span>
           </div>
+
+          <!-- theme page -->
+          <sc-if value="{{isTheme}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 14px; animation: setPage .3s ease both">
+              <div style="{{th.preview}}">
+                <div style="{{th.pvBar}}"><span style="{{th.pvPill}}"></span><span style="flex: 1"></span><span style="{{th.pvDot}}"></span><span style="{{th.pvDot}}"></span><span style="{{th.pvClock}}">12:00</span></div>
+                <div style="{{th.pvDrop}}">
+                  <span style="font-size: 12px; font-weight: 700; color: {{th.pvText}}">Музыка</span>
+                  <span style="{{th.pvBarFill}}"></span>
+                  <div style="display: flex; gap: 6px"><span style="{{th.pvBtn}}"></span><span style="{{th.pvBtn2}}"></span><span style="{{th.pvBtn2}}"></span></div>
+                </div>
+                <div style="{{th.pvWin}}">
+                  <span style="font: 600 11px 'JetBrains Mono', monospace; color: {{th.pvText}}">~/Проекты</span>
+                  <div style="display: flex; gap: 4px; flex-wrap: wrap"><sc-for list="{{th.cur.dots}}" as="dd" hint-placeholder-count="5"><span style="{{dd.style}}"></span></sc-for></div>
+                </div>
+                <div style="{{th.pvDock}}"><span style="{{th.pvIcon}}"></span><span style="{{th.pvIcon}}"></span><span style="{{th.pvIconA}}"></span><span style="{{th.pvIcon}}"></span><span style="{{th.pvIcon}}"></span></div>
+              </div>
+
+              <section aria-label="Оттенок" style="border-radius: 14px; background: rgba(255,255,255,0.04); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); font-size: 16px">●</span>
+                  <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Оттенок</span><span style="font-size: 12.5px; color: #8b8b93">Акцентный цвет: кнопки, кольца, капли, волна, полоса музыки</span></div>
+                </div>
+                <div role="radiogroup" aria-label="Оттенок" style="display: flex; gap: 8px; flex-wrap: wrap">
+                  <sc-for list="{{th.tints}}" as="tn" hint-placeholder-count="10">
+                    <button role="radio" aria-checked="{{tn.on}}" aria-label="{{tn.name}}" title="{{tn.name}}" onClick="{{tn.pick}}" style="{{tn.style}}"><span style="{{tn.dot}}"></span>{{tn.label}}</button>
+                  </sc-for>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 2px">
+                  <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 600">Окрашивать фон</span><span style="font-size: 12.5px; color: #8b8b93">Подмешивает оттенок в рамку, панели, окна и док</span></div>
+                  <div role="radiogroup" aria-label="Окрашивать фон" style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+                    <sc-for list="{{th.levels}}" as="lv" hint-placeholder-count="3">
+                      <button role="radio" aria-checked="{{lv.on}}" onClick="{{lv.pick}}" style="{{lv.style}}">{{lv.name}}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </section>
+
+              <section aria-label="Цветовые темы" style="border-radius: 14px; background: rgba(255,255,255,0.04); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); font-size: 16px">◐</span>
+                  <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 14px; font-weight: 600">Цветовые темы</span><span style="font-size: 12.5px; color: #8b8b93">Выберите готовую палитру — она применяется сразу ко всей системе</span></div>
+                  <input aria-label="Поиск тем" placeholder="Поиск тем…" value="{{th.q}}" onInput="{{th.onQ}}" autocomplete="off" style="width: 180px; height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #2e2e33; background: rgba(0,0,0,0.25); color: #f2f2f4; font-size: 13px; outline: none">
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                  <sc-for list="{{th.list}}" as="t" hint-placeholder-count="12">
+                    <button role="radio" aria-checked="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">
+                      <span style="{{t.nameStyle}}">{{t.name}}</span>
+                      <span style="display: flex; gap: 4px; margin-left: auto"><sc-for list="{{t.dots}}" as="dd" hint-placeholder-count="5"><span style="{{dd.style}}"></span></sc-for></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </section>
+            </div>
+          </sc-if>
 
           <!-- wallpaper page: current wallpaper on top -->
           <sc-if value="{{isWall}}" hint-placeholder-val="{{false}}">
@@ -244,7 +299,7 @@ body{margin:0;background:#050506}
   <div role="status" aria-live="polite" style="{{toast}}">{{toastText}}</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"curWall":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"curWall":{"editor":null},"themeId":{"editor":null},"themeWin":{"editor":null},"themeTint":{"editor":null},"themeLevel":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 const SECTIONS = [
   { cat: 'Внешний вид', items: [
     { id: 'look', name: 'Оформление', glyph: '◐', bg: '#3a3a40', sub: 'Тема, цвета, шрифты, значки', groups: [
@@ -716,6 +771,32 @@ const WALLS = [
       { name: 'Волны', accent: '#ededf0', css: 'radial-gradient(130% 90% at 105% 118%,rgba(0,0,0,0) 57%,rgba(255,255,255,.17) 58.2%,rgba(255,255,255,.04) 62%,rgba(0,0,0,0) 66%),radial-gradient(110% 80% at -12% -22%,rgba(0,0,0,0) 54%,rgba(255,255,255,.13) 55.2%,rgba(255,255,255,.03) 59%,rgba(0,0,0,0) 63%),linear-gradient(155deg,#2a2a2e 0%,#141416 60%,#1e1e21 100%)' }
     ];
 
+const THEMES = [
+  { id: 'obsidian', name: 'Obsidian', bg: '#050506', surface: '#0e0e10', text: '#f2f2f4', accent: '', dots: ['#f2f2f4', '#d6d6db', '#a1a1a8', '#6f6f77', '#3a3a40'] },
+  { id: 'cyberpunk', name: 'Cyberpunk', bg: '#0a0614', surface: '#140c24', text: '#4fe3ff', accent: '#00e5ff', dots: ['#00e5ff', '#ff2bd6', '#f5e94b', '#7cff6b', '#ff5c5c'] },
+  { id: 'nightowl', name: 'Night Owl', bg: '#011627', surface: '#0b2942', text: '#d6deeb', accent: '#82aaff', dots: ['#82aaff', '#c792ea', '#ffcb8b', '#addb67', '#ef5350'] },
+  { id: 'kanagawa', name: 'Kanagawa Dragon', bg: '#12120f', surface: '#1d1c19', text: '#c5c9c5', accent: '#c4b28a', dots: ['#c5c9c5', '#8ba4b0', '#a292a3', '#c4b28a', '#c4746e'] },
+  { id: 'tokyo', name: 'Tokyo Night', bg: '#16161e', surface: '#1f2335', text: '#c0caf5', accent: '#7aa2f7', dots: ['#7aa2f7', '#bb9af7', '#e0af68', '#9ece6a', '#f7768e'] },
+  { id: 'mocha', name: 'Mocha', bg: '#11111b', surface: '#1e1e2e', text: '#cdd6f4', accent: '#cba6f7', dots: ['#89b4fa', '#cba6f7', '#f5c2e7', '#a6e3a1', '#fab387'] },
+  { id: 'gruvbox', name: 'Gruvbox', bg: '#1d2021', surface: '#282828', text: '#ebdbb2', accent: '#fe8019', dots: ['#fabd2f', '#fe8019', '#fb4934', '#b8bb26', '#83a598'] },
+  { id: 'espresso', name: 'Espresso', bg: '#17120e', surface: '#241c16', text: '#eadbc8', accent: '#d9a066', dots: ['#eadbc8', '#d9a066', '#c46a3a', '#8c6a4f', '#5c4433'] },
+  { id: 'nord', name: 'Nord', bg: '#1e222a', surface: '#2e3440', text: '#e5e9f0', accent: '#88c0d0', dots: ['#88c0d0', '#81a1c1', '#b48ead', '#a3be8c', '#ebcb8b'] },
+  { id: 'dracula', name: 'Dracula', bg: '#1b1c24', surface: '#282a36', text: '#f8f8f2', accent: '#bd93f9', dots: ['#bd93f9', '#ff79c6', '#8be9fd', '#50fa7b', '#ffb86c'] },
+  { id: 'solarized', name: 'Solarized', bg: '#00212b', surface: '#073642', text: '#93a1a1', accent: '#268bd2', dots: ['#268bd2', '#2aa198', '#859900', '#b58900', '#dc322f'] },
+  { id: 'monokai', name: 'Monokai', bg: '#1a1b17', surface: '#272822', text: '#f8f8f2', accent: '#a6e22e', dots: ['#a6e22e', '#66d9ef', '#f92672', '#fd971f', '#e6db74'] },
+  { id: 'ocean', name: 'Material Ocean', bg: '#0b0d15', surface: '#161925', text: '#a6accd', accent: '#84ffff', dots: ['#84ffff', '#82aaff', '#c792ea', '#c3e88d', '#f78c6c'] },
+  { id: 'ayu', name: 'Ayu Dark', bg: '#07090d', surface: '#11151c', text: '#bfbdb6', accent: '#e6b450', dots: ['#e6b450', '#ffb454', '#59c2ff', '#aad94c', '#f07178'] },
+  { id: 'github', name: 'GitHub Dark', bg: '#0b0f15', surface: '#161b22', text: '#e6edf3', accent: '#58a6ff', dots: ['#58a6ff', '#bc8cff', '#3fb950', '#d29922', '#f85149'] },
+  { id: 'everforest', name: 'Everforest', bg: '#1e2326', surface: '#2d353b', text: '#d3c6aa', accent: '#a7c080', dots: ['#a7c080', '#83c092', '#dbbc7f', '#e69875', '#e67e80'] },
+  { id: 'rose', name: 'Rose Dusk', bg: '#141018', surface: '#1f1a24', text: '#e0def4', accent: '#ebbcba', dots: ['#ebbcba', '#f6c177', '#c4a7e7', '#9ccfd8', '#eb6f92'] },
+  { id: 'horizon', name: 'Horizon', bg: '#16161c', surface: '#1c1e26', text: '#e0e0e0', accent: '#e95678', dots: ['#e95678', '#fab795', '#25b0bc', '#29d398', '#b877db'] }
+];
+const TINTS = [
+  ['', 'Из темы'], ['#ff8a3d', 'Оранжевый'], ['#ff5c5c', 'Красный'], ['#ff6fae', 'Розовый'], ['#f5c84b', 'Жёлтый'],
+  ['#59c27a', 'Зелёный'], ['#2ec4b6', 'Бирюзовый'], ['#5aa8ff', 'Голубой'], ['#b48cff', 'Фиолетовый'], ['#f2f2f4', 'Белый']
+];
+const mixHex = (a, b, k) => { const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
+
 
 const T = (id, label, v, hint) => ({ id, t: 'toggle', label, v, hint });
 const S = (id, label, opts, v, hint) => ({ id, t: 'select', label, opts, v, hint });
@@ -793,6 +874,7 @@ const CATS = [
     ] })
   ] },
   { cat: 'Внешний вид и стиль', items: [
+    page('theme', 'Тема', '◐', '#ff8a3d', [], { custom: 'theme' }),
     page('wall', 'Обои', '◧', '#4f7fb8', G('wall', 'Экран блокировки'), { custom: 'wall' }),
     page('themes', 'Цвета и темы', '◐', '#8a63d2', null, { children: [
       page('global', 'Глобальная тема', '◐', '#8a63d2', [P.look.groups[0]]),
@@ -868,7 +950,7 @@ const CATS = [
 ];
 
 class Component extends DCLogic {
-  state = { sec: 'wall', parent: null, q: '', vals: {}, saved: {}, toast: null, keyEdit: null, hl: true, wTarget: 'desk', wPick: null };
+  state = { sec: 'theme', parent: null, q: '', vals: {}, saved: {}, toast: null, keyEdit: null, hl: true, wTarget: 'desk', wPick: null };
   componentDidMount() {
     try { const v = JSON.parse(localStorage.getItem('archSettings.v2') || '{}'); if (v && typeof v === 'object') this.setState({ vals: v, saved: v }); } catch (e) {}
   }
@@ -983,6 +1065,48 @@ class Component extends DCLogic {
       heroIcon: icon(cur.bg, 54) + ';border-radius:17px;font-size:24px',
       cur, crumb: par2 ? `${cur.cat} › ${par2.name}` : cur.cat,
       groups, q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      winTheme: (() => { const tid = st.thId || this.props.themeId || 'obsidian'; const T = THEMES.find((x) => x.id === tid) || THEMES[0]; const tint = st.thTint !== undefined ? st.thTint : (this.props.themeTint || ''); const lvl = st.thLevel !== undefined ? st.thLevel : (+this.props.themeLevel || 0); if (tid === 'obsidian' && !lvl) return '#050506'; return mixHex(T.bg, tint || T.accent || T.dots[0], [0, .07, .16][lvl] || 0); })(),
+      isTheme: cur.custom === 'theme',
+      th: (() => {
+        const tid = st.thId || this.props.themeId || 'obsidian';
+        const tint = st.thTint !== undefined ? st.thTint : (this.props.themeTint || '');
+        const lvl = st.thLevel !== undefined ? st.thLevel : (+this.props.themeLevel || 0);
+        const T = THEMES.find((x) => x.id === tid) || THEMES[0];
+        const acc = tint || T.accent || '#ff9a4d';
+        const K = [0, 0.07, 0.16][lvl] || 0;
+        const bg = mixHex(T.bg, acc, K), surf = mixHex(T.surface, acc, K * 1.2);
+        const send = (id, tn, lv) => {
+          this.setState({ thId: id, thTint: tn, thLevel: lv });
+          if (this.props.onAction) this.props.onAction('theme:' + JSON.stringify({ id, tint: tn, level: lv }));
+          const nm = (THEMES.find((x) => x.id === id) || THEMES[0]).name;
+          this.say(`Тема «${nm}»${tn ? ' · ' + (TINTS.find((x) => x[0] === tn) || ['', ''])[1].toLowerCase() + ' оттенок' : ''}`);
+        };
+        const dot = (c, s = 9) => ({ style: `width:${s}px;height:${s}px;border-radius:50%;background:${c};box-shadow:0 0 0 1px rgba(0,0,0,.25)` });
+        const q = (st.thQ || '').trim().toLowerCase();
+        return {
+          cur: { dots: T.dots.map((c) => dot(c, 8)) }, q: st.thQ || '', onQ: (e) => this.setState({ thQ: e.target.value }),
+          preview: `position:relative;height:200px;border-radius:16px;overflow:hidden;background:${bg};box-shadow:0 0 0 1px rgba(255,255,255,.1);transition:background .5s`,
+          pvBar: `position:absolute;left:0;right:0;top:0;height:22px;padding:0 10px;display:flex;align-items:center;gap:6px;background:${bg};transition:background .5s`,
+          pvPill: `width:70px;height:12px;border-radius:6px;background:${mixHex(surf, '#ffffff', 0.08)}`,
+          pvDot: `width:10px;height:10px;border-radius:50%;border:2px solid ${acc};transition:border-color .4s`,
+          pvClock: `font:600 10px Inter,sans-serif;color:${T.text}`,
+          pvDrop: `position:absolute;right:16px;top:22px;width:180px;padding:10px 12px;border-radius:0 0 14px 14px;background:${bg};display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 20px rgba(0,0,0,.4);transition:background .5s`,
+          pvText: T.text,
+          pvBarFill: `display:block;height:5px;border-radius:3px;background:linear-gradient(90deg,${acc} 55%,rgba(255,255,255,.12) 55%);transition:background .4s`,
+          pvBtn: `width:22px;height:22px;border-radius:50%;background:${acc};transition:background .4s`, pvBtn2: `width:22px;height:22px;border-radius:7px;background:rgba(255,255,255,.08)`,
+          pvWin: `position:absolute;left:22px;top:40px;width:250px;height:110px;padding:12px;box-sizing:border-box;border-radius:14px;background:${surf};display:flex;flex-direction:column;gap:10px;box-shadow:0 14px 30px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.06);transition:background .5s`,
+          pvDock: `position:absolute;left:50%;bottom:10px;translate:-50% 0;padding:6px 10px;border-radius:14px;display:flex;gap:6px;background:${mixHex(surf, '#ffffff', 0.04)};box-shadow:0 0 0 1px rgba(255,255,255,.08)`,
+          pvIcon: 'width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.14)', pvIconA: `width:20px;height:20px;border-radius:6px;background:${acc};transition:background .4s`,
+          tints: TINTS.map(([c, name]) => ({ name, label: c ? '' : name, on: tint === c, pick: () => send(tid, c, lvl),
+            dot: c ? `width:22px;height:22px;border-radius:50%;background:${c}` : `width:22px;height:22px;border-radius:50%;background:conic-gradient(${T.dots.join(',')})`,
+            style: `height:36px;${c ? 'width:36px;padding:0;justify-content:center;' : 'padding:0 12px 0 7px;'}border-radius:18px;display:flex;align-items:center;gap:8px;border:0;font-size:12.5px;font-weight:600;color:#e8e8ec;background:rgba(255,255,255,.06);box-shadow:${tint === c ? '0 0 0 2px #f2f2f4' : 'none'};transition:box-shadow .2s` })),
+          levels: [['Нет', 0], ['Лёгкие', 1], ['Насыщенные', 2]].map(([name, v]) => ({ name, on: lvl === v, pick: () => send(tid, tint, v),
+            style: `height:28px;padding:0 12px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;transition:background .2s,color .2s;background:${lvl === v ? '#f2f2f4' : 'transparent'};color:${lvl === v ? '#111113' : '#a1a1a8'}` })),
+          list: THEMES.filter((x) => !q || x.name.toLowerCase().includes(q)).map((x) => ({ name: x.name, on: x.id === tid, pick: () => send(x.id, tint, lvl), dots: x.dots.map((c) => dot(c)),
+            nameStyle: `font:700 12.5px 'JetBrains Mono',monospace;color:${x.id === 'cyberpunk' ? '#4fe3ff' : x.text};white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
+            style: `height:46px;padding:0 14px;border-radius:12px;display:flex;align-items:center;gap:10px;border:0;text-align:left;background:${x.surface};box-shadow:${x.id === tid ? '0 0 0 2px #f2f2f4' : '0 0 0 1px rgba(255,255,255,.06)'};transition:box-shadow .2s,transform .2s` }))
+        };
+      })(),
       isWall: cur.custom === 'wall', pv, wTarget, wType, wFit, wGrid,
       wAdd: () => this.say('Выбор файла: ~/Изображения/Обои — в макете недоступно'),
       help: () => this.say(`Справка: «${cur.name}» — docs.kde.org`),
