@@ -248,6 +248,116 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
       </section>
     </sc-if>
 
+    <sc-if value="{{wOn.cal}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Календарь»" onMouseDown="{{drag.cal}}" class="wlift" style="{{wpos.cal}}">
+        <div style="{{wcase.cal}}">
+          <div style="{{ledBox}}"><span style="{{ledRunSlow}}">{{nw.calLed}}</span></div>
+          <div style="{{accTile}};flex:1;padding:10px 12px 8px;display:flex;flex-direction:column;gap:3px">
+            <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); font-size: 9.5px; font-weight: 700; opacity: 0.6; text-align: center"><span>пн</span><span>вт</span><span>ср</span><span>чт</span><span>пт</span><span>сб</span><span>вс</span></div>
+            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; flex: 1">
+              <sc-for list="{{nw.cal}}" as="c" hint-placeholder-count="35"><span style="{{c.style}}">{{c.d}}</span></sc-for>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Календарь»" onClick="{{wOff.cal}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.cal}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.cal}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.note}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Заметка»" onMouseDown="{{drag.note}}" class="wlift" style="{{wpos.note}}">
+        <div style="{{wcase.note}}">
+          <div style="{{ledBox}}"><span style="{{ledRunSlow}}">{{nw.noteLed}}</span></div>
+          <div style="{{accTile}};flex:1;min-height:0;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+            <span style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nw.noteTitle}}</span>
+            <span style="flex: 1; min-height: 0; overflow: hidden; font-size: 12.5px; font-weight: 500; line-height: 1.5; white-space: pre-wrap; opacity: 0.8">{{nw.noteBody}}</span>
+            <button onClick="{{openNotes}}" onMouseDown="{{stop}}" style="align-self: flex-start; height: 30px; padding: 0 12px; border-radius: 9px; font-size: 12px; font-weight: 700; background: #111113; color: #f2f2f4">Открыть заметки</button>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Заметка»" onClick="{{wOff.note}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.note}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.note}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.pomo}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Помодоро»" onMouseDown="{{drag.pomo}}" class="wlift" style="{{wpos.pomo}}">
+        <div style="{{wcase.pomo}}">
+          <div style="{{ledBox}}"><span style="{{ledRunSlow}}">{{nw.pomoLed}}</span></div>
+          <div style="flex: 1; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); background-color: rgba(255,255,255,0.035); background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1.4px, rgba(0,0,0,0) 1.7px); background-size: 4px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 10px">
+            <span role="timer" aria-label="Осталось {{nw.pomoTime}}" style="{{ledBig}}">{{nw.pomoTime}}</span>
+            <span style="{{nw.pomoBar}}"><span style="{{nw.pomoFill}}"></span></span>
+            <div style="display: flex; gap: 8px">
+              <button onClick="{{nw.pomoToggle}}" onMouseDown="{{stop}}" style="{{nw.pomoBtn}}">{{nw.pomoLabel}}</button>
+              <button onClick="{{nw.pomoReset}}" onMouseDown="{{stop}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 700; background: rgba(255,255,255,0.08); color: #e8e8ec">Сброс</button>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Помодоро»" onClick="{{wOff.pomo}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.pomo}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.pomo}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.batt}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Батарея»" onMouseDown="{{drag.batt}}" class="wlift" style="{{wpos.batt}}">
+        <div style="{{wcase.batt}}">
+          <div style="{{accTile}};height:104px;padding:0 18px;display:flex;align-items:center;gap:14px">
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+              <span style="font-size: 44px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{nw.battPct}}%</span>
+              <span style="font-size: 12px; font-weight: 600; opacity: 0.7">{{nw.battSub}}</span>
+            </div>
+            <span aria-hidden="true" style="position: relative; width: 74px; height: 38px; flex: none; border-radius: 11px; border: 3px solid #111113; padding: 3px; box-sizing: border-box"><span style="{{nw.battFill}}"></span><span style="position: absolute; right: -8px; top: 9px; width: 4px; height: 14px; border-radius: 0 3px 3px 0; background: #111113"></span></span>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Батарея»" onClick="{{wOff.batt}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.batt}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.batt}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.net}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Сеть»" onMouseDown="{{drag.net}}" class="wlift" style="{{wpos.net}}">
+        <div style="{{wcase.net}}">
+          <div style="height: 104px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.035); padding: 12px 14px; box-sizing: border-box; display: flex; gap: 12px">
+            <div style="display: flex; flex-direction: column; justify-content: center; gap: 6px; flex: none">
+              <span style="font-size: 11px; font-weight: 600; color: #a1a1a8">Wi-Fi · AshenNet 5G</span>
+              <span style="font: 700 17px 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums">↓ {{nw.netDown}}</span>
+              <span style="font: 600 12.5px 'JetBrains Mono', monospace; color: #a1a1a8; font-variant-numeric: tabular-nums">↑ {{nw.netUp}}</span>
+            </div>
+            <div aria-hidden="true" style="flex: 1; display: flex; align-items: flex-end; gap: 3px">
+              <sc-for list="{{nw.netBars}}" as="b" hint-placeholder-count="14"><span style="{{b.style}}"></span></sc-for>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Сеть»" onClick="{{wOff.net}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.net}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.net}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.disk}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Диск»" onMouseDown="{{drag.disk}}" class="wlift" style="{{wpos.disk}}">
+        <div style="{{wcase.disk}}">
+          <div style="height: 104px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.035); padding: 14px 16px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 8px">
+            <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-size: 14px; font-weight: 700">microSD</span><span style="font-size: 11.5px; color: #a1a1a8">64 ГБ · /</span><span style="margin-left: auto; font: 700 14px 'JetBrains Mono', monospace">61%</span></div>
+            <span role="meter" aria-label="Занято на диске" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100" style="display: block; height: 12px; border-radius: 6px; background: rgba(255,255,255,0.08); overflow: hidden"><span style="{{nw.diskFill}}"></span></span>
+            <span style="font-size: 11.5px; color: #a1a1a8">39 ГБ занято · 25 ГБ свободно</span>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Диск»" onClick="{{wOff.disk}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.disk}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.disk}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
     <!-- audio wave -->
     <div aria-hidden="true" style="{{waveWrap}}">
       <svg width="100%" height="100%" viewBox="0 0 1440 90" preserveAspectRatio="none" style="display: block; overflow: visible">
@@ -305,7 +415,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.music.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Заметки" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
+        <button class="dock-btn" aria-label="Заметки" onClick="{{openNotes}}" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
           <span style="{{dk.notes.tip}}">Заметки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}};background:linear-gradient(#f5e13b,#f5e13b) 0 0/100% 22% no-repeat,repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 9%,#d6d6db 9% 11%) 0 30%/100% 70% no-repeat,linear-gradient(180deg,#ffffff,#eeeef1)"></span>
           <span aria-hidden="true" style="{{dk.notes.dot}}"></span>
@@ -342,14 +452,14 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           <span aria-hidden="true" style="{{dk.lab.dot}}"></span>
         </button>
         <span aria-hidden="true" style="width: 1px; align-self: stretch; margin: 6px 2px 10px; background: rgba(255,255,255,0.12)"></span>
-        <button class="dock-btn" aria-label="Загрузки" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
+        <button class="dock-btn" aria-label="Загрузки" onClick="{{openDown}}" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
           <span style="{{dk.down.tip}}">Загрузки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}};background:linear-gradient(180deg,rgba(150,150,156,0.75),rgba(40,40,44,0.95))">
             <svg width="52%" height="52%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg>
           </span>
           <span aria-hidden="true" style="{{dk.down.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Корзина" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
+        <button class="dock-btn" aria-label="Корзина" onClick="{{openTrash}}" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
           <span style="{{dk.trash.tip}}">Корзина</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}};background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.3)">
             <svg width="52%" height="52%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
@@ -593,7 +703,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 
     <!-- ===== WIDGET GALLERY ===== -->
     <sc-if value="{{gallery}}" hint-placeholder-val="{{false}}">
-      <section role="dialog" aria-label="Виджеты" style="position: absolute; left: 50%; bottom: 118px; width: 860px; margin-left: -430px; z-index: 36; padding: 18px; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); animation: sheetIn .45s cubic-bezier(.2,1.2,.3,1) both">
+      <section role="dialog" aria-label="Виджеты" style="position: absolute; left: 50%; bottom: 118px; width: 980px; margin-left: -490px; z-index: 36; padding: 18px; border-radius: 22px; background: rgba(20,20,23,0.74); backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); animation: sheetIn .45s cubic-bezier(.2,1.2,.3,1) both">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 0 4px">
           <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
             <span style="font-size: 16px; font-weight: 600">Виджеты</span>
@@ -601,7 +711,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </div>
           <button onClick="{{closeGallery}}" style="height: 40px; padding: 0 18px; border-radius: 12px; font-size: 13.5px; font-weight: 700; color: #111113; background: {{accent}}; transition: background .6s">Готово</button>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px">
           <sc-for list="{{gal}}" as="g" hint-placeholder-count="5">
             <div style="{{g.card}}">
               <span aria-hidden="true" style="height: 92px; display: flex; align-items: center; justify-content: center">
@@ -1268,9 +1378,10 @@ class Component extends DCLogic {
     setSec: 'screen', out: 'phones', ws: 1,
     lock: null, pw: '', pwErr: 0,
     pos: 102, gallery: false, dragId: null,
-    wOn: { music: true, clock: true, weather: true, system: true, tasks: false },
-    wsc: { music: 1, clock: 1, weather: 1, system: 1, tasks: 1 },
-    wpos: { clock: { x: 840, y: 24 }, weather: { x: 840, y: 168 }, system: { x: 1128, y: 168 }, music: { x: 840, y: 456 }, tasks: { x: 536, y: 456 } },
+    wOn: { music: true, clock: true, weather: true, system: true, tasks: false, cal: false, note: false, pomo: false, batt: false, net: false, disk: false },
+    pomo: { left: 1500, run: false, round: 1 },
+    wsc: { music: 1, clock: 1, weather: 1, system: 1, tasks: 1, disk: 0.7 },
+    wpos: { clock: { x: 840, y: 24 }, weather: { x: 840, y: 168 }, system: { x: 1128, y: 168 }, music: { x: 840, y: 456 }, tasks: { x: 536, y: 456 }, cal: { x: 536, y: 168 }, note: { x: 248, y: 168 }, pomo: { x: 248, y: 456 }, batt: { x: 536, y: 24 }, net: { x: 248, y: 24 }, disk: { x: 40, y: 24 } },
     done: { 0: true },
     shelf: [], shelfPage: 0, shelfOver: false
   };
@@ -1296,7 +1407,8 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
-    this.timer = setInterval(() => this.setState((s) => ({ now: new Date(), pos: s.playing ? (s.pos + 1) % 238 : s.pos })), 1000);
+    this.timer = setInterval(() => this.setState((s) => { const o = { now: new Date(), pos: s.playing ? (s.pos + 1) % 238 : s.pos }; if (s.pomo && s.pomo.run) { if (s.pomo.left > 1) o.pomo = { ...s.pomo, left: s.pomo.left - 1 }; else { o.pomo = { left: 1500, run: false, round: s.pomo.round + 1 }; if (this.props.onLevel) setTimeout(() => this.props.onLevel('clip', 'Помодоро: перерыв 5 минут'), 0); } } return o; }), 1000);
+    this.onNotes = () => { this._note = null; this.forceUpdate(); }; window.addEventListener('ashen-notes', this.onNotes);
     this.mt = setInterval(() => {
       if (this.state.hov === 'music' && !this.state.exp) this.setState({ mphase: this.state.mphase ? 0 : 1 });
       else if (this.state.mphase) this.setState({ mphase: 0 });
@@ -1778,8 +1890,8 @@ class Component extends DCLogic {
     const bandAnim = lp === 'in' ? 'animation:bandDown .8s cubic-bezier(.7,0,.25,1) both' : lp === 'out' ? 'animation:bandUp .7s cubic-bezier(.7,0,.25,1) both' : 'display:none';
 
     /* ---------- widgets ---------- */
-    const WS = { music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272] };
-    const WN = { music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи' };
+    const WS = { music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272], cal: [272, 272], note: [272, 272], pomo: [272, 272], batt: [272, 128], net: [272, 128], disk: [272, 128] };
+    const WN = { music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи', cal: 'Календарь', note: 'Заметка', pomo: 'Помодоро', batt: 'Батарея', net: 'Сеть', disk: 'Диск' };
     const editing = st.gallery;
     const rvN = +this.props.reveal || 0;
     const wpos = {}, wcase = {}, wOn = {}, wOff = {}, drag = {}, wSize = {}, wSizeText = {};
@@ -1818,6 +1930,35 @@ class Component extends DCLogic {
       { name: 'ОЗУ', v: st.ram, label: `${st.ram}%` },
       { name: 'Темп.', v: Math.round((tempC - 20) / 80 * 100), label: `${tempC}°` }
     ].map((m) => ({ ...m, fill: `position:absolute;left:0;right:0;bottom:0;height:${m.v}%;border-radius:12px;background:${accent};transition:height .8s cubic-bezier(.3,1.2,.4,1),background .6s` }));
+    /* ---------- new widgets ---------- */
+    if (!this._note) { try { const all = JSON.parse(localStorage.getItem('ashenos.notes.v1') || 'null'); if (Array.isArray(all) && all.length) { const srt = all.slice().sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || b.at - a.at); this._note = srt[0]; } } catch (e) {} if (!this._note) this._note = { title: 'Заметок пока нет', body: 'Откройте «Заметки» и создайте первую.' }; }
+    const nwNow = now, nwY = nwNow.getFullYear(), nwM = nwNow.getMonth();
+    const nwFirst = (new Date(nwY, nwM, 1).getDay() + 6) % 7, nwDays = new Date(nwY, nwM + 1, 0).getDate();
+    const pm = st.pomo || { left: 1500, run: false, round: 1 };
+    const sec = Math.floor(nwNow.getTime() / 1000);
+    const nBar = (i) => { const t = sec - i; return 0.18 + 0.82 * Math.abs(Math.sin(t * 1.7) * 0.55 + Math.sin(t * 0.31 + 1) * 0.45); };
+    const battPct = Math.max(5, 82 - Math.floor((nwNow.getMinutes() % 30) / 6));
+    const nw = {
+      calLed: `${nwNow.toLocaleDateString('ru-RU', { month: 'long' }).toUpperCase()} > ${nwY} > ${nwNow.toLocaleDateString('ru-RU', { month: 'long' }).toUpperCase()} > ${nwY} > `,
+      cal: Array.from({ length: Math.ceil((nwFirst + nwDays) / 7) * 7 }, (_, i) => { const d = i - nwFirst + 1; const ok = d >= 1 && d <= nwDays; const today = ok && d === nwNow.getDate();
+        return { d: ok ? String(d) : '', style: `display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:11.5px;font-weight:${today ? 800 : 600};color:${today ? accent : '#111113'};background:${today ? '#111113' : 'transparent'};opacity:${i % 7 > 4 && !today ? .55 : 1}` }; }),
+      noteLed: `ЗАМЕТКА > ${(this._note.title || 'БЕЗ НАЗВАНИЯ').toUpperCase()} > ЗАМЕТКА > ${(this._note.title || 'БЕЗ НАЗВАНИЯ').toUpperCase()} > `,
+      noteTitle: this._note.title || 'Без названия',
+      noteBody: (this._note.body || '').replace(/^#+ /gm, '').replace(/^\[x\] /gm, '☒ ').replace(/^\[ \] /gm, '☐ ').replace(/^[-*] /gm, '• '),
+      pomoLed: `ПОМОДОРО > РАУНД ${pm.round} > ${pm.run ? 'ФОКУС' : 'ПАУЗА'} > ПОМОДОРО > РАУНД ${pm.round} > ${pm.run ? 'ФОКУС' : 'ПАУЗА'} > `,
+      pomoTime: fmt(pm.left),
+      pomoBar: 'display:block;width:170px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden',
+      pomoFill: `display:block;height:100%;width:${((1500 - pm.left) / 1500 * 100).toFixed(1)}%;border-radius:3px;background:${accent};transition:width 1s linear,background .6s`,
+      pomoLabel: pm.run ? 'Пауза' : pm.left < 1500 ? 'Дальше' : 'Старт',
+      pomoBtn: `height:36px;padding:0 18px;border-radius:11px;font-size:12.5px;font-weight:700;background:${accent};color:#111113;transition:background .6s`,
+      pomoToggle: () => this.setState({ pomo: { ...pm, run: !pm.run } }),
+      pomoReset: () => this.setState({ pomo: { left: 1500, run: false, round: pm.round } }),
+      battPct, battSub: `≈ ${Math.floor(battPct * 2.7 / 60)} ч ${Math.round(battPct * 2.7 % 60)} мин · от аккумулятора`,
+      battFill: `display:block;height:100%;width:${battPct}%;border-radius:5px;background:#111113;transition:width .8s`,
+      netDown: `${(1.2 + nBar(0) * 6.4).toFixed(1)} МБ/с`, netUp: `${(0.1 + nBar(3) * 0.9).toFixed(1)} МБ/с`,
+      netBars: Array.from({ length: 14 }, (_, i) => ({ style: `flex:1;border-radius:3px;background:${accent};opacity:${0.35 + 0.65 * (1 - i / 14)};height:${Math.round(nBar(13 - i) * 100)}%;transition:height .9s cubic-bezier(.3,1.2,.4,1),background .6s` })),
+      diskFill: `display:block;height:100%;width:61%;border-radius:6px;background:${accent};transition:background .6s`
+    };
     const TL = ['Обновить систему', 'Собрать PKGBUILD', 'Ответить Лене', 'Купить кофе'];
     const tasks = TL.map((name, i) => {
       const done = !!st.done[i];
@@ -1828,7 +1969,7 @@ class Component extends DCLogic {
     const leftN = tasks.filter((t) => !t.done).length;
     const wdS = now.toLocaleDateString('ru-RU', { weekday: 'short' }).replace('.', '');
     const monS = now.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '');
-    const sizeName = { music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2' };
+    const sizeName = { music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2', cal: 'Квадрат · 2×2', note: 'Квадрат · 2×2', pomo: 'Квадрат · 2×2', batt: 'Малый · 2×1', net: 'Малый · 2×1', disk: 'Малый · 2×1' };
     const galWave = { id: 'wave', name: 'Аудиоволна', size: 'Во всю ширину · снизу', on: waveOnEff, label: waveOnEff ? 'Убрать' : 'Добавить', toggle: () => setWave(!waveOnEff) };
     const gal0 = Object.keys(WS).map((id) => {
       const on = !!st.wOn[id];
@@ -1922,7 +2063,7 @@ class Component extends DCLogic {
         };
       })(),
       homeQ: st.homeQ || '', onHomeQ: (e) => this.setState({ homeQ: e.target.value, hSel: 0 }),
-      wOn, wOff, wpos, wcase, drag, editing, gal, wSize, wSizeText,
+      wOn, wOff, wpos, wcase, drag, editing, gal, wSize, wSizeText, nw,
       szBtn: 'position:absolute;left:10px;top:-12px;height:24px;padding:0 10px;border-radius:12px;font:700 11.5px Inter,sans-serif;background:#f2f2f4;color:#0b0b0c;box-shadow:0 4px 12px rgba(0,0,0,.45);z-index:9;animation:cardPop .3s ease both',
       stop: (e) => e.stopPropagation(),
       openGallery: () => this.setState({ gallery: true, shade: false, hov: null }),
@@ -2115,6 +2256,9 @@ class Component extends DCLogic {
       winSettings: st.win === 'settings', winTerm: st.win === 'term',
       winAnim: st.winClosing ? 'animation:winOut .22s ease both' : 'animation:winIn .42s cubic-bezier(.2,1.12,.3,1) both',
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
+      openNotes: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('notes', 'dock'); } },
+      openDown: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('files:down', 'place'); } },
+      openTrash: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('files:trash', 'place'); } },
       openClaude: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('claude', 'dock'); } },
       openTerm: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('term', 'dock'); } else openWin('term')(); },
       oskOnP: !!this.props.oskOn,
