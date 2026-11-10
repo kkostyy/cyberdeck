@@ -40,6 +40,7 @@ ashenos/
 ├── build/
 │   ├── build-image.sh   сборка .img для SD-карты
 │   ├── packages.txt     список пакетов
+│   ├── apply-on-sway.sh AshenOS поверх sway, без Plasma
 │   └── ashenos-info     команда: версия, ядро, температура
 ├── apps/claude-desk/     приложение Claude (Quickshell) + install.sh
 ├── shell/animations/    попапы календаря, Wi-Fi, Bluetooth и музыки для будущей оболочки
@@ -81,6 +82,18 @@ sudo systemctl enable --now sddm NetworkManager bluetooth
 ```
 
 После перезагрузки в «Параметры системы → Оформление → Цвета» выберите схему **AshenOS**.
+
+## Вариант без Plasma (sway + Quickshell)
+
+Если на Pi уже работает sway с панелью на Quickshell, Plasma не нужна. Скрипт удаляет Plasma,
+KWin и SDDM, оставляя Konsole, Dolphin и всё, что нужно sway, и ставит оформление AshenOS:
+
+```bash
+bash ashenos/build/apply-on-sway.sh
+```
+
+Перед изменениями скрипт сохраняет оригиналы файлов и список пакетов в `/var/backups/ashenos-pre/`.
+Вход по-прежнему через автологин на tty1 с запуском sway.
 
 ## Статус
 
