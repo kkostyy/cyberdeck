@@ -10,6 +10,7 @@ ShellRoot {
     Status { id: status }
     Lock { st: status }
     Settings { st: status }
+    Explorer {}
 
     Variants {
         model: Quickshell.screens

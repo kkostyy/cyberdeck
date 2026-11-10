@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9b9bf" stop-opacity=".92"/>
+      <stop offset=".55" stop-color="#8d8d93" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#2a2a2e"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity=".45"/>
+      <stop offset=".18" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".82" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".4"/>
+    </linearGradient>
+  </defs>
+  <rect x="17" y="30" width="94" height="62" rx="8" fill="#1d1d20"/>
+  <rect x="26" y="33" width="44" height="58" rx="4" fill="#fff" transform="rotate(-4 48 62)"/>
+  <rect x="53" y="34" width="28" height="52" rx="3" fill="#f3f3f5"/>
+  <rect x="68" y="38" width="26" height="46" rx="3" fill="#ececef"/>
+  <rect x="31" y="40" width="34" height="4" rx="2" fill="#d4d4d9" transform="rotate(-4 48 42)"/>
+  <rect x="58" y="41" width="16" height="3" rx="1.5" fill="#d4d4d9"/>
+  <rect x="72" y="45" width="16" height="3" rx="1.5" fill="#d4d4d9"/>
+  <path d="M14 51 Q14 47 18 47 H55 Q60 47 63 51 L67 57 Q69 59 73 59 H110 Q114 59 114 63 L112 90 Q112 94 108 94 H20 Q16 94 16 90 Z" fill="url(#front)"/>
+  <path d="M14 51 Q14 47 18 47 H55 Q60 47 63 51 L67 57 Q69 59 73 59 H110 Q114 59 114 63 L112 90 Q112 94 108 94 H20 Q16 94 16 90 Z" fill="url(#shine)"/>
+</svg>

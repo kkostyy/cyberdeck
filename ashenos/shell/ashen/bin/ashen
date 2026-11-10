@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # AshenOS shell from the command line (sway keybinds call this).
 #   ashen toggle <clock|vol|music|net|bt|wx|notif|find|clip>   open a drop panel / close it
-#   ashen close | lock | reload | settings [wall|dock|bar|screen|notif|wx|time|about]
+#   ashen close | lock | reload | settings [wall|dock|bar|screen|notif|wx|time|about] | files [путь]
 #   ashen volume <raise|lower|mute>     ashen mic        ashen brightness <raise|lower>
 #   ashen screenshot [--full] [--edit]  область (или весь экран), --edit — открыть в satty
 QML="${ASHEN_SHELL:-$(dirname "$(readlink -f "$0")")/../shell.qml}"
@@ -37,6 +37,7 @@ case "$1" in
   brightness)  ipc ashen brightness "${2:-raise}" ;;
   screenshot)  shift; screenshot "$@" ;;
   settings)    ipc ashen-settings open "${2:-}" ;;
+  files)       p="${2:-$HOME}"; [ -d "$p" ] || p="$(dirname "$p")"; ipc ashen-files open "$(readlink -f "$p")" ;;
   reload)      ipc ashen-shell reload ;;
   *)           sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

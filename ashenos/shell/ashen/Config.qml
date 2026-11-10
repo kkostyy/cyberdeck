@@ -30,7 +30,7 @@ Singleton {
             // "" — built-in AshenOS background; a picture or a video (mp4/webm/mkv) path otherwise
             property string wallpaper: ""
             property string wallpaperFill: "fill"          // fill | fit | center
-            property var dock: ["claude-desk", "chromium", "org.gnome.Nautilus", "kitty", "org.kde.konsole"]
+            property var dock: ["claude-desk", "chromium", "ashenos-files", "kitty", "org.kde.konsole"]
             property int lockAfter: 300                     // seconds, 0 — never
             property int screenOffAfter: 450
             property bool dnd: false                        // notifications go to the list only

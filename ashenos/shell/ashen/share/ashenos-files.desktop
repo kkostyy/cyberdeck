@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Проводник
+GenericName=Файлы
+Comment=Файлы и папки AshenOS
+Exec=ashen files %f
+Icon=ashenos-files
+Terminal=false
+Categories=System;FileManager;
+MimeType=inode/directory;
+Keywords=files;folders;проводник;файлы;папки;
