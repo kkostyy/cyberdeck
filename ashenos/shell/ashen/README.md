@@ -42,6 +42,14 @@
 `ashen volume raise`, `ashen brightness lower`, `ashen screenshot --edit` и т. д.
 Готовые клавиши — в `sway/ashen-keys` (подключается `include` после остальных клавиш).
 
+## Сделать основной
+
+```bash
+bin/ashen-default on       # автозапуск sway: serpantinum → AshenOS, клавиши, ashen в ~/.local/bin
+bin/ashen-default off      # вернуть serpantinum (из копии autostart.pre-ashen)
+bin/ashen-default status
+```
+
 ## Попробовать
 
 ```bash

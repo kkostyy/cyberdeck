@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Сделать оболочку AshenOS основной в sway (on) или вернуть serpantinum (off).
+#   ashen-default on | off | status
+# Правит автозапуск sway (копия — *.pre-ashen), подключает клавиши sway/ashen-keys,
+# кладёт ashen в ~/.local/bin и сразу переключает оболочку, без перезагрузки.
+set -euo pipefail
+HERE="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+QML="$HERE/shell.qml"
+SWAY="$HOME/.config/sway"
+AUTO="$SWAY/configDir/autostart"
+[ -f "$AUTO" ] || AUTO="$SWAY/config"
+KEYS_LINE="include $SWAY/ashen-keys"
+START="exec quickshell -p $QML"
+PAUSE="exec $HERE/bin/ashen-autopause"
+
+running() { pgrep -f "^quickshell -p $QML" >/dev/null; }
+
+case "${1:-status}" in
+  on)
+    [ -f "$AUTO.pre-ashen" ] || cp -a "$AUTO" "$AUTO.pre-ashen"
+    # serpantinum → AshenOS, wallpaper-autopause → ashen-autopause
+    sed -i -E "s|^exec .*serpantinumd start.*$|$START|; s|^exec .*wallpaper-autopause.*$|$PAUSE|" "$AUTO"
+    grep -qxF "$START" "$AUTO" || echo "$START" >> "$AUTO"
+    grep -qxF "$PAUSE" "$AUTO" || echo "$PAUSE" >> "$AUTO"
+    ln -sfn "$HERE/sway/ashen-keys" "$SWAY/ashen-keys"
+    grep -qxF "$KEYS_LINE" "$SWAY/config" || printf '\n# AshenOS\n%s\n' "$KEYS_LINE" >> "$SWAY/config"
+    mkdir -p "$HOME/.local/bin"
+    ln -sfn "$HERE/bin/ashen" "$HOME/.local/bin/ashen"
+    # switch now
+    command -v serpantinumd >/dev/null && serpantinumd stop >/dev/null 2>&1 || true
+    pkill -f "/wallpaper-autopause$" 2>/dev/null || true
+    running || swaymsg exec "quickshell -p $QML" >/dev/null
+    pgrep -f "$HERE/bin/ashen-autopause" >/dev/null || swaymsg exec "$HERE/bin/ashen-autopause" >/dev/null
+    swaymsg reload >/dev/null
+    echo "AshenOS — основная оболочка. Вернуть serpantinum: ashen-default off"
+    ;;
+  off)
+    if [ -f "$AUTO.pre-ashen" ]; then mv "$AUTO.pre-ashen" "$AUTO"; fi
+    sed -i "\|^# AshenOS$|d; \|^$KEYS_LINE$|d" "$SWAY/config"
+    pkill -f "^quickshell -p $QML" 2>/dev/null || true
+    pkill -f "$HERE/bin/ashen-autopause" 2>/dev/null || true
+    command -v serpantinumd >/dev/null && swaymsg exec serpantinumd start >/dev/null
+    [ -x "$HOME/.local/bin/wallpaper-autopause" ] && swaymsg exec "$HOME/.local/bin/wallpaper-autopause" >/dev/null
+    swaymsg reload >/dev/null
+    echo "Вернул serpantinum."
+    ;;
+  status)
+    if grep -qxF "$START" "$AUTO"; then echo "в автозапуске: AshenOS"; else echo "в автозапуске: не AshenOS"; fi
+    if running; then echo "сейчас работает: AshenOS"; else echo "сейчас работает: не AshenOS"; fi
+    ;;
+  *) sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
