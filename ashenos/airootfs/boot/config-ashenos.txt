@@ -2,7 +2,8 @@
 display_auto_detect=0
 dtoverlay=vc4-kms-v3d
 dtoverlay=vc4-kms-dsi-waveshare-800x480,disable_touch
-# безопасное выключение кнопкой на GPIO3
-dtoverlay=gpio-shutdown
+# безопасное выключение кнопкой: GPIO17 (контакт 11) на землю.
+# Не GPIO3: это линия SCL шины I2C, на которой висит OLED, — обмен по шине выключал бы Pi.
+dtoverlay=gpio-shutdown,gpio_pin=17
 # I2C для OLED-монитора
 dtparam=i2c_arm=on

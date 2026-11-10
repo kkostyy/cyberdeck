@@ -1,0 +1,54 @@
+# AshenOS: клавиши оболочки. Подключите в конфиге sway ПОСЛЕ остальных клавиш:
+#   include ~/.config/sway/ashen-keys
+# (--no-warn: заменяем клавиши serpantinum без жёлтой плашки sway)
+
+bindsym --no-warn $mod+S exec ashen toggle find
+bindsym --no-warn $mod+R exec ashen toggle find
+bindsym --no-warn $mod+V exec ashen toggle clip
+bindsym --no-warn $mod+N exec ashen toggle net
+bindsym --no-warn $mod+B exec ashen toggle bt
+bindsym --no-warn $mod+Alt+D exec ashen toggle clock
+bindsym --no-warn $mod+Shift+V exec ashen toggle vol
+bindsym --no-warn $mod+Alt+M exec ashen toggle music
+bindsym --no-warn $mod+A exec ashen toggle notif
+bindsym --no-warn $mod+L exec ashen lock
+bindsym --no-warn XF86PowerOff exec ashen lock
+bindsym --no-warn $mod+Shift+R exec ashen reload
+
+bindsym --no-warn Print exec ashen screenshot
+bindsym --no-warn $mod+Shift+S exec ashen screenshot
+bindsym --no-warn Shift+Print exec ashen screenshot --edit
+bindsym --no-warn $mod+Print exec ashen screenshot --full
+bindsym --no-warn $mod+Shift+Print exec ashen screenshot --full --edit
+
+bindsym --no-warn XF86AudioRaiseVolume exec ashen volume raise
+bindsym --no-warn XF86AudioLowerVolume exec ashen volume lower
+bindsym --no-warn XF86AudioMute exec ashen volume mute
+bindsym --no-warn XF86AudioMicMute exec ashen mic
+bindsym --no-warn XF86MonBrightnessUp exec ashen brightness raise
+bindsym --no-warn XF86MonBrightnessDown exec ashen brightness lower
+bindsym --no-warn XF86AudioPlay exec playerctl play-pause
+bindsym --no-warn XF86AudioPause exec playerctl play-pause
+bindsym --no-warn XF86AudioNext exec playerctl next
+bindsym --no-warn XF86AudioPrev exec playerctl previous
+
+bindsym --no-warn $mod+1 workspace number 1
+bindsym --no-warn $mod+2 workspace number 2
+bindsym --no-warn $mod+3 workspace number 3
+bindsym --no-warn $mod+4 workspace number 4
+bindsym --no-warn $mod+5 workspace number 5
+bindsym --no-warn $mod+6 workspace number 6
+bindsym --no-warn $mod+7 workspace number 7
+bindsym --no-warn $mod+8 workspace number 8
+bindsym --no-warn $mod+9 workspace number 9
+bindsym --no-warn $mod+0 workspace number 10
+bindsym --no-warn $mod+Shift+1 move container to workspace number 1
+bindsym --no-warn $mod+Shift+2 move container to workspace number 2
+bindsym --no-warn $mod+Shift+3 move container to workspace number 3
+bindsym --no-warn $mod+Shift+4 move container to workspace number 4
+bindsym --no-warn $mod+Shift+5 move container to workspace number 5
+bindsym --no-warn $mod+Shift+6 move container to workspace number 6
+bindsym --no-warn $mod+Shift+7 move container to workspace number 7
+bindsym --no-warn $mod+Shift+8 move container to workspace number 8
+bindsym --no-warn $mod+Shift+9 move container to workspace number 9
+bindsym --no-warn $mod+Shift+0 move container to workspace number 10

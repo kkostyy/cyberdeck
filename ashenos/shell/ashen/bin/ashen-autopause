@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Ставит живые обои на паузу, пока рабочий стол закрыт окнами (не плавающими),
+# и запускает снова, когда он виден. Экономит процессор Pi. Запускается из автозапуска sway.
+QML="${ASHEN_SHELL:-$(dirname "$(readlink -f "$0")")/../shell.qml}"
+
+# "OUTPUT=pause|play" для каждого экрана
+states() {
+  swaymsg -t get_tree 2>/dev/null | jq -r '
+    .nodes[] | select(.type=="output" and .name!="__i3") | .name as $o
+    | ([.. | objects | select(.type=="con" and .pid != null and .visible==true)] | length > 0) as $c
+    | "\($o)=\(if $c then "pause" else "play" end)"' | tr '\n' ' '
+}
+
+last=""
+{ echo start; swaymsg -t subscribe -m '["window","workspace","output"]' 2>/dev/null; } | while read -r _; do
+  now=$(states)
+  [ "$now" = "$last" ] && continue
+  for kv in $now; do
+    case " $last " in *" $kv "*) continue ;; esac
+    quickshell ipc -p "$QML" call wallpaper setPlayback "${kv%%=*}" "${kv#*=}" >/dev/null 2>&1
+  done
+  last=$now
+done

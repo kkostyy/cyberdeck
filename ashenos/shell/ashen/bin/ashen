@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# AshenOS shell from the command line (sway keybinds call this).
+#   ashen toggle <clock|vol|music|net|bt|wx|notif|find|clip>   open a drop panel / close it
+#   ashen close | lock | reload | settings [wall|dock|bar|screen|notif|wx|time|about]
+#   ashen volume <raise|lower|mute>     ashen mic        ashen brightness <raise|lower>
+#   ashen screenshot [--full] [--edit]  область (или весь экран), --edit — открыть в satty
+QML="${ASHEN_SHELL:-$(dirname "$(readlink -f "$0")")/../shell.qml}"
+ipc() { quickshell ipc -p "$QML" call "$@"; }
+
+screenshot() {
+  local full=0 edit=0
+  for a in "$@"; do
+    case "$a" in --full) full=1 ;; --edit) edit=1 ;; esac
+  done
+  local dir="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+  mkdir -p "$dir"
+  local f="$dir/Скриншот $(date '+%Y-%m-%d %H-%M-%S').png"
+  local geo=()
+  if [ "$full" = 0 ]; then
+    local g; g="$(slurp)" || exit 0      # Esc — передумали
+    geo=(-g "$g")
+  fi
+  if [ "$edit" = 1 ]; then
+    grim "${geo[@]}" - | satty --filename - --output-filename "$f" --copy-command wl-copy
+  else
+    grim "${geo[@]}" "$f" && wl-copy --type image/png < "$f"
+  fi
+  [ -f "$f" ] && notify-send -a "Скриншот" -i "$f" "Скриншот сохранён" "$(basename "$f") · скопирован в буфер"
+}
+
+case "$1" in
+  open|toggle) ipc ashen toggle "$2" ;;
+  close)       ipc ashen close ;;
+  lock)        ipc ashen-lock lock ;;
+  volume)      ipc ashen volume "${2:-raise}" ;;
+  mic)         wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
+  brightness)  ipc ashen brightness "${2:-raise}" ;;
+  screenshot)  shift; screenshot "$@" ;;
+  settings)    ipc ashen-settings open "${2:-}" ;;
+  reload)      ipc ashen-shell reload ;;
+  *)           sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

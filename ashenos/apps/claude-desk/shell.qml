@@ -775,18 +775,16 @@ ShellRoot {
                     encoder.queue = encoder.queue.concat([{ path: path, media: media }]);
                     if (!encoder.running) encoder.next();
                 }
-                // let the user pick a region, then attach the shot. On sway the window
-                // hides in the scratchpad meanwhile; elsewhere (KWin) Spectacle does it.
+                // tuck the window into the scratchpad, let the user pick a region,
+                // bring the window back, then attach the shot
                 function takeScreenshot() { shooter.running = true; }
                 Process {
                     id: shooter
                     command: ["bash", "-c",
                         "w=$PPID; mkdir -p /tmp/claude-desk; f=/tmp/claude-desk/shot-$(date +%s%N).png; "
-                        + "if [ -n \"$SWAYSOCK\" ]; then "
                         + "swaymsg \"[pid=$w] move scratchpad\" >/dev/null; sleep 0.25; g=$(slurp); r=$?; "
                         + "[ $r = 0 ] && grim -g \"$g\" \"$f\"; "
                         + "swaymsg \"[pid=$w] scratchpad show, floating disable, focus\" >/dev/null; "
-                        + "else spectacle -b -r -n -o \"$f\" >/dev/null 2>&1; r=$?; fi; "
                         + "[ $r = 0 ] && [ -f \"$f\" ] && echo \"$f\""]
                     stdout: StdioCollector { onStreamFinished: { let f = this.text.trim(); if (f !== "") composer.attachImage(f); } }
                     onExited: composer.focusInput()

@@ -1,8 +1,8 @@
 # AshenOS
 
 **AshenOS** — дистрибутив на базе **Arch Linux ARM** для кибердека на Raspberry Pi 4
-(экран Waveshare 4,3" DSI 800×480, клавиатура Rii mini X1). Чёрная тема, Plasma 6 на Wayland,
-своя оболочка с «жидкими» панелями из рамки, Dynamic Island и экранной клавиатурой.
+(экран Waveshare 4,3" DSI 800×480, клавиатура Rii mini X1). Чёрная тема, sway на Wayland,
+оболочка на Quickshell с «жидкими» панелями из рамки, Dynamic Island и экранной клавиатурой.
 
 ![Рабочий стол](design/screens/02-desktop.jpg)
 
@@ -11,10 +11,10 @@
 | | |
 |---|---|
 | База | Arch Linux ARM (aarch64), ядро `linux-rpi` |
-| Окружение | KDE Plasma 6, Wayland, KWin, SDDM |
-| Тема | цветовая схема `AshenOS` (чёрная), Breeze Dark, шрифты Inter и JetBrains Mono |
-| Анимации | как в Plasma: попапы выезжают из панели за 200 мс (OutCubic), списки раскрываются за 100 мс |
-| Ввод | экранная клавиатура (Maliit на рабочем столе, Qt Virtual Keyboard на экране входа) |
+| Окружение | sway (Wayland) + своя оболочка на Quickshell ([`shell/ashen`](shell/ashen)): рамка, остров, капли, док, виджеты; вход автологином на tty1 |
+| Тема | цветовая схема `AshenOS` (чёрная) для Qt/KDE-приложений, шрифты Iosevka Nerd, Inter и JetBrains Mono |
+| Анимации | «жидкие» капли из рамки по кривым прототипа; попапы serpantinum для справки — в `shell/animations` |
+| Ввод | клавиатура Rii mini X1; экранная клавиатура — в планах (сейчас ставится отдельно) |
 | Экран | оверлей `vc4-kms-dsi-waveshare-800x480`, автоопределение выключено |
 | Сеть | NetworkManager, Bluetooth (bluez), SSH, WayVNC |
 | Терминал | Konsole + `claude` (Claude Code) из npm, приложение-оболочка «Claude» с питомцем |
@@ -44,6 +44,7 @@ ashenos/
 ├── build/
 │   ├── build-image.sh   сборка .img для SD-карты
 │   ├── packages.txt     список пакетов
+│   ├── apply-on-sway.sh AshenOS поверх sway, без Plasma
 │   └── ashenos-info     команда: версия, ядро, температура
 ├── apps/claude-desk/     приложение Claude (Quickshell) + install.sh
 ├── shell/animations/    попапы календаря, Wi-Fi, Bluetooth и музыки для будущей оболочки
@@ -62,15 +63,17 @@ ashenos/
 На компьютере с Arch Linux (x86_64):
 
 ```bash
-sudo pacman -S --needed arch-install-scripts qemu-user-static-binfmt dosfstools parted wget
+sudo pacman -S --needed arch-install-scripts qemu-user-static-binfmt dosfstools parted wget git
 cd ashenos/build
 sudo ./build-image.sh 8G
 sudo dd if=out/ashenos-rpi4-*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
 Скрипт скачивает Arch Linux ARM для Pi 4, размечает образ (boot 512 МБ + root ext4),
-накладывает `airootfs`, ставит пакеты и приложение Claude через qemu-chroot и включает `sddm`,
-`NetworkManager`, `bluetooth`, `sshd`. Разделы монтируются по меткам (`ASHEN_BOOT`, `ashenos`). Пользователь по умолчанию — `alarm` / `alarm` (смените пароль после первого входа).
+накладывает `airootfs`, ставит пакеты, оболочку AshenOS (`shell/ashen` с её конфигом sway) и приложение
+Claude через qemu-chroot и включает `NetworkManager`, `bluetooth`, `sshd`. При первой загрузке корневой
+раздел сам растягивается на всю карту, а если Claude ещё не вошёл в аккаунт — придёт подсказка. Разделы монтируются по меткам (`ASHEN_BOOT`, `ashenos`). Пользователь — `alarm`, вход автоматический. Стандартный пароль `alarm` действует один раз:
+при первом входе (в том числе по SSH) система попросит придумать новый. Вход под `root` закрыт, есть `sudo`.
 
 ## Установка поверх уже работающего Arch Linux ARM
 
@@ -81,16 +84,35 @@ sudo cp -r airootfs/etc airootfs/usr /
 sudo sh -c 'cat airootfs/boot/config-ashenos.txt >> /boot/config.txt'
 sudo install -Dm755 build/ashenos-info /usr/local/bin/ashenos-info
 apps/claude-desk/install.sh          # приложение Claude для текущего пользователя
-sudo systemctl enable --now sddm NetworkManager bluetooth
+sudo systemctl enable --now NetworkManager bluetooth
+# оболочка AshenOS: файлы и конфиг sway (старый конфиг сохранится как config.pre-ashenos)
+mkdir -p ~/.local/share/ashen ~/.config/sway && cp -a shell/ashen/. ~/.local/share/ashen/
+[ -f ~/.config/sway/config ] && mv ~/.config/sway/config ~/.config/sway/config.pre-ashenos
+cp shell/ashen/sway/config ~/.config/sway/config
+sudo ln -sf ~/.local/share/ashen/bin/ashen /usr/local/bin/ashen
 ```
 
-После перезагрузки в «Параметры системы → Оформление → Цвета» выберите схему **AshenOS**.
+После перезагрузки автологин на tty1 запустит sway с оболочкой. Если у вас уже есть свой sway
+и оболочка (например, serpantinum), вместо замены конфига можно переключаться командой
+`shell/ashen/bin/ashen-default on|off`.
+
+## Если на Pi осталась Plasma
+
+Ранние версии AshenOS ставили Plasma 6. Если sway с панелью уже работает, скрипт удалит Plasma,
+KWin и SDDM, оставив Konsole, Dolphin и всё, что нужно sway, и поставит оформление AshenOS:
+
+```bash
+bash ashenos/build/apply-on-sway.sh
+```
+
+Перед изменениями скрипт сохраняет оригиналы файлов и список пакетов в `/var/backups/ashenos-pre/`.
+Вход по-прежнему через автологин на tty1 с запуском sway.
 
 ## Статус
 
 - [x] Концепт оболочки: рамка, Dynamic Island, капли-панели, виджеты, док, экран блокировки
-- [x] Цветовая схема, конфиги SDDM/KWin, оверлей экрана
+- [x] Цветовая схема, оверлей экрана, автологин в sway
 - [x] Скрипт сборки образа
 - [x] Приложение Claude (claude-desk) в образе
-- [ ] Перенос оболочки из прототипа в Quickshell/QML (заготовки анимаций — в `shell/animations`)
-- [ ] Свой экран входа SDDM в стиле прототипа
+- [x] Оболочка из прототипа на Quickshell: рамка, остров, капли, док, виджеты, уведомления, блокировка, настройки
+- [ ] Экран блокировки в стиле прототипа (вход — автологин, блокировка — serpantinum)

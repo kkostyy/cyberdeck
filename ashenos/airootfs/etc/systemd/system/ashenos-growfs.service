@@ -1,0 +1,12 @@
+[Unit]
+Description=AshenOS: растянуть корневой раздел на всю карту (один раз)
+ConditionPathExists=!/var/lib/ashenos/grown
+After=local-fs.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ashenos-growfs
+
+[Install]
+WantedBy=multi-user.target

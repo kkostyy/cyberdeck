@@ -58,14 +58,28 @@ for home in "$MNT/etc/skel" "$MNT/home/alarm"; do
   cp "$ROOT_OVERLAY/etc/skel/.local/state/claude-desk/prefs.json" "$home/.local/state/claude-desk/"
 done
 
+echo "==> Ставлю оболочку AshenOS (sway + Quickshell)"
+SH="$HERE/../shell/ashen"
+H="$MNT/home/alarm"
+for home in "$MNT/etc/skel" "$H"; do
+  mkdir -p "$home/.local/share/ashen" "$home/.config/sway"
+  cp -a "$SH/." "$home/.local/share/ashen/"
+  install -m644 "$SH/sway/config" "$home/.config/sway/config"
+done
+cp "$ROOT_OVERLAY/etc/skel/.bash_profile" "$H/.bash_profile"
+ln -sf /home/alarm/.local/share/ashen/bin/ashen "$MNT/usr/local/bin/ashen"
+
 echo "==> Ставлю пакеты (через qemu, это долго)"
 PKGS="$(grep -v '^\s*#' "$HERE/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')"
 arch-chroot "$MNT" /bin/bash -e <<CHROOT
 pacman-key --init
 pacman-key --populate archlinuxarm
 pacman -Syu --noconfirm --needed $PKGS
-systemctl enable sddm NetworkManager bluetooth sshd
+systemctl enable NetworkManager bluetooth sshd power-profiles-daemon
 chown -R alarm:alarm /home/alarm
+# стандартный пароль alarm работает один раз: при первом входе (и по SSH) система попросит новый
+chage -d 0 alarm
+passwd -l root
 echo 'alarm ALL=(ALL) ALL' > /etc/sudoers.d/alarm
 ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
 sed -i 's/^#\(ru_RU.UTF-8\)/\1/; s/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen

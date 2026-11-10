@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Первая загрузка: растянуть корневой раздел и ext4 на всю SD-карту.
+set -euo pipefail
+src="$(findmnt -no SOURCE /)"                 # /dev/mmcblk0p2
+disk="/dev/$(lsblk -no PKNAME "$src")"        # /dev/mmcblk0
+part="$(cat "/sys/class/block/$(basename "$src")/partition")"
+# последний раздел → до конца диска (sfdisk не трогает начало)
+echo ", +" | sfdisk --no-reread --no-tell-kernel -N "$part" "$disk"
+partx -u "$disk"
+resize2fs "$src"
+mkdir -p /var/lib/ashenos
+touch /var/lib/ashenos/grown

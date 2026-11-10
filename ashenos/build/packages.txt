@@ -8,29 +8,75 @@ bluez-utils
 openssh
 wayvnc
 i2c-tools
-python-smbus2
+# python-модуль smbus для OLED входит в i2c-tools (python-smbus2 есть только в AUR)
 
-# Plasma 6 (Wayland)
-plasma-desktop
-plasma-nm
-plasma-pa
-bluedevil
-kscreen
-powerdevil
-kde-gtk-config
-breeze-gtk
-sddm
-sddm-kcm
-kwin
-xdg-desktop-portal-kde
-qt6-virtualkeyboard
-maliit-keyboard
+# окружение: sway (Wayland) + оболочка AshenOS на Quickshell (shell/ashen)
+sway
+xorg-xwayland
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+polkit
+breeze-cursors
+breeze-icons
+adwaita-icon-theme
+adw-gtk-theme
+qt5ct
+qt6ct
+wayvnc
 
-# приложения
+# что нужно оболочке и её командам (обои-видео, буфер, скриншоты, яркость…)
+kitty
+cava
+zbar
+pavucontrol
+alsa-utils
+fd
+qt6-multimedia
+qt6-5compat
+qt6-websockets
+qt5-wayland
+qt5-quickcontrols
+qt5-quickcontrols2
+qt5-graphicaleffects
+qt6-wayland
+cliphist
+socat
+inotify-tools
+pamixer
+brightnessctl
+acpi
+iw
+lm_sensors
+bc
+matugen
+pipewire-alsa
+libpulse
+imagemagick
+wget
+file
+psmisc
+ffmpeg
+fastfetch
+unzip
+python-websockets
+python-jeepney
+grim
+slurp
+satty
+playerctl
+wmctrl
+power-profiles-daemon
+easyeffects
+calf
+lsp-plugins-lv2
+nautilus
+gpu-screen-recorder
+wf-recorder
+
+# приложения (KDE-приложения работают и без Plasma)
 dolphin
 konsole
 ark
-spectacle
 chromium
 
 # звук
