@@ -1780,7 +1780,7 @@ class Component extends DCLogic {
     };
     const g = glyphOf[active];
     const isl = {
-      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : '#000'};border:1px solid ${tDone ? '#f2f2f4' : '#1f1f23'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
+      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : THV.bg};border:1px solid ${tDone ? (THV.accent || '#f2f2f4') : 'rgba(255,255,255,.08)'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
       row: `position:absolute;left:0;top:0;height:30px;width:${rowW}px;box-sizing:border-box;padding:0 12px;display:flex;align-items:center;gap:12px;opacity:${flashMode ? 0 : 1};filter:blur(${flashMode ? 5 : 0}px);transform:scale(${flashMode ? 0.9 : 1});transition:opacity .22s,filter .22s,transform .3s ${SPR}`,
       win: `display:flex;align-items:center;gap:8px;flex:none;width:${winW}px;min-width:0`,
       glyph: `width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font:700 9px 'JetBrains Mono',monospace;background:${g[1]};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)`,
@@ -1790,7 +1790,7 @@ class Component extends DCLogic {
       hasWin: active !== 'desk',
       flash: `position:absolute;left:0;top:0;height:30px;width:${iW}px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:9px;opacity:${flashMode ? 1 : 0};filter:blur(${flashMode ? 0 : 5}px);transform:scale(${flashMode ? 1 : 1.08});transition:opacity .22s,filter .22s,transform .35s ${SPR};pointer-events:none`,
       drop: `position:absolute;left:720px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
-      body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:#050506;clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
+      body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
       big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
     };
     const chip = { call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
@@ -1807,7 +1807,8 @@ class Component extends DCLogic {
       };
     const secStyle = 'display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.05);animation:islRow .35s ease both';
     const btnSoft = 'flex:1;height:32px;border-radius:10px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.09)';
-    const btnMain = 'flex:1;height:32px;border-radius:10px;font-size:12.5px;font-weight:700;background:#f2f2f4;color:#0b0b0c';
+    const accFg = (h) => { const n = parseInt(h.slice(1), 16); return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 150 ? '#0b0b0c' : '#ffffff'; };
+    const btnMain = `flex:1;height:32px;border-radius:10px;font-size:12.5px;font-weight:700;background:${THV.accent || '#f2f2f4'};color:${THV.accent ? accFg(THV.accent) : '#0b0b0c'}`;
     const callBars = [0.7, 1, 0.55, 0.85].map((sp, i2) => `width:2.5px;height:12px;border-radius:2px;background:#4fd18b;transform-origin:center;animation:islEq ${sp}s ease-in-out ${i2 * 0.1}s infinite;${st.call && st.call.muted && speaker === 2 ? 'animation:none;transform:scaleY(.25);' : ''}`);
     const call = st.call ? {
       on: true, who: people[speaker], muted: st.call.muted, title: 'Discord · #дизайн-панели', sub: `${mmss(nowMs - st.call.start)} · 3 участника`, letter: 'D',
