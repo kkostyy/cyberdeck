@@ -23,6 +23,10 @@
 .tl .tl-b:focus-visible i{outline:2px solid #f2f2f4;outline-offset:2px}
 body{margin:0;background:#050506}
 @keyframes labIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes liIn{from{opacity:0;filter:blur(4px);transform:scale(.9)}to{opacity:1;filter:none;transform:none}}
+@keyframes liBlink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes liEq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@keyframes liToast{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes labCard{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .lab-btn:hover{filter:brightness(1.2)}
 </style>
@@ -66,12 +70,80 @@ body{margin:0;background:#050506}
       </sc-for>
     </div>
   </section>
+  <!-- локальный остров: работает, когда доска открыта отдельно (без «Вся система») -->
+  <sc-if value="{{isl.on}}" hint-placeholder-val="{{false}}">
+    <div role="status" aria-live="polite" style="{{isl.box}}">
+      <sc-if value="{{isl.flash}}" hint-placeholder-val="{{false}}">
+        <span style="display: flex; align-items: center; gap: 9px; padding: 0 14px; height: 100%; animation: liIn .3s cubic-bezier(.2,1.2,.3,1) both"><span style="font-size: 13px">{{isl.fGlyph}}</span><span style="font-size: 12.5px; font-weight: 700">{{isl.fLabel}}</span><span style="{{isl.fTrack}}"><span style="{{isl.fFill}}"></span></span><span style="font-size: 12px; font-weight: 700; color: #c9c9cf; white-space: nowrap; max-width: 170px; overflow: hidden; text-overflow: ellipsis">{{isl.fText}}</span></span>
+      </sc-if>
+      <sc-if value="{{isl.chipsOn}}" hint-placeholder-val="{{true}}">
+        <span style="display: flex; align-items: center; gap: 6px; padding: 0 4px; height: 100%">
+          <span style="display: flex; align-items: center; gap: 7px; padding: 0 10px 0 8px; font-size: 12.5px; font-weight: 600; color: #c9c9cf"><span style="width: 18px; height: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; background: #2e2e33">◉</span>Тест острова</span>
+          <sc-for list="{{isl.chips}}" as="c" hint-placeholder-count="2">
+            <button aria-label="{{c.label}}" title="Нажмите, чтобы остановить" onClick="{{c.stop}}" style="{{c.st}}"><span style="{{c.dot}}"></span>{{c.text}}</button>
+          </sc-for>
+        </span>
+      </sc-if>
+    </div>
+  </sc-if>
+  <sc-for list="{{toasts}}" as="t" hint-placeholder-count="1">
+    <div role="status" style="{{t.st}}"><span style="{{t.ic}}">{{t.glyph}}</span><span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1"><span style="font-size: 13px; font-weight: 700">{{t.title}} <span style="font-weight: 500; color: #8b8b93; font-size: 11.5px">{{t.app}}</span></span><span style="font-size: 12.5px; color: #c9c9cf">{{t.body}}</span></span><button aria-label="Закрыть уведомление" onClick="{{t.close}}" style="width: 26px; height: 26px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); color: #c9c9cf; font-size: 12px; flex: none">✕</button></div>
+  </sc-for>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onAction":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
+  state = { L: {}, flash: null, toasts: [], vol: 64, br: 72, lang: 'RU', now: Date.now() };
+  componentWillUnmount() { clearInterval(this.iv); clearTimeout(this.fT); }
+  ensureTick() { if (!this.iv) this.iv = setInterval(() => { const L = this.state.L; const busy = Object.keys(L).length || this.state.flash || this.state.toasts.length; if (!busy) { clearInterval(this.iv); this.iv = null; } this.local(); }, 250); }
+  local() {
+    const now = Date.now(), L = { ...this.state.L };
+    if (L.prog) { L.prog = { ...L.prog, pct: Math.min(100, L.prog.pct + (L.prog.kind === 'update' ? 1.2 : 2.5)) }; if (L.prog.pct >= 100) { delete L.prog; this.toast({ app: 'Система', title: 'Готово', body: 'Операция завершена', glyph: '✓', ms: 3000 }); } }
+    this.setState({ L, now, toasts: this.state.toasts.filter((t) => !t.until || t.until > now), flash: this.state.flash && now - this.state.flash.at < 1600 ? this.state.flash : null });
+  }
+  toast(t) { const id = Math.random().toString(36).slice(2); this.setState({ toasts: [{ ...t, id, until: t.ms ? Date.now() + t.ms : 0 }, ...this.state.toasts].slice(0, 3) }); this.ensureTick(); }
+  run(id) {
+    if (this.props.onAction) { this.props.onAction(id); return; }
+    const now = Date.now(), L = { ...this.state.L }, fl = (kind, val) => this.setState({ flash: { kind, val, at: Date.now() } });
+    if (id.startsWith('timer')) L.timer = { end: now + +id.slice(5) * 1000 };
+    else if (id === 'sw') L.sw = { start: now };
+    else if (id === 'rec') L.rec = { start: now };
+    else if (id === 'call') L.call = { start: now };
+    else if (id === 'update' || id === 'copy') L.prog = { kind: id, pct: 0 };
+    else if (id === 'volUp' || id === 'volDown') { const v = Math.max(0, Math.min(100, this.state.vol + (id === 'volUp' ? 8 : -8))); this.setState({ vol: v }); fl('vol', v); }
+    else if (id === 'brUp' || id === 'brDown') { const v = Math.max(5, Math.min(100, this.state.br + (id === 'brUp' ? 10 : -10))); this.setState({ br: v }); fl('bright', v); }
+    else if (id === 'lang') { const v = this.state.lang === 'RU' ? 'EN' : 'RU'; this.setState({ lang: v }); fl('lang', v); }
+    else if (id === 'clipPath') fl('clip', '~/Проекты/Дизайн/Концепт.fig');
+    else if (id === 'clipCmd') fl('clip', 'sudo pacman -Syu --noconfirm');
+    else if (id === 'nShort') this.toast({ app: 'Telegram', title: 'Миша', body: 'Ок, жду ссылку', glyph: 'М', ms: 3000 });
+    else if (id === 'nLong') this.toast({ app: 'Почта', title: 'Счёт за ноябрь', body: 'Хостинг: оплатите до 25 ноября', glyph: '@', ms: 6000 });
+    else if (id === 'nImp') this.toast({ app: 'Система', title: 'Батарея 15%', body: 'Подключите зарядку — осталось около 20 минут', glyph: '!', ms: 0, imp: true });
+    this.setState({ L, now }); this.ensureTick();
+  }
   renderVals() {
-    const act = (id) => () => { if (this.props.onAction) this.props.onAction(id); };
+    const act = (id) => () => this.run(id);
+    const st = this.state, now = st.now, mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
+    const stop = (k) => () => { const L = { ...this.state.L }; delete L[k]; this.setState({ L }); };
+    const chipSt = (bg) => `height:24px;padding:0 10px;border-radius:12px;border:0;display:flex;align-items:center;gap:6px;font:700 12px 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;background:${bg};color:#f2f2f4;animation:liIn .35s cubic-bezier(.2,1.2,.3,1) both;cursor:pointer`;
+    const chips = [];
+    const L = st.L;
+    if (L.call) chips.push({ label: 'Звонок · завершить', text: 'Миша ' + mmss(now - L.call.start), st: chipSt('rgba(79,209,139,.16)'), dot: 'width:8px;height:12px;border-left:2px solid #4fd18b;border-right:2px solid #4fd18b;animation:liEq .7s ease-in-out infinite', stop: stop('call') });
+    if (L.rec) chips.push({ label: 'Запись · остановить', text: mmss(now - L.rec.start), st: chipSt('rgba(229,72,77,.16)'), dot: 'width:8px;height:8px;border-radius:50%;background:#e5484d;animation:liBlink 1s steps(2) infinite', stop: stop('rec') });
+    if (L.timer) { const left = L.timer.end - now; chips.push({ label: 'Таймер · сбросить', text: left > 0 ? mmss(left) : 'Время!', st: chipSt(left > 0 ? 'rgba(255,255,255,.08)' : '#f2f2f4') + (left > 0 ? '' : ';color:#0b0b0c;animation:liBlink .8s ease-in-out infinite'), dot: 'width:8px;height:8px;border-radius:50%;border:2px solid currentColor', stop: stop('timer') }); }
+    if (L.sw) chips.push({ label: 'Секундомер · остановить', text: mmss(now - L.sw.start), st: chipSt('rgba(255,255,255,.08)'), dot: 'width:8px;height:8px;border-radius:2px;background:#f2f2f4', stop: stop('sw') });
+    if (L.prog) chips.push({ label: 'Прогресс', text: Math.round(L.prog.pct) + '%', st: chipSt('rgba(255,255,255,.08)'), dot: `width:12px;height:12px;border-radius:50%;background:conic-gradient(#f2f2f4 ${L.prog.pct * 3.6}deg,rgba(255,255,255,.18) 0)`, stop: stop('prog') });
+    const fl = st.flash, lvl = fl && (fl.kind === 'vol' || fl.kind === 'bright');
+    const on = !this.props.onAction && (chips.length > 0 || !!fl);
+    const w = fl ? (lvl ? 280 : fl.kind === 'clip' ? 360 : 220) : 150 + chips.length * 92;
+    const isl = { on, flash: !!fl, chipsOn: !fl, chips,
+      box: `position:absolute;left:50%;top:0;translate:-50% 0;z-index:30;height:30px;width:${w}px;border-radius:0 0 16px 16px;background:#000;border:1px solid #1f1f23;border-top:0;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:width .45s cubic-bezier(.34,1.32,.64,1);animation:liIn .4s cubic-bezier(.2,1.2,.3,1) both`,
+      fGlyph: fl ? { vol: '♪', bright: '☀', lang: '⌨', clip: '⧉' }[fl.kind] : '', fLabel: fl ? { vol: 'Громкость', bright: 'Яркость', lang: 'Раскладка', clip: 'Скопировано' }[fl.kind] : '',
+      fTrack: lvl ? 'position:relative;width:90px;height:5px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden;flex:none' : 'display:none',
+      fFill: lvl ? `position:absolute;left:0;top:0;bottom:0;width:${fl.val}%;background:#f2f2f4;border-radius:3px;transition:width .2s` : '',
+      fText: fl ? (lvl ? fl.val + '%' : fl.kind === 'lang' ? fl.val : `«${fl.val}»`) : '' };
+    const toasts = st.toasts.map((t, i) => ({ ...t, close: () => this.setState({ toasts: this.state.toasts.filter((x) => x.id !== t.id) }),
+      st: `position:absolute;right:52px;top:${44 + i * 76}px;z-index:31;width:340px;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:18px;background:rgba(22,22,25,.94);border:1px solid ${t.imp ? '#f2f2f4' : 'rgba(255,255,255,.1)'};box-shadow:0 18px 40px rgba(0,0,0,.5);backdrop-filter:blur(16px);animation:liToast .4s cubic-bezier(.2,1.2,.3,1) both`,
+      ic: `width:34px;height:34px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;background:${t.imp ? '#f2f2f4' : '#2e2e33'};color:${t.imp ? '#0b0b0c' : '#fff'}` }));
     const defs = [
       { glyph: '⏲', bg: '#3a3a40', title: 'Таймер', app: 'как из «Часов»', text: 'Обратный отсчёт в острове. Когда время выйдет, капсула начнёт пульсировать.', btns: [['10 секунд', 'timer10'], ['1 минута', 'timer60'], ['5 минут', 'timer300']] },
       { glyph: '◷', bg: '#3a3a40', title: 'Секундомер', app: 'как из «Часов»', text: 'Идёт в острове, в раскрытом виде можно ставить круги и пауза.', btns: [['Запустить', 'sw']] },
@@ -91,7 +163,7 @@ class Component extends DCLogic {
     }));
     return {
       winTheme: this.props.themeWin || 'rgba(20,20,23,0.92)',
-      cards,
+      cards, isl, toasts,
       closeApp: () => { if (this.props.onClose) this.props.onClose(); },
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); }
