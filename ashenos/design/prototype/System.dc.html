@@ -1184,8 +1184,16 @@ class Component extends DCLogic {
     const n = parseInt(surface.slice(1), 16);
     return { id: T.id, accent: acc, bg, surface, text: T.text, level: t.level || 0, tint: t.tint || '', islBg: `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.88)` };
   }
+  /* в полноэкранном режиме верхняя панель спрятана — событие острова ненадолго её показывает (как «чёлка» в macOS) */
+  peekBar() {
+    if (!this.autohide()) return;
+    clearTimeout(this.hideT); this.hideT = null;
+    if (!this.state.barShown) this.setState({ barShown: true });
+    clearTimeout(this.pbT); this.pbT = setTimeout(() => { if (!this.state.menu && !this.state.right) this.setState({ barShown: false }); }, 3500);
+  }
   labAction = (id) => {
     const st = this.state, now = Date.now();
+    if (/^(timer|sw$|rec$|call$|update$|copy$|vol|br|lang$|clip|nav:(?!off))/.test(id)) this.peekBar();
     if (id.startsWith('open:')) { this.openApp(id.slice(5), 'place'); return; }
     if (id.startsWith('pet:')) {
       const [, cmd, arg] = id.split(':');
