@@ -409,88 +409,157 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
       <nav aria-label="Док" style="{{dockNav}}">
         <button class="dock-btn" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
           <span style="{{dk.files.tip}}">Проводник</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path><path d="M3.5 10.5h17" stroke="{{icoAcc}}"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}}">
+            <span style="{{dk.fileScale}}">
+              <span style="position: absolute; left: 2px; top: 0; width: 36px; height: 27px; border-radius: 4px; background: #2a2a2e"></span>
+              <span style="position: absolute; left: 24px; top: 4px; width: 9px; height: 20px; border-radius: 1.5px; background: #e4e4e8"></span>
+              <span style="position: absolute; left: 18px; top: 2px; width: 10px; height: 22px; border-radius: 1.5px; background: #ececef"></span>
+              <span style="position: absolute; left: 4px; top: 0; width: 19px; height: 24px; border-radius: 2px; background: #ffffff; transform: rotate(-4deg)"></span>
+              <span style="position: absolute; left: 0; top: 6px; width: 40px; height: 25px; clip-path: path('M 2 0 H 19 Q 21 0 22 1 L 24 5 Q 25 6 26 6 H 38 Q 40 6 40 8 L 39 23 Q 39 25 37 25 H 3 Q 1 25 1 23 L 0 2 Q 0 0 2 0 Z'); background: linear-gradient(180deg, rgba(160,160,166,0.8), rgba(92,92,98,0.85) 45%, rgba(40,40,44,0.97))"></span>
+            </span>
+          </span>
           <span aria-hidden="true" style="{{dk.files.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Терминал" onClick="{{openTerm}}" onMouseEnter="{{dh.term}}" onFocus="{{dh.term}}" style="{{dk.term.btn}}">
           <span style="{{dk.term.tip}}">Терминал</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.term.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="4.5" width="18" height="15" rx="3"></rect><path d="m7.5 10 3 2.5-3 2.5" stroke="{{icoAcc}}"></path><path d="M12.5 15.5h4"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.term.tile}}">
+            <span style="position: absolute; left: 10%; right: 10%; bottom: 11%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, #121214, #1d1d20); box-shadow: inset 0 2px 4px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.1); display: flex; align-items: center; padding-left: 14%">
+              <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.62em; color: #8e8e93; letter-spacing: -0.04em">&gt;_</span>
+            </span>
+            <span style="{{icoDotT}}"></span>
+          </span>
           <span aria-hidden="true" style="{{dk.term.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Claude" onClick="{{openClaude}}" onMouseEnter="{{dh.claude}}" onFocus="{{dh.claude}}" style="{{dk.claude.btn}}">
           <span style="{{dk.claude.tip}}">Claude</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.claude.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4.5 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"></path><path d="m7.5 9.5 2.5 2-2.5 2" stroke="{{icoAcc}}"></path><path d="M12 13.5h4"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.claude.tile}}">
+            <span style="position: absolute; left: 12%; right: 12%; top: 20%; bottom: 22%; border-radius: 22%; background: linear-gradient(180deg,#151517,#222226); box-shadow: inset 0 2px 4px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center">
+              <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.62em; color: #e6e6ea; letter-spacing: -0.04em">&gt;_</span>
+            </span>
+            <span style="{{icoDotC}}"></span>
+          </span>
           <span aria-hidden="true" style="{{dk.claude.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Браузер" onClick="{{openWeb}}" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
           <span style="{{dk.web.tip}}">Браузер</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><circle cx="12" cy="12" r="8.5"></circle><path d="M3.5 12h17"></path><ellipse cx="12" cy="12" rx="3.8" ry="8.5" stroke="{{icoAcc}}"></ellipse></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><radialGradient id="wbG" cx="0.38" cy="0.3" r="0.8"><stop offset="0" stop-color="#77777e"></stop><stop offset="0.55" stop-color="#38383d"></stop><stop offset="1" stop-color="#141416"></stop></radialGradient><radialGradient id="wbH" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.55"></stop><stop offset="1" stop-color="#ffffff" stop-opacity="0"></stop></radialGradient></defs><circle cx="20" cy="20" r="13" fill="url(#wbG)"></circle>
+<g fill="none" stroke="rgba(235,235,240,.55)" stroke-width=".9"><ellipse cx="20" cy="20" rx="5.6" ry="13"></ellipse><path d="M7 20h26M9 13.5h22M9 26.5h22"></path></g>
+<ellipse cx="20" cy="20" rx="13" ry="3.2" fill="none" stroke="{{icoAcc}}" stroke-width="1.4" opacity=".95"></ellipse>
+<ellipse cx="15.5" cy="12.5" rx="6" ry="3.4" fill="url(#wbH)"></ellipse></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.web.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Карты" onClick="{{openMaps}}" onMouseEnter="{{dh.maps}}" onFocus="{{dh.maps}}" style="{{dk.maps.btn}}">
           <span style="{{dk.maps.tip}}">Карты</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z"></path><path d="M9 4.5v13M15 6.5v13"></path><path d="M12 9.2a1.8 1.8 0 1 1 0 .01" stroke="{{icoAcc}}" stroke-width="2.4"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="mpA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d8dc"></stop><stop offset="1" stop-color="#a6a6ad"></stop></linearGradient><linearGradient id="mpB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9b9bf"></stop><stop offset="1" stop-color="#86868d"></stop></linearGradient></defs><g transform="translate(0 1)"><path d="M6 10l9-3v24l-9 3z" fill="url(#mpA)"></path><path d="M15 7l10 3v24l-10-3z" fill="url(#mpB)"></path><path d="M25 10l9-3v24l-9 3z" fill="url(#mpA)"></path>
+<path d="M9 27c4-2 6-9 11-8s5 6 11 2" fill="none" stroke="{{icoAcc}}" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2.2 1.6"></path>
+<path d="M28.5 9.5a3.6 3.6 0 0 1 3.6 3.6c0 2.7-3.6 6.3-3.6 6.3s-3.6-3.6-3.6-6.3a3.6 3.6 0 0 1 3.6-3.6z" fill="#f4f4f6"></path><circle cx="28.5" cy="13.1" r="1.3" fill="{{icoAcc}}"></circle></g></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.maps.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
           <span style="{{dk.music.tip}}">Музыка</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9 17.5V6.5l10-2v11"></path><circle cx="6.5" cy="17.5" r="2.5" stroke="{{icoAcc}}"></circle><circle cx="16.5" cy="15.5" r="2.5" stroke="{{icoAcc}}"></circle></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}}">
+            <span style="{{dockSleeveV}}"></span>
+            <span style="position: absolute; left: 7%; right: 7%; bottom: 7%; height: 47%; border-radius: 6% 6% 22% 22%; background: linear-gradient(180deg,#4a4a50,#2a2a2e 55%,#1b1b1e); box-shadow: 0 -1px 0 rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.22); -webkit-mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%); mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%)"></span>
+            <span style="{{icoLabel}}"></span>
+          </span>
           <span aria-hidden="true" style="{{dk.music.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Заметки" onClick="{{openNotes}}" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
           <span style="{{dk.notes.tip}}">Заметки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="4.5" y="3.5" width="15" height="17" rx="2.5"></rect><path d="M4.5 8h15" stroke="{{icoAcc}}"></path><path d="M8 12h8M8 15.5h5"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ntP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfbfc"></stop><stop offset="1" stop-color="#dedee2"></stop></linearGradient></defs><rect x="9" y="7" width="22" height="27" rx="2.5" fill="url(#ntP)"></rect><rect x="9" y="7" width="22" height="6" rx="2.5" fill="{{icoAcc}}"></rect><rect x="9" y="10" width="22" height="3" fill="{{icoAcc}}"></rect>
+<g stroke="#b0b0b6" stroke-width=".8"><path d="M12.5 18h15M12.5 22h15M12.5 26h10"></path></g><rect x="9" y="12.6" width="22" height=".8" fill="rgba(0,0,0,.25)"></rect></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.notes.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Обои" onClick="{{openPicker}}" onMouseEnter="{{dh.photo}}" onFocus="{{dh.photo}}" style="{{dk.photo.btn}}">
           <span style="{{dk.photo.tip}}">Обои</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.photo.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m3.5 17 5-5 4 4 2.5-2.5 5 4"></path><circle cx="15.5" cy="9.5" r="1.6" stroke="{{icoAcc}}"></circle></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.photo.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ppS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6b72"></stop><stop offset="1" stop-color="#2a2a2e"></stop></linearGradient></defs><rect x="6" y="9" width="28" height="20" rx="2.6" fill="#0d0d0f" stroke="#5a5a60" stroke-width="1"></rect><rect x="7.6" y="10.6" width="24.8" height="16.8" rx="1.4" fill="url(#ppS)"></rect>
+<circle cx="26" cy="15" r="2.4" fill="{{icoAcc}}"></circle><path d="M7.6 24l6-6 4.5 4 3.5-3 10.8 8.4v-.4H7.6z" fill="#1d1d21"></path><path d="M7.6 27.4v-3.4l6-6 4.5 4 3.5-3 10.8 8.4z" fill="#2a2a2f"></path>
+<rect x="16" y="29" width="8" height="3" fill="#3a3a40"></rect><rect x="12" y="32" width="16" height="1.6" rx=".8" fill="#5a5a60"></rect></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.photo.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Виджеты" onClick="{{openGallery}}" onMouseEnter="{{dh.wid}}" onFocus="{{dh.wid}}" style="{{dk.wid.btn}}">
           <span style="{{dk.wid.tip}}">Виджеты</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.wid.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2" stroke="{{icoAcc}}"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.wid.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="wdA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0f0f2"></stop><stop offset="1" stop-color="#b4b4ba"></stop></linearGradient><linearGradient id="wdB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e6e75"></stop><stop offset="1" stop-color="#3a3a40"></stop></linearGradient></defs><rect x="7" y="7" width="12" height="12" rx="3.5" fill="url(#wdA)"></rect><rect x="21" y="7" width="12" height="12" rx="3.5" fill="{{icoAcc}}" opacity=".9"></rect><rect x="21" y="7" width="12" height="6" rx="3" fill="rgba(255,255,255,.25)"></rect>
+<rect x="7" y="21" width="12" height="12" rx="3.5" fill="url(#wdA)"></rect><rect x="21" y="21" width="12" height="12" rx="3.5" fill="url(#wdB)"></rect></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.wid.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Монитор" onClick="{{openMon}}" onMouseEnter="{{dh.mon}}" onFocus="{{dh.mon}}" style="{{dk.mon.btn}}">
           <span style="{{dk.mon.tip}}">Монитор</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M4 20h16"></path><path d="M6.5 16v-4M10.5 16V7"></path><path d="M14.5 16v-6" stroke="{{icoAcc}}"></path><path d="M18.5 16V5"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="mnF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{icoAcc}}" stop-opacity=".45"></stop><stop offset="1" stop-color="{{icoAcc}}" stop-opacity="0"></stop></linearGradient></defs><rect x="6" y="8" width="28" height="24" rx="3.5" fill="#121214" stroke="rgba(255,255,255,.08)"></rect>
+<path d="M8 25 L13 20 L17 22.5 L22 14 L26 18 L32 11" fill="none" stroke="{{icoAcc}}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M8 25 L13 20 L17 22.5 L22 14 L26 18 L32 11 V30 H8z" fill="url(#mnF)"></path><g stroke="rgba(255,255,255,.07)" stroke-width=".6"><path d="M8 15h24M8 20h24M8 25h24"></path></g></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
           <span style="{{dk.photos.tip}}">Фото</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><circle cx="12" cy="7.2" r="3.2"></circle><circle cx="16.8" cy="12" r="3.2"></circle><circle cx="12" cy="16.8" r="3.2"></circle><circle cx="7.2" cy="12" r="3.2"></circle><circle cx="12" cy="12" r="1.4" stroke="{{icoAcc}}" stroke-width="2.2"></circle></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="phP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"></stop><stop offset="1" stop-color="#e2e2e6"></stop></linearGradient><linearGradient id="phS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d7d84"></stop><stop offset="1" stop-color="#3c3c42"></stop></linearGradient></defs><g transform="rotate(-9 20 20)"><rect x="8" y="9" width="21" height="24" rx="1.6" fill="#cfcfd4"></rect><rect x="10" y="11" width="17" height="15" fill="#4a4a50"></rect></g>
+<g transform="rotate(6 20 20)"><rect x="11" y="8" width="21" height="24" rx="1.6" fill="url(#phP)"></rect><rect x="13" y="10" width="17" height="15" fill="url(#phS)"></rect><path d="M13 25l5-5 3.5 3 3-2.5 5.5 4.5z" fill="#1f1f23"></path><circle cx="25.5" cy="14" r="2" fill="{{icoAcc}}"></circle></g></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.photos.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Блокнот" onClick="{{openPad}}" onMouseEnter="{{dh.pad}}" onFocus="{{dh.pad}}" style="{{dk.pad.btn}}">
           <span style="{{dk.pad.tip}}">Блокнот</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10z"></path><path d="M14 3.5v5h5"></path><path d="M8.5 13h5M8.5 16.5h7" stroke="{{icoAcc}}"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="pdP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafafb"></stop><stop offset="1" stop-color="#d9d9de"></stop></linearGradient></defs><path d="M10 6h14l7 7v20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" fill="url(#pdP)"></path><path d="M24 6v5a2 2 0 0 0 2 2h5z" fill="#bdbdc3"></path>
+<g stroke="#9a9aa1" stroke-width=".9" stroke-linecap="round"><path d="M12 17h13M12 21h13M12 25h8"></path></g>
+<g transform="rotate(42 27 26)"><rect x="24.5" y="14" width="5" height="17" rx="1" fill="{{icoAcc}}"></rect><rect x="24.5" y="14" width="5" height="3" fill="#e9e9ec"></rect><path d="M24.5 31h5l-2.5 4z" fill="#e8d2b0"></path><path d="M26.3 33.8h1.4L27 35z" fill="#2a2a2e"></path></g></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.pad.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Калькулятор" onClick="{{openCalc}}" onMouseEnter="{{dh.calc}}" onFocus="{{dh.calc}}" style="{{dk.calc.btn}}">
           <span style="{{dk.calc.tip}}">Калькулятор</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M8.5 7.5h7" stroke="{{icoAcc}}"></path><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" stroke-width="2.4"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ccB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c3c42"></stop><stop offset="1" stop-color="#1a1a1d"></stop></linearGradient></defs><rect x="9" y="5" width="22" height="30" rx="4" fill="url(#ccB)"></rect><rect x="12" y="8" width="16" height="7" rx="1.6" fill="#0b0b0c"></rect><text x="26.6" y="13.6" font-family="Inter,sans-serif" font-size="5" font-weight="600" text-anchor="end" fill="#e6e6ea">42</text>
+<g fill="#7b7b82"><rect x="12" y="18" width="4.4" height="3.6" rx="1.6"></rect><rect x="17.8" y="18" width="4.4" height="3.6" rx="1.6"></rect><rect x="12" y="23" width="4.4" height="3.6" rx="1.6"></rect><rect x="17.8" y="23" width="4.4" height="3.6" rx="1.6"></rect><rect x="12" y="28" width="10.2" height="3.6" rx="1.6"></rect></g>
+<g fill="{{icoAcc}}"><rect x="23.6" y="18" width="4.4" height="3.6" rx="1.6"></rect><rect x="23.6" y="23" width="4.4" height="8.6" rx="1.6"></rect></g></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.calc.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
           <span style="{{dk.set.tip}}">Настройки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M12 3.2l1.6 1.9 2.4-.6.7 2.4 2.4.7-.6 2.4 1.9 1.6-1.9 1.6.6 2.4-2.4.7-.7 2.4-2.4-.6L12 20.8l-1.6-1.9-2.4.6-.7-2.4-2.4-.7.6-2.4L3.6 12l1.9-1.6-.6-2.4 2.4-.7.7-2.4 2.4.6z"></path><circle cx="12" cy="12" r="3" stroke="{{icoAcc}}"></circle></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><radialGradient id="stG" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#f2f2f4"></stop><stop offset="0.6" stop-color="#a7a7ad"></stop><stop offset="1" stop-color="#6a6a70"></stop></radialGradient><radialGradient id="stR" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#8a8a90"></stop><stop offset="1" stop-color="#4a4a50"></stop></radialGradient></defs><path d="M20 6.5l2 .3.7 2.9 2.1.9 2.5-1.6 1.6 1.2 1.2 1.6-1.6 2.5.9 2.1 2.9.7.3 2-.3 2-2.9.7-.9 2.1 1.6 2.5-1.2 1.6-1.6 1.2-2.5-1.6-2.1.9-.7 2.9-2 .3-2-.3-.7-2.9-2.1-.9-2.5 1.6-1.6-1.2-1.2-1.6 1.6-2.5-.9-2.1-2.9-.7-.3-2 .3-2 2.9-.7.9-2.1-1.6-2.5 1.2-1.6 1.6-1.2 2.5 1.6 2.1-.9.7-2.9z" fill="url(#stG)" stroke="rgba(0,0,0,.35)" stroke-width=".5"></path><circle cx="20" cy="20" r="7.2" fill="url(#stR)"></circle><circle cx="20" cy="20" r="4" fill="#161618"></circle><circle cx="20" cy="20" r="1.6" fill="{{icoAcc}}"></circle></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.set.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Тест острова" onClick="{{openLab}}" onMouseEnter="{{dh.lab}}" onFocus="{{dh.lab}}" style="{{dk.lab.btn}}">
           <span style="{{dk.lab.tip}}">Тест острова</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.lab.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="8.5" width="18" height="7" rx="3.5"></rect><circle cx="17.5" cy="12" r="1.3" stroke="{{icoAcc}}" stroke-width="2.2"></circle></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.lab.tile}}">
+            <span style="width: 64%; height: 26%; border-radius: 999px; background: linear-gradient(180deg,#050506,#141416); box-shadow: 0 0 0 1.5px rgba(255,255,255,0.3), inset 0 1px 2px rgba(255,255,255,.08); position: relative">
+              <span style="{{icoDotL}}"></span>
+            </span>
+          </span>
           <span aria-hidden="true" style="{{dk.lab.dot}}"></span>
         </button>
         <span aria-hidden="true" style="width: 1px; align-self: stretch; margin: 6px 2px 10px; background: rgba(255,255,255,0.12)"></span>
         <button class="dock-btn" aria-label="Загрузки" onClick="{{openDown}}" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
           <span style="{{dk.down.tip}}">Загрузки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M12 4v10.5" stroke="{{icoAcc}}"></path><path d="m7.5 10 4.5 4.5 4.5-4.5" stroke="{{icoAcc}}"></path><path d="M4.5 15v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V15"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="dnT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e2e6"></stop><stop offset="1" stop-color="#8d8d94"></stop></linearGradient></defs><path d="M7 24h7l2 3h8l2-3h7v7a2.5 2.5 0 0 1-2.5 2.5h-21A2.5 2.5 0 0 1 7 31z" fill="url(#dnT)"></path><path d="M7 24l3.5-8h4M33 24l-3.5-8h-4" fill="none" stroke="#9a9aa1" stroke-width="1.2" stroke-linejoin="round"></path>
+<path d="M17.5 6h5v10h4.5L20 23.5 13 16h4.5z" fill="{{icoAcc}}"></path><path d="M17.5 6h5v3h-5z" fill="rgba(255,255,255,.3)"></path></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.down.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Корзина" onClick="{{openTrash}}" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
           <span style="{{dk.trash.tip}}">Корзина</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M4.5 7h15"></path><path d="M9.5 7V4.5h5V7" stroke="{{icoAcc}}"></path><path d="M6.5 7l1 12.5h9l1-12.5"></path><path d="M10 11v5M14 11v5"></path></svg></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="trB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d0d0d5"></stop><stop offset="1" stop-color="#7d7d84"></stop></linearGradient><linearGradient id="trL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0f0f2"></stop><stop offset="1" stop-color="#a9a9af"></stop></linearGradient></defs><path d="M11 13h18l-1.6 19.5a2.5 2.5 0 0 1-2.5 2.3H15.1a2.5 2.5 0 0 1-2.5-2.3z" fill="url(#trB)"></path>
+<g stroke="rgba(0,0,0,.28)" stroke-width="1.1" stroke-linecap="round"><path d="M16 17v14M20 17v14M24 17v14"></path></g>
+<rect x="9" y="9.5" width="22" height="3.6" rx="1.8" fill="url(#trL)"></rect><rect x="17" y="7" width="6" height="3" rx="1.2" fill="#8a8a91"></rect><rect x="9" y="12" width="22" height="1.1" fill="{{icoAcc}}" opacity=".85"></rect></svg>
+          </span>
           <span aria-hidden="true" style="{{dk.trash.dot}}"></span>
         </button>
       </nav>
@@ -1796,7 +1865,7 @@ class Component extends DCLogic {
     let DC = {}; try { DC = JSON.parse(this.props.dockCfg || '{}') || {}; } catch (e) { DC = {}; }
     const ASH = (() => { const h = /^#?([0-9a-f]{6})$/i.exec(accent || '') ? parseInt(/^#?([0-9a-f]{6})$/i.exec(accent)[1], 16) : 0x9a9aa2; const ar = (h >> 16) & 255, ag = (h >> 8) & 255, ab = h & 255;
       const mix = (r, g, b, t) => `rgb(${Math.round(r + (ar - r) * t)},${Math.round(g + (ag - g) * t)},${Math.round(b + (ab - b) * t)})`;
-      return { bg: `radial-gradient(120% 95% at 30% 0%,${mix(62, 62, 66, 0.10)} 0%,${mix(36, 36, 40, 0.06)} 45%,${mix(20, 20, 22, 0.03)} 100%)`, fg: '#dcdce0', acc: mix(200, 200, 205, 0.55) }; })();
+      return { bg: `radial-gradient(120% 90% at 85% 8%,${mix(74, 74, 80, 0.10)} 0%,${mix(46, 46, 51, 0.06)} 45%,${mix(28, 28, 31, 0.03)} 78%,#161618 100%)`, fg: '#dcdce0', acc: mix(190, 190, 196, 0.6), glow: `rgba(${ar},${ag},${ab},.55)` }; })();
     if (DC.run === false) Object.keys(running).forEach((k) => { running[k] = false; });
     const DSCR = 1440, nD = dockIds.length, DGAP = 4, DSEP = 9;
     const mag = Math.max(0, Math.min(1, (DC.mag === undefined ? 50 : +DC.mag) / 100));
@@ -1817,7 +1886,7 @@ class Component extends DCLogic {
       dh[id] = () => { if (this.state.dock !== id) this.setState({ dock: id, peek: true }); };
       dk[id] = {
         btn: `position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:${s}px;transition:width .16s ease`,
-        tile: `display:flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${Math.round(s * 0.26)}px;overflow:hidden;position:relative;color:${ASH.fg};background:${ASH.bg};box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 0 1px rgba(255,255,255,.07),0 ${Math.round(s * 0.08)}px ${Math.round(s * 0.2)}px rgba(0,0,0,.35);transition:width .16s ease,height .16s ease,border-radius .16s ease`,
+        tile: `display:flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${Math.round(s * 0.26)}px;overflow:hidden;position:relative;font-size:${Math.round(s * 0.32)}px;color:${ASH.fg};background:${ASH.bg};box-shadow:inset 0 1px 1px rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.06),0 ${Math.round(s * 0.08)}px ${Math.round(s * 0.2)}px rgba(0,0,0,.35);transition:width .16s ease,height .16s ease,border-radius .16s ease`,
         dot: `width:4px;height:4px;border-radius:50%;transition:background .3s;background:${running[id] ? accent : 'rgba(0,0,0,0)'}`,
         tip: `position:absolute;bottom:${s + 14}px;left:50%;transform:translateX(-50%) translateY(${on ? 0 : 4}px);padding:4px 10px;border-radius:8px;background:rgba(20,20,22,.82);color:#f2f2f4;font-size:12.5px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:${on ? 1 : 0};transition:opacity .15s ease,transform .15s ease`
       };
@@ -2369,6 +2438,10 @@ class Component extends DCLogic {
       dk, dh,
       peekOn: () => { if (!this.state.peek) this.setState({ peek: true }); },
       dockLeave: () => this.setState({ dock: null, peek: false }),
+      icoDotT: `position:absolute;left:14%;top:16%;width:16%;height:16%;border-radius:50%;background:${ASH.acc};box-shadow:0 0 6px ${ASH.glow}`,
+      icoDotC: `position:absolute;right:9%;top:9%;width:22%;height:22%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,${ASH.acc} 55%,#2a2a2e 120%);box-shadow:0 0 7px ${ASH.glow}`,
+      icoDotL: `position:absolute;right:12%;top:50%;width:22%;height:46%;translate:0 -50%;border-radius:50%;background:${ASH.acc};box-shadow:0 0 5px ${ASH.glow}`,
+      icoLabel: `position:absolute;right:12%;bottom:13%;width:30%;height:15%;border-radius:2px;background:linear-gradient(135deg,${ASH.acc},#2a2a2e);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)`,
       icoAcc: ASH.acc,
       dockNav: dockNavSt,
       dockWrap: `position:absolute;left:50%;bottom:12px;z-index:42;transform:translateX(-50%) translateY(${dockHidden ? 'calc(100% + 20px)' : '0'});transition:transform .4s cubic-bezier(.3,1.2,.4,1);${rvN ? `animation:${rvN % 2 ? 'dockA' : 'dockB'} .9s cubic-bezier(.2,1.25,.3,1) .55s both;` : ''}`,
