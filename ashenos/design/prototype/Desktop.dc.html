@@ -1313,7 +1313,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
   </nav>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"onPower":{"editor":null},"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"sysVol":{"editor":null},"onPower":{"editor":null},"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 class Component extends DCLogic {
   /* Plasma calendar: MonthView (InfiniteList, 200 ms), Days/Months/Years swipe */
   calStep(d) {
@@ -1448,6 +1448,8 @@ class Component extends DCLogic {
     const W = this.walls();
     const curWall = st.front === 'A' ? st.wallA : st.wallB;
     const wall = W[curWall];
+    const sv = this.props.sysVol;
+    if (sv !== undefined && sv !== null && sv !== '' && +sv !== this._sv) { this._sv = +sv; if (+sv !== st.vol) setTimeout(() => this.setState({ vol: +sv }), 0); }
     const accent = this.props.themeAccent || st.accentOv || wall.accent;
     const tBg = this.props.themeBg || '#050506', tSurf = this.props.themeSurface || '#141416';
     const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };

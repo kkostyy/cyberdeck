@@ -69,7 +69,7 @@ body{margin:0;background:#050506}
 
   <!-- ============ DESKTOP (wallpaper, widgets, dock) ============ -->
   <div style="position: absolute; inset: 0">
-    <dc-import name="Desktop" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
+    <dc-import name="Desktop" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" sys-vol="{{sysVol}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
   </div>
 
   <!-- minimized stack hover zone -->
@@ -791,6 +791,7 @@ body{margin:0;background:#050506}
     </sc-for>
   </section>
 
+  <style>{{calmCss}}</style>
   <!-- night colour (Settings → Night colour) -->
   <div aria-hidden="true" style="{{nightSt}}"></div>
 
@@ -903,7 +904,7 @@ class Component extends DCLogic {
     try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
     this.setState({ events: evs, calSel: today, profile });
     try { const t = JSON.parse(localStorage.getItem('ashenos.theme') || 'null'); if (t && t.id) this.setState({ theme: t }); } catch (e) {}
-    try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); if (c) this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim }); } catch (e) {}
+    try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); if (c) this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false }); } catch (e) {}
     this.tick = setInterval(() => this.onTick(), 1000);
     window.addEventListener('mousemove', this.onCurMove, true);
     window.addEventListener('mousedown', this.onCurDown, true);
@@ -1157,7 +1158,7 @@ class Component extends DCLogic {
       return;
     }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
-    if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim }); localStorage.setItem('ashenos.sys', JSON.stringify(c)); this.onLevel('vol', Math.min(100, Math.round(c.vol))); } catch (e) {} return; }
+    if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false }); localStorage.setItem('ashenos.sys', JSON.stringify(c)); if (c.islLvl !== false) this.onLevel('vol', Math.min(100, Math.round(c.vol))); this.notify({ app: 'Параметры', title: 'Изменения применены', body: `Громкость ${Math.min(100, Math.round(c.vol))}% · Wi-Fi ${c.wifi ? 'вкл' : 'выкл'}${c.dnd ? ' · не беспокоить' : ''}`, kind: 'short', glyph: '⚙', sys: true }); } catch (e) {} return; }
     if (id.startsWith('theme:')) { try { const t = JSON.parse(id.slice(6)); this.setState({ theme: t }); localStorage.setItem('ashenos.theme', JSON.stringify(t)); } catch (e) {} return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
     const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
@@ -1325,7 +1326,7 @@ class Component extends DCLogic {
   armToast(item) {
     clearTimeout(this.toastT);
     if (item.kind === 'important') return;
-    this.toastT = setTimeout(() => this.finishToast(false), item.kind === 'long' ? 6000 : 3000);
+    this.toastT = setTimeout(() => this.finishToast(false), item.kind === 'long' ? (this.state.nLong || 6) * 1000 : (this.state.nShort || 3) * 1000);
   }
   finishToast(instant) {
     const t = this.state.toast;
@@ -1712,7 +1713,7 @@ class Component extends DCLogic {
     const shelfOn = st.shelf.length > 0 || st.shDrag || st.dragging;
     const dragMode = st.dragging || st.shDrag;
     const nowMs = Date.now();
-    const fl = st.flash && nowMs - st.flash.at < 1700 ? st.flash : null;
+    const fl = st.islLvl !== false && st.flash && nowMs - st.flash.at < 1700 ? st.flash : null;
     const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
     const glyphOf = { desk: ['◇', '#2e2e33'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2e2e33'], set: ['⚙', '#6d6d73'], claude: ['>_', '#232327'], notes: ['✎', '#c99a1e'], web: ['◍', '#2f6fd6'] };
     const winT = active === 'desk' ? 'Рабочий стол' : this.meta[active].title;
@@ -2063,6 +2064,8 @@ class Component extends DCLogic {
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
       filesPlace: st.filesPlace || '',
       powerOff: this.powerOff,
+      sysVol: st.vol,
+      calmCss: (st.anim !== undefined && st.anim < 15) ? '[data-sys-root] *,[data-sys-root] *::before,[data-sys-root] *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;transition-delay:0s!important}' : (st.anim !== undefined && st.anim < 40 ? '[data-sys-root] *{transition-duration:.12s!important}' : ''),
       nightSt: (() => { const mode = st.night || 'Закат—рассвет', h = new Date().getHours(); const on = mode === 'Всегда' || (mode === 'Закат—рассвет' && (h >= 20 || h < 7)); const k = Math.max(0, Math.min(1, (6500 - (st.nightTemp || 4200)) / 4000)); return `position:absolute;inset:0;z-index:400;pointer-events:none;background:rgb(255,140,40);mix-blend-mode:multiply;opacity:${on ? (0.08 + k * 0.22).toFixed(3) : 0};transition:opacity 1.2s ease`; })(),
       thWin: (() => { const v = this.themeVals(); if (v.id === 'obsidian' && !v.level) return ''; const n = parseInt(v.surface.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.9)`; })(),
       thBg: this.themeVals().bg, thAccent: this.themeVals().accent, thId: this.themeVals().id, thTint: this.themeVals().tint, thLevel: String(this.themeVals().level), thSurface: this.themeVals().surface,
