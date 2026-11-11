@@ -61,6 +61,8 @@ body{margin:0;background:#050506}
 @keyframes islFade{from{opacity:0;filter:blur(4px)}to{opacity:1;filter:blur(0)}}
 @keyframes islSpin{to{transform:rotate(360deg)}}
 @keyframes islEq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@keyframes fpIn{from{opacity:0;transform:translateY(-18px) scale(.94);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.fp-scroll{scrollbar-width:none}.fp-in::placeholder{color:#6f6f77}
 @keyframes islRow{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes islPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 6px rgba(255,255,255,.28)}}
 @keyframes islBlink{50%{opacity:.25}}
@@ -458,12 +460,14 @@ body{margin:0;background:#050506}
     </div>
 
     <!-- ===== DYNAMIC ISLAND: active window + live activities + shelf ===== -->
-    <div onMouseEnter="{{islEnter}}" onMouseLeave="{{pillLeave}}" onDragEnter="{{shDragIn}}" onDragOver="{{shDragOver}}" onDragLeave="{{shDragOut}}" onDrop="{{shDrop}}" style="{{isl.box}}">
+    <div role="button" tabindex="0" aria-label="Остров: нажмите, чтобы открыть «Сегодня»" aria-expanded="{{fp.on}}" onClick="{{islClick}}" onMouseEnter="{{islEnter}}" onMouseLeave="{{pillLeave}}" onDragEnter="{{shDragIn}}" onDragOver="{{shDragOver}}" onDragLeave="{{shDragOut}}" onDrop="{{shDrop}}" style="{{isl.box}}">
       <div style="{{isl.row}}">
         <span style="{{isl.win}}">
           <span aria-hidden="true" style="{{isl.glyph}}">{{isl.glyphText}}</span>
           <span style="font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{isl.title}}</span>
         </span>
+        <span style="{{chip.focus}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="5"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="5" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
+        <span style="{{chip.nav}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{nv.dist}}</span></span>
         <span style="{{chip.call}}"><span aria-hidden="true" style="display: flex; align-items: center; gap: 2px; height: 12px"><sc-for list="{{callBars}}" as="b" hint-placeholder-count="4"><span style="{{b}}"></span></sc-for></span><span style="font-size: 12px; font-weight: 600">{{call.who}}</span></span>
         <span style="{{chip.rec}}"><span aria-hidden="true" style="{{recDot}}"></span><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{rec.text}}</span></span>
         <span style="{{chip.timer}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2M9.5 2.5h5"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{timer.text}}</span></span>
@@ -498,6 +502,29 @@ body{margin:0;background:#050506}
               <button aria-label="Закрыть окно" onClick="{{winClose}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
             </sc-if>
           </div>
+
+          <!-- фокус: текущее дело (как notch на Mac) -->
+          <div style="{{secStyle}}">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <span style="position: relative; width: 52px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="52" height="52" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
+              <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1">
+                <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1a8"><span style="{{fo.logo}}">A</span>AshenOS · Фокус<span style="{{fo.dot}}"></span></span>
+                <span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{fo.task}}</span>
+              </span>
+              <button aria-label="{{fo.pauseLabel}}" onClick="{{focusToggle}}" style="{{ctlBtnL}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="{{fo.pauseIcon}}"></path></svg></button>
+              <button aria-label="Готово" onClick="{{focusDone}}" style="{{fo.doneBtn}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></button>
+            </div>
+            <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{fo.bar}}"></span></span>
+            <div style="display: flex; font-size: 11.5px; color: #8b8b93"><span>{{fo.left}}</span><span style="margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px">{{fo.next}}</span></div>
+          </div>
+
+          <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}};flex-direction:row;align-items:center;gap:12px">
+              <span style="{{nv.icon}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg></span>
+              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1"><span style="font-size: 16px; font-weight: 800">{{nv.dist}}</span><span style="font-size: 12px; color: #c9c9cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.text}}</span></span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; font-size: 11.5px; color: #8b8b93"><span style="font-size: 14px; font-weight: 700; color: #f2f2f4">{{nv.eta}}</span>{{nv.left}}</span>
+            </div>
+          </sc-if>
 
           <!-- call -->
           <sc-if value="{{call.on}}" hint-placeholder-val="{{false}}">
@@ -615,6 +642,69 @@ body{margin:0;background:#050506}
         </div>
       </div>
     </div>
+
+    <!-- ===== ПАНЕЛЬ «СЕГОДНЯ / НЕДЕЛЯ / ФОКУС» по клику на остров ===== -->
+    <sc-if value="{{fp.on}}" hint-placeholder-val="{{false}}">
+      <div aria-hidden="true" onClick="{{fpClose}}" style="position: fixed; inset: 0; z-index: 96"></div>
+      <section role="dialog" aria-label="Сегодня" style="{{fp.box}}">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span style="{{fo.logoBig}}">A</span>
+          <div role="tablist" aria-label="Раздел" style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+            <sc-for list="{{fp.tabs}}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="{{t.st}}">{{t.name}}</button></sc-for>
+          </div>
+          <span style="{{fp.music}}"><span style="{{fp.musicDot}}"></span>{{fp.musicText}}</span>
+          <button aria-label="Закрыть" onClick="{{fpClose}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
+          <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); overflow: hidden">
+            <span aria-hidden="true" style="{{fp.glow}}"></span>
+            <span style="position: relative; width: 74px; height: 74px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="74" height="74" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="3.4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
+            <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1a8; margin-top: 6px"><span style="{{fo.logo}}">A</span>Фокус<span style="{{fo.dot}}"></span></span>
+            <span style="font-size: 16px; font-weight: 700; line-height: 1.25">{{fo.task}}</span>
+            <span style="font-size: 11.5px; color: #8b8b93">{{fo.left}}</span>
+            <div style="display: flex; gap: 8px; margin-top: auto; position: relative">
+              <button onClick="{{focusToggle}}" style="height: 34px; padding: 0 14px; border-radius: 11px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; background: rgba(255,255,255,0.1)"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="{{fo.pauseIcon}}"></path></svg>{{fo.pauseLabel}}</button>
+              <button onClick="{{focusDone}}" style="{{fo.doneBig}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Готово</button>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; min-height: 0">
+            <sc-if value="{{fp.isToday}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; align-items: baseline; font-size: 12px; color: #8b8b93"><span style="font-size: 13px; font-weight: 700; color: #f2f2f4">Далее</span><span style="margin-left: auto">{{fp.sum}}</span></div>
+              <ul class="fp-scroll" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1; min-height: 0; overflow-y: auto">
+                <sc-for list="{{fp.tasks}}" as="k" hint-placeholder-count="4">
+                  <li style="{{k.row}}">
+                    <button role="checkbox" aria-checked="{{k.done}}" aria-label="{{k.text}}" onClick="{{k.toggle}}" style="{{k.ring}}"></button>
+                    <button onClick="{{k.focus}}" title="Сделать текущим делом" style="flex: 1; min-width: 0; text-align: left; display: flex; flex-direction: column; gap: 1px"><span style="{{k.textSt}}">{{k.text}}</span><span style="font-size: 11px; color: #6f6f77">{{k.note}}</span></button>
+                    <span style="font-size: 12px; color: #a1a1a8; font-variant-numeric: tabular-nums">{{k.time}}</span>
+                  </li>
+                </sc-for>
+              </ul>
+              <label style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 10px; border-radius: 12px; background: rgba(255,255,255,0.05)">
+                <span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.12); font-size: 13px">+</span>
+                <input class="fp-in" aria-label="Новая задача" placeholder="Добавить задачу — Enter" value="{{fp.q}}" onInput="{{fp.onQ}}" onKeyDown="{{fp.onKey}}" style="flex: 1; min-width: 0; height: 36px; background: none; border: 0; outline: none; color: #f2f2f4; font: 13px Inter, sans-serif">
+                <span style="font: 600 10.5px 'JetBrains Mono', monospace; color: #8b8b93; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.14)">↵</span>
+              </label>
+            </sc-if>
+            <sc-if value="{{fp.isWeek}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 13px; font-weight: 700">Неделя</span>
+              <sc-for list="{{fp.week}}" as="w" hint-placeholder-count="7">
+                <div style="display: grid; grid-template-columns: 70px minmax(0, 1fr) 70px; align-items: center; gap: 10px; height: 30px"><span style="{{w.dayLab}}">{{w.day}}</span><span style="height: 8px; border-radius: 4px; background: rgba(255,255,255,0.07); overflow: hidden"><span style="{{w.bar}}"></span></span><span style="font-size: 12px; color: #a1a1a8; text-align: right">{{w.text}}</span></div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{fp.isFocus}}" hint-placeholder-val="{{false}}">
+              <span style="font-size: 13px; font-weight: 700">Длительность фокуса</span>
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
+                <sc-for list="{{fp.durs}}" as="d" hint-placeholder-count="4"><button onClick="{{d.pick}}" style="{{d.st}}">{{d.name}}</button></sc-for>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px">
+                <sc-for list="{{fp.stats}}" as="s" hint-placeholder-count="3"><span style="display: flex; flex-direction: column; gap: 3px; padding: 12px; border-radius: 14px; background: rgba(255,255,255,0.05)"><span style="font-size: 11px; color: #8b8b93">{{s.k}}</span><span style="font-size: 18px; font-weight: 700">{{s.v}}</span></span></sc-for>
+              </div>
+              <span style="font-size: 12px; color: #8b8b93; line-height: 1.5">Во время фокуса уведомления приходят тихо, а остров показывает оставшееся время. Задачи берутся из чек-листов в «Заметках».</span>
+            </sc-if>
+          </div>
+        </div>
+      </section>
+    </sc-if>
 
     <!-- ===== RIGHT ISLAND: control center + calendar ===== -->
     <div onMouseEnter="{{barHold}}" style="{{right.box}}">
@@ -893,7 +983,7 @@ const mixHex = (a, b, k) => { const p = (h) => [1, 3, 5].map((i) => parseInt(h.s
 class Component extends DCLogic {
   state = {
     now: new Date(), lock: 'on', power: null,
-    profile: 'work', autoProfile: true, prevProfile: null, barShown: false,
+    profile: 'work', autoProfile: true, prevProfile: null, barShown: false, fcs: { total: 1500000, left: 1080000, running: true, startAt: Date.now(), task: null, sessions: 3, doneN: 0 }, fp: false, fpTab: 'today', fpQ: '', notesRev: 0,
     menu: false, q: '', hitSel: 0,
     right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
     wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
@@ -952,6 +1042,7 @@ class Component extends DCLogic {
     try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
     this.setState({ events: evs, calSel: today, profile });
     try { const t = JSON.parse(localStorage.getItem('ashenos.theme') || 'null'); if (t && t.id) this.setState({ theme: t }); } catch (e) {}
+    this.onNotesEv = () => this.setState({ notesRev: (this.state.notesRev || 0) + 1 }); window.addEventListener('ashen-notes', this.onNotesEv);
     try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); if (c) this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false }); } catch (e) {}
     this.tick = setInterval(() => this.onTick(), 1000);
     window.addEventListener('mousemove', this.onCurMove, true);
@@ -1191,6 +1282,40 @@ class Component extends DCLogic {
     if (!this.state.barShown) this.setState({ barShown: true });
     clearTimeout(this.pbT); this.pbT = setTimeout(() => { if (!this.state.menu && !this.state.right) this.setState({ barShown: false }); }, 3500);
   }
+  /* ---------- фокус и задачи из «Заметок» (остров-notch) ---------- */
+  readNotes() { try { const a = JSON.parse(localStorage.getItem('ashenos.notes.v1') || 'null'); return Array.isArray(a) ? a : null; } catch (e) { return null; } }
+  writeNotes(a) { try { localStorage.setItem('ashenos.notes.v1', JSON.stringify(a)); window.dispatchEvent(new CustomEvent('ashen-notes')); } catch (e) {} this.setState({ notesRev: (this.state.notesRev || 0) + 1 }); }
+  seedNotes() { const t = Date.now(); return [
+    { id: 'n1', title: 'AshenOS — что дальше', color: '#ff8a3d', tag: 'work', pin: true, at: t, body: '# План\n[x] Темы и оттенки в Параметрах\n[ ] Собрать образ для Pi 4\n[ ] Перенести оболочку в Quickshell' },
+    { id: 'n2', title: 'Покупки', color: '#6fd39b', tag: 'personal', pin: false, at: t - 4e6, body: '[ ] Карта microSD 64 ГБ\n[ ] Термопрокладки\n[x] Аккумуляторы 18650' }
+  ]; }
+  tasksAll() {
+    const notes = this.readNotes() || this.seedNotes();
+    const out = [];
+    notes.forEach((n) => String(n.body || '').split('\n').forEach((ln, li) => { const m = ln.match(/^\s*\[( |x)\]\s*(.+)$/i); if (m) out.push({ nid: n.id, li, done: m[1].toLowerCase() === 'x', text: m[2].trim(), note: n.title, color: n.color || '#f5c84b' }); }));
+    return out;
+  }
+  taskSet(t, done) {
+    const notes = this.readNotes() || this.seedNotes();
+    this.writeNotes(notes.map((n) => n.id !== t.nid ? n : { ...n, at: Date.now(), body: String(n.body).split('\n').map((ln, i) => i === t.li ? ln.replace(/\[( |x)\]/i, done ? '[x]' : '[ ]') : ln).join('\n') }));
+  }
+  taskAdd(text) {
+    text = text.trim(); if (!text) return;
+    const notes = this.readNotes() || this.seedNotes();
+    const i = notes.findIndex((n) => n.title === 'Задачи');
+    if (i >= 0) notes[i] = { ...notes[i], at: Date.now(), body: String(notes[i].body || '').replace(/\n*$/, '\n') + '[ ] ' + text };
+    else notes.unshift({ id: 'n' + Date.now(), title: 'Задачи', body: '[ ] ' + text, tag: 'work', color: '#7fb8ff', pin: false, at: Date.now() });
+    this.writeNotes(notes); this.setState({ fpQ: '' });
+  }
+  focusLeft() { const f = this.state.fcs; return f.running ? Math.max(0, f.left - (Date.now() - f.startAt)) : f.left; }
+  focusToggle = () => { const f = this.state.fcs; this.setState({ fcs: f.running ? { ...f, running: false, left: this.focusLeft() } : { ...f, running: true, startAt: Date.now(), left: f.left > 0 ? f.left : f.total } }); };
+  focusDone = () => {
+    const f = this.state.fcs, cur = this.curTask();
+    if (cur) this.taskSet(cur, true);
+    this.setState({ fcs: { ...f, running: false, left: f.total, task: null, doneN: (f.doneN || 0) + 1, sessions: (f.sessions || 0) + 1 } });
+    this.notify({ app: 'Фокус', title: 'Готово!', body: cur ? `«${cur.text}» отмечено в Заметках` : 'Сессия фокуса завершена', kind: 'short', glyph: '✓', sys: true });
+  };
+  curTask() { const all = this.tasksAll().filter((t) => !t.done && !(this.state.fakeDone || {})[t.text]); const want = this.state.fcs.task; return all.find((t) => t.text === want) || all[0] || null; }
   labAction = (id) => {
     const st = this.state, now = Date.now();
     if (/^(timer|sw$|rec$|call$|update$|copy$|vol|br|lang$|clip|nav:(?!off))/.test(id)) this.peekBar();
@@ -1258,6 +1383,7 @@ class Component extends DCLogic {
   }
   onTick() {
     const st = this.state;
+    if (st.fcs && st.fcs.running && this.focusLeft() <= 0) { this.setState({ fcs: { ...st.fcs, running: false, left: 0 } }); this.notify({ app: 'Фокус', title: 'Время вышло', body: 'Сделайте перерыв 5 минут', kind: 'long', glyph: '◔', sys: true }); }
     const patch = { now: new Date() };
     if (st.music.on && st.music.playing) {
       const pos = st.music.pos + 1;
@@ -1817,16 +1943,17 @@ class Component extends DCLogic {
     const recE = st.rec ? st.rec.acc + (st.rec.paused ? 0 : nowMs - st.rec.start) : 0;
     const people = ['Аня', 'Миша', 'Ты'];
     const speaker = st.call ? (st.call.muted ? Math.floor(nowMs / 2600) % 2 : Math.floor(nowMs / 2600) % 3) : 0;
-    const chipOn = { call: !!st.call, rec: !!st.rec, timer: !!tm, sw: !!st.sw, prog: !!st.prog, shelf: st.shelf.length > 0 };
-    const chipW = { call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44 };
+    const fRun = !!(st.fcs && st.fcs.running);
+    const chipOn = { focus: fRun, nav: !!st.navInfo, call: !!st.call, rec: !!st.rec, timer: !!tm, sw: !!st.sw, prog: !!st.prog, shelf: st.shelf.length > 0 };
+    const chipW = { focus: 52, nav: 84, call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44 };
     const winW = Math.min(230, 34 + Math.round(winT.length * 7.3));
     const onChips = Object.keys(chipW).filter((c) => chipOn[c]);
     const rowW = 24 + winW + onChips.reduce((a2, c) => a2 + chipW[c], 0) + onChips.length * 12;
     const flashMode = dragMode ? 'drag' : fl ? fl.kind : null;
     const iW = flashMode === 'drag' ? 196 : flashMode === 'clip' ? 300 : flashMode ? 250 : rowW;
-    const big = (st.hoverPill === 'isl' || st.shDrag) && unlocked;
+    const big = (st.hoverPill === 'isl' || st.shDrag) && unlocked && !st.fp;
     const shelfShow = st.shelf.length > 0 || dragMode;
-    const secs = [36, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
+    const secs = [36, 120, st.navInfo ? 74 : 0, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
     const bigH = 28 + secs.reduce((a2, b2) => a2 + b2, 0) + (secs.length - 1) * 14;
     const chipS = (c) => `display:${chipOn[c] && !flashMode ? 'flex' : 'none'};align-items:center;gap:6px;flex:none;width:${chipW[c]}px;justify-content:center;height:22px;border-radius:11px;background:rgba(255,255,255,.08);animation:islPop .45s ${SPR} both`;
     const SBI = 60, DW = 384 + SBI * 2, eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
@@ -1850,7 +1977,60 @@ class Component extends DCLogic {
       body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
       big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
     };
-    const chip = { call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
+    /* ---- фокус / навигация / панель «Сегодня» ---- */
+    const accI = THV.accent || '#3b82f6';
+    const fLeft = this.focusLeft(), fTot = st.fcs.total, curT = this.curTask();
+    const mm = (ms) => { const s2 = Math.ceil(ms / 1000); return `${Math.floor(s2 / 60)}:${String(s2 % 60).padStart(2, '0')}`; };
+    const hhmm = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const allT = this.tasksAll().map((t) => ({ ...t, done: t.done || !!(st.fakeDone || {})[t.text] }));
+    const openT = allT.filter((t) => !t.done);
+    const nextT = openT.find((t) => !curT || t.text !== curT.text);
+    const fo = {
+      min: String(Math.ceil(fLeft / 60000)), dash: (100.5 * (1 - fLeft / fTot)).toFixed(1), ringCol: st.fcs.running ? '#f2f2f4' : '#8b8b93',
+      task: curT ? curT.text : 'Все задачи сделаны 🎉'.replace(' 🎉', ''), left: `${mm(fLeft)} осталось · до ${hhmm(new Date(Date.now() + fLeft))}`,
+      next: nextT ? `Далее: ${nextT.text}` : 'Больше задач нет',
+      bar: `display:block;height:100%;width:${(100 * (1 - fLeft / fTot)).toFixed(1)}%;background:#f2f2f4;border-radius:2px;transition:width 1s linear`,
+      dot: `width:6px;height:6px;border-radius:50%;background:${st.fcs.running ? '#4fd18b' : '#f5c84b'}`,
+      logo: 'width:15px;height:15px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;background:#f2f2f4;color:#0b0b0c',
+      logoBig: 'width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;background:#f2f2f4;color:#0b0b0c;flex:none',
+      pauseLabel: st.fcs.running ? 'Пауза' : 'Продолжить', pauseIcon: st.fcs.running ? 'M6.5 5h4v14h-4zM13.5 5h4v14h-4z' : 'M7 4.5v15l13-7.5z',
+      doneBtn: `width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${accI};color:#fff`,
+      doneBig: `height:34px;padding:0 14px;border-radius:11px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;background:${accI};color:#fff`
+    };
+    const NI = st.navInfo;
+    const ARW = { start: 'M12 20V5M6 11l6-6 6 6', left: 'M18 20v-7a3 3 0 0 0-3-3H6M10 6l-4 4 4 4', right: 'M6 20v-7a3 3 0 0 1 3-3h9M14 6l4 4-4 4', straight: 'M12 20V4M7 9l5-5 5 5', end: 'M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z' };
+    const nv = NI ? { on: true, arrow: ARW[NI.turn] || ARW.straight, dist: NI.dist, text: NI.text, eta: NI.eta, left: NI.left, icon: `width:44px;height:44px;border-radius:13px;flex:none;display:flex;align-items:center;justify-content:center;background:#ef3b3b;color:#fff` } : { on: false, arrow: '', dist: '' };
+    const times = (() => { const d = new Date(Date.now() + fLeft); d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15); return (i) => { const x = new Date(d.getTime() + i * 75 * 60000); return hhmm(x); }; })();
+    const free = Math.max(0, 22 - new Date().getHours() - Math.ceil(openT.length * 1.25));
+    let oi = 0;
+    const fpTasks = allT.slice(0, 12).map((t) => {
+      const isCur = curT && t.text === curT.text && !t.done;
+      const tm = t.done ? 'готово' : isCur ? 'сейчас' : times(oi++);
+      return { text: t.text, note: t.note, done: t.done, time: tm,
+        toggle: () => this.taskSet(t, !t.done),
+        focus: () => this.setState({ fcs: { ...st.fcs, task: t.text, running: true, startAt: Date.now(), left: st.fcs.total } }),
+        row: `display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:12px;background:${isCur ? 'rgba(255,255,255,.06)' : 'transparent'};animation:islRow .3s ease both`,
+        ring: `width:18px;height:18px;flex:none;border-radius:50%;border:2px solid ${t.color};background:${t.done ? t.color : 'transparent'};box-shadow:${t.done ? 'inset 0 0 0 3px #141416' : 'none'};transition:background .2s`,
+        textSt: `font-size:13px;font-weight:${isCur ? 700 : 500};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t.done ? 'text-decoration:line-through;color:#6f6f77' : 'color:#e8e8ec'}` };
+    });
+    const mNow = window.__ashenNow;
+    const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']];
+    const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], wd = (new Date().getDay() + 6) % 7;
+    const fp = {
+      on: !!st.fp && unlocked, isToday: st.fpTab === 'today', isWeek: st.fpTab === 'week', isFocus: st.fpTab === 'focus',
+      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:340px;box-sizing:border-box;padding:14px 16px 16px;border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
+      tabs: tabsFP.map(([id, name]) => ({ name, on: st.fpTab === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${st.fpTab === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${st.fpTab === id ? '#ffffff' : '#a1a1a8'}` })),
+      music: `margin-left:auto;height:30px;padding:0 12px 0 6px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.06);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
+      musicDot: 'width:20px;height:20px;border-radius:50%;flex:none;background:conic-gradient(#ff6fae,#ff8a3d,#b48cff,#ff6fae)',
+      musicText: mNow && mNow.title ? mNow.title : 'Трек.mp3',
+      glow: `position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,${accI}55,rgba(0,0,0,0) 70%);pointer-events:none`,
+      sum: `${openT.length} осталось · ${free} ч свободно`, tasks: fpTasks,
+      q: st.fpQ || '', onQ: (e) => this.setState({ fpQ: e.target.value }), onKey: (e) => { if (e.key === 'Enter') this.taskAdd(e.target.value); if (e.key === 'Escape') this.setState({ fp: false }); },
+      week: DAYS.map((d, i) => { const n = i === wd ? openT.length : i < wd ? 0 : [3, 2, 4, 1, 2, 0, 1][i]; const dn = i < wd ? [4, 3, 5, 2, 3, 1, 2][i] : i === wd ? allT.length - openT.length : 0; const tot = n + dn; return { day: d + (i === wd ? ' · сегодня' : ''), dayLab: `font-size:12.5px;font-weight:${i === wd ? 700 : 500};color:${i === wd ? '#fff' : '#a1a1a8'};white-space:nowrap`, text: tot ? `${dn}/${tot}` : '—', bar: `display:block;height:100%;width:${tot ? Math.round(dn / tot * 100) : 0}%;background:${i === wd ? accI : 'rgba(255,255,255,.35)'};border-radius:4px` }; }),
+      durs: [15, 25, 45, 60].map((n) => ({ name: n + ' мин', pick: () => this.setState({ fcs: { ...st.fcs, total: n * 60000, left: n * 60000, running: true, startAt: Date.now() } }), st: `height:44px;border-radius:12px;font-size:13px;font-weight:700;background:${fTot === n * 60000 ? '#f2f2f4' : 'rgba(255,255,255,.06)'};color:${fTot === n * 60000 ? '#0b0b0c' : '#e8e8ec'}` })),
+      stats: [{ k: 'Сессий сегодня', v: String(st.fcs.sessions || 0) }, { k: 'В фокусе', v: `${Math.floor((st.fcs.sessions || 0) * fTot / 3600000)} ч ${Math.round(((st.fcs.sessions || 0) * fTot / 60000) % 60)} мин` }, { k: 'Задач закрыто', v: String(allT.length - openT.length) }]
+    };
+    const chip = { focus: chipS('focus'), nav: chipS('nav'), call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
     const lvl = fl && (fl.kind === 'vol' || fl.kind === 'bright');
     const flash = !flashMode ? { glyph: '', label: '', text: '', track: 'display:none', fill: '', textStyle: 'display:none' } : flashMode === 'drag'
       ? { glyph: '⇣', label: 'Положить на полку', text: '', track: 'display:none', fill: '', textStyle: 'display:none' }
@@ -2034,7 +2214,10 @@ class Component extends DCLogic {
       toast = {
         show: true, title: t.title, app: t.app, body: t.body, glyph: t.glyph,
         box: `position:absolute;${corner ? 'right:16px;top:16px;' : 'right:16px;top:48px;'}z-index:95;width:${long ? 390 : 320}px;min-height:${long ? 84 : 58}px;box-sizing:border-box;padding:10px 10px 10px 12px;border-radius:${long ? 24 : 29}px;display:flex;align-items:${long ? 'flex-start' : 'center'};gap:11px;${ISL}${imp ? 'box-shadow:0 0 0 1.5px rgba(255,255,255,.7),0 14px 40px rgba(0,0,0,.45);' : ''}animation:${t.phase === 'back' ? `islBack .42s ${OUT} both` : `islPop .5s ${SPR} both`};transform-origin:100% 0`,
-        icon: `width:36px;height:36px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:${imp ? '#f2f2f4' : '#2e2e33'};color:${imp ? '#0b0b0c' : '#f2f2f4'}`,
+        /* сообщения от людей — карточка контакта: круглый аватар с градиентом и точкой «в сети» */
+        icon: (() => { const person = /Telegram|Discord|Signal|Почта/.test(t.app || ''); if (!person) return `width:36px;height:36px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:${imp ? '#f2f2f4' : '#2e2e33'};color:${imp ? '#0b0b0c' : '#f2f2f4'}`;
+          const G = [['#ffb36b', '#ff5f6d'], ['#7fb8ff', '#6a5cff'], ['#6fd39b', '#2ec4b6'], ['#f5c84b', '#ff8a3d'], ['#ff8fd0', '#b48cff']][(String(t.title || '').charCodeAt(0) || 0) % 5];
+          return `position:relative;width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(140deg,${G[0]},${G[1]});box-shadow:0 0 0 2px rgba(255,255,255,.14),13px 13px 0 -15px #4fd18b,14px 14px 0 -12.5px #141416,14px 14px 0 -14.5px #4fd18b`; })(),
         bodyStyle: `font-size:12.5px;color:#c9c9cf;line-height:1.4;${long ? 'display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden' : 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'}`
       };
     }
@@ -2177,6 +2360,8 @@ class Component extends DCLogic {
       swStop: () => this.setState({ sw: null }),
       progCancel: () => { clearTimeout(this.progT); this.progT = null; this.setState({ prog: null }); },
       clipClear: () => this.setState({ clip: [] }),
+      fo, nv, fp, ctlBtnL: 'width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)', focusToggle: this.focusToggle, focusDone: this.focusDone,
+      islClick: (e) => { if (e && e.target && e.target.closest && e.target.closest('button')) return; this.setState({ fp: !this.state.fp, hoverPill: null }); }, fpClose: () => this.setState({ fp: false }),
       isl, islEnter: () => { clearTimeout(this.pillT); if (this.state.hoverPill !== 'isl') this.setState({ hoverPill: 'isl' }); },
       appTitle: active === 'desk' ? '' : this.meta[active].title,
       center, pill, pillLeave: () => { clearTimeout(this.pillT); this.pillT = setTimeout(() => this.setState({ hoverPill: null }), 180); },

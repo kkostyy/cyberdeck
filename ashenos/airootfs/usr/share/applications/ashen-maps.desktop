@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Карты
+Comment=Карта OpenStreetMap, поиск, маршруты и навигация
+Exec=ashen-maps
+Icon=maps
+Categories=Utility;Maps;
+Keywords=карта;маршрут;навигация;map;gps;

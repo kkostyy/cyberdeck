@@ -67,3 +67,10 @@ plasma-workspace
 kscreen
 iw
 wireless-regdb
+
+# карты (ashen-maps)
+qt6-declarative
+qt6-location
+qt6-positioning
+geoclue
+gpsd

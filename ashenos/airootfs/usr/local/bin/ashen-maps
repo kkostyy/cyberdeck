@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AshenOS · Карты — запуск с оттенком и стилем из ashenos-settings
+get() { ashenos-settings get "$1" 2>/dev/null; }
+ACC=$(get ACCENT); case "$ACC" in \#*) ;; orange) ACC='#ff8a3d';; red) ACC='#ff5c5c';; pink) ACC='#ff6fae';; yellow) ACC='#f5c84b';; green) ACC='#59c27a';; teal) ACC='#2ec4b6';; blue) ACC='#5aa8ff';; purple) ACC='#b48cff';; *) ACC='#ef3b3b';; esac
+STYLE=$(get MAPS_STYLE); [ -n "$STYLE" ] || STYLE=dark
+OFF=$(get MAPS_OFFLINE_DIR); [ -n "$OFF" ] || OFF="$HOME/.local/share/ashen-maps/tiles"
+mkdir -p "$OFF"
+QML=$(command -v qml6 || echo /usr/lib/qt6/bin/qml)
+exec "$QML" /usr/share/ashen-maps/main.qml -- "accent=$ACC" "style=$STYLE" "offline=$OFF"

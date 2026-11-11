@@ -51,6 +51,7 @@ rm "$MNT/boot/config-ashenos.txt"
 # настройки первого запуска лежат на загрузочном разделе — их можно править с любого компьютера
 cp "$ROOT_OVERLAY/boot/ashenos.conf" "$MNT/boot/ashenos.conf"
 install -Dm755 "$HERE/ashenos-info" "$MNT/usr/local/bin/ashenos-info"
+install -Dm644 "$HERE/../apps/ashen-maps/main.qml" "$MNT/usr/share/ashen-maps/main.qml"
 
 echo "==> Ставлю приложение Claude (claude-desk)"
 APP="$HERE/../apps/claude-desk"
