@@ -148,7 +148,7 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font:600 20px Inter,sans-serif}
       <!-- detail + edit stage -->
       <sc-if value="{{showStage}}" hint-placeholder-val="{{false}}">
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #0c0c0d">
-          <div class="vw-stage" onPointerDown="{{panDown}}" onPointerMove="{{panMove}}" onPointerUp="{{panUp}}" onDblClick="{{dbl}}" onWheel="{{onWheel}}" style="{{stageSt}}">
+          <div class="vw-stage" onPointerDown="{{panDown}}" onPointerMove="{{panMove}}" onPointerUp="{{panUp}}" onDoubleClick="{{dbl}}" onWheel="{{onWheel}}" style="{{stageSt}}">
             <sc-if value="{{cur.isPhoto}}" hint-placeholder-val="{{true}}">
               <div style="{{frameSt}}">
                 <img alt="{{cur.title}}" src="{{cur.src}}" draggable="false" style="{{photoSt}}">
@@ -229,7 +229,7 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font:600 20px Inter,sans-serif}
             <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 14px 16px">
               <sc-for list="{{adj}}" as="a" hint-placeholder-count="6">
                 <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px 2px; border-bottom: 1px solid rgba(255,255,255,0.05)">
-                  <div style="display: flex; align-items: center"><span style="font-size: 13px; font-weight: 600">{{a.name}}</span><button onDblClick="{{a.reset}}" onClick="{{a.reset}}" title="Сбросить" style="{{a.valSt}}">{{a.text}}</button></div>
+                  <div style="display: flex; align-items: center"><span style="font-size: 13px; font-weight: 600">{{a.name}}</span><button onClick="{{a.reset}}" title="Сбросить" style="{{a.valSt}}">{{a.text}}</button></div>
                   <input type="range" min="{{a.min}}" max="{{a.max}}" value="{{a.v}}" onInput="{{a.set}}" aria-label="{{a.name}}" class="vw-range" style="width: 100%">
                 </div>
               </sc-for>
@@ -347,6 +347,12 @@ const E0 = { exp: 0, con: 0, sat: 0, warm: 0, fade: 0, vig: 0, blur: 0, rot: 0, 
 const cssFilter = (e) => { if (!e) return 'none'; const w = e.warm || 0; const f = [`brightness(${(1 + (e.exp || 0) / 160).toFixed(3)})`, `contrast(${(1 + (e.con || 0) / 160 - (e.fade || 0) / 300).toFixed(3)})`, `saturate(${(1 + (e.sat || 0) / 100).toFixed(3)})`];
   if (w > 0) f.push(`sepia(${(w / 260).toFixed(3)})`, `hue-rotate(${(-w / 14).toFixed(1)}deg)`); if (w < 0) f.push(`hue-rotate(${(w / 6).toFixed(1)}deg)`, `saturate(${(1 + w / 500).toFixed(3)})`);
   if (e.blur) f.push(`blur(${(e.blur / 25).toFixed(2)}px)`); if (e.fade) f.push(`brightness(${(1 + e.fade / 900).toFixed(3)})`); return f.join(' '); };
+const IDB = {
+  db() { return new Promise((res, rej) => { try { const r = indexedDB.open('ashenos-photos', 1); r.onupgradeneeded = () => r.result.createObjectStore('files', { keyPath: 'id' }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }); },
+  async put(rec) { const d = await this.db(); return new Promise((res) => { const t = d.transaction('files', 'readwrite'); t.objectStore('files').put(rec); t.oncomplete = () => res(true); t.onerror = () => res(false); }); },
+  async all() { const d = await this.db(); return new Promise((res) => { const q = d.transaction('files').objectStore('files').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => res([]); }); },
+  async del(id) { const d = await this.db(); return new Promise((res) => { const t = d.transaction('files', 'readwrite'); t.objectStore('files').delete(id); t.oncomplete = () => res(true); t.onerror = () => res(false); }); }
+};
 const fmtDur = (s) => { s = Math.max(0, Math.floor(s || 0)); const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, '0')}`; };
 const fmtSize = (b) => b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ';
 
@@ -390,6 +396,8 @@ class Component extends DCLogic {
     this.cfgLoad();
     try { const s = JSON.parse(localStorage.getItem('ashenos.photos.v1') || 'null'); if (s) this.setState({ favs: s.favs || {}, deleted: s.deleted || {}, extraAlb: s.extraAlb || {}, albumsUser: s.albumsUser || [], edits: s.edits || {}, captions: s.captions || {}, tile: s.tile || 170, sideOpen: s.sideOpen !== false }); } catch (e) {}
     setTimeout(() => this.focusRoot(), 200);
+    IDB.all().then((rows) => { if (!rows.length) return; const items = rows.map((r) => { const url = URL.createObjectURL(r.blob); return { ...r.meta, src: url, thumb: r.meta.thumb && r.meta.thumb.startsWith('data:') ? r.meta.thumb : url, poster: r.meta.poster || '' }; });
+      this.setState({ imported: [...items, ...this.state.imported.filter((x) => !items.some((y) => y.id === x.id))] }); }).catch(() => {});
   }
   componentWillUnmount() { clearInterval(this.showT); clearTimeout(this.tt); clearTimeout(this.ctT); }
   focusRoot() { const el = document.querySelector('section[aria-label="Фото и видео"]'); if (el && document.activeElement && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) el.focus(); }
@@ -428,11 +436,13 @@ class Component extends DCLogic {
       if (vid) { const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true; v.src = url; v.onloadedmetadata = () => { this.patchImp(it.id, { dur: v.duration, w: v.videoWidth, h: v.videoHeight }); try { v.currentTime = Math.min(1, v.duration / 3); } catch (e) {} };
         v.onseeked = () => { try { const c = document.createElement('canvas'); c.width = 480; c.height = Math.round(480 * v.videoHeight / Math.max(1, v.videoWidth)); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); this.patchImp(it.id, { thumb: c.toDataURL('image/jpeg', 0.75), poster: c.toDataURL('image/jpeg', 0.75) }); } catch (e) {} }; }
       else { const im = new Image(); im.onload = () => this.patchImp(it.id, { w: im.naturalWidth, h: im.naturalHeight }); im.src = url; }
+      IDB.put({ id: it.id, blob: f, meta: { ...it, src: '', thumb: '' } }).then((ok) => { if (!ok) this.say('Не удалось сохранить файл в медиатеке'); }).catch(() => {});
       return it; });
     this.setState({ imported: [...this.state.imported, ...items], album: 'import', view: 'grid' });
-    this.say(`Импортировано: ${items.length}. Файлы доступны, пока открыто приложение`);
+    this.say(`Импортировано: ${items.length} — сохранено в медиатеке`);
   }
-  patchImp(id, p) { this.setState({ imported: this.state.imported.map((x) => (x.id === id ? { ...x, ...p } : x)) }); }
+  patchImp(id, p) { this.setState({ imported: this.state.imported.map((x) => (x.id === id ? { ...x, ...p } : x)) });
+    IDB.all().then((rows) => { const r = rows.find((x) => x.id === id); if (r) IDB.put({ ...r, meta: { ...r.meta, ...p, src: '', thumb: p.thumb || r.meta.thumb || '' } }); }).catch(() => {}); }
   /* edit */
   ed(id) { return { ...E0, ...(this.state.edits[id] || {}) }; }
   cur() { return this.all().find((x) => x.id === this.state.curId); }
@@ -488,8 +498,23 @@ class Component extends DCLogic {
   remove() { const c = this.cur(); if (!c || c.deleted) return; const ids = this.list().map((x) => x.id); const i = ids.indexOf(c.id); const nx = ids[i + 1] || ids[i - 1];
     this.up({ deleted: { ...this.state.deleted, [c.id]: Date.now() } }); this.say('Перемещено в «Недавно удалённые»'); if (nx) this.setState({ curId: nx }); else this.back(); }
   startEdit() { const c = this.cur(); if (!c || c.video) return; this.setState({ view: 'edit', draft: this.ed(c.id), etab: 'adj', infoOpen: false, zoom: 1, panX: 0, panY: 0 }); }
+  openByName(name, size) {
+    const all = this.all(); const base = name.replace(/\.[^.]+$/, '').toLowerCase();
+    let f = all.find((x) => x.file === name || x.name.toLowerCase() === base || (x.file || '').toLowerCase() === name.toLowerCase());
+    if (!f) { const ex = this.state.imported.find((x) => x.file === name); if (ex) f = ex; }
+    if (!f) {
+      const h = [...name].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7); const c1 = `hsl(${h % 360},55%,42%)`, c2 = `hsl(${(h >> 8) % 360},60%,22%)`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="1600" height="1000" fill="url(#g)"/><text x="800" y="520" font-family="Inter,sans-serif" font-size="64" font-weight="700" fill="rgba(255,255,255,.85)" text-anchor="middle">${name.replace(/[<&]/g, '')}</text><text x="800" y="590" font-family="Inter,sans-serif" font-size="30" fill="rgba(255,255,255,.55)" text-anchor="middle">Предпросмотр из Проводника</text></svg>`;
+      const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      f = { id: 'x' + h.toString(36), file: name, src: url, thumb: url, poster: '', video: false, dur: 0, name: name.replace(/\.[^.]+$/, ''), date: new Date().toISOString().slice(0, 16), place: '~/Проекты', albums: ['import'], w: 1600, h: 1000, size: 0, sizeText: size, local: true };
+      this.setState({ imported: [...this.state.imported, f] });
+    }
+    this.setState({ album: f.local ? 'import' : 'all' });
+    setTimeout(() => this.open(f.id), 30);
+  }
   renderVals() {
     const st = this.state; const accent = this.props.themeTint || '#0a84ff';
+    const rq = this.props.openReq; if (rq && rq !== VW.req) { VW.req = rq; let r = null; try { r = JSON.parse(rq); } catch (e) {} if (r && r.app === 'photos') setTimeout(() => this.openByName(r.name, r.size), 60); }
     const lum = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return 0; const n = parseInt(m[1], 16); return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
     const onAcc = lum(accent) > 160 ? '#111113' : '#ffffff';
     const A = this.albums(); const ALL = this.all(); const live = ALL.filter((x) => !x.deleted);
@@ -539,7 +564,7 @@ class Component extends DCLogic {
     const iconBtn = 'width:32px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#d6d6dc';
     const albumChips = c ? A.map(([id, name, col]) => { const on = c.albums.includes(id); return { name, on: String(on), toggle: () => { const cur = (st.extraAlb[c.id] || []).filter((a) => a !== id && a !== '-' + id); this.up({ extraAlb: { ...st.extraAlb, [c.id]: [...cur, on ? '-' + id : id] } }); },
       st: `height:28px;padding:0 11px;border-radius:14px;font-size:12px;font-weight:600;background:${on ? col : 'rgba(255,255,255,.07)'};color:${on ? '#fff' : '#c9c9cf'}` }; }) : [];
-    const infoRows = c ? [['Тип', c.video ? 'Видео' : (extOf(c.file) || 'Изображение').toUpperCase()], ['Размер', `${c.w && c.h ? `${c.w}×${c.h} · ` : ''}${fmtSize(c.size || 0)}`], c.video ? ['Длительность', fmtDur(c.dur || V.d)] : ['Камера', c.local ? '—' : 'AshenCam · f/1.8 · 1/250'], ['Место', c.place || '—'], ['Файл', c.local ? c.file : '~/Изображения/' + c.file], ['Правка', st.edits[c.id] ? 'Есть изменения' : 'Оригинал']].map(([k, v]) => ({ k, v })) : [];
+    const infoRows = c ? [['Тип', c.video ? 'Видео' : (extOf(c.file) || 'Изображение').toUpperCase()], ['Размер', `${c.w && c.h ? `${c.w}×${c.h} · ` : ''}${c.sizeText || fmtSize(c.size || 0)}`], c.video ? ['Длительность', fmtDur(c.dur || V.d)] : ['Камера', c.local ? '—' : 'AshenCam · f/1.8 · 1/250'], ['Место', c.place || '—'], ['Файл', c.local ? c.file : '~/Изображения/' + c.file], ['Правка', st.edits[c.id] ? 'Есть изменения' : 'Оригинал']].map(([k, v]) => ({ k, v })) : [];
     // edit panel
     const D = st.draft || E0;
     const sl = (key, name, min, max, unit) => ({ name, min, max, v: D[key], text: (D[key] > 0 && min < 0 ? '+' : '') + D[key] + (unit || ''), set: (e) => this.setDraft({ [key]: +e.target.value, filter: key === 'zoom' || key === 'straight' ? D.filter : 'custom' }), reset: () => this.setDraft({ [key]: E0[key] }),
@@ -564,7 +589,7 @@ class Component extends DCLogic {
       groups, gridSt,
       back: () => this.back(), cur: curV, inTrash: !!(c && c.deleted), notTrash: !(c && c.deleted),
       restore: () => { const dd = { ...st.deleted }; delete dd[c.id]; this.up({ deleted: dd }); this.say('Восстановлено'); this.back(); },
-      purge: () => { if (c.local) this.setState({ imported: st.imported.filter((x) => x.id !== c.id) }); const dd = { ...st.deleted, [c.id]: -1 }; this.up({ deleted: dd, favs: { ...st.favs, [c.id]: false } }); this.say('Удалено навсегда'); this.back(); },
+      purge: () => { if (c.local) { this.setState({ imported: st.imported.filter((x) => x.id !== c.id) }); IDB.del(c.id).catch(() => {}); } const dd = { ...st.deleted, [c.id]: -1 }; this.up({ deleted: dd, favs: { ...st.favs, [c.id]: false } }); this.say('Удалено навсегда'); this.back(); },
       zoomText: st.zoom > 1.001 ? Math.round(st.zoom * 100) + '%' : '', zoomIn: () => this.setState({ zoom: Math.min(6, st.zoom * 1.25) }), zoomOut: () => { const z = Math.max(1, st.zoom / 1.25); this.setState({ zoom: z, panX: z === 1 ? 0 : st.panX, panY: z === 1 ? 0 : st.panY }); },
       iconBtn, favLabel: c && c.fav ? 'Убрать из избранного' : 'В избранное', favFill: c && c.fav ? 'currentColor' : 'none', toggleFav: () => this.toggleFav(),
       favBtn: `${iconBtn};color:${c && c.fav ? '#ff375f' : '#d6d6dc'}`, infoOpen: String(st.infoOpen), toggleInfo: () => this.setState({ infoOpen: !st.infoOpen }),

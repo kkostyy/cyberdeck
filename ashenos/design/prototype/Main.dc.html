@@ -237,7 +237,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
             <div class="scroll" role="listbox" aria-label="Файлы" onDragOver="{{dropOver}}" onDragLeave="{{dropOut}}" onDrop="{{dropIn}}" style="{{gridSt}}">
               <sc-if value="{{pl.empty}}" hint-placeholder-val="{{false}}"><span style="grid-column: 1 / -1; padding: 60px 0; text-align: center; font-size: 14px; color: #6f6f77">{{pl.emptyText}}</span></sc-if>
               <sc-for list="{{files}}" as="r" hint-placeholder-count="7">
-                <button role="option" draggable="true" onDragStart="{{r.drag}}" aria-selected="{{r.selected}}" aria-label="{{r.label}}" onClick="{{r.pick}}" style="{{r.cardStyle}}">
+                <button role="option" draggable="true" onDragStart="{{r.drag}}" aria-selected="{{r.selected}}" aria-label="{{r.label}}" title="Двойной щелчок — открыть" onClick="{{r.pick}}" onDoubleClick="{{r.open}}" onKeyDown="{{r.key}}" style="{{r.cardStyle}}">
                   <span aria-hidden="true" style="position: relative; display: block; width: 72px; height: 64px; flex: none">
                     <span style="position: absolute; left: 3px; top: 6px; width: 66px; height: 54px; border-radius: 9px; background: #1e1e20; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07)"></span>
                     <span style="{{r.item}}"></span>
@@ -728,6 +728,8 @@ class Component extends DCLogic {
         label: `${f.name}, ${f.type}, ${f.size}`,
         item: this.fileItem(f.kind),
         pick: () => this.setState({ file: f.name }),
+        open: () => { if (isTrash || f.ext === 'DIR') return; if (this.props.onAction) this.props.onAction('openfile:' + JSON.stringify({ name: f.name, kind: f.kind, size: f.size })); },
+        key: (e) => { if (e.key === 'Enter' && !isTrash && this.props.onAction) { e.preventDefault(); this.props.onAction('openfile:' + JSON.stringify({ name: f.name, kind: f.kind, size: f.size })); } },
         drag: (e) => {
           const data = JSON.stringify({ name: f.name, size: f.size, ext: f.ext, kind: f.kind });
           try { e.dataTransfer.setData('application/x-arch-file', data); e.dataTransfer.setData('text/plain', f.name); e.dataTransfer.effectAllowed = 'copy'; } catch (err) {}

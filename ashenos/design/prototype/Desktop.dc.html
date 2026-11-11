@@ -1836,7 +1836,9 @@ class Component extends DCLogic {
 
     /* ---------- dock ---------- */
     const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'photos', 'pad', 'calc', 'set', 'lab', 'down', 'trash'];
+    const runP = String(this.props.openApps || '').split(',').filter(Boolean);
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
+    runP.forEach((id) => { running[id] = true; });
     const hi = dockIds.indexOf(st.dock);
     const dk = {}, dh = {};
     let filesSize = 40;
@@ -2098,6 +2100,11 @@ class Component extends DCLogic {
       { group: 'Файлы', name: 'install.sh', kind: 'Скрипт Bash · 3 КБ', glyph: 'SH', bg: xc.SH, mono: true, text: '#!/usr/bin/env bash\nsudo pacman -S --needed quickshell\nsystemctl --user enable shell', meta: [{ k: 'Права', v: 'rwxr-xr-x' }], open: () => openApp2('term') },
       { group: 'Файлы', name: 'Трек.mp3', kind: 'Аудио · 7,2 МБ', glyph: 'MP3', bg: xc.MP3, text: '3:58 · 320 кбит/с · 44,1 кГц', meta: [{ k: 'Исполнитель', v: 'user' }], open: () => this.setState({ playing: true, homeQ: '' }) },
       { group: 'Файлы', name: 'Презентация.pdf', kind: 'PDF · 12,4 МБ', glyph: 'PDF', bg: xc.PDF, text: '18 страниц · Концепция рабочего окружения для AshenOS', meta: [{ k: 'Страниц', v: '18' }], open: () => openApp2('files') },
+      { group: 'Приложения', name: 'Калькулятор', kind: 'Приложение', glyph: '±', bg: '#ff9f0a', text: 'Обычный, научный, программист и конвертер величин', meta: [{ k: 'Режимы', v: '4' }], open: () => openApp2('calc') },
+      { group: 'Приложения', name: 'Блокнот', kind: 'Приложение', glyph: '✎', bg: '#5a5a62', text: 'Текст и код с подсветкой, поиск и замена, Markdown', meta: [{ k: 'Папка', v: '~/Документы' }], open: () => openApp2('pad') },
+      { group: 'Приложения', name: 'Фото', kind: 'Приложение', glyph: '✿', bg: '#ff375f', text: 'Медиатека, альбомы, правка снимков и видеоплеер', meta: [{ k: 'Объектов', v: '17' }], open: () => openApp2('photos') },
+      { group: 'Приложения', name: 'Карты', kind: 'Приложение', glyph: '➤', bg: '#c4302b', text: 'Поиск мест, маршруты и навигация в острове', meta: [{ k: 'Данные', v: 'OSM' }], open: () => openApp2('maps') },
+      { group: 'Приложения', name: 'Монитор', kind: 'Приложение', glyph: '▮', bg: '#3a3a42', text: 'Процессор, память, сеть и процессы', meta: [{ k: 'Обновление', v: '1 с' }], open: () => openApp2('mon') },
       { group: 'Приложения', name: 'Тест острова', kind: 'Проверка функций', glyph: '◉', bg: '#2e2e33', text: 'Таймер, запись экрана, звонок, обновление, громкость, раскладка, буфер обмена', meta: [{ k: 'Тип', v: 'Демо-приложение' }], open: () => openApp2('lab') },
       { group: 'Команды', name: 'Заблокировать экран', kind: 'Система', glyph: '⏻', bg: '#3a3a40', cmd: true, text: 'Блокирует сеанс, музыка продолжит играть', meta: [{ k: 'Сочетание', v: 'Super + L' }], open: () => { this.setState({ homeQ: '' }); lockNow(); } }
     ];

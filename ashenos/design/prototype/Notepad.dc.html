@@ -116,7 +116,16 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cu
               <button onClick="{{newFile}}" class="pd-b" style="{{newBtn}}">Новый файл</button>
             </div>
           </sc-if>
-          <sc-if value="{{hasFile}}" hint-placeholder-val="{{true}}">
+          <sc-if value="{{isPrev}}" hint-placeholder-val="{{false}}">
+            <article class="pd-scroll" aria-label="Предпросмотр Markdown" style="flex: 1; min-width: 0; overflow-y: auto; padding: 36px 0 60px">
+              <div style="width: min(100% - 80px, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 4px">
+                <sc-for list="{{mdBlocks}}" as="b" hint-placeholder-count="8">
+                  <div style="{{b.st}}"><sc-if value="{{b.task}}" hint-placeholder-val="{{false}}"><button role="checkbox" aria-checked="{{b.checked}}" aria-label="Отметить пункт" onClick="{{b.toggle}}" style="{{b.box}}">{{b.mark}}</button></sc-if><sc-if value="{{b.bullet}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{b.dot}}">{{b.bulletText}}</span></sc-if><span style="{{b.body}}"><sc-for list="{{b.tk}}" as="k" hint-placeholder-count="2"><span style="{{k.st}}">{{k.t}}</span></sc-for></span></div>
+                </sc-for>
+              </div>
+            </article>
+          </sc-if>
+          <sc-if value="{{hasEditor}}" hint-placeholder-val="{{true}}">
             <sc-if value="{{isCode}}" hint-placeholder-val="{{true}}">
               <div aria-hidden="true" style="width: {{gutterW}}px; flex: none; position: relative; overflow: hidden; background: rgba(0,0,0,0.12); border-right: 1px solid rgba(255,255,255,0.04)">
                 <div style="{{gutterInner}}">
@@ -312,7 +321,7 @@ class Component extends DCLogic {
   say(t) { clearTimeout(this.tt); this.setState({ toast: { on: true, text: t } }); this.tt = setTimeout(() => this.setState({ toast: { on: false, text: '' } }), 2000); }
   file(id) { return this.state.files.find((f) => f.id === (id || this.state.active)); }
   ta() { return document.querySelector('textarea.pd-ta'); }
-  modeOf(f) { if (!f) return 'text'; const m = this.state.modes[f.id]; if (m) return m; return ['txt', 'md'].includes(langOf(f.name)) ? 'text' : 'code'; }
+  modeOf(f) { if (!f) return 'text'; const m = this.state.modes[f.id]; if (m) return m; const l = langOf(f.name); return l === 'md' ? 'prev' : l === 'txt' ? 'text' : 'code'; }
   isDirty(f) { if (!f) return false; const s = this.state.saved[f.id]; return s === undefined ? f.text.length > 0 : s !== f.text; }
   openFile(id) { const st = this.state; const tabs = st.tabs.includes(id) ? st.tabs : [...st.tabs, id]; this.up({ tabs, active: id, sTop: 0, sLeft: 0, caret: 0 }); const ta = this.ta(); if (ta) ta.scrollTop = 0; }
   closeTab(id) {
@@ -397,11 +406,55 @@ class Component extends DCLogic {
     const nb = e.shiftKey ? block.replace(/^( {1,4}|\t)/gm, '') : block.replace(/^/gm, ind);
     this.setText(f.text.slice(0, ls) + nb + f.text.slice(b)); setTimeout(() => { const t = this.ta(); if (t) t.setSelectionRange(ls, ls + nb.length); }, 0);
   }
+  mdBlocks(f, accent, onAcc) {
+    const lines = f.text.split('\n'); const out = []; let fence = null;
+    const inl = (t, base) => { const tk = []; const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*]+\*)|(\[[^\]]+\]\([^)]+\))/g; let i = 0, m;
+      while ((m = re.exec(t))) { if (m.index > i) tk.push({ t: t.slice(i, m.index), st: base });
+        if (m[1]) tk.push({ t: m[1].slice(1, -1), st: base + ";font-family:'JetBrains Mono',monospace;font-size:.88em;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.09);color:#fc9a8d" });
+        else if (m[2]) tk.push({ t: m[2].slice(2, -2), st: base + ';font-weight:700;color:#fff' });
+        else if (m[3]) tk.push({ t: m[3].slice(1, -1), st: base + ';font-style:italic' });
+        else { const lm = /\[([^\]]+)\]/.exec(m[4]); tk.push({ t: lm[1], st: base + `;color:${accent};text-decoration:underline;text-underline-offset:3px` }); }
+        i = re.lastIndex; }
+      if (i < t.length) tk.push({ t: t.slice(i), st: base }); if (!tk.length) tk.push({ t: '\u00a0', st: base }); return tk; };
+    const B = (o) => ({ task: false, bullet: false, checked: 'false', mark: '', box: '', dot: '', bulletText: '', toggle: () => {}, body: 'flex:1;min-width:0', ...o });
+    lines.forEach((ln, li) => {
+      if (/^```/.test(ln)) { if (fence) { out.push(B({ st: 'margin:6px 0;padding:12px 14px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);white-space:pre-wrap', tk: [{ t: fence.join('\n') || ' ', st: "font:13px/1.55 'JetBrains Mono',monospace;color:#e8e8ec" }] })); fence = null; } else fence = []; return; }
+      if (fence) { fence.push(ln); return; }
+      const h = /^(#{1,6})\s+(.*)$/.exec(ln);
+      if (h) { const n = h[1].length; const fs = [0, 30, 23, 19, 17, 16, 15][n]; out.push(B({ st: `display:flex;margin:${n === 1 ? '4px 0 10px' : '18px 0 6px'};${n <= 2 ? 'padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08)' : ''}`, tk: inl(h[2], `font:700 ${fs}px/1.3 Inter,sans-serif;color:#f7f7f9;letter-spacing:-.01em`) })); return; }
+      if (/^\s*>/.test(ln)) { out.push(B({ st: `display:flex;padding:6px 14px;margin:4px 0;border-left:3px solid ${accent};background:rgba(255,255,255,.03);border-radius:0 8px 8px 0`, tk: inl(ln.replace(/^\s*>\s?/, ''), 'font:italic 15px/1.6 Inter,sans-serif;color:#c9c9cf') })); return; }
+      const t = /^(\s*)[-*+]\s+\[([ xX])\]\s+(.*)$/.exec(ln);
+      if (t) { const done = t[2] !== ' '; const ind = Math.min(4, Math.floor(t[1].length / 2));
+        out.push(B({ task: true, checked: String(done), mark: done ? '✓' : '', st: `display:flex;align-items:flex-start;gap:10px;padding:3px 0 3px ${ind * 22}px`,
+          box: `width:18px;height:18px;flex:none;margin-top:3px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:800 12px Inter,sans-serif;color:${onAcc};background:${done ? accent : 'transparent'};box-shadow:inset 0 0 0 1.5px ${done ? accent : 'rgba(255,255,255,.35)'}`,
+          toggle: () => { const L2 = f.text.split('\n'); L2[li] = L2[li].replace(/\[([ xX])\]/, done ? '[ ]' : '[x]'); this.setText(L2.join('\n')); },
+          tk: inl(t[3], `font:15px/1.6 Inter,sans-serif;color:${done ? '#7d7d86' : '#ececf0'};${done ? 'text-decoration:line-through' : ''}`) })); return; }
+      const b = /^(\s*)([-*+]|\d+\.)\s+(.*)$/.exec(ln);
+      if (b) { const ind = Math.min(4, Math.floor(b[1].length / 2)); const num = /\d/.test(b[2]);
+        out.push(B({ bullet: true, bulletText: num ? b[2] : '•', dot: `flex:none;min-width:14px;font:${num ? '600 14px' : '700 16px'}/1.6 Inter,sans-serif;color:${accent}`, st: `display:flex;gap:8px;padding:2px 0 2px ${ind * 22 + 4}px`, tk: inl(b[3], 'font:15px/1.6 Inter,sans-serif;color:#ececf0') })); return; }
+      if (/^\s*(---|\*\*\*)\s*$/.test(ln)) { out.push(B({ st: 'height:1px;margin:14px 0;background:rgba(255,255,255,.1)', tk: [] })); return; }
+      if (!ln.trim()) { out.push(B({ st: 'height:10px', tk: [] })); return; }
+      out.push(B({ st: 'display:flex', tk: inl(ln, 'font:15px/1.65 Inter,sans-serif;color:#ececf0') }));
+    });
+    if (fence) out.push(B({ st: 'padding:12px 14px;border-radius:10px;background:rgba(0,0,0,.35);white-space:pre-wrap', tk: [{ t: fence.join('\n'), st: "font:13px/1.55 'JetBrains Mono',monospace" }] }));
+    return out;
+  }
+  openByName(name) {
+    const f = this.state.files.find((x) => x.name === name);
+    if (f) { this.openFile(f.id); this.say(`Открыт «${name}»`); return; }
+    const ext = (/\.([^.]+)$/.exec(name) || [0, ''])[1].toLowerCase();
+    const tpl = name === 'PKGBUILD' ? "# Maintainer: alarm\npkgname=ashen-shell\npkgver=0.4.0\npkgrel=1\narch=('aarch64')\ndepends=('qt6-declarative' 'quickshell')\nsource=(\"$pkgname-$pkgver.tar.gz\")\n\npackage() {\n  cd \"$srcdir/$pkgname-$pkgver\"\n  install -Dm755 ashen-shell \"$pkgdir/usr/bin/ashen-shell\"\n}\n"
+      : ['sh', 'bash'].includes(ext) ? `#!/usr/bin/env bash\n# ${name}\nset -euo pipefail\n\necho "==> ${name}: начало"\nsudo pacman -Syu --noconfirm\n\nfor dir in "$HOME/.config/ashen" "$HOME/.local/share/ashen"; do\n  mkdir -p "$dir"\ndone\n\necho "Готово"\n`
+      : name === '.bashrc' ? "# ~/.bashrc\n[[ $- != *i* ]] && return\nalias ls='ls --color=auto'\nPS1='[\\u@\\h \\W]\\$ '\n" : '';
+    this.newFile(name, tpl, '~/Проекты');
+    this.setState({ open: { ...this.state.open, '~/Проекты': true } });
+  }
   renderVals() {
     const st = this.state; const accent = this.props.themeTint || '#0a84ff';
+    const rq = this.props.openReq; if (rq && rq !== PADM.req) { PADM.req = rq; let r = null; try { r = JSON.parse(rq); } catch (e) {} if (r && r.app === 'pad') setTimeout(() => this.openByName(r.name), 60); }
     const lum = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return 0; const n = parseInt(m[1], 16); return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
     const onAcc = lum(accent) > 160 ? '#111113' : '#ffffff';
-    const f = this.file(); const mode = this.modeOf(f); const code = mode === 'code'; const lang = f ? langOf(f.name) : 'txt';
+    const f = this.file(); let mode = this.modeOf(f); const lang = f ? langOf(f.name) : 'txt'; if (mode === 'prev' && lang !== 'md') mode = 'text'; const code = mode === 'code'; const prevOn = mode === 'prev';
     const iconSt = (n, sz) => { const c = ICON_COL[langOf(n)]; return `min-width:${sz}px;height:${sz - 2}px;padding:0 3px;flex:none;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 8.5px 'JetBrains Mono',monospace;text-transform:uppercase;color:#111113;background:${c}`; };
     const tabs = st.tabs.map((id) => this.file(id)).filter(Boolean).map((t) => { const on = t.id === st.active; const dirty = this.isDirty(t);
       return { name: t.name, path: `${t.dir}/${t.name}`, ext: (extOf(t.name) || 'txt').slice(0, 4), icon: iconSt(t.name, 22), on: String(on), pick: () => this.openFile(t.id), close: () => this.closeTab(t.id), closeLabel: 'Закрыть ' + t.name,
@@ -452,7 +505,7 @@ class Component extends DCLogic {
       newBtn: `margin-top:6px;height:32px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:600;background:${accent};color:${onAcc}`,
       sideOpen: st.sideOpen, toggleSide: () => this.up({ sideOpen: !st.sideOpen }),
       tabs, newFile: () => this.newFile(),
-      modes: [['text', 'Текст'], ['code', 'Код']].map(([id, name]) => ({ name, on: String(mode === id), pick: () => { if (f) this.up({ modes: { ...st.modes, [f.id]: id } }); },
+      modes: [['text', 'Текст'], ['code', 'Код'], ...(lang === 'md' ? [['prev', 'Просмотр']] : [])].map(([id, name]) => ({ name, on: String(mode === id), pick: () => { if (f) this.up({ modes: { ...st.modes, [f.id]: id } }); },
         st: `height:26px;padding:0 12px;border-radius:6px;font:600 12.5px Inter,sans-serif;background:${mode === id ? '#636366' : 'transparent'};color:${mode === id ? '#fff' : '#a1a1a8'};box-shadow:${mode === id ? '0 1px 2px rgba(0,0,0,.35)' : 'none'}` })),
       findOpen: st.find.open, toggleFind: () => { const o = !st.find.open; this.setState({ find: { ...st.find, open: o } }); if (o) setTimeout(() => { const i = document.querySelector('.pd-find'); if (i) i.focus(); }, 40); },
       findBtn: `width:32px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;color:${st.find.open ? '#fff' : '#c9c9cf'};background:${st.find.open ? 'rgba(255,255,255,.14)' : 'transparent'}`,
@@ -465,7 +518,7 @@ class Component extends DCLogic {
       fNext: () => this.jump(1), fPrev: () => this.jump(-1), toggleCase: () => this.setState({ find: { ...st.find, cs: !st.find.cs, idx: -1 } }),
       caseBtn: `height:28px;padding:0 9px;border-radius:7px;font:600 12.5px Inter,sans-serif;background:${st.find.cs ? accent : 'rgba(255,255,255,.07)'};color:${st.find.cs ? onAcc : '#c9c9cf'}`,
       replOne: () => this.replOne(), replAll: () => this.replAll(),
-      noFile: !f, hasFile: !!f, isCode: code, gutterW, gutterInner: `position:absolute;left:0;right:0;top:${padY}px;transform:translateY(${first * lh - st.sTop}px)`, nums,
+      noFile: !f, hasFile: !!f, hasEditor: !!f && !prevOn, isPrev: !!f && prevOn, mdBlocks: prevOn ? this.mdBlocks(f, accent, onAcc) : [], isCode: code, gutterW, gutterInner: `position:absolute;left:0;right:0;top:${padY}px;transform:translateY(${first * lh - st.sTop}px)`, nums,
       hlBox, hl, text, spell: String(!code && !!this.cfgGet('spell')), taSt,
       onText: (e) => { this.setText(e.target.value); this.setState({ caret: e.target.selectionStart }); },
       onScroll: (e) => this.setState({ sTop: e.target.scrollTop, sLeft: e.target.scrollLeft }),
