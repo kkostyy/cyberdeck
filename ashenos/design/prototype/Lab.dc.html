@@ -32,7 +32,7 @@ body{margin:0;background:#050506}
   <section aria-label="Тест острова" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: labIn .5s cubic-bezier(.2,1.1,.3,1) both">
 
     <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
-      <div class="tl" role="group" aria-label="Управление окном">
+      <div class="tl" role="group" aria-label="Управление окном" style="margin-left:auto">
         <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
         <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
         <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>

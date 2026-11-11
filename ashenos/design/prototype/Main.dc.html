@@ -200,7 +200,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
           <!-- FOLDERS -->
           <div role="listbox" aria-label="Папки" style="{{pl.folders}}">
             <sc-for list="{{folders}}" as="f" hint-placeholder-count="4">
-              <button role="option" aria-selected="{{f.selected}}" onClick="{{f.pick}}" style="{{f.cardStyle}}">
+              <button role="option" aria-selected="{{f.selected}}" onClick="{{f.pick}}" onDragOver="{{f.over}}" onDragLeave="{{f.out}}" onDrop="{{f.drop}}" style="{{f.cardStyle}}">
                 <sc-if value="{{f.selected}}" hint-placeholder-val="{{false}}">
                   <span aria-hidden="true" style="position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%; background: #ededf0; color: #111113; display: flex; align-items: center; justify-content: center">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
@@ -267,7 +267,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
 
       <!-- APPEARANCE PANEL -->
       <sc-if value="{{panel}}" hint-placeholder-val="{{true}}">
-        <aside aria-label="Оформление папки" style="width: 288px; flex: none; display: flex; flex-direction: column; gap: 20px; padding: 18px 18px 16px; border-radius: 18px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.07); overflow: hidden">
+        <aside aria-label="Оформление папки" class="fm-pscroll" style="width: 288px; flex: none; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 20px; padding: 18px 18px 16px; border-radius: 18px; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.07); overflow: hidden">
           <div style="display: flex; align-items: center; justify-content: space-between">
             <div style="display: flex; flex-direction: column; gap: 2px">
               <span style="font-size: 16px; font-weight: 600">Оформление папки</span>
@@ -276,6 +276,31 @@ a{color:#d6d6db}a:hover{color:#ffffff}
             <button aria-label="Закрыть панель" onClick="{{togglePanel}}" style="width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: rgba(255,255,255,0.05)">
               <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
             </button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <div style="display: flex; align-items: center; justify-content: space-between">
+              <span style="font-size: 13px; font-weight: 500; color: #c9c9cf">Обложка</span>
+              <button onClick="{{coverOwn.clear}}" style="{{coverOwn.clearStyle}}">Убрать</button>
+            </div>
+            <div role="radiogroup" aria-label="Обложка" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+              <label title="Своя картинка — или перетащите её на папку" style="{{coverOwn.tileStyle}}">
+                <input type="file" accept="image/*" aria-label="Своя картинка для папки" onChange="{{coverOwn.onFile}}" style="position: absolute; width: 1px; height: 1px; opacity: 0">
+                <sc-if value="{{coverOwn.has}}" hint-placeholder-val="{{false}}">
+                  <span aria-hidden="true" style="{{coverOwn.p.box}}"><span style="{{coverOwn.p.back}}"></span><span style="{{coverOwn.p.paper1}}"></span><span style="{{coverOwn.p.front}}"><span style="{{coverOwn.p.vig}}"></span><span style="{{coverOwn.p.hl}}"></span></span></span>
+                </sc-if>
+                <sc-if value="{{coverOwn.none}}" hint-placeholder-val="{{true}}">
+                  <span aria-hidden="true" style="width: 50px; height: 30px; border-radius: 8px; border: 1.5px dashed rgba(255,255,255,0.35); display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="m21 16-5-5-8 8"></path></svg></span>
+                </sc-if>
+                <span style="font-size: 11px; color: #c9c9cf">Своя</span>
+              </label>
+              <sc-for list="{{covers}}" as="m" hint-placeholder-count="9">
+                <button role="radio" aria-checked="{{m.selected}}" aria-label="{{m.name}}" title="{{m.name}}" onClick="{{m.pick}}" style="{{m.tileStyle}}">
+                  <span aria-hidden="true" style="{{m.p.box}}"><span style="{{m.p.back}}"></span><span style="{{m.p.paper2}}"></span><span style="{{m.p.paper1}}"></span><span style="{{m.p.front}}"><span style="{{m.p.vig}}"></span><span style="{{m.p.tint}}"></span><span style="{{m.p.hl}}"></span></span></span>
+                  <span style="font-size: 11px; color: #c9c9cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62px">{{m.name}}</span>
+                </button>
+              </sc-for>
+            </div>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px">
@@ -452,7 +477,7 @@ class Component extends DCLogic {
     };
   }
   cfgChanged(k, v) { if (k === 'view') this.setState({ view: v }); if (k === 'sort') this.setState({ sortBy: v }); if (k === 'panel') this.setState({ panel: v }); if (k === '*') this.setState({ view: 'grid', sortBy: 'name', panel: true }); }
-  componentDidMount() { this.cfgLoad(); setTimeout(() => this.setState({ view: this.cfgGet('view'), sortBy: this.cfgGet('sort'), panel: this.cfgGet('panel') }), 0); }
+  componentDidMount() { try { const lk = JSON.parse(localStorage.getItem('ashenos.files.look') || 'null'); if (lk && typeof lk === 'object') this.setState({ look: { ...this.state.look, ...lk } }); } catch (e) {} this.cfgLoad(); setTimeout(() => this.setState({ view: this.cfgGet('view'), sortBy: this.cfgGet('sort'), panel: this.cfgGet('panel') }), 0); }
   toast(t) { clearTimeout(this.tT); this.setState({ toastTx: t, toastAt: Date.now() }); this.tT = setTimeout(() => this.setState({ toastTx: '' }), 2200); }
   goPlace(id) { if (id === this.state.place) return; const h = (this.state.hist || ['proj']).slice(0, (this.state.hi || 0) + 1).concat(id); this.setState({ place: id, file: '', hist: h, hi: h.length - 1, fq: '' }); }
   state = {
@@ -492,7 +517,7 @@ class Component extends DCLogic {
     ];
   }
 
-  folderParts(k, si, ci, withTint) {
+  folderParts(k, si, ci, withTint, cov) {
     const C = this.colors()[ci];
     const px = (n) => (n * k).toFixed(2) + 'px';
     const sc = (p) => p.replace(/-?\d+(\.\d+)?/g, (n) => (parseFloat(n) * k).toFixed(2));
@@ -526,6 +551,7 @@ class Component extends DCLogic {
         front: `backdrop-filter:blur(${(7 * k).toFixed(1)}px);-webkit-backdrop-filter:blur(${(7 * k).toFixed(1)}px);background:linear-gradient(180deg,rgba(26,26,28,.42) 0%,rgba(16,16,18,.82) 55%,rgba(10,10,12,.95) 100%)`,
         vig: 'linear-gradient(90deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 12%,rgba(0,0,0,0) 88%,rgba(0,0,0,.35) 100%)', hl: .22 }
     ][si];
+    if (cov) return this.coverParts(k, cov, { px, sc, oy, FRONT, BACK_TAB, paper, none });
 
     const big = k >= 0.99;
     return {
@@ -542,6 +568,71 @@ class Component extends DCLogic {
       plus: big && S.plus ? `position:absolute;right:${px(9)};bottom:${px(9)};width:${px(24)};height:${px(24)};border-radius:${px(8)};background:#141416;color:#ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.22)` : none,
       dots: big && S.dots ? `position:absolute;right:${px(9)};bottom:${px(9)};width:${px(30)};height:${px(18)};border-radius:${px(6)};background:rgba(214,214,218,.95);border:1px solid rgba(0,0,0,.18);color:#2a2a2e;display:flex;align-items:center;justify-content:center` : none
     };
+  }
+
+
+  /* ---------- обложки папок: своя картинка или материал ---------- */
+  svgUri(s) { return 'url("data:image/svg+xml;utf8,' + encodeURIComponent(s) + '")'; }
+  mats() {
+    const face = (eye, mouth) => this.svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 74"><g transform="translate(70 36)">${eye}${mouth}</g></svg>`);
+    const happy = face('<ellipse cx="-8" cy="-6" rx="5" ry="7" fill="#fff"/><ellipse cx="8" cy="-6" rx="5" ry="7" fill="#fff"/><circle cx="-8" cy="-4" r="3" fill="#111"/><circle cx="8" cy="-4" r="3" fill="#111"/>', '<path d="M-7 8 Q0 14 7 8" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round"/>');
+    const sleepy = face('<path d="M-16 -4 h9 M7 -4 h9" stroke="#222" stroke-width="2.4" stroke-linecap="round"/><path d="M-15 -2 a4 3 0 0 0 7 0 M8 -2 a4 3 0 0 0 7 0" fill="#222"/>', '<path d="M-8 9 h16" stroke="#222" stroke-width="2.2" stroke-linecap="round"/>');
+    const felt = (a, b) => `radial-gradient(rgba(255,255,255,.13) .7px,rgba(0,0,0,0) 1.3px) 0 0/3px 3px,radial-gradient(rgba(0,0,0,.16) .8px,rgba(0,0,0,0) 1.4px) 1px 2px/4px 4px,radial-gradient(120% 90% at 30% 10%,${a},${b})`;
+    const crack = this.svgUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 74"><g fill="none" stroke="#d9a93a" stroke-linecap="round"><path d="M-2 22 L18 26 L30 18 L52 30 L60 46 L78 50" stroke-width="1.6"/><path d="M30 18 L36 4 L44 -2" stroke-width="1.1"/><path d="M98 -2 L92 18 L104 30 L100 52 L112 76" stroke-width="1.8"/><path d="M104 30 L126 34 L142 28" stroke-width="1.1"/><path d="M60 46 L56 66" stroke-width=".9"/></g></svg>');
+    return [
+      { name: 'Синий фетр', back: '#2f5ea6', front: `background:${felt('#6a9fe4', '#3a6fbe')}`, over: happy },
+      { name: 'Кожа', back: 'linear-gradient(180deg,#a8643a,#7d4524)', front: 'background:radial-gradient(rgba(0,0,0,.05) .8px,rgba(0,0,0,0) 1.4px) 0 0/3px 3px,linear-gradient(180deg,#f1ebe1,#ddd4c6)' },
+      { name: 'Мрамор', back: '#121214', front: `background:${crack} center/cover no-repeat,radial-gradient(70% 60% at 30% 30%,#3a3a3e,rgba(0,0,0,0) 70%),radial-gradient(60% 60% at 80% 80%,#2a2a2e,rgba(0,0,0,0) 70%),linear-gradient(160deg,#18181a,#08080a)` },
+      { name: 'Деним', back: '#0e0e10', front: 'background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 1px,rgba(0,0,0,0) 1px 3px),repeating-linear-gradient(45deg,rgba(0,0,0,.35) 0 1px,rgba(0,0,0,0) 1px 4px),linear-gradient(180deg,#232327,#121214)' },
+      { name: 'Стекло', back: 'linear-gradient(180deg,#2fb3c4,#14808f)', front: `backdrop-filter:blur(${(3 * (this._k || 1)).toFixed(1)}px);-webkit-backdrop-filter:blur(3px);background:linear-gradient(180deg,rgba(60,200,215,.55),rgba(20,140,158,.82))`, glass: true },
+      { name: 'Дерево', back: '#7a5230', front: 'background:repeating-radial-gradient(ellipse 120% 40% at 35% 60%,#c69a64 0 5px,#ad7d48 5px 9px,#d2a874 9px 12px,#9c6d3c 12px 15px)' },
+      { name: 'Серый фетр', back: '#77777c', front: `background:${felt('#b9b9be', '#8e8e94')}`, over: sleepy },
+      { name: 'Пластик', back: 'linear-gradient(180deg,#e0242c,#a50d14)', front: 'background:linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,rgba(0,0,0,0) 1px) 25% 0/25% 100%,linear-gradient(180deg,rgba(255,255,255,.35) 0,rgba(255,255,255,0) 18%),radial-gradient(120% 80% at 50% 0%,#ff3b3f,#c3111a 80%)' },
+      { name: 'Пуховик', back: '#0b0b0c', front: 'background:linear-gradient(90deg,rgba(0,0,0,0) 49%,#000 49.5% 50.5%,rgba(0,0,0,0) 51%),radial-gradient(60% 35% at 30% 30%,rgba(255,255,255,.22),rgba(255,255,255,0) 70%) 0 0/100% 33.4%,repeating-linear-gradient(180deg,#050506 0,#2c2c31 30%,#0e0e10 33.4%)' }
+    ];
+  }
+  coverParts(k, cov, h) {
+    const { px, sc, oy, FRONT, BACK_TAB, paper, none } = h;
+    const M = cov.m != null ? this.mats()[cov.m] : null;
+    const back = M ? M.back : 'linear-gradient(180deg,#232326,#101012)';
+    const front = M ? M.front : `background:url(${cov.img}) center/cover no-repeat,#141416`;
+    const big = k >= 0.99;
+    return {
+      box: `position:relative;display:block;width:${px(140)};height:${px(34 + oy + 74)};flex:none`,
+      shadow: `position:absolute;left:${px(14)};right:${px(14)};bottom:${px(-4)};height:${px(14)};border-radius:50%;background:rgba(0,0,0,.5);filter:blur(${px(8)})`,
+      back: `position:absolute;left:${px(4)};top:${px(oy)};width:${px(132)};height:${px(96)};clip-path:path('${sc(BACK_TAB)}');background:${back}`,
+      paper1: paper(10, 22, 114, 40, 0, 'linear-gradient(180deg,#ffffff,#ececef)'),
+      paper2: M && M.glass ? paper(26, 30, 60, 40, -4, 'linear-gradient(#2f6b4f,#2f6b4f) 6px 6px/40% 30% no-repeat,linear-gradient(180deg,#3d8a64,#245a40)') : none,
+      paper3: none,
+      front: `position:absolute;left:0;top:${px(34 + oy)};width:${px(140)};height:${px(74)};clip-path:path('${sc(FRONT)}');overflow:hidden;${front}`,
+      vig: `position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 0,rgba(255,255,255,0) 80%,${M ? 'rgba(0,0,0,.18)' : 'rgba(214,228,244,.85)'} 92%,${M ? 'rgba(0,0,0,.3)' : 'rgba(236,242,250,.95)'} 100%),linear-gradient(90deg,rgba(0,0,0,.22),rgba(0,0,0,0) 8%,rgba(0,0,0,0) 92%,rgba(0,0,0,.22))`,
+      tint: M && M.over ? `position:absolute;inset:0;background:${M.over} center/contain no-repeat` : none,
+      hl: `position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.55) 0,rgba(255,255,255,0) ${px(3)}) 0 0/${px(70)} 100% no-repeat,linear-gradient(180deg,rgba(255,255,255,0) ${px(14)},rgba(255,255,255,.55) ${px(14)},rgba(255,255,255,0) ${px(17)}) ${px(76)} 0/${px(64)} 100% no-repeat`,
+      plus: none, dots: none
+    };
+  }
+  /* картинка → уменьшенный JPEG, чтобы влезал в localStorage */
+  readCover(file, id) {
+    if (!file || !/^image\//.test(file.type)) { this.toast('Это не картинка'); return; }
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const W = 420, H = 222, c = document.createElement('canvas'); c.width = W; c.height = H;
+        const s = Math.max(W / img.width, H / img.height), w = img.width * s, h = img.height * s;
+        c.getContext('2d').drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+        let src = ''; try { src = c.toDataURL('image/jpeg', 0.84); } catch (e) { src = r.result; }
+        this.setLookOf(id, { cover: { img: src } });
+        this.toast('Обложка папки обновлена');
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+  setLookOf(id, patch) {
+    const look = { ...this.state.look, [id]: { ...this.state.look[id], ...patch } };
+    this.setState({ look });
+    try { localStorage.setItem('ashenos.files.look', JSON.stringify(look)); } catch (e) { this.toast('Мало места для картинки'); }
   }
 
   fileItem(kind) {
@@ -576,8 +667,7 @@ class Component extends DCLogic {
       arch: { name: 'Архив', count: '5 элементов', size: '640 МБ', date: '2 нояб., 09:12' }
     };
     const setLook = (patch) => {
-      const look = { ...st.look, [st.sel]: { ...st.look[st.sel], ...patch } };
-      this.setState({ look });
+      this.setLookOf(st.sel, patch);
     };
 
     const folders = ['design', 'dev', 'res', 'arch'].map((id) => {
@@ -587,8 +677,11 @@ class Component extends DCLogic {
       winTheme: this.props.themeWin || 'rgba(20,20,23,0.74)',
         ...meta[id], id, selected: on,
         pick: () => this.setState({ sel: id, file: '' }),
-        p: this.folderParts(1, L.s, L.c, true),
-        cardStyle: `position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 12px 16px;border-radius:18px;min-width:0;text-align:center;background:${on ? 'rgba(255,255,255,.075)' : 'rgba(255,255,255,.03)'};border:1.5px solid ${on ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.06)'};box-shadow:${on ? '0 0 0 4px rgba(255,255,255,.06)' : 'none'}`
+        p: this.folderParts(1, L.s, L.c, true, L.cover),
+        over: (e) => { const t = Array.from((e.dataTransfer && e.dataTransfer.types) || []); if (t.includes('Files')) { e.preventDefault(); e.stopPropagation(); if (this.state.covHot !== id) this.setState({ covHot: id }); } },
+        out: () => this.state.covHot === id && this.setState({ covHot: null }),
+        drop: (e) => { const fl = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (!fl) return; e.preventDefault(); e.stopPropagation(); this.setState({ covHot: null, sel: id }); this.readCover(fl, id); },
+        cardStyle: `position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 12px 16px;border-radius:18px;min-width:0;text-align:center;transition:transform .25s cubic-bezier(.3,1.4,.5,1),background .2s;${st.covHot === id ? 'transform:scale(1.04);outline:2px dashed rgba(255,255,255,.7);outline-offset:-6px;' : ''}background:${on ? 'rgba(255,255,255,.075)' : 'rgba(255,255,255,.03)'};border:1.5px solid ${on ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.06)'};box-shadow:${on ? '0 0 0 4px rgba(255,255,255,.06)' : 'none'}`
       };
     });
 
@@ -667,11 +760,26 @@ class Component extends DCLogic {
 
     const L = st.look[st.sel];
     const styles = this.styles().map((s, i) => ({
-      name: s.name, selected: L.s === i,
-      pick: () => setLook({ s: i }),
+      name: s.name, selected: !L.cover && L.s === i,
+      pick: () => setLook({ s: i, cover: null }),
       p: this.folderParts(0.36, i, 0, false),
-      tileStyle: `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:12px;background:rgba(255,255,255,.04);border:1.5px solid ${L.s === i ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.07)'}`
+      tileStyle: `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:72px;border-radius:12px;background:rgba(255,255,255,.04);border:1.5px solid ${!L.cover && L.s === i ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.07)'}`
     }));
+    const tileOn = (on) => `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:66px;border-radius:12px;background:rgba(255,255,255,.04);border:1.5px solid ${on ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.07)'};padding:0`;
+    const cv = L.cover || null;
+    const covers = this.mats().map((m, i) => ({
+      name: m.name, selected: !!cv && cv.m === i,
+      pick: () => setLook({ cover: { m: i } }),
+      p: this.folderParts(0.36, 0, 0, false, { m: i }),
+      tileStyle: tileOn(!!cv && cv.m === i)
+    }));
+    const coverOwn = {
+      has: !!(cv && cv.img), none: !(cv && cv.img), p: this.folderParts(0.36, 0, 0, false, cv && cv.img ? cv : { img: '' }),
+      tileStyle: tileOn(!!(cv && cv.img)) + ';cursor:pointer',
+      onFile: (e) => { const fl = e.target.files && e.target.files[0]; this.readCover(fl, st.sel); e.target.value = ''; },
+      clear: () => { setLook({ cover: null }); this.toast('Обложка убрана'); },
+      clearStyle: `height:30px;padding:0 12px;border-radius:9px;border:0;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);color:#e8e8ec;${cv ? '' : 'opacity:.4;pointer-events:none'}`
+    };
     const colors = this.colors().map((c, i) => ({
       name: c.name, check: c.check, selected: L.c === i,
       pick: () => setLook({ c: i }),
@@ -702,7 +810,7 @@ class Component extends DCLogic {
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); },
       wallStyle: `position:absolute;inset:0;background:${this.walls()[st.bg].css}`,
-      folders, files, fileInfo, pl, styles, colors, bgs, nav, go,
+      folders, files, fileInfo, pl, styles, colors, bgs, nav, go, covers, coverOwn,
       ...(() => {
         const H = st.hist || ['proj'], hi = st.hi || 0;
         const nb = (on) => `width:44px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:0;background:none;color:${on ? '#e8e8ec' : '#5c5c64'};transition:color .2s`;
