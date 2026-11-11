@@ -34,6 +34,8 @@ a{color:#d6d6db}a:hover{color:#ffffff}
 @keyframes cfgFade{from{opacity:0}to{opacity:1}}
 .cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
 @keyframes mToast{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.fm-mi{transition:background .12s}.fm-mi:hover{background:rgba(255,255,255,.08)}
+@keyframes fmCtx{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 </style>
 </helmet>
 
@@ -237,7 +239,7 @@ a{color:#d6d6db}a:hover{color:#ffffff}
             <div class="scroll" role="listbox" aria-label="Файлы" onDragOver="{{dropOver}}" onDragLeave="{{dropOut}}" onDrop="{{dropIn}}" style="{{gridSt}}">
               <sc-if value="{{pl.empty}}" hint-placeholder-val="{{false}}"><span style="grid-column: 1 / -1; padding: 60px 0; text-align: center; font-size: 14px; color: #6f6f77">{{pl.emptyText}}</span></sc-if>
               <sc-for list="{{files}}" as="r" hint-placeholder-count="7">
-                <button role="option" draggable="true" onDragStart="{{r.drag}}" aria-selected="{{r.selected}}" aria-label="{{r.label}}" title="Двойной щелчок — открыть" onClick="{{r.pick}}" onDoubleClick="{{r.open}}" onKeyDown="{{r.key}}" style="{{r.cardStyle}}">
+                <button role="option" draggable="true" onDragStart="{{r.drag}}" aria-selected="{{r.selected}}" aria-label="{{r.label}}" title="Двойной щелчок — открыть" onClick="{{r.pick}}" onDoubleClick="{{r.open}}" onContextMenu="{{r.ctx}}" onKeyDown="{{r.key}}" style="{{r.cardStyle}}">
                   <span aria-hidden="true" style="position: relative; display: block; width: 72px; height: 64px; flex: none">
                     <span style="position: absolute; left: 3px; top: 6px; width: 66px; height: 54px; border-radius: 9px; background: #1e1e20; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07)"></span>
                     <span style="{{r.item}}"></span>
@@ -404,6 +406,16 @@ a{color:#d6d6db}a:hover{color:#ffffff}
     </sc-if>
     <div role="status" aria-live="polite" style="{{toastSt}}">{{toastTx}}</div>
     <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{ctxOn}}" hint-placeholder-val="{{false}}">
+      <div aria-hidden="true" onClick="{{ctxClose}}" onContextMenu="{{ctxClose}}" style="position: absolute; inset: 0; z-index: 59"></div>
+      <div role="menu" aria-label="Действия с файлом" style="{{ctxSt}}">
+        <div style="padding: 6px 10px 8px; font-size: 12px; font-weight: 600; color: #a1a1a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ctxTitle}}</div>
+        <button role="menuitem" onClick="{{ctxOpen}}" class="fm-mi" style="width: 100%; height: 34px; padding: 0 10px; border-radius: 9px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; text-align: left">Открыть</button>
+        <div style="padding: 8px 10px 4px; font-size: 11.5px; font-weight: 700; color: #7d7d86">Открыть с помощью</div>
+        <sc-for list="{{ctxApps}}" as="a" hint-placeholder-count="2"><button role="menuitem" onClick="{{a.pick}}" class="fm-mi" style="width: 100%; height: 34px; padding: 0 10px; border-radius: 9px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; text-align: left"><span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; background: linear-gradient(180deg,#46464c,#232327)">{{a.g}}</span>{{a.name}}</button></sc-for>
+        <sc-if value="{{ctxNone}}" hint-placeholder-val="{{false}}"><span style="display: block; padding: 6px 10px 8px; font-size: 12.5px; color: #6f6f77">Нет подходящих приложений</span></sc-if>
+      </div>
+    </sc-if>
     <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
       <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
       <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
@@ -441,6 +453,14 @@ a{color:#d6d6db}a:hover{color:#ffffff}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"placeReq":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+const AFS = {
+  key: 'ashenos.fs.v1',
+  all() { try { const a = JSON.parse(localStorage.getItem(this.key) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } },
+  put(e) { try { const a = this.all().filter((x) => x.path !== e.path); a.push({ ...e, mtime: Date.now() }); localStorage.setItem(this.key, JSON.stringify(a)); } catch (err) {} },
+  del(path) { try { localStorage.setItem(this.key, JSON.stringify(this.all().filter((x) => x.path !== path))); } catch (e) {} },
+  place(dir) { return /^~\/Документы/.test(dir) ? 'docs' : /^~\/Изображения/.test(dir) ? 'pics' : /^~\/Загрузки/.test(dir) ? 'down' : /^~\/Музыка/.test(dir) ? 'music' : /^~\/Проекты/.test(dir) ? 'proj' : /^~\/Рабочий стол/.test(dir) ? 'desk' : 'home'; },
+  size(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ'; }
+};
 class Component extends DCLogic {
   CFG_KEY = 'ashenos.files.cfg';
   CFG_DEFS = [
@@ -710,6 +730,8 @@ class Component extends DCLogic {
     ]).filter((f) => isTrash || !st.gone[(isDown ? 'down' : 'proj') + ':' + f.name]).map((f) => ({ ...f }));
     const kinds = { FIG: 'fig', PDF: 'pdf', PNG: 'png', MP3: 'mp3', TXT: 'txt', SH: 'sh', PKG: 'pkg' };
     if (this.cfgGet('hidden') && !isTrash) fileData.push({ name: '.config', type: 'Скрытая папка', size: '—', kind: 'txt', ext: 'DIR' }, { name: '.bashrc', type: 'Скрытый файл', size: '1 КБ', kind: 'sh', ext: 'SH' }, { name: '.gitignore', type: 'Скрытый файл', size: '96 Б', kind: 'txt', ext: 'TXT' });
+    if (!isTrash) { const EXT = (n) => ((/\.([^.]+)$/.exec(n) || [0, ''])[1] || '').toUpperCase(); const KIND = (e) => ({ SH: 'sh', PNG: 'png', JPG: 'png', JPEG: 'png', WEBP: 'png', GIF: 'png', MP4: 'png', MP3: 'mp3', OGG: 'mp3', WAV: 'mp3', PDF: 'pdf', FIG: 'fig' }[e] || 'txt');
+      AFS.all().filter((x) => AFS.place(x.dir) === st.place || (st.place === 'proj' && /^~\/Проекты/.test(x.dir))).forEach((x) => { if (!fileData.some((f) => f.name === x.name)) { const e = EXT(x.name) || 'TXT'; fileData.push({ name: x.name, type: x.app === 'photos' ? 'Из «Фото»' : 'Из «Блокнота»', size: AFS.size(x.size || 0), kind: KIND(e), ext: e.slice(0, 4), fs: true }); } }); }
     if (!isTrash && !isDown) st.added.forEach((a) => { if (!fileData.some((f) => f.name === a.name)) fileData.push({ name: a.name, type: 'С полки', size: a.size || '—', kind: a.kind || kinds[a.ext] || 'txt', ext: a.ext || 'FILE' }); });
     const szN = (z) => { const m = String(z).replace(',', '.').match(/([\d.]+)\s*(Б|КБ|МБ|ГБ)/); if (!m) return 0; return parseFloat(m[1]) * { 'Б': 1, 'КБ': 1e3, 'МБ': 1e6, 'ГБ': 1e9 }[m[2]]; };
     const sb = st.sortBy || 'name';
@@ -728,6 +750,7 @@ class Component extends DCLogic {
         label: `${f.name}, ${f.type}, ${f.size}`,
         item: this.fileItem(f.kind),
         pick: () => this.setState({ file: f.name }),
+        ctx: (e) => { if (isTrash || f.ext === 'DIR') return; e.preventDefault(); const sec = e.currentTarget.closest('section'); const rr = sec.getBoundingClientRect(); const k = rr.width / sec.offsetWidth || 1; this.setState({ file: f.name, ctx: { name: f.name, kind: f.kind, size: f.size, x: Math.round((e.clientX - rr.left) / k), y: Math.round((e.clientY - rr.top) / k) } }); },
         open: () => { if (isTrash || f.ext === 'DIR') return; if (this.props.onAction) this.props.onAction('openfile:' + JSON.stringify({ name: f.name, kind: f.kind, size: f.size })); },
         key: (e) => { if (e.key === 'Enter' && !isTrash && this.props.onAction) { e.preventDefault(); this.props.onAction('openfile:' + JSON.stringify({ name: f.name, kind: f.kind, size: f.size })); } },
         drag: (e) => {
@@ -803,7 +826,15 @@ class Component extends DCLogic {
 
     const pill = (on) => `height:44px;padding:0 ${on === null ? 0 : 14}px;border-radius:12px;display:flex;align-items:center;gap:8px;font-size:13px;flex:none;background:${on ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)'};color:${on ? '#ffffff' : '#c9c9cf'}`;
 
+    const CX = st.ctx; const ext0 = CX ? ((/\.([^.]+)$/.exec(CX.name) || [0, ''])[1] || '').toLowerCase() : '';
+    const appsFor = CX ? [['pad', 'Блокнот', '✎', !/^(png|jpg|jpeg|webp|gif|mp4|mp3|ogg|wav|pdf|fig|zip|xz|gz|img)$/.test(ext0)], ['photos', 'Фото', '✿', /^(png|jpg|jpeg|webp|gif|mp4)$/.test(ext0)], ['music', 'Музыка', '♪', /^(mp3|ogg|wav|flac)$/.test(ext0)], ['pad', 'Блокнот (как текст)', '✎', /^(pdf|fig|zip|img|png|jpg)$/.test(ext0) && false]].filter((a) => a[3]) : [];
+
     return {
+      ctxOn: !!st.ctx, ctxSt: st.ctx ? `position:absolute;left:${Math.min(st.ctx.x, 1368 - 230)}px;top:${Math.min(st.ctx.y, 836 - 260)}px;z-index:60;width:220px;padding:6px;border-radius:14px;background:rgba(32,32,36,.94);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.08);animation:fmCtx .18s cubic-bezier(.2,1.3,.4,1) both;transform-origin:0 0` : 'display:none',
+      ctxClose: () => this.setState({ ctx: null }), ctxTitle: st.ctx ? st.ctx.name : '',
+      ctxApps: appsFor.map(([id, name, g]) => ({ name, g, pick: () => { const c = st.ctx; this.setState({ ctx: null }); if (this.props.onAction) this.props.onAction('openwith:' + JSON.stringify({ app: id, name: c.name, size: c.size })); } })),
+      ctxNone: !appsFor.length,
+      ctxOpen: () => { const c = st.ctx; this.setState({ ctx: null }); if (c && this.props.onAction) this.props.onAction('openfile:' + JSON.stringify({ name: c.name, kind: c.kind, size: c.size })); },
       closeApp: () => { if (this.props.onClose) this.props.onClose(); },
       dropOver: (e) => { const t = e.dataTransfer && Array.from(e.dataTransfer.types || []); if (t && t.includes('application/x-arch-file')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; if (!this.state.dropHot) this.setState({ dropHot: true }); } },
       dropOut: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ dropHot: false }); },

@@ -1489,6 +1489,7 @@ class Component extends DCLogic {
       const k = w.w / old[0]; const nw = Math.round(q.w * k), nh = Math.round(q.h * k); const cx = w.x + w.w / 2;
       const x = Math.max(8, Math.min((SCR.W - 8) - nw, Math.round(cx - nw / 2))), y = Math.max(44, Math.min((SCR.H - 8) - nh, w.y + Math.round((w.h - nh) / 2)));
       this.setState({ wins: { ...st.wins, [q.id]: { ...w, nat: [q.w, q.h], x, y, w: nw, h: nh, anim: 'resize', animAt: Date.now() } } }); } catch (e) {} return; }
+    if (id.startsWith('openwith:')) { try { const q = JSON.parse(id.slice(9)); if (!this.meta[q.app]) return; this.setState({ openReq: JSON.stringify({ app: q.app, name: q.name, size: q.size || '', n: now }) }); this.openApp(q.app, 'place'); } catch (e) {} return; }
     if (id.startsWith('openfile:')) {
       let f = {}; try { f = JSON.parse(id.slice(9)); } catch (e) { return; }
       const ext = (/\.([^.]+)$/.exec(f.name || '') || [0, ''])[1].toLowerCase();
@@ -1766,6 +1767,7 @@ class Component extends DCLogic {
     return this.hs[id];
   }
   openApp = (id, from) => {
+    if (typeof id === 'string' && (id.startsWith('openfile:') || id.startsWith('openwith:'))) { this.labAction(id); return; }
     if (typeof id === 'string' && id.startsWith('files:')) { this.setState({ filesPlace: id.slice(6) + ':' + Date.now() }); id = 'files'; from = 'place'; }
     if (!this.meta[id]) return;
     const w = this.state.wins[id];

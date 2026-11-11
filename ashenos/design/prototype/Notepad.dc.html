@@ -276,6 +276,14 @@ const SEED = [
 ];
 const LH = 20;
 
+const AFS = {
+  key: 'ashenos.fs.v1',
+  all() { try { const a = JSON.parse(localStorage.getItem(this.key) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } },
+  put(e) { try { const a = this.all().filter((x) => x.path !== e.path); a.push({ ...e, mtime: Date.now() }); localStorage.setItem(this.key, JSON.stringify(a)); } catch (err) {} },
+  del(path) { try { localStorage.setItem(this.key, JSON.stringify(this.all().filter((x) => x.path !== path))); } catch (e) {} },
+  place(dir) { return /^~\/Документы/.test(dir) ? 'docs' : /^~\/Изображения/.test(dir) ? 'pics' : /^~\/Загрузки/.test(dir) ? 'down' : /^~\/Музыка/.test(dir) ? 'music' : /^~\/Проекты/.test(dir) ? 'proj' : /^~\/Рабочий стол/.test(dir) ? 'desk' : 'home'; },
+  size(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ'; }
+};
 class Component extends DCLogic {
   state = { files: SEED, tabs: ['f3', 'f4', 'f2'], active: 'f3', modes: {}, saved: Object.fromEntries(SEED.map((f) => [f.id, f.text])), open: { '~/Документы': true, '~/Проекты/ashenos': true }, sideOpen: true,
     sTop: 0, sLeft: 0, caret: 0, find: { open: false, q: '', r: '', cs: false, idx: -1 }, dragOn: false, toast: { on: false, text: '' }, askClose: null, zoom: 13.5, cfg: {} };
@@ -314,6 +322,8 @@ class Component extends DCLogic {
   componentDidMount() {
     this.cfgLoad();
     try { const s = JSON.parse(localStorage.getItem('ashenos.pad.v1') || 'null'); if (s && s.files) this.setState({ files: s.files, tabs: s.tabs || [], active: s.active || null, modes: s.modes || {}, saved: s.saved || {}, sideOpen: s.sideOpen !== false }); } catch (e) {}
+    setTimeout(() => { const have = new Set(this.state.files.map((x) => x.dir + '/' + x.name)); const add = AFS.all().filter((x) => typeof x.text === 'string' && x.text && !have.has(x.path)).map((x, i) => ({ id: 'fs' + i + Date.now().toString(36), dir: x.dir, name: x.name, text: x.text }));
+      if (add.length) this.setState({ files: [...this.state.files, ...add], saved: { ...this.state.saved, ...Object.fromEntries(add.map((a) => [a.id, a.text])) } }); }, 0);
   }
   componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.st); }
   persist() { clearTimeout(this.st); this.st = setTimeout(() => { const s = this.state; try { localStorage.setItem('ashenos.pad.v1', JSON.stringify({ files: s.files, tabs: s.tabs, active: s.active, modes: s.modes, saved: s.saved, sideOpen: s.sideOpen })); this.setState({ autoAt: Date.now() }); } catch (e) {} }, 500); }
@@ -340,7 +350,7 @@ class Component extends DCLogic {
     return f;
   }
   setText(v) { const st = this.state; this.up({ files: st.files.map((f) => (f.id === st.active ? { ...f, text: v } : f)), askClose: null }); }
-  save() { const f = this.file(); if (!f) return; this.up({ saved: { ...this.state.saved, [f.id]: f.text } }); this.say(`Сохранено: ${f.dir}/${f.name}`); }
+  save() { const f = this.file(); if (!f) return; this.up({ saved: { ...this.state.saved, [f.id]: f.text } }); AFS.put({ path: f.dir + '/' + f.name, dir: f.dir, name: f.name, size: new Blob([f.text]).size, text: f.text.length < 300000 ? f.text : '', app: 'pad' }); this.say(`Сохранено: ${f.dir}/${f.name} — видно в Проводнике`); }
   download() {
     const f = this.file(); if (!f) return;
     try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([f.text], { type: 'text/plain;charset=utf-8' })); a.download = f.name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); this.say('Файл «' + f.name + '» скачивается'); } catch (e) { this.say('Не удалось скачать файл'); }
@@ -527,11 +537,11 @@ class Component extends DCLogic {
       showMap, map, mapView,
       mapClick: (e) => { const r = e.currentTarget.getBoundingClientRect(); const y = (e.clientY - r.top - 8) / Math.max(1, mapH); const ta = this.ta(); if (ta) ta.scrollTop = Math.max(0, y * totalH - ta.clientHeight / 2); },
       dragOn: st.dragOn,
-      onDragOver: (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); if (!st.dragOn) this.setState({ dragOn: true }); } },
+      onDragOver: (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).some((t) => t === 'Files' || t === 'application/x-arch-file')) { e.preventDefault(); if (!st.dragOn) this.setState({ dragOn: true }); } },
       onDragLeave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ dragOn: false }); },
-      onDrop: (e) => { if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); this.readFiles(e.dataTransfer.files); } this.setState({ dragOn: false }); },
+      onDrop: (e) => { const af = e.dataTransfer && e.dataTransfer.getData('application/x-arch-file'); if (af) { e.preventDefault(); try { const q = JSON.parse(af); this.openByName(q.name); } catch (x) {} this.setState({ dragOn: false }); return; } if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); this.readFiles(e.dataTransfer.files); } this.setState({ dragOn: false }); },
       fname: f ? f.name : '', fpath: f ? f.dir : '',
-      onRename: (e) => { const v = e.target.value.trim().replace(/[\/\\]/g, ''); if (!f || !v || v === f.name) return; this.up({ files: st.files.map((x) => (x.id === f.id ? { ...x, name: v } : x)), modes: { ...st.modes, [f.id]: undefined } }); this.say('Переименовано в «' + v + '»'); },
+      onRename: (e) => { const v = e.target.value.trim().replace(/[\/\\]/g, ''); if (!f || !v || v === f.name) return; if (AFS.all().some((x) => x.path === f.dir + '/' + f.name)) { AFS.del(f.dir + '/' + f.name); AFS.put({ path: f.dir + '/' + v, dir: f.dir, name: v, size: new Blob([f.text]).size, text: f.text, app: 'pad' }); } this.up({ files: st.files.map((x) => (x.id === f.id ? { ...x, name: v } : x)), modes: { ...st.modes, [f.id]: undefined } }); this.say('Переименовано в «' + v + '»'); },
       pos: f ? `Строка ${ln}, столбец ${col}` : '', counts: f ? `${words} ${words % 10 === 1 && words % 100 !== 11 ? 'слово' : [2, 3, 4].includes(words % 10) && ![12, 13, 14].includes(words % 100) ? 'слова' : 'слов'} · ${text.length} симв.` : '',
       lang: f ? PAD_LANG[lang].name : '', saveText: !f ? '' : dirty ? '● Не сохранено (черновик хранится)' : '✓ Сохранено', saveCol: dirty ? '#ffd60a' : '#30d158',
       onKey: (e) => this.onKey(e), toast: st.toast,

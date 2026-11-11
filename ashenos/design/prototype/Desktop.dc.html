@@ -2171,7 +2171,14 @@ class Component extends DCLogic {
       { group: 'Команды', name: 'Заблокировать экран', kind: 'Система', glyph: '⏻', bg: '#3a3a40', cmd: true, text: 'Блокирует сеанс, музыка продолжит играть', meta: [{ k: 'Сочетание', v: 'Super + L' }], open: () => { this.setState({ homeQ: '' }); lockNow(); } }
     ];
     const hq = (st.homeQ || '').trim().toLowerCase();
-    const found = hq ? index.filter((x) => (x.name + ' ' + x.kind + ' ' + x.group).toLowerCase().includes(hq)) : [];
+    const deep = [];
+    if (hq.length >= 2) {
+      const snip = (t) => { const i = t.toLowerCase().indexOf(hq); const a0 = Math.max(0, i - 30); return (a0 ? '…' : '') + t.slice(a0, i + hq.length + 60).replace(/\s+/g, ' ') + '…'; };
+      try { (JSON.parse(localStorage.getItem('ashenos.fs.v1') || '[]') || []).forEach((x) => { if (x.text && x.text.toLowerCase().includes(hq) && deep.length < 6) deep.push({ group: 'Внутри файлов', name: x.name, kind: x.dir, glyph: ((/\.([^.]+)$/.exec(x.name) || [0, 'TXT'])[1] || 'TXT').toUpperCase().slice(0, 3), bg: '#2a2a2e', mono: true, text: snip(x.text), meta: [{ k: 'Папка', v: x.dir }], open: () => { this.setState({ homeQ: '', hSel: 0 }); if (this.props.onOpenApp) this.props.onOpenApp('openfile:' + JSON.stringify({ name: x.name })); } }); }); } catch (e) {}
+      try { (JSON.parse(localStorage.getItem('ashenos.notes.v1') || '[]') || []).forEach((n) => { const t = (n.title || '') + '\n' + (n.text || n.body || ''); if (t.toLowerCase().includes(hq) && deep.length < 9) deep.push({ group: 'В заметках', name: n.title || 'Заметка', kind: 'Заметки', glyph: '✎', bg: '#2a2a2e', text: snip(t), meta: [{ k: 'Приложение', v: 'Заметки' }], open: () => openApp2('notes') }); }); } catch (e) {}
+      try { const c = JSON.parse(localStorage.getItem('ashenos.calc.v1') || 'null'); ((c && c.hist) || []).forEach((h) => { if ((h.expr + ' ' + h.res).toLowerCase().includes(hq) && deep.length < 11) deep.push({ group: 'Калькулятор', name: `${h.expr} = ${h.res}`, kind: 'История вычислений', glyph: '±', bg: '#2a2a2e', mono: true, text: `${h.expr} = ${h.res}`, meta: [{ k: 'Режим', v: h.mode || 'basic' }], open: () => openApp2('calc') }); }); } catch (e) {}
+    }
+    const found = hq ? [...index.filter((x) => (x.name + ' ' + x.kind + ' ' + x.group).toLowerCase().includes(hq)), ...deep] : [];
     const hSel = Math.min(st.hSel || 0, Math.max(0, found.length - 1));
     this.hFound = found;
     let pg = '';

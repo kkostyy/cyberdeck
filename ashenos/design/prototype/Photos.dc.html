@@ -356,6 +356,14 @@ const IDB = {
 const fmtDur = (s) => { s = Math.max(0, Math.floor(s || 0)); const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, '0')}`; };
 const fmtSize = (b) => b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ';
 
+const AFS = {
+  key: 'ashenos.fs.v1',
+  all() { try { const a = JSON.parse(localStorage.getItem(this.key) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } },
+  put(e) { try { const a = this.all().filter((x) => x.path !== e.path); a.push({ ...e, mtime: Date.now() }); localStorage.setItem(this.key, JSON.stringify(a)); } catch (err) {} },
+  del(path) { try { localStorage.setItem(this.key, JSON.stringify(this.all().filter((x) => x.path !== path))); } catch (e) {} },
+  place(dir) { return /^~\/Документы/.test(dir) ? 'docs' : /^~\/Изображения/.test(dir) ? 'pics' : /^~\/Загрузки/.test(dir) ? 'down' : /^~\/Музыка/.test(dir) ? 'music' : /^~\/Проекты/.test(dir) ? 'proj' : /^~\/Рабочий стол/.test(dir) ? 'desk' : 'home'; },
+  size(b) { return b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ'; }
+};
 class Component extends DCLogic {
   state = { album: 'all', view: 'grid', curId: null, sideOpen: true, tile: 170, q: '', favs: {}, deleted: {}, extraAlb: {}, albumsUser: [], edits: {}, captions: {}, imported: [],
     infoOpen: false, zoom: 1, panX: 0, panY: 0, draft: null, etab: 'adj', showing: false, dragOn: false, toast: { on: false, text: '' },
@@ -436,6 +444,7 @@ class Component extends DCLogic {
       if (vid) { const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true; v.src = url; v.onloadedmetadata = () => { this.patchImp(it.id, { dur: v.duration, w: v.videoWidth, h: v.videoHeight }); try { v.currentTime = Math.min(1, v.duration / 3); } catch (e) {} };
         v.onseeked = () => { try { const c = document.createElement('canvas'); c.width = 480; c.height = Math.round(480 * v.videoHeight / Math.max(1, v.videoWidth)); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); this.patchImp(it.id, { thumb: c.toDataURL('image/jpeg', 0.75), poster: c.toDataURL('image/jpeg', 0.75) }); } catch (e) {} }; }
       else { const im = new Image(); im.onload = () => this.patchImp(it.id, { w: im.naturalWidth, h: im.naturalHeight }); im.src = url; }
+      AFS.put({ path: '~/Изображения/' + f.name, dir: '~/Изображения', name: f.name, size: f.size, idb: it.id, app: 'photos' });
       IDB.put({ id: it.id, blob: f, meta: { ...it, src: '', thumb: '' } }).then((ok) => { if (!ok) this.say('Не удалось сохранить файл в медиатеке'); }).catch(() => {});
       return it; });
     this.setState({ imported: [...this.state.imported, ...items], album: 'import', view: 'grid' });
@@ -589,7 +598,7 @@ class Component extends DCLogic {
       groups, gridSt,
       back: () => this.back(), cur: curV, inTrash: !!(c && c.deleted), notTrash: !(c && c.deleted),
       restore: () => { const dd = { ...st.deleted }; delete dd[c.id]; this.up({ deleted: dd }); this.say('Восстановлено'); this.back(); },
-      purge: () => { if (c.local) { this.setState({ imported: st.imported.filter((x) => x.id !== c.id) }); IDB.del(c.id).catch(() => {}); } const dd = { ...st.deleted, [c.id]: -1 }; this.up({ deleted: dd, favs: { ...st.favs, [c.id]: false } }); this.say('Удалено навсегда'); this.back(); },
+      purge: () => { if (c.local) { AFS.del('~/Изображения/' + c.file); this.setState({ imported: st.imported.filter((x) => x.id !== c.id) }); IDB.del(c.id).catch(() => {}); } const dd = { ...st.deleted, [c.id]: -1 }; this.up({ deleted: dd, favs: { ...st.favs, [c.id]: false } }); this.say('Удалено навсегда'); this.back(); },
       zoomText: st.zoom > 1.001 ? Math.round(st.zoom * 100) + '%' : '', zoomIn: () => this.setState({ zoom: Math.min(6, st.zoom * 1.25) }), zoomOut: () => { const z = Math.max(1, st.zoom / 1.25); this.setState({ zoom: z, panX: z === 1 ? 0 : st.panX, panY: z === 1 ? 0 : st.panY }); },
       iconBtn, favLabel: c && c.fav ? 'Убрать из избранного' : 'В избранное', favFill: c && c.fav ? 'currentColor' : 'none', toggleFav: () => this.toggleFav(),
       favBtn: `${iconBtn};color:${c && c.fav ? '#ff375f' : '#d6d6dc'}`, infoOpen: String(st.infoOpen), toggleInfo: () => this.setState({ infoOpen: !st.infoOpen }),
@@ -636,9 +645,9 @@ class Component extends DCLogic {
       etabs, tabAdj: st.etab === 'adj', tabFil: st.etab === 'fil', tabCrop: st.etab === 'crop', adj, filters, aspects, cropSl,
       autoFix: () => this.setDraft({ exp: 8, con: 14, sat: 18, warm: 6, filter: 'custom' }),
       dragOn: st.dragOn, dropSt: `position:absolute;inset:12px;z-index:6;border-radius:18px;border:2px dashed ${accent};background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;pointer-events:none`,
-      onDragOver: (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); if (!st.dragOn) this.setState({ dragOn: true }); } },
+      onDragOver: (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).some((t) => t === 'Files' || t === 'application/x-arch-file')) { e.preventDefault(); if (!st.dragOn) this.setState({ dragOn: true }); } },
       onDragLeave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ dragOn: false }); },
-      onDrop: (e) => { if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); this.importFiles(e.dataTransfer.files); } this.setState({ dragOn: false }); },
+      onDrop: (e) => { const af = e.dataTransfer && e.dataTransfer.getData('application/x-arch-file'); if (af) { e.preventDefault(); try { const q = JSON.parse(af); this.openByName(q.name, q.size); } catch (x) {} this.setState({ dragOn: false }); return; } if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); this.importFiles(e.dataTransfer.files); } this.setState({ dragOn: false }); },
       onKey: (e) => { this.onKey(e); if (c && c.video) this.vPoke(); },
       toast: st.toast,
       cfg: this.cfgView('Настройки «Фото»'), cfgOpen: () => this.setState({ cfgOpen: true }),
