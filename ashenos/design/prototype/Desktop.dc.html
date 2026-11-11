@@ -103,6 +103,10 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
 .cw-k{transition:filter .12s,transform .08s}.cw-k:hover{filter:brightness(1.2)}.cw-k:active{transform:scale(.92)}
 @keyframes phKb{from{transform:scale(1.08)}to{transform:scale(1)}}
+.dm-i{transition:background .12s}.dm-i:hover{background:rgba(255,255,255,.09)}
+@keyframes dmIn{from{opacity:0;transform:scale(.88) translateY(6px)}to{opacity:1;transform:none}}
+.dock-btn{animation:dockPop .32s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes dockPop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
 </style>
 </helmet>
 
@@ -445,7 +449,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
     <div aria-hidden="true" onMouseEnter="{{peekOn}}" style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; z-index: 9"></div>
     <div onMouseEnter="{{peekOn}}" onMouseLeave="{{dockLeave}}" style="{{dockWrap}}">
       <nav aria-label="Док" style="{{dockNav}}">
-        <button class="dock-btn" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
+        <sc-if value="{{dv.files}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="files" onContextMenu="{{dctx.files}}" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
           <span style="{{dk.files.tip}}">Проводник</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}}">
             <span style="{{dk.fileScale}}">
@@ -458,7 +463,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.files.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Терминал" onClick="{{openTerm}}" onMouseEnter="{{dh.term}}" onFocus="{{dh.term}}" style="{{dk.term.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.term}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="term" onContextMenu="{{dctx.term}}" aria-label="Терминал" onClick="{{openTerm}}" onMouseEnter="{{dh.term}}" onFocus="{{dh.term}}" style="{{dk.term.btn}}">
           <span style="{{dk.term.tip}}">Терминал</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.term.tile}}">
             <span style="position: absolute; left: 10%; right: 10%; bottom: 11%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, #121214, #1d1d20); box-shadow: inset 0 2px 4px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.1); display: flex; align-items: center; padding-left: 14%">
@@ -468,7 +475,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.term.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Claude" onClick="{{openClaude}}" onMouseEnter="{{dh.claude}}" onFocus="{{dh.claude}}" style="{{dk.claude.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.claude}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="claude" onContextMenu="{{dctx.claude}}" aria-label="Claude" onClick="{{openClaude}}" onMouseEnter="{{dh.claude}}" onFocus="{{dh.claude}}" style="{{dk.claude.btn}}">
           <span style="{{dk.claude.tip}}">Claude</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.claude.tile}}">
             <span style="position: absolute; left: 12%; right: 12%; top: 20%; bottom: 22%; border-radius: 22%; background: linear-gradient(180deg,#151517,#222226); box-shadow: inset 0 2px 4px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center">
@@ -478,7 +487,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.claude.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Браузер" onClick="{{openWeb}}" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.web}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="web" onContextMenu="{{dctx.web}}" aria-label="Браузер" onClick="{{openWeb}}" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
           <span style="{{dk.web.tip}}">Браузер</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><radialGradient id="wbG" cx="0.38" cy="0.3" r="0.8"><stop offset="0" stop-color="#77777e"></stop><stop offset="0.55" stop-color="#38383d"></stop><stop offset="1" stop-color="#141416"></stop></radialGradient><radialGradient id="wbH" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.55"></stop><stop offset="1" stop-color="#ffffff" stop-opacity="0"></stop></radialGradient></defs><circle cx="20" cy="20" r="13" fill="url(#wbG)"></circle>
@@ -488,7 +499,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.web.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Карты" onClick="{{openMaps}}" onMouseEnter="{{dh.maps}}" onFocus="{{dh.maps}}" style="{{dk.maps.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.maps}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="maps" onContextMenu="{{dctx.maps}}" aria-label="Карты" onClick="{{openMaps}}" onMouseEnter="{{dh.maps}}" onFocus="{{dh.maps}}" style="{{dk.maps.btn}}">
           <span style="{{dk.maps.tip}}">Карты</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="mpA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8d8dc"></stop><stop offset="1" stop-color="#a6a6ad"></stop></linearGradient><linearGradient id="mpB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9b9bf"></stop><stop offset="1" stop-color="#86868d"></stop></linearGradient></defs><g transform="translate(0 1)"><path d="M6 10l9-3v24l-9 3z" fill="url(#mpA)"></path><path d="M15 7l10 3v24l-10-3z" fill="url(#mpB)"></path><path d="M25 10l9-3v24l-9 3z" fill="url(#mpA)"></path>
@@ -497,7 +510,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.maps.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.music}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="music" onContextMenu="{{dctx.music}}" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
           <span style="{{dk.music.tip}}">Музыка</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}}">
             <span style="{{dockSleeveV}}"></span>
@@ -506,7 +521,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.music.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Заметки" onClick="{{openNotes}}" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.notes}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="notes" onContextMenu="{{dctx.notes}}" aria-label="Заметки" onClick="{{openNotes}}" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
           <span style="{{dk.notes.tip}}">Заметки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ntP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfbfc"></stop><stop offset="1" stop-color="#dedee2"></stop></linearGradient></defs><rect x="9" y="7" width="22" height="27" rx="2.5" fill="url(#ntP)"></rect><rect x="9" y="7" width="22" height="6" rx="2.5" fill="{{icoAcc}}"></rect><rect x="9" y="10" width="22" height="3" fill="{{icoAcc}}"></rect>
@@ -514,7 +531,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.notes.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Обои" onClick="{{openPicker}}" onMouseEnter="{{dh.photo}}" onFocus="{{dh.photo}}" style="{{dk.photo.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.photo}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="photo" onContextMenu="{{dctx.photo}}" aria-label="Обои" onClick="{{openPicker}}" onMouseEnter="{{dh.photo}}" onFocus="{{dh.photo}}" style="{{dk.photo.btn}}">
           <span style="{{dk.photo.tip}}">Обои</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.photo.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ppS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6b72"></stop><stop offset="1" stop-color="#2a2a2e"></stop></linearGradient></defs><rect x="6" y="9" width="28" height="20" rx="2.6" fill="#0d0d0f" stroke="#5a5a60" stroke-width="1"></rect><rect x="7.6" y="10.6" width="24.8" height="16.8" rx="1.4" fill="url(#ppS)"></rect>
@@ -523,7 +542,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.photo.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Виджеты" onClick="{{openGallery}}" onMouseEnter="{{dh.wid}}" onFocus="{{dh.wid}}" style="{{dk.wid.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.wid}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="wid" onContextMenu="{{dctx.wid}}" aria-label="Виджеты" onClick="{{openGallery}}" onMouseEnter="{{dh.wid}}" onFocus="{{dh.wid}}" style="{{dk.wid.btn}}">
           <span style="{{dk.wid.tip}}">Виджеты</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.wid.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="wdA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0f0f2"></stop><stop offset="1" stop-color="#b4b4ba"></stop></linearGradient><linearGradient id="wdB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e6e75"></stop><stop offset="1" stop-color="#3a3a40"></stop></linearGradient></defs><rect x="7" y="7" width="12" height="12" rx="3.5" fill="url(#wdA)"></rect><rect x="21" y="7" width="12" height="12" rx="3.5" fill="{{icoAcc}}" opacity=".9"></rect><rect x="21" y="7" width="12" height="6" rx="3" fill="rgba(255,255,255,.25)"></rect>
@@ -531,7 +552,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.wid.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Монитор" onClick="{{openMon}}" onMouseEnter="{{dh.mon}}" onFocus="{{dh.mon}}" style="{{dk.mon.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.mon}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="mon" onContextMenu="{{dctx.mon}}" aria-label="Монитор" onClick="{{openMon}}" onMouseEnter="{{dh.mon}}" onFocus="{{dh.mon}}" style="{{dk.mon.btn}}">
           <span style="{{dk.mon.tip}}">Монитор</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="mnF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{icoAcc}}" stop-opacity=".45"></stop><stop offset="1" stop-color="{{icoAcc}}" stop-opacity="0"></stop></linearGradient></defs><rect x="6" y="8" width="28" height="24" rx="3.5" fill="#121214" stroke="rgba(255,255,255,.08)"></rect>
@@ -540,7 +563,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.photos}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="photos" onContextMenu="{{dctx.photos}}" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
           <span style="{{dk.photos.tip}}">Фото</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="phP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"></stop><stop offset="1" stop-color="#e2e2e6"></stop></linearGradient><linearGradient id="phS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d7d84"></stop><stop offset="1" stop-color="#3c3c42"></stop></linearGradient></defs><g transform="rotate(-9 20 20)"><rect x="8" y="9" width="21" height="24" rx="1.6" fill="#cfcfd4"></rect><rect x="10" y="11" width="17" height="15" fill="#4a4a50"></rect></g>
@@ -548,7 +573,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.photos.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Блокнот" onClick="{{openPad}}" onMouseEnter="{{dh.pad}}" onFocus="{{dh.pad}}" style="{{dk.pad.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.pad}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="pad" onContextMenu="{{dctx.pad}}" aria-label="Блокнот" onClick="{{openPad}}" onMouseEnter="{{dh.pad}}" onFocus="{{dh.pad}}" style="{{dk.pad.btn}}">
           <span style="{{dk.pad.tip}}">Блокнот</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="pdP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafafb"></stop><stop offset="1" stop-color="#d9d9de"></stop></linearGradient></defs><path d="M10 6h14l7 7v20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" fill="url(#pdP)"></path><path d="M24 6v5a2 2 0 0 0 2 2h5z" fill="#bdbdc3"></path>
@@ -557,7 +584,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.pad.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Калькулятор" onClick="{{openCalc}}" onMouseEnter="{{dh.calc}}" onFocus="{{dh.calc}}" style="{{dk.calc.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.calc}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="calc" onContextMenu="{{dctx.calc}}" aria-label="Калькулятор" onClick="{{openCalc}}" onMouseEnter="{{dh.calc}}" onFocus="{{dh.calc}}" style="{{dk.calc.btn}}">
           <span style="{{dk.calc.tip}}">Калькулятор</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="ccB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c3c42"></stop><stop offset="1" stop-color="#1a1a1d"></stop></linearGradient></defs><rect x="9" y="5" width="22" height="30" rx="4" fill="url(#ccB)"></rect><rect x="12" y="8" width="16" height="7" rx="1.6" fill="#0b0b0c"></rect><text x="26.6" y="13.6" font-family="Inter,sans-serif" font-size="5" font-weight="600" text-anchor="end" fill="#e6e6ea">42</text>
@@ -566,14 +595,18 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.calc.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.set}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="set" onContextMenu="{{dctx.set}}" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
           <span style="{{dk.set.tip}}">Настройки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><radialGradient id="stG" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#f2f2f4"></stop><stop offset="0.6" stop-color="#a7a7ad"></stop><stop offset="1" stop-color="#6a6a70"></stop></radialGradient><radialGradient id="stR" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#8a8a90"></stop><stop offset="1" stop-color="#4a4a50"></stop></radialGradient></defs><path d="M20 6.5l2 .3.7 2.9 2.1.9 2.5-1.6 1.6 1.2 1.2 1.6-1.6 2.5.9 2.1 2.9.7.3 2-.3 2-2.9.7-.9 2.1 1.6 2.5-1.2 1.6-1.6 1.2-2.5-1.6-2.1.9-.7 2.9-2 .3-2-.3-.7-2.9-2.1-.9-2.5 1.6-1.6-1.2-1.2-1.6 1.6-2.5-.9-2.1-2.9-.7-.3-2 .3-2 2.9-.7.9-2.1-1.6-2.5 1.2-1.6 1.6-1.2 2.5 1.6 2.1-.9.7-2.9z" fill="url(#stG)" stroke="rgba(0,0,0,.35)" stroke-width=".5"></path><circle cx="20" cy="20" r="7.2" fill="url(#stR)"></circle><circle cx="20" cy="20" r="4" fill="#161618"></circle><circle cx="20" cy="20" r="1.6" fill="{{icoAcc}}"></circle></svg>
           </span>
           <span aria-hidden="true" style="{{dk.set.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Тест острова" onClick="{{openLab}}" onMouseEnter="{{dh.lab}}" onFocus="{{dh.lab}}" style="{{dk.lab.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.lab}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="lab" onContextMenu="{{dctx.lab}}" aria-label="Тест острова" onClick="{{openLab}}" onMouseEnter="{{dh.lab}}" onFocus="{{dh.lab}}" style="{{dk.lab.btn}}">
           <span style="{{dk.lab.tip}}">Тест острова</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.lab.tile}}">
             <span style="width: 64%; height: 26%; border-radius: 999px; background: linear-gradient(180deg,#050506,#141416); box-shadow: 0 0 0 1.5px rgba(255,255,255,0.3), inset 0 1px 2px rgba(255,255,255,.08); position: relative">
@@ -582,8 +615,10 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.lab.dot}}"></span>
         </button>
+        </sc-if>
         <span aria-hidden="true" style="width: 1px; align-self: stretch; margin: 6px 2px 10px; background: rgba(255,255,255,0.12)"></span>
-        <button class="dock-btn" aria-label="Загрузки" onClick="{{openDown}}" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
+        <sc-if value="{{dv.down}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="down" onContextMenu="{{dctx.down}}" aria-label="Загрузки" onClick="{{openDown}}" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
           <span style="{{dk.down.tip}}">Загрузки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="dnT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e2e6"></stop><stop offset="1" stop-color="#8d8d94"></stop></linearGradient></defs><path d="M7 24h7l2 3h8l2-3h7v7a2.5 2.5 0 0 1-2.5 2.5h-21A2.5 2.5 0 0 1 7 31z" fill="url(#dnT)"></path><path d="M7 24l3.5-8h4M33 24l-3.5-8h-4" fill="none" stroke="#9a9aa1" stroke-width="1.2" stroke-linejoin="round"></path>
@@ -591,7 +626,9 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.down.dot}}"></span>
         </button>
-        <button class="dock-btn" aria-label="Корзина" onClick="{{openTrash}}" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
+        </sc-if>
+        <sc-if value="{{dv.trash}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="trash" onContextMenu="{{dctx.trash}}" aria-label="Корзина" onClick="{{openTrash}}" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
           <span style="{{dk.trash.tip}}">Корзина</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}}">
             <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><defs><linearGradient id="trB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d0d0d5"></stop><stop offset="1" stop-color="#7d7d84"></stop></linearGradient><linearGradient id="trL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0f0f2"></stop><stop offset="1" stop-color="#a9a9af"></stop></linearGradient></defs><path d="M11 13h18l-1.6 19.5a2.5 2.5 0 0 1-2.5 2.3H15.1a2.5 2.5 0 0 1-2.5-2.3z" fill="url(#trB)"></path>
@@ -600,8 +637,17 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.trash.dot}}"></span>
         </button>
+        </sc-if>
       </nav>
     </div>
+
+    <sc-if value="{{dmOn}}" hint-placeholder-val="{{false}}">
+      <div aria-hidden="true" onClick="{{dmClose}}" onContextMenu="{{dmClose}}" style="position: absolute; inset: 0; z-index: 59"></div>
+      <div role="menu" aria-label="Меню значка" style="{{dmSt}}">
+        <div style="padding: 6px 10px 6px; font-size: 12px; font-weight: 700; color: #a1a1a8">{{dmTitle}}</div>
+        <sc-for list="{{dmItems}}" as="m" hint-placeholder-count="3"><button role="menuitem" onClick="{{m.pick}}" class="dm-i" style="{{m.st}}">{{m.label}}</button></sc-for>
+      </div>
+    </sc-if>
 
     <!-- ===== SETTINGS WINDOW ===== -->
     <sc-if value="{{winSettings}}" hint-placeholder-val="{{false}}">
@@ -1903,6 +1949,8 @@ class Component extends DCLogic {
     /* ---------- dock ---------- */
     const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'photos', 'pad', 'calc', 'set', 'lab', 'down', 'trash'];
     const runP = String(this.props.openApps || '').split(',').filter(Boolean);
+    const PINS = st.pins || (() => { try { const v = JSON.parse(localStorage.getItem('ashenos.dock.pins') || 'null'); if (Array.isArray(v)) return v; } catch (e) {} return ['files', 'term', 'web', 'music', 'notes', 'photos', 'set']; })();
+    const ALWAYS = ['down', 'trash'];
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     runP.forEach((id) => { running[id] = true; });
     let DC = {}; try { DC = JSON.parse(this.props.dockCfg || '{}') || {}; } catch (e) { DC = {}; }
@@ -1910,7 +1958,8 @@ class Component extends DCLogic {
       const mix = (r, g, b, t) => `rgb(${Math.round(r + (ar - r) * t)},${Math.round(g + (ag - g) * t)},${Math.round(b + (ab - b) * t)})`;
       return { bg: `radial-gradient(120% 90% at 85% 8%,${mix(74, 74, 80, 0.10)} 0%,${mix(46, 46, 51, 0.06)} 45%,${mix(28, 28, 31, 0.03)} 78%,#161618 100%)`, fg: '#dcdce0', acc: mix(190, 190, 196, 0.6), glow: `rgba(${ar},${ag},${ab},.55)` }; })();
     if (DC.run === false) Object.keys(running).forEach((k) => { running[k] = false; });
-    const DSCR = DSK.W, nD = dockIds.length, DGAP = 4, DSEP = 9;
+    const dockAll = dockIds; const dockVis = dockAll.filter((id) => ALWAYS.includes(id) || PINS.includes(id) || runP.includes(id) || (id === 'photo' && st.picker) || (id === 'wid' && st.gallery));
+    const DSCR = DSK.W, nD = dockVis.length, DGAP = 4, DSEP = 9;
     const mag = Math.max(0, Math.min(1, (DC.mag === undefined ? 50 : +DC.mag) / 100));
     const wMode = DC.width === 'По содержимому' ? 'fit' : DC.width === 'Во всю ширину' ? 'full' : 'half';
     const maxNav = DSCR - 48;
@@ -1918,11 +1967,14 @@ class Component extends DCLogic {
     const want = Math.max(this.props.touch ? 46 : 24, Math.min(64, +DC.size || 40));
     const fitS = Math.floor((maxNav - 28 - DGAP * (nD - 1) - DSEP) / (nD + mag * 2.32));
     const B = Math.max(22, Math.min(want, fitS));
-    const hi = dockIds.indexOf(st.dock);
+    const hi = dockVis.indexOf(st.dock);
     const dk = {}, dh = {};
     let filesSize = B;
-    dockIds.forEach((id, i) => {
-      const dist = hi < 0 ? 9 : Math.abs(i - hi);
+    const dv = {}, dctx = {};
+    dockIds.forEach((id) => { dv[id] = dockVis.includes(id); dctx[id] = (e) => { e.preventDefault(); const r = e.currentTarget.getBoundingClientRect(); const root = e.currentTarget.closest('[data-root]'); const rr = root.getBoundingClientRect(); const k = rr.width / DSK.W || 1; this.setState({ dMenu: { id, x: Math.round((r.left + r.width / 2 - rr.left) / k) } }); }; });
+    dockIds.forEach((id) => {
+      const i = dockVis.indexOf(id);
+      const dist = hi < 0 || i < 0 ? 9 : Math.abs(i - hi);
       const s = Math.round(B * (dist === 0 ? 1 + mag : dist === 1 ? 1 + mag / 2 : dist === 2 ? 1 + mag * 0.16 : 1));
       if (id === 'files') filesSize = s;
       const on = dist === 0;
@@ -2202,6 +2254,9 @@ class Component extends DCLogic {
       { group: 'Файлы', name: 'install.sh', kind: 'Скрипт Bash · 3 КБ', glyph: 'SH', bg: xc.SH, mono: true, text: '#!/usr/bin/env bash\nsudo pacman -S --needed quickshell\nsystemctl --user enable shell', meta: [{ k: 'Права', v: 'rwxr-xr-x' }], open: () => openApp2('term') },
       { group: 'Файлы', name: 'Трек.mp3', kind: 'Аудио · 7,2 МБ', glyph: 'MP3', bg: xc.MP3, text: '3:58 · 320 кбит/с · 44,1 кГц', meta: [{ k: 'Исполнитель', v: 'user' }], open: () => this.setState({ playing: true, homeQ: '' }) },
       { group: 'Файлы', name: 'Презентация.pdf', kind: 'PDF · 12,4 МБ', glyph: 'PDF', bg: xc.PDF, text: '18 страниц · Концепция рабочего окружения для AshenOS', meta: [{ k: 'Страниц', v: '18' }], open: () => openApp2('files') },
+      { group: 'Приложения', name: 'Claude', kind: 'Приложение', glyph: '>_', bg: '#2a2a2e', text: 'Claude Code в окне: чат, скиллы, агенты', meta: [{ k: 'Тип', v: 'Ассистент' }], open: () => openApp2('claude') },
+      { group: 'Приложения', name: 'Браузер', kind: 'Приложение', glyph: '◍', bg: '#2a2a2e', text: 'Веб-страницы и закладки', meta: [{ k: 'Тип', v: 'Интернет' }], open: () => openApp2('web') },
+      { group: 'Приложения', name: 'Заметки', kind: 'Приложение', glyph: '✎', bg: '#2a2a2e', text: 'Заметки и чек-листы, задачи для острова', meta: [{ k: 'Тип', v: 'Записи' }], open: () => openApp2('notes') },
       { group: 'Приложения', name: 'Калькулятор', kind: 'Приложение', glyph: '±', bg: '#2a2a2e', text: 'Обычный, научный, программист и конвертер величин', meta: [{ k: 'Режимы', v: '4' }], open: () => openApp2('calc') },
       { group: 'Приложения', name: 'Блокнот', kind: 'Приложение', glyph: '✎', bg: '#2a2a2e', text: 'Текст и код с подсветкой, поиск и замена, Markdown', meta: [{ k: 'Папка', v: '~/Документы' }], open: () => openApp2('pad') },
       { group: 'Приложения', name: 'Фото', kind: 'Приложение', glyph: '✿', bg: '#2a2a2e', text: 'Медиатека, альбомы, правка снимков и видеоплеер', meta: [{ k: 'Объектов', v: '17' }], open: () => openApp2('photos') },
@@ -2523,6 +2578,17 @@ class Component extends DCLogic {
           open: () => { if (this.props.onOpenApp) this.props.onOpenApp('calc', 'dock'); } }; })(),
       ph: (() => { const i = Math.floor(Date.now() / 9000) % DESK_PHOTOS.length; const p = DESK_PHOTOS[i];
         return { src: p.u, title: p.t, sub: `${i + 1} из ${DESK_PHOTOS.length} · Медиатека`, open: () => { if (this.props.onOpenApp) this.props.onOpenApp('photos', 'dock'); }, imgSt: 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:phKb 9s ease-in-out both' }; })(),
+      dv, dctx,
+      dmOn: !!st.dMenu, dmClose: () => this.setState({ dMenu: null }),
+      dmSt: st.dMenu ? `position:absolute;left:${Math.max(110, Math.min(DSK.W - 110, st.dMenu.x))}px;bottom:${92 + 8}px;translate:-50% 0;z-index:60;width:210px;padding:6px;border-radius:14px;background:rgba(30,30,34,.94);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.08);animation:dmIn .18s cubic-bezier(.2,1.3,.4,1) both;transform-origin:50% 100%` : 'display:none',
+      dmTitle: st.dMenu ? ({ files: 'Проводник', term: 'Терминал', claude: 'Claude', web: 'Браузер', maps: 'Карты', music: 'Музыка', notes: 'Заметки', photo: 'Обои', wid: 'Виджеты', mon: 'Монитор', photos: 'Фото', pad: 'Блокнот', calc: 'Калькулятор', set: 'Настройки', lab: 'Тест острова', down: 'Загрузки', trash: 'Корзина' }[st.dMenu.id] || '') : '',
+      dmItems: (() => { const dm = st.dMenu; if (!dm) return []; const id = dm.id; const run = runP.includes(id); const pinned = PINS.includes(id); const sysApp = !['photo', 'wid', 'down', 'trash'].includes(id);
+        const mi = (label, fn, danger) => ({ label, pick: () => { this.setState({ dMenu: null }); fn(); }, st: `width:100%;height:34px;padding:0 10px;border-radius:9px;display:flex;align-items:center;font-size:13.5px;font-weight:${danger ? 600 : 500};text-align:left;color:${danger ? '#ff6961' : '#f2f2f4'}` });
+        const out = [];
+        if (sysApp) out.push(mi(run ? 'Показать' : 'Открыть', () => this.props.onOpenApp && this.props.onOpenApp(id, 'menu')));
+        if (!ALWAYS.includes(id)) out.push(mi(pinned ? 'Убрать из Dock' : 'Оставить в Dock', () => { const np = pinned ? PINS.filter((x) => x !== id) : [...PINS, id]; this.setState({ pins: np }); try { localStorage.setItem('ashenos.dock.pins', JSON.stringify(np)); } catch (e) {} }));
+        if (run && sysApp) out.push(mi('Завершить', () => this.props.onOpenApp && this.props.onOpenApp('quit:' + id), true));
+        return out; })(),
       dockNav: dockNavSt,
       dockWrap: `position:absolute;left:50%;bottom:12px;z-index:42;transform:translateX(-50%) translateY(${dockHidden ? 'calc(100% + 20px)' : '0'});transition:transform .4s cubic-bezier(.3,1.2,.4,1);${rvN ? `animation:${rvN % 2 ? 'dockA' : 'dockB'} .9s cubic-bezier(.2,1.25,.3,1) .55s both;` : ''}`,
       wave,
