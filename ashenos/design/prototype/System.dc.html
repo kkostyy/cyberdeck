@@ -579,6 +579,7 @@ body{margin:0;background:#050506}
           </sc-if>
 
           <!-- фокус: текущее дело (как notch на Mac) -->
+          <sc-if value="{{fo.show}}" hint-placeholder-val="{{true}}">
           <div style="{{secStyle}}">
             <div style="display: flex; align-items: center; gap: 12px">
               <span style="position: relative; width: 52px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="52" height="52" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
@@ -590,8 +591,9 @@ body{margin:0;background:#050506}
               <button aria-label="Готово" onClick="{{focusDone}}" style="{{fo.doneBtn}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></button>
             </div>
             <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{fo.bar}}"></span></span>
-            <div style="display: flex; font-size: 11.5px; color: #8b8b93"><span>{{fo.left}}</span><span style="margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px">{{fo.next}}</span></div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #8b8b93"><span>{{fo.left}}</span><span style="margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px">{{fo.next}}</span><button aria-label="Скрыть фокус" title="Скрыть фокус (вернуть в Параметрах)" onClick="{{fo.hide}}" style="width: 22px; height: 22px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); color: #a1a1a8"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 3l18 18M10.6 6.1A9.9 9.9 0 0 1 12 6c5.5 0 9 6 9 6a15.6 15.6 0 0 1-2.7 3.4M6.5 7.6C4.3 9.2 3 12 3 12s3.5 6 9 6a8.9 8.9 0 0 0 4-1"></path></svg></button></div>
           </div>
+          </sc-if>
 
           <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
             <div style="{{secStyle}};flex-direction:row;align-items:center;gap:12px">
@@ -677,7 +679,8 @@ body{margin:0;background:#050506}
             </sc-if>
           </div>
         </sc-if>
-        <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
+        <div style="{{fp.grid}}">
+          <sc-if value="{{fo.show}}" hint-placeholder-val="{{true}}">
           <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); overflow: hidden">
             <span aria-hidden="true" style="{{fp.glow}}"></span>
             <span style="position: relative; width: 74px; height: 74px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="74" height="74" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="3.4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
@@ -689,8 +692,10 @@ body{margin:0;background:#050506}
               <button onClick="{{focusDone}}" style="{{fo.doneBig}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Готово</button>
             </div>
           </div>
+          </sc-if>
           <div style="display: flex; flex-direction: column; gap: 8px; min-height: 0">
-            <sc-if value="{{fp.isToday}}" hint-placeholder-val="{{true}}">
+            <sc-if value="{{fp.tasksOff}}" hint-placeholder-val="{{false}}"><span style="margin: auto; font-size: 13px; color: #8b8b93; text-align: center">Задачи в острове выключены.<br>Включить: Параметры › Динамический остров</span></sc-if>
+            <sc-if value="{{fp.isTodayT}}" hint-placeholder-val="{{true}}">
               <div style="display: flex; align-items: baseline; font-size: 12px; color: #8b8b93"><span style="font-size: 13px; font-weight: 700; color: #f2f2f4">Далее</span><span style="margin-left: auto">{{fp.sum}}</span></div>
               <ul class="fp-scroll" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1; min-height: 0; overflow-y: auto">
                 <sc-for list="{{fp.tasks}}" as="k" hint-placeholder-count="4">
@@ -1005,7 +1010,7 @@ const mixHex = (a, b, k) => { const p = (h) => [1, 3, 5].map((i) => parseInt(h.s
 class Component extends DCLogic {
   state = {
     now: new Date(), lock: 'on', power: null,
-    profile: 'work', autoProfile: false, prevProfile: null, barShown: false, fcs: { total: 1500000, left: 1080000, running: true, startAt: Date.now(), task: null, sessions: 3, doneN: 0 }, fp: false, fpTab: 'today', fpQ: '', notesRev: 0,
+    profile: 'work', autoProfile: false, prevProfile: null, barShown: false, fcs: { total: 1500000, left: 1080000, running: true, startAt: Date.now(), task: null, sessions: 3, doneN: 0 }, islCfg: { focus: true, focusChip: true, focusLen: 25, tasks: true, hover: true, click: true, peek: true, call: true, rec: true, timer: true, nav: true, prog: true, style: 'theme' }, fp: false, fpTab: 'today', fpQ: '', notesRev: 0,
     menu: false, q: '', hitSel: 0,
     right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
     wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
@@ -1064,6 +1069,7 @@ class Component extends DCLogic {
     try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
     this.setState({ events: evs, calSel: today, profile });
     try { const t = JSON.parse(localStorage.getItem('ashenos.theme') || 'null'); if (t && t.id) this.setState({ theme: t }); } catch (e) {}
+    try { const ic = JSON.parse(localStorage.getItem('ashenos.island') || 'null'); if (ic && typeof ic === 'object') this.setState({ islCfg: { ...this.state.islCfg, ...ic } }); } catch (e) {}
     this.onNotesEv = () => this.setState({ notesRev: (this.state.notesRev || 0) + 1 }); window.addEventListener('ashen-notes', this.onNotesEv);
     try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); if (c) this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false }); } catch (e) {}
     this.tick = setInterval(() => this.onTick(), 1000);
@@ -1299,7 +1305,7 @@ class Component extends DCLogic {
   }
   /* в полноэкранном режиме верхняя панель спрятана — событие острова ненадолго её показывает (как «чёлка» в macOS) */
   peekBar() {
-    if (!this.autohide()) return;
+    if (!this.autohide() || !this.state.islCfg.peek) return;
     clearTimeout(this.hideT); this.hideT = null;
     if (!this.state.barShown) this.setState({ barShown: true });
     clearTimeout(this.pbT); this.pbT = setTimeout(() => { if (!this.state.menu && !this.state.right) this.setState({ barShown: false }); }, 3500);
@@ -1358,6 +1364,14 @@ class Component extends DCLogic {
     if (id === 'claudeDone') {
       this.notify({ app: 'Claude', title: 'Задача выполнена', body: 'Claude закончил работу в ~/Проекты/ashen-shell', kind: 'short', glyph: '>_' });
       if (st.pet.on) this.petSay('Готово!', true);
+      return;
+    }
+    if (id.startsWith('island:')) {
+      let p = {}; try { p = JSON.parse(id.slice(7)); } catch (e) {}
+      const ic = { ...this.state.islCfg, ...p };
+      try { localStorage.setItem('ashenos.island', JSON.stringify(ic)); } catch (e) {}
+      const f = this.state.fcs, len = (+ic.focusLen || 25) * 60000;
+      this.setState({ islCfg: ic, ...(len !== f.total ? { fcs: { ...f, total: len, left: len, running: false } } : {}), ...(ic.click ? {} : { fp: false }) });
       return;
     }
     if (id.startsWith('nav:')) { let nv = null; if (id !== 'nav:off') { try { nv = JSON.parse(id.slice(4)); } catch (e) {} } this.setState({ navInfo: nv }); return; }
@@ -1749,7 +1763,9 @@ class Component extends DCLogic {
 
   /* ---------------- render ---------------- */
   renderVals() {
-    const st = this.state;
+    const st0 = this.state, IC = st0.islCfg || {};
+    /* выключенные в «Параметры › Остров» живые действия просто не показываются в острове */
+    const st = { ...st0, call: IC.call === false ? null : st0.call, rec: IC.rec === false ? null : st0.rec, timer: IC.timer === false ? null : st0.timer, sw: IC.timer === false ? null : st0.sw, prog: IC.prog === false ? null : st0.prog, navInfo: IC.nav === false ? null : st0.navInfo };
     const now = st.now;
     const pad = (n) => String(n).padStart(2, '0');
     const prof = st.profile, game = prof === 'game', mini = prof === 'min';
@@ -1965,7 +1981,7 @@ class Component extends DCLogic {
     const recE = st.rec ? st.rec.acc + (st.rec.paused ? 0 : nowMs - st.rec.start) : 0;
     const people = ['Аня', 'Миша', 'Ты'];
     const speaker = st.call ? (st.call.muted ? Math.floor(nowMs / 2600) % 2 : Math.floor(nowMs / 2600) % 3) : 0;
-    const fRun = !!(st.fcs && st.fcs.running);
+    const fOn = IC.focus !== false, fRun = fOn && IC.focusChip !== false && !!(st.fcs && st.fcs.running);
     const chipOn = { focus: fRun, nav: !!st.navInfo, call: !!st.call, rec: !!st.rec, timer: !!tm, sw: !!st.sw, prog: !!st.prog, shelf: st.shelf.length > 0 };
     const chipW = { focus: 52, nav: 84, call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44 };
     const winW = Math.min(230, 34 + Math.round(winT.length * 7.3));
@@ -1973,9 +1989,9 @@ class Component extends DCLogic {
     const rowW = 24 + winW + onChips.reduce((a2, c) => a2 + chipW[c], 0) + onChips.length * 12;
     const flashMode = dragMode ? 'drag' : fl ? fl.kind : null;
     const iW = flashMode === 'drag' ? 196 : flashMode === 'clip' ? 300 : flashMode ? 250 : rowW;
-    const big = (st.hoverPill === 'isl' || st.shDrag) && unlocked && !st.fp;
+    const big = ((st.hoverPill === 'isl' && IC.hover !== false) || st.shDrag) && unlocked && !st.fp;
     const shelfShow = st.shelf.length > 0 || dragMode;
-    const secs = [36, 120, st.navInfo ? 74 : 0, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
+    const secs = [36, fOn ? 120 : 0, st.navInfo ? 74 : 0, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
     const bigH = 28 + secs.reduce((a2, b2) => a2 + b2, 0) + (secs.length - 1) * 14;
     const chipS = (c) => `display:${chipOn[c] && !flashMode ? 'flex' : 'none'};align-items:center;gap:6px;flex:none;width:${chipW[c]}px;justify-content:center;height:22px;border-radius:11px;background:rgba(255,255,255,.08);animation:islPop .45s ${SPR} both`;
     const SBI = 60, DW = 384 + SBI * 2, eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
@@ -1986,7 +2002,7 @@ class Component extends DCLogic {
     };
     const g = glyphOf[active];
     const isl = {
-      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : THV.bg};border:1px solid ${tDone ? (THV.accent || '#f2f2f4') : 'rgba(255,255,255,.08)'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
+      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(30,30,34,.55);backdrop-filter:blur(16px) saturate(150%)' : THV.bg};border:1px solid ${tDone ? (THV.accent || '#f2f2f4') : 'rgba(255,255,255,.08)'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
       row: `position:absolute;left:0;top:0;height:30px;width:${rowW}px;box-sizing:border-box;padding:0 12px;display:flex;align-items:center;gap:12px;opacity:${flashMode ? 0 : 1};filter:blur(${flashMode ? 5 : 0}px);transform:scale(${flashMode ? 0.9 : 1});transition:opacity .22s,filter .22s,transform .3s ${SPR}`,
       win: `display:flex;align-items:center;gap:8px;flex:none;width:${winW}px;min-width:0`,
       glyph: `width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font:700 9px 'JetBrains Mono',monospace;background:${g[1]};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)`,
@@ -1996,7 +2012,7 @@ class Component extends DCLogic {
       hasWin: active !== 'desk',
       flash: `position:absolute;left:0;top:0;height:30px;width:${iW}px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:9px;opacity:${flashMode ? 1 : 0};filter:blur(${flashMode ? 0 : 5}px);transform:scale(${flashMode ? 1 : 1.08});transition:opacity .22s,filter .22s,transform .35s ${SPR};pointer-events:none`,
       drop: `position:absolute;left:720px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
-      body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
+      body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(24,24,28,.82);backdrop-filter:blur(20px) saturate(150%)' : THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
       big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
     };
     /* ---- фокус / навигация / панель «Сегодня» ---- */
@@ -2008,6 +2024,7 @@ class Component extends DCLogic {
     const openT = allT.filter((t) => !t.done);
     const nextT = openT.find((t) => !curT || t.text !== curT.text);
     const fo = {
+      show: IC.focus !== false, hide: () => { this.labAction('island:' + JSON.stringify({ focus: false })); this.notify({ app: 'Остров', title: 'Фокус скрыт', body: 'Вернуть: Параметры › Динамический остров', kind: 'short', glyph: '◉', sys: true }); },
       min: String(Math.ceil(fLeft / 60000)), dash: (100.5 * (1 - fLeft / fTot)).toFixed(1), ringCol: st.fcs.running ? '#f2f2f4' : '#8b8b93',
       task: curT ? curT.text : 'Все задачи сделаны 🎉'.replace(' 🎉', ''), left: `${mm(fLeft)} осталось · до ${hhmm(new Date(Date.now() + fLeft))}`,
       next: nextT ? `Далее: ${nextT.text}` : 'Больше задач нет',
@@ -2039,8 +2056,9 @@ class Component extends DCLogic {
     const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']];
     const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], wd = (new Date().getDay() + 6) % 7;
     const fp = {
+      grid: `display:grid;grid-template-columns:${IC.focus !== false ? '250px minmax(0,1fr)' : 'minmax(0,1fr)'};gap:16px;flex:1;min-height:0`, tasksOn: IC.tasks !== false, tasksOff: IC.tasks === false,
       live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: 'flex:none;min-width:230px;max-width:330px;height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
-      on: !!st.fp && unlocked, isToday: st.fpTab === 'today', isWeek: st.fpTab === 'week', isFocus: st.fpTab === 'focus',
+      on: !!st.fp && unlocked, isToday: st.fpTab === 'today', isTodayT: st.fpTab === 'today' && IC.tasks !== false, isWeek: st.fpTab === 'week', isFocus: st.fpTab === 'focus',
       box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo) ? 410 : 340}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
       tabs: tabsFP.map(([id, name]) => ({ name, on: st.fpTab === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${st.fpTab === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${st.fpTab === id ? '#ffffff' : '#a1a1a8'}` })),
       music: `margin-left:auto;height:30px;padding:0 12px 0 6px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.06);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
@@ -2384,7 +2402,7 @@ class Component extends DCLogic {
       progCancel: () => { clearTimeout(this.progT); this.progT = null; this.setState({ prog: null }); },
       clipClear: () => this.setState({ clip: [] }),
       fo, nv, fp, ctlBtnL: 'width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)', focusToggle: this.focusToggle, focusDone: this.focusDone,
-      islClick: (e) => { if (e && e.target && e.target.closest && e.target.closest('button')) return; this.setState({ fp: !this.state.fp, hoverPill: null }); }, fpClose: () => this.setState({ fp: false }),
+      islClick: (e) => { if (e && e.target && e.target.closest && e.target.closest('button')) return; if (IC.click === false) return; this.setState({ fp: !this.state.fp, hoverPill: null }); }, fpClose: () => this.setState({ fp: false }),
       isl, islEnter: () => { clearTimeout(this.pillT); if (this.state.hoverPill !== 'isl') this.setState({ hoverPill: 'isl' }); },
       appTitle: active === 'desk' ? '' : this.meta[active].title,
       center, pill, pillLeave: () => { clearTimeout(this.pillT); this.pillT = setTimeout(() => this.setState({ hoverPill: null }), 180); },

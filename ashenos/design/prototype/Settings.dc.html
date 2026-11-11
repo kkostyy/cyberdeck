@@ -902,6 +902,29 @@ const CATS = [
   { cat: 'Внешний вид и стиль', items: [
     page('theme', 'Тема', '◐', '#ff8a3d', [], { custom: 'theme' }),
     page('wall', 'Обои', '◧', '#4f7fb8', G('wall', 'Экран блокировки'), { custom: 'wall' }),
+    page('island', 'Динамический остров', '◉', '#1f1f23', [
+      { title: 'Фокус', rows: [
+        { id: 'isl_focus', t: 'toggle', label: 'Показывать фокус', hint: 'Карточка текущего дела при наведении и в панели «Сегодня»', v: true },
+        { id: 'isl_focusChip', t: 'toggle', label: 'Кольцо таймера в острове', hint: 'Минуты фокуса рядом с названием окна', v: true },
+        { id: 'isl_focusLen', t: 'seg', label: 'Длительность сессии', opts: ['15 мин', '25 мин', '45 мин', '60 мин'], v: '25 мин' },
+        { id: 'isl_tasks', t: 'toggle', label: 'Задачи из «Заметок»', hint: 'Чек-листы [ ] из заметок в панели «Сегодня»', v: true }
+      ] },
+      { title: 'Поведение', rows: [
+        { id: 'isl_hover', t: 'toggle', label: 'Раскрывать при наведении', v: true },
+        { id: 'isl_click', t: 'toggle', label: 'Панель «Сегодня / Неделя / Фокус» по клику', v: true },
+        { id: 'isl_peek', t: 'toggle', label: 'Показывать во весь экран при событиях', hint: 'Панель ненадолго выезжает, когда меняется громкость, раскладка и т. п.', v: true }
+      ] },
+      { title: 'Живые действия', rows: [
+        { id: 'isl_call', t: 'toggle', label: 'Звонки и голосовые чаты', hint: 'Discord, Telegram', v: true },
+        { id: 'isl_rec', t: 'toggle', label: 'Запись экрана', v: true },
+        { id: 'isl_timer', t: 'toggle', label: 'Таймер и секундомер', v: true },
+        { id: 'isl_prog', t: 'toggle', label: 'Обновления и копирование', v: true },
+        { id: 'isl_nav', t: 'toggle', label: 'Навигация из «Карт»', v: true }
+      ] },
+      { title: 'Вид', rows: [
+        { id: 'isl_style', t: 'seg', label: 'Фон острова', opts: ['Цвет темы', 'Чёрный', 'Стекло'], v: 'Цвет темы' }
+      ] }
+    ]),
     page('themes', 'Цвета и темы', '◐', '#8a63d2', null, { children: [
       page('global', 'Глобальная тема', '◐', '#8a63d2', [P.look.groups[0]]),
       page('pstyle', 'Стиль Plasma', '▭', '#2e2e33', NEW.plasmaStyle),
@@ -979,8 +1002,17 @@ class Component extends DCLogic {
   state = { sec: 'theme', parent: null, q: '', vals: {}, saved: {}, toast: null, keyEdit: null, hl: true, wTarget: 'desk', wPick: null };
   componentDidMount() {
     try { const v = JSON.parse(localStorage.getItem('archSettings.v2') || '{}'); if (v && typeof v === 'object') this.setState({ vals: v, saved: v }); } catch (e) {}
+    try { const ic = JSON.parse(localStorage.getItem('ashenos.island') || '{}') || {}; const back = { theme: 'Цвет темы', black: 'Чёрный', glass: 'Стекло' }; const v2 = {}; Object.keys(ic).forEach((k) => { v2['isl_' + k] = k === 'focusLen' ? ic[k] + ' мин' : k === 'style' ? back[ic[k]] : ic[k]; }); this.setState({ vals: { ...this.state.vals, ...v2 }, saved: { ...this.state.saved, ...v2 } }); } catch (e) {}
   }
   componentWillUnmount() { clearTimeout(this.tt); }
+  /* остров настраивается сразу, без «Применить» */
+  islSend(id, v) {
+    const k = id.slice(4), map = { 'Цвет темы': 'theme', 'Чёрный': 'black', 'Стекло': 'glass' };
+    const val = k === 'focusLen' ? parseInt(v, 10) : k === 'style' ? map[v] : v;
+    try { const ic = { ...(JSON.parse(localStorage.getItem('ashenos.island') || '{}') || {}), [k]: val }; localStorage.setItem('ashenos.island', JSON.stringify(ic)); } catch (e) {}
+    if (this.props.onAction) this.props.onAction('island:' + JSON.stringify({ [k]: val }));
+    this.setState({ saved: { ...this.state.saved, [id]: v } });
+  }
   say(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: null }), 2200); }
   /* кнопки-действия в разделах: каждая что-то делает — прогресс в острове, итог в тосте */
   runBtn(r) {
@@ -1027,7 +1059,7 @@ class Component extends DCLogic {
     const groupsOf = (pg) => pg.groups || [];
     const val = (r) => (r.id in st.vals ? st.vals[r.id] : r.v);
     const savedVal = (r) => (r.id in st.saved ? st.saved[r.id] : r.v);
-    const set = (id, v) => this.setState({ vals: { ...this.state.vals, [id]: v } });
+    const set = (id, v) => { this.setState({ vals: { ...this.state.vals, [id]: v } }); if (id.startsWith('isl_')) this.islSend(id, v); };
     const ql = st.q.trim().toLowerCase();
     const matchRow = (r) => (r.label + ' ' + (r.hint || '') + ' ' + (Array.isArray(r.opts) ? r.opts.map((o) => Array.isArray(o) ? o.join(' ') : o).join(' ') : '')).toLowerCase().includes(ql);
     const pageHit = (pg) => !ql || pg.name.toLowerCase().includes(ql) || groupsOf(pg).some((g) => g.title.toLowerCase().includes(ql) || g.rows.some(matchRow));
