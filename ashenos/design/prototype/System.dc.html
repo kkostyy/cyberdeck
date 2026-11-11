@@ -651,14 +651,14 @@ body{margin:0;background:#050506}
       <section role="dialog" aria-label="Сегодня" style="{{fp.box}}">
         <div style="display: flex; align-items: center; gap: 12px">
           <span style="{{fo.logoBig}}">A</span>
-          <div role="tablist" aria-label="Раздел" style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
+          <sc-if value="{{fp.showTabs}}" hint-placeholder-val="{{true}}"><div role="tablist" aria-label="Раздел" style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06)">
             <sc-for list="{{fp.tabs}}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="{{t.st}}">{{t.name}}</button></sc-for>
-          </div>
+          </div></sc-if>
           <span style="{{fp.music}}"><span style="{{fp.musicDot}}"></span>{{fp.musicText}}</span>
           <button aria-label="Закрыть" onClick="{{fpClose}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
         </div>
         <sc-if value="{{fp.live}}" hint-placeholder-val="{{false}}">
-          <div aria-label="Сейчас" style="display: flex; gap: 8px; overflow-x: auto; flex: none; scrollbar-width: none">
+          <div aria-label="Сейчас" style="{{fp.liveRow}}">
             <sc-if value="{{call.on}}" hint-placeholder-val="{{false}}">
               <div style="{{fp.liveCard}}"><span style="{{call.badge}}">{{call.letter}}</span><span style="display: flex; flex-direction: column; min-width: 0; flex: 1"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{call.title}}</span><span style="font-size: 11.5px; color: #8b8b93; white-space: nowrap">{{call.sub}}</span></span><button aria-label="{{call.micLabel}}" aria-pressed="{{call.muted}}" onClick="{{callMic}}" style="{{call.micBtn}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button><button aria-label="Завершить звонок" onClick="{{callEnd}}" style="width: 32px; height: 32px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e5484d; color: #fff"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 15.5c5-5 13-5 18 0l-2.4 2.4-3.4-1.6v-2.4a11 11 0 0 0-6.4 0v2.4L5.4 17.9z"></path></svg></button></div>
             </sc-if>
@@ -679,6 +679,8 @@ body{margin:0;background:#050506}
             </sc-if>
           </div>
         </sc-if>
+        <sc-if value="{{fp.idle}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: #8b8b93; padding: 2px 4px">Сейчас ничего не происходит — звонки, запись, таймеры и навигация появятся здесь.</span></sc-if>
+        <sc-if value="{{fp.body}}" hint-placeholder-val="{{true}}">
         <div style="{{fp.grid}}">
           <sc-if value="{{fo.show}}" hint-placeholder-val="{{true}}">
           <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); overflow: hidden">
@@ -694,7 +696,6 @@ body{margin:0;background:#050506}
           </div>
           </sc-if>
           <div style="display: flex; flex-direction: column; gap: 8px; min-height: 0">
-            <sc-if value="{{fp.tasksOff}}" hint-placeholder-val="{{false}}"><span style="margin: auto; font-size: 13px; color: #8b8b93; text-align: center">Задачи в острове выключены.<br>Включить: Параметры › Динамический остров</span></sc-if>
             <sc-if value="{{fp.isTodayT}}" hint-placeholder-val="{{true}}">
               <div style="display: flex; align-items: baseline; font-size: 12px; color: #8b8b93"><span style="font-size: 13px; font-weight: 700; color: #f2f2f4">Далее</span><span style="margin-left: auto">{{fp.sum}}</span></div>
               <ul class="fp-scroll" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1; min-height: 0; overflow-y: auto">
@@ -730,6 +731,7 @@ body{margin:0;background:#050506}
             </sc-if>
           </div>
         </div>
+        </sc-if>
       </section>
     </sc-if>
 
@@ -2053,14 +2055,21 @@ class Component extends DCLogic {
         textSt: `font-size:13px;font-weight:${isCur ? 700 : 500};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${t.done ? 'text-decoration:line-through;color:#6f6f77' : 'color:#e8e8ec'}` };
     });
     const mNow = window.__ashenNow;
-    const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']];
+    const fOnP = IC.focus !== false, tOnP = IC.tasks !== false;
+    const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']].filter(([id]) => id === 'today' || (id === 'week' ? tOnP : fOnP));
+    const tabNow = tabsFP.some(([id]) => id === st.fpTab) ? st.fpTab : 'today';
+    const liveP = !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo);
+    /* панель подстраивается: без фокуса и задач остаются только живые действия */
+    const bodyP = tabNow === 'today' ? (fOnP || tOnP) : true;
+    const hP = bodyP ? (tabNow === 'today' && !tOnP ? 270 : 340) + (liveP ? 70 : 0) : 72 + (liveP ? 68 : 40);
     const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], wd = (new Date().getDay() + 6) % 7;
     const fp = {
-      grid: `display:grid;grid-template-columns:${IC.focus !== false ? '250px minmax(0,1fr)' : 'minmax(0,1fr)'};gap:16px;flex:1;min-height:0`, tasksOn: IC.tasks !== false, tasksOff: IC.tasks === false,
-      live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: 'flex:none;min-width:230px;max-width:330px;height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
-      on: !!st.fp && unlocked, isToday: st.fpTab === 'today', isTodayT: st.fpTab === 'today' && IC.tasks !== false, isWeek: st.fpTab === 'week', isFocus: st.fpTab === 'focus',
-      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo) ? 410 : 340}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
-      tabs: tabsFP.map(([id, name]) => ({ name, on: st.fpTab === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${st.fpTab === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${st.fpTab === id ? '#ffffff' : '#a1a1a8'}` })),
+      grid: `display:grid;grid-template-columns:${fOnP && (tOnP || tabNow !== 'today') ? '250px minmax(0,1fr)' : 'minmax(0,1fr)'};gap:16px;flex:1;min-height:0`, tasksOn: tOnP, tasksOff: false, body: bodyP, idle: !bodyP && !liveP, showTabs: tabsFP.length > 1,
+      liveRow: `display:flex;gap:8px;flex:none;${bodyP ? 'overflow-x:auto;scrollbar-width:none' : 'flex-wrap:wrap'}`,
+      live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: (bodyP ? 'flex:none;' : 'flex:1 1 230px;') + 'min-width:230px;max-width:' + (bodyP ? '330px;' : '100%;') + 'height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
+      on: !!st.fp && unlocked, isToday: tabNow === 'today', isTodayT: tabNow === 'today' && tOnP, isWeek: tabNow === 'week', isFocus: tabNow === 'focus',
+      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${hP}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
+      tabs: tabsFP.map(([id, name]) => ({ name, on: tabNow === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${tabNow === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${tabNow === id ? '#ffffff' : '#a1a1a8'}` })),
       music: `margin-left:auto;height:30px;padding:0 12px 0 6px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.06);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
       musicDot: 'width:20px;height:20px;border-radius:50%;flex:none;background:conic-gradient(#ff6fae,#ff8a3d,#b48cff,#ff6fae)',
       musicText: mNow && mNow.title ? mNow.title : 'Трек.mp3',
