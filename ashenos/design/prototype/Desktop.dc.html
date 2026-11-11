@@ -444,6 +444,13 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.wid.dot}}"></span>
         </button>
+        <button class="dock-btn" aria-label="Монитор" onClick="{{openMon}}" onMouseEnter="{{dh.mon}}" onFocus="{{dh.mon}}" style="{{dk.mon.btn}}">
+          <span style="{{dk.mon.tip}}">Монитор</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}};background:linear-gradient(160deg,#2a2c31,#141518)">
+            <svg width="100%" height="100%" viewBox="0 0 40 40"><rect x="8" y="22" width="5" height="10" rx="2" fill="#6f6f77"></rect><rect x="15.5" y="14" width="5" height="18" rx="2" fill="#b9f36a"></rect><rect x="23" y="18" width="5" height="14" rx="2" fill="#a1a1a8"></rect><rect x="30.5" y="9" width="5" height="23" rx="2" fill="#f2f2f4"></rect></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
+        </button>
         <button class="dock-btn" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
           <span style="{{dk.set.tip}}">Настройки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}};background:linear-gradient(180deg,#b9b9be,#6d6d73)">
@@ -1769,7 +1776,7 @@ class Component extends DCLogic {
       style: `height:38px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;${T};background:${st.out === o.id ? accent : 'rgba(255,255,255,.05)'};color:${st.out === o.id ? '#111113' : '#e8e8ec'}` }));
 
     /* ---------- dock ---------- */
-    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'set', 'lab', 'down', 'trash'];
+    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'set', 'lab', 'down', 'trash'];
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     const hi = dockIds.indexOf(st.dock);
     const dk = {}, dh = {};
@@ -2271,6 +2278,7 @@ class Component extends DCLogic {
       winSettings: st.win === 'settings', winTerm: st.win === 'term',
       winAnim: st.winClosing ? 'animation:winOut .22s ease both' : 'animation:winIn .42s cubic-bezier(.2,1.12,.3,1) both',
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
+      openMon: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('mon', 'dock'); } },
       openMaps: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('maps', 'dock'); } },
       openWeb: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('web', 'dock'); } },
       expandWin: () => { const w = st.win; closeWin(); if (this.props.onOpenApp) this.props.onOpenApp(w === 'term' ? 'term' : 'set', 'place'); },

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Монитор</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+/* macOS traffic lights */
+.tl{display:flex;flex-direction:row-reverse;align-items:center;flex:none;order:99;margin-left:6px}
+.tl .tl-b{width:26px;height:44px;padding:0;margin:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:default;-webkit-tap-highlight-color:transparent}
+.tl .tl-b:first-child{width:30px;justify-content:flex-end;padding-right:4px}
+.tl .tl-b i{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.2);transition:filter .12s,transform .18s cubic-bezier(.3,1.4,.5,1)}
+.tl .tl-b svg{opacity:0;transition:opacity .12s}
+.tl:hover .tl-b svg,.tl:focus-within .tl-b svg{opacity:1}
+.tl .tl-b:active i{filter:brightness(.72);transform:scale(.92)}
+.tl .tl-b:focus-visible i{outline:2px solid #f2f2f4;outline-offset:2px}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+
+.mn-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent}
+.mn-b{transition:background .15s,transform .2s cubic-bezier(.3,1.6,.5,1),filter .15s}.mn-b:hover{filter:brightness(1.15)}.mn-b:active{transform:scale(.94)}
+.mn-in::placeholder{color:#6f6f77}
+@keyframes mnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes mnUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes mnBlink{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 0% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Монитор системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+    <header style="height: 64px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 20px">
+      <span aria-hidden="true" style="width: 36px; height: 36px; flex: none; border-radius: 11px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding-bottom: 8px; background: linear-gradient(160deg,#2a2c31,#141518); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1)"><span style="width: 4px; height: 10px; border-radius: 2px; background: #6f6f77"></span><span style="width: 4px; height: 16px; border-radius: 2px; background: {{accent}}"></span><span style="width: 4px; height: 12px; border-radius: 2px; background: #a1a1a8"></span><span style="width: 4px; height: 19px; border-radius: 2px; background: #f2f2f4"></span></span>
+      <span style="font-size: 15px; font-weight: 700">Монитор</span>
+      <nav role="tablist" aria-label="Разделы" style="margin: 0 auto; display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07)">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="{{t.st}}">{{t.name}}</button></sc-for>
+      </nav>
+      <span style="{{livePill}}"><span style="{{liveDot}}"></span>{{liveText}}</span>
+      <button aria-label="{{pauseLabel}}" title="{{pauseLabel}}" onClick="{{togglePause}}" class="mn-b" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); color: #e8e8ec"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="{{pauseIcon}}"></path></svg></button>
+      <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+      <div class="tl" role="group" aria-label="Управление окном">
+        <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
+        <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
+        <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>
+      </div>
+    </header>
+
+    <!-- ===== ОБЗОР ===== -->
+    <sc-if value="{{isOver}}" hint-placeholder-val="{{true}}">
+      <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; padding: 2px 18px 18px">
+        <div style="display: flex; flex-direction: column; gap: 14px; min-width: 0; min-height: 0">
+          <h1 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -.02em">Система</h1>
+          <div style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px">
+            <div style="{{bat.card}}">
+              <span aria-hidden="true" style="position: absolute; right: -60px; bottom: -80px; width: 320px; height: 260px; border-radius: 50%; background: rgba(255,255,255,0.14); filter: blur(2px)"></span>
+              <span style="font-size: 16px; font-weight: 600">Батарея кибердека</span>
+              <span style="font-size: 52px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1">{{bat.pct}}<span style="font-size: 22px; vertical-align: top; margin-left: 4px">%</span></span>
+              <span style="font-size: 12.5px; opacity: .75">{{bat.sub}}</span>
+              <div style="display: flex; gap: 8px; margin-top: auto; position: relative">
+                <sc-for list="{{bat.modes}}" as="m" hint-placeholder-count="3"><button aria-pressed="{{m.on}}" onClick="{{m.pick}}" class="mn-b" style="{{m.st}}">{{m.name}}</button></sc-for>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-rows: 1fr 1fr; gap: 14px; min-width: 0">
+              <sc-for list="{{minis}}" as="k" hint-placeholder-count="2">
+                <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); overflow: hidden">
+                  <span style="font-size: 15px; font-weight: 600">{{k.name}}</span>
+                  <span style="font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums">{{k.val}}</span>
+                  <span style="font-size: 11.5px; color: #8b8b93">{{k.sub}}</span>
+                  <span style="{{k.badge}}">{{k.delta}}</span>
+                  <svg aria-hidden="true" width="150" height="40" viewBox="0 0 150 40" style="position: absolute; right: 14px; top: 16px; opacity: .9"><path d="{{k.spark}}" fill="none" stroke="{{k.col}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); min-height: 0">
+              <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 16px; font-weight: 600">Нагрузка ЦП</span>
+                <div role="radiogroup" aria-label="Период" style="margin-left: auto; display: flex; gap: 3px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,0.06)"><sc-for list="{{periods}}" as="p" hint-placeholder-count="2"><button role="radio" aria-checked="{{p.on}}" onClick="{{p.pick}}" style="{{p.st}}">{{p.name}}</button></sc-for></div>
+              </div>
+              <div style="flex: 1; min-height: 0; display: flex; align-items: flex-end; gap: 10px; padding-top: 30px">
+                <sc-for list="{{bars}}" as="b" hint-placeholder-count="6">
+                  <button aria-label="{{b.label}}" onClick="{{b.pick}}" style="{{b.col}}">
+                    <sc-if value="{{b.on}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: 50%; top: -30px; translate: -50% 0; padding: 4px 9px; border-radius: 9px; background: #f2f2f4; color: #111113; font-size: 11.5px; font-weight: 700; white-space: nowrap">{{b.tip}}</span></sc-if>
+                    <span style="{{b.fill}}"><span style="font-size: 11px; font-weight: 700; color: {{b.txt}}">{{b.val}}</span></span>
+                    <span style="font-size: 11px; color: #8b8b93">{{b.lab}}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); min-height: 0">
+              <div style="display: flex; align-items: center"><span style="font-size: 16px; font-weight: 600">Место на карте</span><span style="margin-left: auto; height: 26px; padding: 0 10px; border-radius: 13px; display: flex; align-items: center; font-size: 11.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #c9c9cf">microSD 64 ГБ</span></div>
+              <div style="flex: 1; display: flex; align-items: center; gap: 18px; min-height: 0">
+                <div style="position: relative; width: 150px; height: 150px; flex: none">
+                  <svg aria-hidden="true" width="150" height="150" viewBox="0 0 150 150" style="rotate: -90deg"><circle cx="75" cy="75" r="58" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="16"></circle><sc-for list="{{disk.arcs}}" as="a" hint-placeholder-count="5"><circle cx="75" cy="75" r="58" fill="none" stroke="{{a.col}}" stroke-width="{{a.w}}" stroke-dasharray="{{a.dash}}" stroke-dashoffset="{{a.off}}" stroke-linecap="round" style="{{a.st}}" onMouseEnter="{{a.hover}}"></circle></sc-for></svg>
+                  <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-size: 11px; color: #8b8b93">{{disk.cap}}</span><span style="font-size: 24px; font-weight: 700; letter-spacing: -.02em">{{disk.big}}</span><span style="font-size: 11px; color: #8b8b93">ГБ</span></div>
+                </div>
+                <ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; flex: 1">
+                  <sc-for list="{{disk.legend}}" as="l" hint-placeholder-count="5"><li onMouseEnter="{{l.hover}}" style="display: flex; flex-direction: column; gap: 2px; cursor: default"><span style="font-size: 11.5px; color: #a1a1a8">{{l.name}}</span><span style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700"><span style="{{l.bar}}"></span>{{l.pct}}</span></li></sc-for>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside style="display: flex; flex-direction: column; gap: 14px; min-height: 0; padding: 16px; border-radius: 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07)">
+          <div style="display: flex; align-items: center"><span style="font-size: 16px; font-weight: 600">Устройства</span><span style="margin-left: 6px; font-size: 12px; color: #8b8b93; align-self: flex-start">{{devCount}}</span></div>
+          <div style="position: relative; height: 196px; flex: none">
+            <sc-for list="{{devs}}" as="d" hint-placeholder-count="3">
+              <button onClick="{{d.pick}}" style="{{d.st}}">
+                <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700"><span>{{d.kind}}</span><span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-weight: 500; opacity: .8">{{d.id}}</span></span>
+                <span style="font-size: 18px; font-weight: 700; margin-top: auto">{{d.name}}</span>
+                <span style="display: flex; gap: 14px; font-size: 11.5px; opacity: .85"><span>{{d.a}}</span><span>{{d.b}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display: flex; align-items: center"><span style="font-size: 16px; font-weight: 600">Службы</span><span style="margin-left: 6px; font-size: 12px; color: #8b8b93; align-self: flex-start">{{svcOn}}</span><span style="margin-left: auto; font-size: 12px; color: #8b8b93">systemctl</span></div>
+          <ul class="mn-scroll" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto">
+            <sc-for list="{{svcs}}" as="s" hint-placeholder-count="5">
+              <li style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.05)">
+                <span style="{{s.ic}}">{{s.glyph}}</span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13.5px; font-weight: 600; font-family: 'JetBrains Mono', monospace">{{s.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{s.sub}}</span></span>
+                <button role="switch" aria-checked="{{s.on}}" aria-label="{{s.name}}" onClick="{{s.toggle}}" style="{{s.track}}"><span style="{{s.knob}}"></span></button>
+              </li>
+            </sc-for>
+          </ul>
+        </aside>
+      </div>
+    </sc-if>
+
+    <!-- ===== ПРОЦЕССЫ ===== -->
+    <sc-if value="{{isProc}}" hint-placeholder-val="{{false}}">
+      <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 2px 18px 18px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <h1 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -.02em">Процессы</h1><span style="font-size: 14px; color: #8b8b93; align-self: flex-start; margin-top: 6px">{{procCount}}</span>
+          <label style="margin-left: auto; position: relative; display: flex; align-items: center; width: 260px"><svg aria-hidden="true" style="position: absolute; left: 12px" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input type="search" aria-label="Поиск процесса" placeholder="Поиск процесса" value="{{pq}}" onInput="{{onPq}}" class="mn-in" style="width: 100%; height: 40px; padding: 0 12px 0 36px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.05); color: #f2f2f4; font: 13.5px Inter, sans-serif; outline: none"></label>
+        </div>
+        <div role="table" aria-label="Процессы" style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); overflow: hidden">
+          <div role="row" style="display: grid; grid-template-columns: 34px minmax(0, 2fr) 110px 70px 120px 120px 110px 44px; align-items: center; gap: 10px; height: 44px; padding: 0 14px; font-size: 12px; color: #8b8b93; border-bottom: 1px solid rgba(255,255,255,0.06)">
+            <span></span><sc-for list="{{cols}}" as="c" hint-placeholder-count="6"><button role="columnheader" onClick="{{c.pick}}" style="{{c.st}}">{{c.name}}</button></sc-for><span></span>
+          </div>
+          <div class="mn-scroll" style="flex: 1; min-height: 0; overflow-y: auto">
+            <sc-for list="{{procs}}" as="p" hint-placeholder-count="8">
+              <div role="row" style="{{p.row}}">
+                <span style="{{p.ic}}">{{p.glyph}}</span>
+                <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 11px; color: #8b8b93; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.cmd}}</span></span>
+                <span style="{{p.badge}}">{{p.state}}</span>
+                <span style="font-size: 12.5px; color: #a1a1a8; font-family: 'JetBrains Mono', monospace">{{p.pid}}</span>
+                <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums"><span style="width: 44px">{{p.cpu}}</span><span style="flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden"><span style="{{p.cpuBar}}"></span></span></span>
+                <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums">{{p.mem}}</span>
+                <span style="font-size: 12.5px; color: #a1a1a8; font-variant-numeric: tabular-nums">{{p.user}}</span>
+                <button aria-label="{{p.killLabel}}" title="{{p.killLabel}}" onClick="{{p.kill}}" class="mn-b" style="{{p.killSt}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== СЕТЬ ===== -->
+    <sc-if value="{{isNet}}" hint-placeholder-val="{{false}}">
+      <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; padding: 2px 18px 18px">
+        <h1 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -.02em">Сеть</h1>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+          <sc-for list="{{netCards}}" as="n" hint-placeholder-count="2">
+            <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 22px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); overflow: hidden; height: 230px">
+              <span style="font-size: 15px; font-weight: 600">{{n.name}}</span>
+              <span style="font-size: 36px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums">{{n.val}}</span>
+              <span style="font-size: 12px; color: #8b8b93">{{n.sub}}</span>
+              <svg aria-hidden="true" width="100%" height="110" viewBox="0 0 600 110" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0"><path d="{{n.area}}" fill="{{n.fill}}"></path><path d="{{n.line}}" fill="none" stroke="{{n.col}}" stroke-width="2.4" vector-effect="non-scaling-stroke"></path></svg>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border-radius: 22px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07)">
+          <span style="font-size: 16px; font-weight: 600">Интерфейсы</span>
+          <sc-for list="{{ifaces}}" as="f" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: 34px 120px minmax(0, 1fr) 140px 110px; align-items: center; gap: 12px; padding: 10px 6px; border-top: 1px solid rgba(255,255,255,0.05)">
+              <span style="{{f.ic}}">{{f.glyph}}</span><span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 13.5px">{{f.name}}</span><span style="font-size: 12.5px; color: #a1a1a8">{{f.sub}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px">{{f.ip}}</span><span style="{{f.badge}}">{{f.state}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{toast.on}}" hint-placeholder-val="{{false}}">
+      <div role="status" style="position: absolute; left: 50%; bottom: 26px; translate: -50% 0; z-index: 9; padding: 10px 16px; border-radius: 14px; background: #f2f2f4; color: #111113; font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px rgba(0,0,0,0.4); animation: mnUp .3s ease both">{{toast.text}}</div>
+    </sc-if>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
+
+  </section>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"themeTint":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  state = { tab: 'over', paused: false, cpu: [22, 31, 18, 44, 27, 35, 29, 41, 24, 33, 38, 26], mem: [41, 42, 42, 43, 44, 43, 45, 46, 45, 44, 46, 47], rx: [], tx: [], bat: 82, power: 'bal', period: 'min', barSel: 5, diskHot: -1, sort: 'cpu', pq: '', killed: {}, ask: null, svc: { NetworkManager: true, sddm: true, bluetooth: true, sshd: true, 'claude-desk-web': false, wayvnc: false, 'ashenos-firstboot': false }, dev: 0, toast: null, cfg: {} };
+  CFG_KEY = 'ashenos.mon.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Обновление' },
+    { k: 'rate', type: 'seg', name: 'Частота', note: 'Как часто опрашивать /proc', def: '1', opts: [['0.5', '0,5 с'], ['1', '1 с'], ['3', '3 с']] },
+    { k: 'temp', type: 'sw', name: 'Температура SoC', note: 'vcgencmd measure_temp', def: true },
+    { type: 'head', name: 'Процессы' },
+    { k: 'all', type: 'sw', name: 'Процессы всех пользователей', note: 'Иначе — только ваши', def: true },
+    { k: 'confirm', type: 'sw', name: 'Спрашивать перед завершением', def: true },
+    { k: 'units', type: 'seg', name: 'Память', def: 'mb', opts: [['mb', 'МБ'], ['pct', '%']] }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+
+  PROCS = [
+    { pid: 1, name: 'systemd', cmd: '/sbin/init', user: 'root', cpu: 0.1, mem: 12, sys: true },
+    { pid: 412, name: 'kwin_wayland', cmd: 'kwin_wayland --xwayland', user: 'alarm', cpu: 6.4, mem: 184, sys: true },
+    { pid: 455, name: 'plasmashell', cmd: 'plasmashell --no-respawn', user: 'alarm', cpu: 4.1, mem: 262 },
+    { pid: 503, name: 'claude-desk', cmd: 'quickshell -p ~/.local/share/claude-desk', user: 'alarm', cpu: 2.6, mem: 96 },
+    { pid: 611, name: 'claude', cmd: 'node /usr/bin/claude', user: 'alarm', cpu: 8.2, mem: 214 },
+    { pid: 640, name: 'chromium', cmd: 'chromium --ozone-platform=wayland', user: 'alarm', cpu: 11.5, mem: 412 },
+    { pid: 702, name: 'pipewire', cmd: '/usr/bin/pipewire', user: 'alarm', cpu: 1.2, mem: 18 },
+    { pid: 706, name: 'wireplumber', cmd: '/usr/bin/wireplumber', user: 'alarm', cpu: 0.4, mem: 22 },
+    { pid: 731, name: 'NetworkManager', cmd: '/usr/bin/NetworkManager --no-daemon', user: 'root', cpu: 0.3, mem: 21, sys: true },
+    { pid: 760, name: 'konsole', cmd: 'konsole', user: 'alarm', cpu: 0.8, mem: 74 },
+    { pid: 812, name: 'dolphin', cmd: 'dolphin --new-window', user: 'alarm', cpu: 0.5, mem: 88 },
+    { pid: 840, name: 'maliit-keyboard', cmd: 'maliit-keyboard', user: 'alarm', cpu: 0.2, mem: 41 },
+    { pid: 901, name: 'sshd', cmd: 'sshd: /usr/bin/sshd -D', user: 'root', cpu: 0, mem: 7, sys: true },
+    { pid: 977, name: 'python3', cmd: 'python3 -I server.py (claude-desk-web)', user: 'alarm', cpu: 0.6, mem: 31 },
+    { pid: 1020, name: 'ashen-maps', cmd: 'qml6 /usr/share/ashen-maps/main.qml', user: 'alarm', cpu: 3.1, mem: 128 }
+  ];
+  componentDidMount() {
+    this.cfgLoad();
+    const seed = (n, b, a) => Array.from({ length: n }, (_, i) => b + Math.sin(i / 2) * a + Math.random() * a);
+    this.setState({ rx: seed(40, 30, 18), tx: seed(40, 8, 5) });
+    this.tick();
+  }
+  componentWillUnmount() { clearTimeout(this.t); }
+  tick() {
+    clearTimeout(this.t);
+    this.t = setTimeout(() => this.tick(), (+this.cfgGet('rate') || 1) * 1000);
+    if (this.state.paused) return;
+    const st = this.state, w = (v, a, lo, hi) => Math.max(lo, Math.min(hi, v + (Math.random() - 0.5) * a));
+    const load = st.power === 'perf' ? 12 : st.power === 'save' ? -10 : 0;
+    this.setState({
+      cpu: [...st.cpu.slice(1), Math.round(w(st.cpu[st.cpu.length - 1] + load * 0.1, 18, 4, 96))],
+      mem: [...st.mem.slice(1), Math.round(w(st.mem[st.mem.length - 1], 3, 30, 80))],
+      rx: [...st.rx.slice(1), w(st.rx[st.rx.length - 1] || 30, 16, 2, 90)],
+      tx: [...st.tx.slice(1), w(st.tx[st.tx.length - 1] || 8, 6, 1, 40)],
+      bat: Math.max(5, st.bat - (Math.random() < 0.08 ? 1 : 0)),
+      jit: Math.random()
+    });
+  }
+  say(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: null }), 2400); }
+  spark(arr, w, h, pad = 4) { const mx = Math.max(...arr, 1), mn = Math.min(...arr); return 'M' + arr.map((v, i) => `${(i / (arr.length - 1) * w).toFixed(1)} ${(h - pad - (v - mn) / Math.max(1, mx - mn) * (h - pad * 2)).toFixed(1)}`).join('L'); }
+  renderVals() {
+    const st = this.state, accent = this.props.themeTint || '#b9f36a';
+    const lum = (h) => { const n = parseInt(h.slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+    const onAcc = lum(accent) > 150 ? '#111113' : '#ffffff';
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;display:flex;border:0;background:${on ? accent : 'rgba(255,255,255,.14)'};transition:background .2s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? onAcc : '#f2f2f4'};transform:translateX(${on ? 16 : 0}px);transition:transform .25s cubic-bezier(.3,1.4,.5,1)` });
+    const cpuNow = st.cpu[st.cpu.length - 1], cpuPrev = st.cpu[st.cpu.length - 2];
+    const memNow = st.mem[st.mem.length - 1];
+    const temp = Math.round(44 + cpuNow * 0.22);
+    const tabs = [['over', 'Обзор'], ['proc', 'Процессы'], ['net', 'Сеть']].map(([id, name]) => ({ name, on: st.tab === id, pick: () => this.setState({ tab: id }),
+      st: `height:34px;padding:0 16px;border-radius:17px;border:0;font-size:13px;font-weight:600;transition:background .2s,color .2s;background:${st.tab === id ? '#f2f2f4' : 'transparent'};color:${st.tab === id ? '#111113' : '#c9c9cf'}` }));
+    /* батарея */
+    const hrs = st.bat / (st.power === 'perf' ? 22 : st.power === 'save' ? 9 : 14);
+    const bat = {
+      pct: st.bat, sub: `Осталось ≈ ${Math.floor(hrs)} ч ${Math.round((hrs % 1) * 60)} мин · 2× 18650 · ${(7.4 + st.bat / 100 * 0.9).toFixed(2).replace('.', ',')} В`,
+      card: `position:relative;display:flex;flex-direction:column;gap:8px;padding:20px 22px;border-radius:24px;overflow:hidden;min-height:228px;color:#111113;background:linear-gradient(120deg,${accent} 0%,#d8f5a8 55%,#7fe0c4 100%)`,
+      modes: [['save', 'Экономия'], ['bal', 'Баланс'], ['perf', 'Мощность']].map(([id, name]) => ({ name, on: st.power === id, pick: () => { this.setState({ power: id }); this.say(`Профиль питания: ${name} · powerprofilesctl set ${id === 'save' ? 'power-saver' : id === 'perf' ? 'performance' : 'balanced'}`); },
+        st: `height:40px;padding:0 18px;border-radius:20px;border:0;font-size:13px;font-weight:700;background:${st.power === id ? '#111113' : 'rgba(255,255,255,.6)'};color:${st.power === id ? '#ffffff' : '#111113'}` }))
+    };
+    const badge = (d) => `position:absolute;right:14px;bottom:14px;height:22px;padding:0 8px;border-radius:7px;display:flex;align-items:center;font-size:11px;font-weight:800;background:${d > 0 ? 'rgba(255,92,92,.18)' : 'rgba(185,243,106,.18)'};color:${d > 0 ? '#ff8f8f' : '#b9f36a'}`;
+    const minis = [
+      { name: 'Процессор', val: cpuNow + ' %', sub: `4 ядра Cortex-A72 · ${(1.2 + cpuNow / 100 * 0.6).toFixed(1).replace('.', ',')} ГГц${this.cfgGet('temp') ? ' · ' + temp + ' °C' : ''}`, delta: (cpuNow - cpuPrev > 0 ? '+' : '') + (cpuNow - cpuPrev) + ' %', badge: badge(cpuNow - cpuPrev), spark: this.spark(st.cpu, 150, 40), col: accent },
+      { name: 'Память', val: (memNow / 100 * 4).toFixed(2).replace('.', ',') + ' ГБ', sub: `из 4 ГБ · подкачка zram 0,3 ГБ`, delta: memNow + ' %', badge: badge(memNow > 60 ? 1 : -1), spark: this.spark(st.mem, 150, 40), col: '#b48cff' }
+    ];
+    /* столбики */
+    const per = st.period;
+    const labs = per === 'min' ? ['−50с', '−40с', '−30с', '−20с', '−10с', 'сейчас'] : ['−5ч', '−4ч', '−3ч', '−2ч', '−1ч', 'сейчас'];
+    const vals = per === 'min' ? [0, 2, 4, 6, 8, 11].map((i) => st.cpu[i]) : [38, 52, 29, 61, 44, Math.round(st.cpu.reduce((a, b) => a + b) / st.cpu.length)];
+    const bars = vals.map((v, i) => {
+      const on = st.barSel === i;
+      return { label: `${labs[i]}: ${v}%`, on, tip: `${v} % · ${labs[i]}`, val: v + '%', lab: labs[i], pick: () => this.setState({ barSel: i }), txt: on ? onAcc : '#f2f2f4',
+        col: 'position:relative;flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;gap:6px;border:0;background:none;padding:0;text-align:center',
+        fill: `display:flex;align-items:flex-start;justify-content:center;padding-top:8px;height:${Math.max(16, v)}%;border-radius:12px;transition:height .6s cubic-bezier(.22,1,.36,1),background .25s;background:${on ? accent : 'linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.07))'}` };
+    });
+    const periods = [['min', 'Минута'], ['hour', 'Часы']].map(([id, name]) => ({ name, on: per === id, pick: () => this.setState({ period: id }), st: `height:26px;padding:0 11px;border-radius:9px;border:0;font-size:11.5px;font-weight:600;background:${per === id ? '#f2f2f4' : 'transparent'};color:${per === id ? '#111113' : '#c9c9cf'}` }));
+    /* диск */
+    const parts = [['Система', 9.4, '#f5c84b'], ['Приложения', 6.1, '#4aa3ff'], ['Музыка', 11.8, '#ff6fae'], ['Проекты', 5.2, accent], ['Кэш', 2.3, '#b48cff']];
+    const total = 59.5, used = parts.reduce((a, p) => a + p[1], 0), C = 2 * Math.PI * 58;
+    let accLen = 0;
+    const disk = {
+      cap: st.diskHot >= 0 ? parts[st.diskHot][0] : 'Занято', big: (st.diskHot >= 0 ? parts[st.diskHot][1] : used).toFixed(1).replace('.', ','),
+      arcs: parts.map(([n, v, col], i) => { const L = v / total * C, gap = 6; const a = { col, w: st.diskHot === i ? 20 : 16, dash: `${Math.max(1, L - gap).toFixed(1)} ${C.toFixed(1)}`, off: (-accLen).toFixed(1), st: 'transition:stroke-width .2s', hover: () => this.setState({ diskHot: i }) }; accLen += L; return a; }),
+      legend: parts.map(([n, v, col], i) => ({ name: n, pct: Math.round(v / total * 100) + ' %', bar: `width:3px;height:16px;border-radius:2px;background:${col}`, hover: () => this.setState({ diskHot: i }) })).concat([{ name: 'Свободно', pct: Math.round((total - used) / total * 100) + ' %', bar: 'width:3px;height:16px;border-radius:2px;background:rgba(255,255,255,.25)', hover: () => this.setState({ diskHot: -1 }) }])
+    };
+    /* устройства (стопка карт) */
+    const DEV = [
+      { kind: 'Raspberry Pi 4', id: 'BCM2711', name: 'Кибердек', a: `SoC ${temp} °C`, b: 'Throttle: нет', bg: `linear-gradient(135deg,#b48cff,#6f7cff)` },
+      { kind: 'microSD', id: 'mmcblk0', name: 'SanDisk 64 ГБ', a: 'ext4 + vfat', b: 'Износ 4 %', bg: 'linear-gradient(135deg,#5ee0c0,#2f9e8f)' },
+      { kind: 'USB', id: 'sda1', name: 'Флешка 14 ГБ', a: 'exFAT', b: 'Подключена', bg: 'linear-gradient(135deg,#ffb36b,#ff6f6f)' }
+    ];
+    const devs = DEV.map((d, i) => { const k = (i - st.dev + DEV.length) % DEV.length; return { ...d, pick: () => this.setState({ dev: (st.dev + 1) % DEV.length }),
+      st: `position:absolute;left:${k * 10}px;right:${k * 10}px;top:${(2 - k) * 14}px;height:150px;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:20px;border:0;text-align:left;color:#111113;background:${d.bg};box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:${10 - k};opacity:${k === 0 ? 1 : 0.85 - k * 0.15};transition:top .45s cubic-bezier(.3,1.3,.5,1),left .45s,right .45s,opacity .3s;cursor:pointer` }; });
+    const SV = { NetworkManager: ['N', '#4aa3ff', 'Сеть и Wi-Fi'], sddm: ['S', '#f2f2f4', 'Экран входа'], bluetooth: ['B', '#5865f2', 'Bluetooth'], sshd: ['›_', '#2f9e5b', 'SSH-доступ'], 'claude-desk-web': ['C', '#d97757', 'Зеркало Claude 127.0.0.1:8765'], wayvnc: ['V', '#b48cff', 'Удалённый экран'], 'ashenos-firstboot': ['1', '#8b8b93', 'Первый запуск · выполнено'] };
+    const svcs = Object.keys(SV).map((k) => ({ name: k, glyph: SV[k][0], sub: (st.svc[k] ? 'active · ' : 'inactive · ') + SV[k][2], on: !!st.svc[k], ...sw(!!st.svc[k]),
+      toggle: () => { const v = !st.svc[k]; this.setState({ svc: { ...st.svc, [k]: v } }); this.say(`sudo systemctl ${v ? 'start' : 'stop'} ${k}`); },
+      ic: `width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:800 12px 'JetBrains Mono',monospace;background:${SV[k][1]};color:${lum(SV[k][1]) > 150 ? '#111113' : '#fff'}` }));
+    /* процессы */
+    const pq = st.pq.trim().toLowerCase();
+    const mul = (p) => 0.6 + ((p.pid * 37 + Math.round((st.jit || 0) * 100)) % 80) / 100;
+    let procs = this.PROCS.filter((p) => !st.killed[p.pid] && (this.cfgGet('all') || p.user !== 'root') && (!pq || (p.name + p.cmd).toLowerCase().includes(pq))).map((p) => ({ ...p, cpuN: +(p.cpu * mul(p)).toFixed(1) }));
+    const key = st.sort;
+    procs.sort((a, b) => key === 'name' ? a.name.localeCompare(b.name) : key === 'pid' ? a.pid - b.pid : key === 'mem' ? b.mem - a.mem : key === 'user' ? a.user.localeCompare(b.user) : b.cpuN - a.cpuN);
+    const colDefs = [['name', 'Имя'], ['state', 'Состояние'], ['pid', 'PID'], ['cpu', 'ЦП'], ['mem', 'Память'], ['user', 'Пользователь']];
+    const cols = colDefs.map(([id, name]) => ({ name: name + (st.sort === id ? ' ↓' : ''), pick: () => id !== 'state' && this.setState({ sort: id }), st: `height:44px;border:0;background:none;padding:0;text-align:left;font-size:12px;font-weight:${st.sort === id ? 700 : 500};color:${st.sort === id ? '#f2f2f4' : '#8b8b93'}` }));
+    const procRows = procs.map((p, i) => {
+      const running = p.cpuN > 1, ask = st.ask === p.pid;
+      return { name: p.name, cmd: p.cmd, pid: p.pid, cpu: p.cpuN.toFixed(1).replace('.', ',') + '%', mem: this.cfgGet('units') === 'pct' ? (p.mem / 40.96).toFixed(1).replace('.', ',') + ' %' : p.mem + ' МБ', user: p.user,
+        glyph: p.name[0].toUpperCase(), state: running ? 'Работает' : 'Ожидает',
+        badge: `justify-self:start;height:22px;padding:0 9px;border-radius:7px;display:flex;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.03em;background:${running ? 'rgba(185,243,106,.16)' : 'rgba(255,255,255,.07)'};color:${running ? '#b9f36a' : '#a1a1a8'}`,
+        cpuBar: `display:block;height:100%;width:${Math.min(100, p.cpuN * 5)}%;background:${p.cpuN > 8 ? '#ff8f8f' : accent};transition:width .5s`,
+        row: `display:grid;grid-template-columns:34px minmax(0,2fr) 110px 70px 120px 120px 110px 44px;align-items:center;gap:10px;min-height:54px;padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.04);animation:mnIn .3s ease ${Math.min(i, 10) * 0.025}s both;background:${ask ? 'rgba(255,92,92,.08)' : 'transparent'}`,
+        ic: `width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font:800 12px Inter,sans-serif;background:rgba(255,255,255,.08);color:#e8e8ec`,
+        killLabel: p.sys ? 'Системный процесс' : ask ? `Точно завершить ${p.name}?` : `Завершить ${p.name}`,
+        killSt: `width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:0;background:${ask ? '#e5484d' : 'rgba(255,255,255,.06)'};color:${ask ? '#fff' : '#c9c9cf'};opacity:${p.sys ? 0.3 : 1}`,
+        kill: () => {
+          if (p.sys) { this.say(`${p.name} — системный процесс, нужен root`); return; }
+          if (this.cfgGet('confirm') && !ask) { this.setState({ ask: p.pid }); clearTimeout(this.askT); this.askT = setTimeout(() => this.setState({ ask: null }), 3000); return; }
+          this.setState({ killed: { ...st.killed, [p.pid]: true }, ask: null }); this.say(`kill ${p.pid} · ${p.name} завершён`);
+        } };
+    });
+    /* сеть */
+    const area = (arr) => { const l = this.spark(arr, 600, 110, 8); return { line: l, area: l + 'L600 110L0 110Z' }; };
+    const rxN = st.rx[st.rx.length - 1] || 0, txN = st.tx[st.tx.length - 1] || 0;
+    const netCards = [
+      { name: 'Загрузка', val: (rxN / 10).toFixed(1).replace('.', ',') + ' МБ/с', sub: 'wlan0 · Wi-Fi «AshenNet» 5 ГГц', col: accent, fill: 'rgba(185,243,106,.12)', ...area(st.rx.length ? st.rx : [1, 2]) },
+      { name: 'Отдача', val: (txN / 10).toFixed(1).replace('.', ',') + ' МБ/с', sub: 'Всего сегодня 412 МБ', col: '#4aa3ff', fill: 'rgba(74,163,255,.12)', ...area(st.tx.length ? st.tx : [1, 2]) }
+    ];
+    const ifb = (on) => `justify-self:start;height:22px;padding:0 9px;border-radius:7px;display:flex;align-items:center;font-size:10.5px;font-weight:800;background:${on ? 'rgba(185,243,106,.16)' : 'rgba(255,255,255,.07)'};color:${on ? '#b9f36a' : '#a1a1a8'}`;
+    const ific = (c) => `width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font:800 11px 'JetBrains Mono',monospace;background:${c};color:#fff`;
+    const ifaces = [
+      { glyph: 'W', name: 'wlan0', sub: 'Wi-Fi · −54 дБм · 433 Мбит/с', ip: '192.168.1.42', state: 'ПОДКЛЮЧЁН', badge: ifb(true), ic: ific('#2f6fd6') },
+      { glyph: 'E', name: 'eth0', sub: 'Ethernet · кабель не подключён', ip: '—', state: 'НЕТ СВЯЗИ', badge: ifb(false), ic: ific('#3a3a42') },
+      { glyph: 'B', name: 'bnep0', sub: 'Bluetooth-модем телефона', ip: '—', state: 'ВЫКЛ', badge: ifb(false), ic: ific('#5865f2') }
+    ];
+    return {
+      winTheme: this.props.themeWin || 'rgba(16,16,18,0.96)', accent, tabs, isOver: st.tab === 'over', isProc: st.tab === 'proc', isNet: st.tab === 'net',
+      livePill: `height:30px;padding:0 12px;border-radius:15px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;background:rgba(255,255,255,.05);color:${st.paused ? '#a1a1a8' : '#e8e8ec'}`,
+      liveDot: `width:7px;height:7px;border-radius:50%;background:${st.paused ? '#6f6f77' : '#4fd18b'};${st.paused ? '' : 'animation:mnBlink 1.6s ease-in-out infinite'}`,
+      liveText: st.paused ? 'Пауза' : `Живые данные · ${this.cfgGet('rate').replace('.', ',')} с`,
+      pauseLabel: st.paused ? 'Продолжить' : 'Пауза', pauseIcon: st.paused ? 'M8 5v14l11-7z' : 'M7 5h3.5v14H7zM13.5 5H17v14h-3.5z', togglePause: () => this.setState({ paused: !st.paused }),
+      bat, minis, bars, periods, disk, devs, devCount: DEV.length, svcs, svcOn: Object.values(st.svc).filter(Boolean).length,
+      procs: procRows, cols, procCount: procRows.length, pq: st.pq, onPq: (e) => this.setState({ pq: e.target.value }),
+      netCards, ifaces, toast: { on: !!st.toast, text: st.toast || '' },
+      cfg: this.cfgView('Настройки монитора'), cfgOpen: () => this.setState({ cfgOpen: true }),
+      closeApp: () => this.props.onClose && this.props.onClose(), minApp: () => this.props.onMinimize && this.props.onMinimize(), maxApp: () => this.props.onMaximize && this.props.onMaximize()
+    };
+  }
+}
+</script>
+</body>
+</html>
