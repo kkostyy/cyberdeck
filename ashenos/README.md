@@ -1,3 +1,5 @@
+<img src="design/brand/avatar-coal-a.png" width="128" align="right" alt="AshenOS">
+
 # AshenOS
 
 **AshenOS** — дистрибутив на базе **Arch Linux ARM** для кибердека на Raspberry Pi 4

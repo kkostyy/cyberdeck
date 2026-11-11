@@ -1,0 +1,5 @@
+# Сочетания как в прототипе AshenOS (Meta-сочетания KDE тоже работают)
+[kwin]
+Switch One Desktop to the Left=Meta+Ctrl+Left\tCtrl+Alt+Left,Meta+Ctrl+Left,Переключиться на рабочий стол слева
+Switch One Desktop to the Right=Meta+Ctrl+Right\tCtrl+Alt+Right,Meta+Ctrl+Right,Переключиться на рабочий стол справа
+Overview=Meta+W\tCtrl+Alt+Up,Meta+W,Обзор

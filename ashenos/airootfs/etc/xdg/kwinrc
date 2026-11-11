@@ -10,3 +10,23 @@ SlideOutTime=200
 [Wayland]
 InputMethod[$e]=/usr/share/applications/com.github.maliit.keyboard.desktop
 VirtualKeyboardEnabled=true
+
+# --- как в прототипе AshenOS: 4 рабочих стола, привязка окон к краям, обзор окон ---
+[Desktops]
+Number=4
+Rows=1
+
+[Windows]
+# окно у верхнего края — во весь экран, у бокового — половина, в углу — четверть
+ElectricBorderMaximize=true
+ElectricBorderTiling=true
+ElectricBorderCornerRatio=0.25
+ElectricBorderDelay=150
+
+[Effect-overview]
+# свайп от нижнего края сенсорного экрана — обзор всех окон
+TouchBorderActivate=4
+
+[TouchEdges]
+# свайп от верхнего края — меню приложений (на 4,3″ экране удобнее, чем тянуться к панели)
+Top=ApplicationLauncher
