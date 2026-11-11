@@ -1945,7 +1945,7 @@ class Component extends DCLogic {
     const wsList = [1, 2, 3, 4].map((n) => ({ on: st.ws === n, label: `Рабочий стол ${n}`, pick: () => this.setState({ ws: n }), style: `height:7px;border-radius:4px;width:${st.ws === n ? 20 : 7}px;background:${st.ws === n ? '#f2f2f4' : 'rgba(255,255,255,.3)'};transition:width .3s ${SPR}` }));
 
     const tile = (bg, fg) => `width:34px;height:34px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font:700 12px 'JetBrains Mono',monospace;background:${bg};color:${fg || '#fff'}`;
-    const appGlyph = { files: ['▤', '#3a3a40'], term: ['>_', '#1e1e22'], music: ['♪', '#c2412f'], set: ['⚙', '#3a3a40'], web: ['◎', '#4f7fb8'], steam: ['◈', '#2a3150'] };
+    const appGlyph = { files: ['▤', '#2a2a2e'], term: ['>_', '#2a2a2e'], music: ['♪', '#2a2a2e'], set: ['⚙', '#2a2a2e'], web: ['◎', '#2a2a2e'], steam: ['◈', '#2a2a2e'] };
     const favDefs = [
       { id: 'files', name: 'Проводник' }, { id: 'term', name: 'Терминал' }, { id: 'music', name: 'Музыка' },
       { id: 'web', name: 'Firefox' }, { id: 'steam', name: 'Steam' }, { id: 'set', name: 'Настройки' }
@@ -2070,7 +2070,7 @@ class Component extends DCLogic {
     const nowMs = Date.now();
     const fl = st.islLvl !== false && st.flash && nowMs - st.flash.at < 1700 ? st.flash : null;
     const mmss = (ms) => { const t = Math.max(0, Math.floor(ms / 1000)); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
-    const glyphOf = { desk: ['◇', '#2e2e33'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2e2e33'], set: ['⚙', '#6d6d73'], claude: ['>_', '#232327'], notes: ['✎', '#c99a1e'], web: ['◍', '#2f6fd6'], maps: ['➤', '#c4302b'], mon: ['▮', '#3a3a42'], calc: ['±', '#ff9f0a'], pad: ['✎', '#5a5a62'], photos: ['✿', '#ff375f'] };
+    const glyphOf = { desk: ['◇', '#2a2a2e'], files: appGlyph.files, term: appGlyph.term, music: appGlyph.music, lab: ['◉', '#2a2a2e'], set: ['⚙', '#2a2a2e'], claude: ['>_', '#2a2a2e'], notes: ['✎', '#2a2a2e'], web: ['◍', '#2a2a2e'], maps: ['➤', '#2a2a2e'], mon: ['▮', '#2a2a2e'], calc: ['±', '#2a2a2e'], pad: ['✎', '#2a2a2e'], photos: ['✿', '#2a2a2e'] };
     const winT = active === 'desk' ? 'Рабочий стол' : this.meta[active].title;
     /* live activities */
     const tm = st.timer, tLeft = tm ? (tm.paused ? tm.left : tm.end - nowMs) : 0, tDone = !!tm && tLeft <= 0;

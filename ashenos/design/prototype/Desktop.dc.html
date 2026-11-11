@@ -409,134 +409,88 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
       <nav aria-label="Док" style="{{dockNav}}">
         <button class="dock-btn" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
           <span style="{{dk.files.tip}}">Проводник</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}};background:#1c1c1f">
-            <span style="{{dk.fileScale}}">
-              <span style="position: absolute; left: 2px; top: 0; width: 36px; height: 27px; border-radius: 4px; background: #2a2a2e"></span>
-              <span style="position: absolute; left: 24px; top: 4px; width: 9px; height: 20px; border-radius: 1.5px; background: #e4e4e8"></span>
-              <span style="position: absolute; left: 18px; top: 2px; width: 10px; height: 22px; border-radius: 1.5px; background: #ececef"></span>
-              <span style="position: absolute; left: 4px; top: 0; width: 19px; height: 24px; border-radius: 2px; background: #ffffff; transform: rotate(-4deg)"></span>
-              <span style="position: absolute; left: 0; top: 6px; width: 40px; height: 25px; clip-path: path('M 2 0 H 19 Q 21 0 22 1 L 24 5 Q 25 6 26 6 H 38 Q 40 6 40 8 L 39 23 Q 39 25 37 25 H 3 Q 1 25 1 23 L 0 2 Q 0 0 2 0 Z'); background: linear-gradient(180deg, rgba(160,160,166,0.8), rgba(92,92,98,0.85) 45%, rgba(40,40,44,0.97))"></span>
-            </span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"></path><path d="M3.5 10.5h17" stroke="{{icoAcc}}"></path></svg></span>
           <span aria-hidden="true" style="{{dk.files.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Терминал" onClick="{{openTerm}}" onMouseEnter="{{dh.term}}" onFocus="{{dh.term}}" style="{{dk.term.btn}}">
           <span style="{{dk.term.tip}}">Терминал</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.term.tile}};background:radial-gradient(120% 90% at 85% 8%,#46464c 0%,#34343a 32%,#26262a 62%,#1c1c1f 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.28),0 4px 10px rgba(0,0,0,.3)">
-            <span style="position: absolute; left: 10%; right: 10%; bottom: 11%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, #121214, #1d1d20); box-shadow: inset 0 2px 4px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.1); display: flex; align-items: center; padding-left: 14%">
-              <span style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.62em; color: #8e8e93; letter-spacing: -0.04em">&gt;_</span>
-            </span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.term.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="4.5" width="18" height="15" rx="3"></rect><path d="m7.5 10 3 2.5-3 2.5" stroke="{{icoAcc}}"></path><path d="M12.5 15.5h4"></path></svg></span>
           <span aria-hidden="true" style="{{dk.term.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Claude" onClick="{{openClaude}}" onMouseEnter="{{dh.claude}}" onFocus="{{dh.claude}}" style="{{dk.claude.btn}}">
           <span style="{{dk.claude.tip}}">Claude</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.claude.tile}};background:radial-gradient(120% 90% at 85% 8%,#3a3a40 0%,#232327 55%,#141416 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.25),0 4px 10px rgba(0,0,0,.3)">
-            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.95em; color: #f2f2f4; letter-spacing: -0.04em">&gt;_</span>
-            <span style="position: absolute; right: 14%; top: 14%; width: 20%; height: 20%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffd27a, #ff8a3d 70%); box-shadow: 0 0 6px rgba(255,138,61,.7)"></span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.claude.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4.5 3v-3H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"></path><path d="m7.5 9.5 2.5 2-2.5 2" stroke="{{icoAcc}}"></path><path d="M12 13.5h4"></path></svg></span>
           <span aria-hidden="true" style="{{dk.claude.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Браузер" onClick="{{openWeb}}" onMouseEnter="{{dh.web}}" onFocus="{{dh.web}}" style="{{dk.web.btn}}">
           <span style="{{dk.web.tip}}">Браузер</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}};background:radial-gradient(80% 80% at 30% 20%,#7fb8ff,#2f6fd6 60%,#1d4796)">
-            <svg width="58%" height="58%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.7"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.web.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><circle cx="12" cy="12" r="8.5"></circle><path d="M3.5 12h17"></path><ellipse cx="12" cy="12" rx="3.8" ry="8.5" stroke="{{icoAcc}}"></ellipse></svg></span>
           <span aria-hidden="true" style="{{dk.web.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Карты" onClick="{{openMaps}}" onMouseEnter="{{dh.maps}}" onFocus="{{dh.maps}}" style="{{dk.maps.btn}}">
           <span style="{{dk.maps.tip}}">Карты</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}};background:linear-gradient(160deg,#2a2c31,#141518)">
-            <svg width="100%" height="100%" viewBox="0 0 40 40"><path d="M0 27 Q11 20 20 25 T40 18 V40 H0Z" fill="#1d2a22"></path><path d="M-2 14 L42 30" stroke="#3d3e45" stroke-width="3"></path><path d="M6 33 C14 29 15 16 24 14 S33 9 35 6" fill="none" stroke="#ef3b3b" stroke-width="2.6" stroke-dasharray="3.2 2.6" stroke-linecap="round"></path><circle cx="6" cy="33" r="3" fill="#f2f2f4"></circle><path d="M35 1.5a4.6 4.6 0 0 1 4.6 4.6c0 3.4-4.6 7.4-4.6 7.4s-4.6-4-4.6-7.4A4.6 4.6 0 0 1 35 1.5z" fill="#ef3b3b" stroke="#fff" stroke-width="1.2"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z"></path><path d="M9 4.5v13M15 6.5v13"></path><path d="M12 9.2a1.8 1.8 0 1 1 0 .01" stroke="{{icoAcc}}" stroke-width="2.4"></path></svg></span>
           <span aria-hidden="true" style="{{dk.maps.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
           <span style="{{dk.music.tip}}">Музыка</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}};background:linear-gradient(180deg,#ffffff,#e9e9ec)">
-            <span style="{{dockSleeveV}}"></span>
-            <span style="position: absolute; left: 7%; right: 7%; bottom: 7%; height: 47%; border-radius: 6% 6% 22% 22%; background: linear-gradient(180deg,#f7f7f9,#d9d9de); box-shadow: 0 -1px 0 rgba(0,0,0,.06), inset 0 2px 3px rgba(255,255,255,.9); -webkit-mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%); mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%)"></span>
-            <span style="position: absolute; right: 12%; bottom: 13%; width: 30%; height: 15%; border-radius: 2px; background: conic-gradient(from 40deg,#c9f2ff,#f9c9ff,#fff2b8,#b8ffd9,#c9f2ff); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18)"></span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9 17.5V6.5l10-2v11"></path><circle cx="6.5" cy="17.5" r="2.5" stroke="{{icoAcc}}"></circle><circle cx="16.5" cy="15.5" r="2.5" stroke="{{icoAcc}}"></circle></svg></span>
           <span aria-hidden="true" style="{{dk.music.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Заметки" onClick="{{openNotes}}" onMouseEnter="{{dh.notes}}" onFocus="{{dh.notes}}" style="{{dk.notes.btn}}">
           <span style="{{dk.notes.tip}}">Заметки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}};background:linear-gradient(#f5e13b,#f5e13b) 0 0/100% 22% no-repeat,repeating-linear-gradient(180deg,rgba(0,0,0,0) 0 9%,#d6d6db 9% 11%) 0 30%/100% 70% no-repeat,linear-gradient(180deg,#ffffff,#eeeef1)"></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.notes.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="4.5" y="3.5" width="15" height="17" rx="2.5"></rect><path d="M4.5 8h15" stroke="{{icoAcc}}"></path><path d="M8 12h8M8 15.5h5"></path></svg></span>
           <span aria-hidden="true" style="{{dk.notes.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Обои" onClick="{{openPicker}}" onMouseEnter="{{dh.photo}}" onFocus="{{dh.photo}}" style="{{dk.photo.btn}}">
           <span style="{{dk.photo.tip}}">Обои</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.photo.tile}};background:radial-gradient(circle at 72% 28%,#ffd166 0 9%,rgba(0,0,0,0) 10%),linear-gradient(155deg,rgba(0,0,0,0) 58%,#3f7d5c 59%),linear-gradient(205deg,rgba(0,0,0,0) 52%,#2f6247 53%),linear-gradient(180deg,#6fa8de,#d3e6f6)"></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.photo.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m3.5 17 5-5 4 4 2.5-2.5 5 4"></path><circle cx="15.5" cy="9.5" r="1.6" stroke="{{icoAcc}}"></circle></svg></span>
           <span aria-hidden="true" style="{{dk.photo.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Виджеты" onClick="{{openGallery}}" onMouseEnter="{{dh.wid}}" onFocus="{{dh.wid}}" style="{{dk.wid.btn}}">
           <span style="{{dk.wid.tip}}">Виджеты</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.wid.tile}};background:#0b0b0c;border:1px solid rgba(255,255,255,0.14)">
-            <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 9%; width: 58%; height: 58%">
-              <span style="border-radius: 22%; background: {{accent}}; transition: background .6s"></span>
-              <span style="border-radius: 22%; background: #3a3a3f"></span>
-              <span style="border-radius: 22%; background: #3a3a3f"></span>
-              <span style="border-radius: 22%; background: #e8e8ec"></span>
-            </span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.wid.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2" stroke="{{icoAcc}}"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></span>
           <span aria-hidden="true" style="{{dk.wid.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Монитор" onClick="{{openMon}}" onMouseEnter="{{dh.mon}}" onFocus="{{dh.mon}}" style="{{dk.mon.btn}}">
           <span style="{{dk.mon.tip}}">Монитор</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}};background:linear-gradient(160deg,#2a2c31,#141518)">
-            <svg width="100%" height="100%" viewBox="0 0 40 40"><rect x="8" y="22" width="5" height="10" rx="2" fill="#6f6f77"></rect><rect x="15.5" y="14" width="5" height="18" rx="2" fill="#b9f36a"></rect><rect x="23" y="18" width="5" height="14" rx="2" fill="#a1a1a8"></rect><rect x="30.5" y="9" width="5" height="23" rx="2" fill="#f2f2f4"></rect></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.mon.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M4 20h16"></path><path d="M6.5 16v-4M10.5 16V7"></path><path d="M14.5 16v-6" stroke="{{icoAcc}}"></path><path d="M18.5 16V5"></path></svg></span>
           <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
           <span style="{{dk.photos.tip}}">Фото</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}};background:linear-gradient(160deg,#ffffff,#ececf0)">
-            <svg width="100%" height="100%" viewBox="0 0 40 40"><g transform="translate(20 20)"><ellipse rx="4.5" ry="9" cy="-8" fill="#ff9f0a" opacity=".9"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ffd60a" opacity=".85" transform="rotate(45)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#30d158" opacity=".85" transform="rotate(90)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#64d2ff" opacity=".85" transform="rotate(135)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#0a84ff" opacity=".85" transform="rotate(180)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#bf5af2" opacity=".85" transform="rotate(225)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ff375f" opacity=".85" transform="rotate(270)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ff453a" opacity=".85" transform="rotate(315)"></ellipse></g></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><circle cx="12" cy="7.2" r="3.2"></circle><circle cx="16.8" cy="12" r="3.2"></circle><circle cx="12" cy="16.8" r="3.2"></circle><circle cx="7.2" cy="12" r="3.2"></circle><circle cx="12" cy="12" r="1.4" stroke="{{icoAcc}}" stroke-width="2.2"></circle></svg></span>
           <span aria-hidden="true" style="{{dk.photos.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Блокнот" onClick="{{openPad}}" onMouseEnter="{{dh.pad}}" onFocus="{{dh.pad}}" style="{{dk.pad.btn}}">
           <span style="{{dk.pad.tip}}">Блокнот</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}};background:linear-gradient(160deg,#f6f6f2,#d9d9d2)">
-            <svg width="100%" height="100%" viewBox="0 0 40 40"><path d="M11 11h18M11 17h18M11 23h12M11 29h15" stroke="#6f6f77" stroke-width="2.2" stroke-linecap="round"></path><path d="M27 31l7-7" stroke="#0a84ff" stroke-width="3" stroke-linecap="round"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10z"></path><path d="M14 3.5v5h5"></path><path d="M8.5 13h5M8.5 16.5h7" stroke="{{icoAcc}}"></path></svg></span>
           <span aria-hidden="true" style="{{dk.pad.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Калькулятор" onClick="{{openCalc}}" onMouseEnter="{{dh.calc}}" onFocus="{{dh.calc}}" style="{{dk.calc.btn}}">
           <span style="{{dk.calc.tip}}">Калькулятор</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}};background:linear-gradient(160deg,#3a3a40,#1c1c20)">
-            <svg width="100%" height="100%" viewBox="0 0 40 40"><rect x="9" y="9" width="9.5" height="9.5" rx="3" fill="#a1a1a8"></rect><rect x="21.5" y="9" width="9.5" height="9.5" rx="3" fill="#ff9f0a"></rect><rect x="9" y="21.5" width="9.5" height="9.5" rx="3" fill="#5a5a62"></rect><rect x="21.5" y="21.5" width="9.5" height="9.5" rx="3" fill="#5a5a62"></rect></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M8.5 7.5h7" stroke="{{icoAcc}}"></path><path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" stroke-width="2.4"></path></svg></span>
           <span aria-hidden="true" style="{{dk.calc.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
           <span style="{{dk.set.tip}}">Настройки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}};background:linear-gradient(180deg,#b9b9be,#6d6d73)">
-            <svg width="62%" height="62%" viewBox="0 0 24 24" fill="none" stroke="#1c1c1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M12 3.2l1.6 1.9 2.4-.6.7 2.4 2.4.7-.6 2.4 1.9 1.6-1.9 1.6.6 2.4-2.4.7-.7 2.4-2.4-.6L12 20.8l-1.6-1.9-2.4.6-.7-2.4-2.4-.7.6-2.4L3.6 12l1.9-1.6-.6-2.4 2.4-.7.7-2.4 2.4.6z"></path><circle cx="12" cy="12" r="3" stroke="{{icoAcc}}"></circle></svg></span>
           <span aria-hidden="true" style="{{dk.set.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Тест острова" onClick="{{openLab}}" onMouseEnter="{{dh.lab}}" onFocus="{{dh.lab}}" style="{{dk.lab.btn}}">
           <span style="{{dk.lab.tip}}">Тест острова</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.lab.tile}};background:radial-gradient(120% 90% at 85% 8%,#46464c 0%,#2c2c31 50%,#1c1c1f 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.25),0 4px 10px rgba(0,0,0,.3)">
-            <span style="width: 58%; height: 26%; border-radius: 999px; background: #050506; box-shadow: 0 0 0 1.5px rgba(255,255,255,0.35)"></span>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.lab.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><rect x="3" y="8.5" width="18" height="7" rx="3.5"></rect><circle cx="17.5" cy="12" r="1.3" stroke="{{icoAcc}}" stroke-width="2.2"></circle></svg></span>
           <span aria-hidden="true" style="{{dk.lab.dot}}"></span>
         </button>
         <span aria-hidden="true" style="width: 1px; align-self: stretch; margin: 6px 2px 10px; background: rgba(255,255,255,0.12)"></span>
         <button class="dock-btn" aria-label="Загрузки" onClick="{{openDown}}" onMouseEnter="{{dh.down}}" onFocus="{{dh.down}}" style="{{dk.down.btn}}">
           <span style="{{dk.down.tip}}">Загрузки</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}};background:linear-gradient(180deg,rgba(150,150,156,0.75),rgba(40,40,44,0.95))">
-            <svg width="52%" height="52%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.down.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M12 4v10.5" stroke="{{icoAcc}}"></path><path d="m7.5 10 4.5 4.5 4.5-4.5" stroke="{{icoAcc}}"></path><path d="M4.5 15v2.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V15"></path></svg></span>
           <span aria-hidden="true" style="{{dk.down.dot}}"></span>
         </button>
         <button class="dock-btn" aria-label="Корзина" onClick="{{openTrash}}" onMouseEnter="{{dh.trash}}" onFocus="{{dh.trash}}" style="{{dk.trash.btn}}">
           <span style="{{dk.trash.tip}}">Корзина</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}};background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.3)">
-            <svg width="52%" height="52%" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
-          </span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.trash.tile}}"><svg width="56%" height="56%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M4.5 7h15"></path><path d="M9.5 7V4.5h5V7" stroke="{{icoAcc}}"></path><path d="M6.5 7l1 12.5h9l1-12.5"></path><path d="M10 11v5M14 11v5"></path></svg></span>
           <span aria-hidden="true" style="{{dk.trash.dot}}"></span>
         </button>
       </nav>
@@ -1840,6 +1794,9 @@ class Component extends DCLogic {
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     runP.forEach((id) => { running[id] = true; });
     let DC = {}; try { DC = JSON.parse(this.props.dockCfg || '{}') || {}; } catch (e) { DC = {}; }
+    const ASH = (() => { const h = /^#?([0-9a-f]{6})$/i.exec(accent || '') ? parseInt(/^#?([0-9a-f]{6})$/i.exec(accent)[1], 16) : 0x9a9aa2; const ar = (h >> 16) & 255, ag = (h >> 8) & 255, ab = h & 255;
+      const mix = (r, g, b, t) => `rgb(${Math.round(r + (ar - r) * t)},${Math.round(g + (ag - g) * t)},${Math.round(b + (ab - b) * t)})`;
+      return { bg: `radial-gradient(120% 95% at 30% 0%,${mix(62, 62, 66, 0.10)} 0%,${mix(36, 36, 40, 0.06)} 45%,${mix(20, 20, 22, 0.03)} 100%)`, fg: '#dcdce0', acc: mix(200, 200, 205, 0.55) }; })();
     if (DC.run === false) Object.keys(running).forEach((k) => { running[k] = false; });
     const DSCR = 1440, nD = dockIds.length, DGAP = 4, DSEP = 9;
     const mag = Math.max(0, Math.min(1, (DC.mag === undefined ? 50 : +DC.mag) / 100));
@@ -1860,7 +1817,7 @@ class Component extends DCLogic {
       dh[id] = () => { if (this.state.dock !== id) this.setState({ dock: id, peek: true }); };
       dk[id] = {
         btn: `position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:${s}px;transition:width .16s ease`,
-        tile: `display:flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${Math.round(s * 0.26)}px;overflow:hidden;position:relative;font-size:${Math.round(s * 0.32)}px;box-shadow:0 ${Math.round(s * 0.08)}px ${Math.round(s * 0.2)}px rgba(0,0,0,.28);transition:width .16s ease,height .16s ease,border-radius .16s ease`,
+        tile: `display:flex;align-items:center;justify-content:center;width:${s}px;height:${s}px;border-radius:${Math.round(s * 0.26)}px;overflow:hidden;position:relative;color:${ASH.fg};background:${ASH.bg};box-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 0 1px rgba(255,255,255,.07),0 ${Math.round(s * 0.08)}px ${Math.round(s * 0.2)}px rgba(0,0,0,.35);transition:width .16s ease,height .16s ease,border-radius .16s ease`,
         dot: `width:4px;height:4px;border-radius:50%;transition:background .3s;background:${running[id] ? accent : 'rgba(0,0,0,0)'}`,
         tip: `position:absolute;bottom:${s + 14}px;left:50%;transform:translateX(-50%) translateY(${on ? 0 : 4}px);padding:4px 10px;border-radius:8px;background:rgba(20,20,22,.82);color:#f2f2f4;font-size:12.5px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:${on ? 1 : 0};transition:opacity .15s ease,transform .15s ease`
       };
@@ -2106,23 +2063,23 @@ class Component extends DCLogic {
     const tileS = (bg, fg) => `width:34px;height:34px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;font:700 12px 'JetBrains Mono',monospace;background:${bg};color:${fg || '#fff'}`;
     const xc = { FIG: '#8a63d2', PDF: '#c2412f', PNG: '#4f7fb8', MP3: '#d0452f', TXT: '#e8d9a8', SH: '#3f9a6b' };
     const index = [
-      { group: 'Приложения', name: 'Проводник', kind: 'Приложение', glyph: '▤', bg: '#3a3a40', text: '4 папки и 7 файлов в ~/Проекты', meta: [{ k: 'Тип', v: 'Приложение' }, { k: 'Версия', v: '1.0' }], open: () => openApp2('files') },
-      { group: 'Приложения', name: 'Терминал', kind: 'Приложение', glyph: '>_', bg: '#1e1e22', text: 'zsh 5.9 · вкладки, разделение панелей, палитра команд', meta: [{ k: 'Оболочка', v: 'zsh' }, { k: 'Сочетание', v: 'Super + Enter' }], open: () => openApp2('term') },
-      { group: 'Приложения', name: 'Музыка', kind: 'Приложение', glyph: '♪', bg: '#c2412f', text: 'SoundCloud, Spotify, Apple Music, Яндекс Музыка, YouTube Music', meta: [{ k: 'Сейчас', v: 'Трек.mp3' }], open: () => openApp2('music') },
-      { group: 'Приложения', name: 'Настройки', kind: 'Приложение', glyph: '⚙', bg: '#3a3a40', text: 'Экран, звук, сеть, оформление и пользователи', meta: [{ k: 'Разделов', v: '8' }], open: () => { if (this.props.onOpenApp) openApp2('set'); else this.setState({ win: 'settings', homeQ: '' }); } },
-      { group: 'Приложения', name: 'Обои', kind: 'Оформление', glyph: '◧', bg: '#4f7fb8', text: 'Выбор обоев с перекраской акцента под картинку', meta: [{ k: 'Текущие', v: 'Волны' }], open: () => this.setState({ picker: true, homeQ: '' }) },
-      { group: 'Приложения', name: 'Виджеты', kind: 'Рабочий стол', glyph: '▦', bg: '#3a3a40', text: 'Музыка, часы, погода, система, задачи', meta: [{ k: 'Включено', v: '4 из 5' }], open: () => this.setState({ gallery: true, homeQ: '' }) },
+      { group: 'Приложения', name: 'Проводник', kind: 'Приложение', glyph: '▤', bg: '#2a2a2e', text: '4 папки и 7 файлов в ~/Проекты', meta: [{ k: 'Тип', v: 'Приложение' }, { k: 'Версия', v: '1.0' }], open: () => openApp2('files') },
+      { group: 'Приложения', name: 'Терминал', kind: 'Приложение', glyph: '>_', bg: '#2a2a2e', text: 'zsh 5.9 · вкладки, разделение панелей, палитра команд', meta: [{ k: 'Оболочка', v: 'zsh' }, { k: 'Сочетание', v: 'Super + Enter' }], open: () => openApp2('term') },
+      { group: 'Приложения', name: 'Музыка', kind: 'Приложение', glyph: '♪', bg: '#2a2a2e', text: 'SoundCloud, Spotify, Apple Music, Яндекс Музыка, YouTube Music', meta: [{ k: 'Сейчас', v: 'Трек.mp3' }], open: () => openApp2('music') },
+      { group: 'Приложения', name: 'Настройки', kind: 'Приложение', glyph: '⚙', bg: '#2a2a2e', text: 'Экран, звук, сеть, оформление и пользователи', meta: [{ k: 'Разделов', v: '8' }], open: () => { if (this.props.onOpenApp) openApp2('set'); else this.setState({ win: 'settings', homeQ: '' }); } },
+      { group: 'Приложения', name: 'Обои', kind: 'Оформление', glyph: '◧', bg: '#2a2a2e', text: 'Выбор обоев с перекраской акцента под картинку', meta: [{ k: 'Текущие', v: 'Волны' }], open: () => this.setState({ picker: true, homeQ: '' }) },
+      { group: 'Приложения', name: 'Виджеты', kind: 'Рабочий стол', glyph: '▦', bg: '#2a2a2e', text: 'Музыка, часы, погода, система, задачи', meta: [{ k: 'Включено', v: '4 из 5' }], open: () => this.setState({ gallery: true, homeQ: '' }) },
       { group: 'Файлы', name: 'Концепт.fig', kind: 'Макет Figma · 5,6 МБ', glyph: 'FIG', bg: xc.FIG, text: 'Чёрная рамка · Dynamic Island · капли из рамки', meta: [{ k: 'Папка', v: '~/Проекты/Дизайн' }, { k: 'Изменён', v: '12 минут назад' }], open: () => openApp2('files') },
       { group: 'Файлы', name: 'Заметки.txt', kind: 'Текст · 18 КБ', glyph: 'TXT', bg: xc.TXT, fg: '#3a3020', mono: true, text: '— рамка 40 px, капли вниз\n— остров по центру\n— панели справа, календарь в центре', meta: [{ k: 'Папка', v: '~/Проекты' }, { k: 'Строк', v: '42' }], open: () => openApp2('files') },
       { group: 'Файлы', name: 'install.sh', kind: 'Скрипт Bash · 3 КБ', glyph: 'SH', bg: xc.SH, mono: true, text: '#!/usr/bin/env bash\nsudo pacman -S --needed quickshell\nsystemctl --user enable shell', meta: [{ k: 'Права', v: 'rwxr-xr-x' }], open: () => openApp2('term') },
       { group: 'Файлы', name: 'Трек.mp3', kind: 'Аудио · 7,2 МБ', glyph: 'MP3', bg: xc.MP3, text: '3:58 · 320 кбит/с · 44,1 кГц', meta: [{ k: 'Исполнитель', v: 'user' }], open: () => this.setState({ playing: true, homeQ: '' }) },
       { group: 'Файлы', name: 'Презентация.pdf', kind: 'PDF · 12,4 МБ', glyph: 'PDF', bg: xc.PDF, text: '18 страниц · Концепция рабочего окружения для AshenOS', meta: [{ k: 'Страниц', v: '18' }], open: () => openApp2('files') },
-      { group: 'Приложения', name: 'Калькулятор', kind: 'Приложение', glyph: '±', bg: '#ff9f0a', text: 'Обычный, научный, программист и конвертер величин', meta: [{ k: 'Режимы', v: '4' }], open: () => openApp2('calc') },
-      { group: 'Приложения', name: 'Блокнот', kind: 'Приложение', glyph: '✎', bg: '#5a5a62', text: 'Текст и код с подсветкой, поиск и замена, Markdown', meta: [{ k: 'Папка', v: '~/Документы' }], open: () => openApp2('pad') },
-      { group: 'Приложения', name: 'Фото', kind: 'Приложение', glyph: '✿', bg: '#ff375f', text: 'Медиатека, альбомы, правка снимков и видеоплеер', meta: [{ k: 'Объектов', v: '17' }], open: () => openApp2('photos') },
-      { group: 'Приложения', name: 'Карты', kind: 'Приложение', glyph: '➤', bg: '#c4302b', text: 'Поиск мест, маршруты и навигация в острове', meta: [{ k: 'Данные', v: 'OSM' }], open: () => openApp2('maps') },
-      { group: 'Приложения', name: 'Монитор', kind: 'Приложение', glyph: '▮', bg: '#3a3a42', text: 'Процессор, память, сеть и процессы', meta: [{ k: 'Обновление', v: '1 с' }], open: () => openApp2('mon') },
-      { group: 'Приложения', name: 'Тест острова', kind: 'Проверка функций', glyph: '◉', bg: '#2e2e33', text: 'Таймер, запись экрана, звонок, обновление, громкость, раскладка, буфер обмена', meta: [{ k: 'Тип', v: 'Демо-приложение' }], open: () => openApp2('lab') },
+      { group: 'Приложения', name: 'Калькулятор', kind: 'Приложение', glyph: '±', bg: '#2a2a2e', text: 'Обычный, научный, программист и конвертер величин', meta: [{ k: 'Режимы', v: '4' }], open: () => openApp2('calc') },
+      { group: 'Приложения', name: 'Блокнот', kind: 'Приложение', glyph: '✎', bg: '#2a2a2e', text: 'Текст и код с подсветкой, поиск и замена, Markdown', meta: [{ k: 'Папка', v: '~/Документы' }], open: () => openApp2('pad') },
+      { group: 'Приложения', name: 'Фото', kind: 'Приложение', glyph: '✿', bg: '#2a2a2e', text: 'Медиатека, альбомы, правка снимков и видеоплеер', meta: [{ k: 'Объектов', v: '17' }], open: () => openApp2('photos') },
+      { group: 'Приложения', name: 'Карты', kind: 'Приложение', glyph: '➤', bg: '#2a2a2e', text: 'Поиск мест, маршруты и навигация в острове', meta: [{ k: 'Данные', v: 'OSM' }], open: () => openApp2('maps') },
+      { group: 'Приложения', name: 'Монитор', kind: 'Приложение', glyph: '▮', bg: '#2a2a2e', text: 'Процессор, память, сеть и процессы', meta: [{ k: 'Обновление', v: '1 с' }], open: () => openApp2('mon') },
+      { group: 'Приложения', name: 'Тест острова', kind: 'Проверка функций', glyph: '◉', bg: '#2a2a2e', text: 'Таймер, запись экрана, звонок, обновление, громкость, раскладка, буфер обмена', meta: [{ k: 'Тип', v: 'Демо-приложение' }], open: () => openApp2('lab') },
       { group: 'Команды', name: 'Заблокировать экран', kind: 'Система', glyph: '⏻', bg: '#3a3a40', cmd: true, text: 'Блокирует сеанс, музыка продолжит играть', meta: [{ k: 'Сочетание', v: 'Super + L' }], open: () => { this.setState({ homeQ: '' }); lockNow(); } }
     ];
     const hq = (st.homeQ || '').trim().toLowerCase();
@@ -2412,6 +2369,7 @@ class Component extends DCLogic {
       dk, dh,
       peekOn: () => { if (!this.state.peek) this.setState({ peek: true }); },
       dockLeave: () => this.setState({ dock: null, peek: false }),
+      icoAcc: ASH.acc,
       dockNav: dockNavSt,
       dockWrap: `position:absolute;left:50%;bottom:12px;z-index:42;transform:translateX(-50%) translateY(${dockHidden ? 'calc(100% + 20px)' : '0'});transition:transform .4s cubic-bezier(.3,1.2,.4,1);${rvN ? `animation:${rvN % 2 ? 'dockA' : 'dockB'} .9s cubic-bezier(.2,1.25,.3,1) .55s both;` : ''}`,
       wave,
