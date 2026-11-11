@@ -1609,7 +1609,9 @@ class Component extends DCLogic {
     const D = game ? 0.25 : 0.32;
     const THV = this.themeVals();
     const ISL = `background:${THV.islBg};${game ? '' : 'backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);'}border:1px solid #2e2e33;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);`;
-    const hide = this.autohide() && !st.barShown && !st.menu && !st.right;
+    /* идёт звонок, запись, таймер и т.п. — остров не прячем даже во весь экран */
+    const liveAct = !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo);
+    const hide = this.autohide() && !st.barShown && !st.menu && !st.right && !liveAct;
     const unlocked = st.lock === 'off';
 
     /* ---- windows ---- */
