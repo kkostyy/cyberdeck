@@ -564,6 +564,15 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
         </button>
         </sc-if>
+        <sc-if value="{{dv.tasks}}" hint-placeholder-val="{{true}}">
+        <button class="dock-btn" data-app="tasks" onContextMenu="{{dctx.tasks}}" aria-label="Диспетчер задач" onClick="{{openTasks}}" onMouseEnter="{{dh.tasks}}" onFocus="{{dh.tasks}}" style="{{dk.tasks.btn}}">
+          <span style="{{dk.tasks.tip}}">Диспетчер задач</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.tasks.tile}}">
+            <svg width="100%" height="100%" viewBox="0 0 40 40" style="position:absolute;inset:0"><rect x="8" y="9" width="24" height="22" rx="3.5" fill="#121214" stroke="rgba(255,255,255,.1)"></rect><rect x="11" y="13" width="18" height="3" rx="1.5" fill="#d6d6db"></rect><rect x="11" y="18.5" width="12" height="3" rx="1.5" fill="{{icoAcc}}"></rect><rect x="11" y="24" width="15" height="3" rx="1.5" fill="#8e8e95"></rect></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.tasks.dot}}"></span>
+        </button>
+        </sc-if>
         <sc-if value="{{dv.photos}}" hint-placeholder-val="{{true}}">
         <button class="dock-btn" data-app="photos" onContextMenu="{{dctx.photos}}" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
           <span style="{{dk.photos.tip}}">Фото</span>
@@ -1947,7 +1956,7 @@ class Component extends DCLogic {
       style: `height:38px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;${T};background:${st.out === o.id ? accent : 'rgba(255,255,255,.05)'};color:${st.out === o.id ? '#111113' : '#e8e8ec'}` }));
 
     /* ---------- dock ---------- */
-    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'photos', 'pad', 'calc', 'set', 'lab', 'down', 'trash'];
+    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'tasks', 'photos', 'pad', 'calc', 'set', 'lab', 'down', 'trash'];
     const runP = String(this.props.openApps || '').split(',').filter(Boolean);
     const PINS = st.pins || (() => { try { const v = JSON.parse(localStorage.getItem('ashenos.dock.pins') || 'null'); if (Array.isArray(v)) return v; } catch (e) {} return ['files', 'term', 'web', 'music', 'notes', 'photos', 'set']; })();
     const ALWAYS = ['down', 'trash'];
@@ -2261,6 +2270,7 @@ class Component extends DCLogic {
       { group: 'Приложения', name: 'Блокнот', kind: 'Приложение', glyph: '✎', bg: '#2a2a2e', text: 'Текст и код с подсветкой, поиск и замена, Markdown', meta: [{ k: 'Папка', v: '~/Документы' }], open: () => openApp2('pad') },
       { group: 'Приложения', name: 'Фото', kind: 'Приложение', glyph: '✿', bg: '#2a2a2e', text: 'Медиатека, альбомы, правка снимков и видеоплеер', meta: [{ k: 'Объектов', v: '17' }], open: () => openApp2('photos') },
       { group: 'Приложения', name: 'Карты', kind: 'Приложение', glyph: '➤', bg: '#2a2a2e', text: 'Поиск мест, маршруты и навигация в острове', meta: [{ k: 'Данные', v: 'OSM' }], open: () => openApp2('maps') },
+      { group: 'Приложения', name: 'Диспетчер задач', kind: 'Приложение · Ctrl+Shift+Esc', glyph: '▮', bg: '#2a2a2e', text: 'Что запущено, сколько ест памяти и процессора, умные советы что закрыть', meta: [{ k: 'Сочетание', v: 'Ctrl+Shift+Esc' }], open: () => openApp2('tasks') },
       { group: 'Приложения', name: 'Монитор', kind: 'Приложение', glyph: '▮', bg: '#2a2a2e', text: 'Процессор, память, сеть и процессы', meta: [{ k: 'Обновление', v: '1 с' }], open: () => openApp2('mon') },
       { group: 'Приложения', name: 'Тест острова', kind: 'Проверка функций', glyph: '◉', bg: '#2a2a2e', text: 'Таймер, запись экрана, звонок, обновление, громкость, раскладка, буфер обмена', meta: [{ k: 'Тип', v: 'Демо-приложение' }], open: () => openApp2('lab') },
       { group: 'Команды', name: 'Заблокировать экран', kind: 'Система', glyph: '⏻', bg: '#3a3a40', cmd: true, text: 'Блокирует сеанс, музыка продолжит играть', meta: [{ k: 'Сочетание', v: 'Super + L' }], open: () => { this.setState({ homeQ: '' }); lockNow(); } }
@@ -2529,6 +2539,7 @@ class Component extends DCLogic {
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
       openMon: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('mon', 'dock'); } },
       openMaps: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('maps', 'dock'); } },
+      openTasks: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('tasks', 'dock'); } },
       openCalc: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('calc', 'dock'); } },
       openPad: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('pad', 'dock'); } },
       openPhotos: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('photos', 'dock'); } },
@@ -2581,7 +2592,7 @@ class Component extends DCLogic {
       dv, dctx,
       dmOn: !!st.dMenu, dmClose: () => this.setState({ dMenu: null }),
       dmSt: st.dMenu ? `position:absolute;left:${Math.max(110, Math.min(DSK.W - 110, st.dMenu.x))}px;bottom:${92 + 8}px;translate:-50% 0;z-index:60;width:210px;padding:6px;border-radius:14px;background:rgba(30,30,34,.94);backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.08);animation:dmIn .18s cubic-bezier(.2,1.3,.4,1) both;transform-origin:50% 100%` : 'display:none',
-      dmTitle: st.dMenu ? ({ files: 'Проводник', term: 'Терминал', claude: 'Claude', web: 'Браузер', maps: 'Карты', music: 'Музыка', notes: 'Заметки', photo: 'Обои', wid: 'Виджеты', mon: 'Монитор', photos: 'Фото', pad: 'Блокнот', calc: 'Калькулятор', set: 'Настройки', lab: 'Тест острова', down: 'Загрузки', trash: 'Корзина' }[st.dMenu.id] || '') : '',
+      dmTitle: st.dMenu ? ({ files: 'Проводник', term: 'Терминал', claude: 'Claude', web: 'Браузер', maps: 'Карты', music: 'Музыка', notes: 'Заметки', photo: 'Обои', wid: 'Виджеты', mon: 'Монитор', photos: 'Фото', pad: 'Блокнот', calc: 'Калькулятор', set: 'Настройки', lab: 'Тест острова', down: 'Загрузки', trash: 'Корзина', tasks: 'Диспетчер задач' }[st.dMenu.id] || '') : '',
       dmItems: (() => { const dm = st.dMenu; if (!dm) return []; const id = dm.id; const run = runP.includes(id); const pinned = PINS.includes(id); const sysApp = !['photo', 'wid', 'down', 'trash'].includes(id);
         const mi = (label, fn, danger) => ({ label, pick: () => { this.setState({ dMenu: null }); fn(); }, st: `width:100%;height:34px;padding:0 10px;border-radius:9px;display:flex;align-items:center;font-size:13.5px;font-weight:${danger ? 600 : 500};text-align:left;color:${danger ? '#ff6961' : '#f2f2f4'}` });
         const out = [];

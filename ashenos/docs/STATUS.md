@@ -25,6 +25,7 @@
 | Фото и видео | ✅ | Gwenview / mpv | ❌ |
 | Карты | ✅ | ✅ `ashen-maps` (QML, OSM) | ❌ |
 | Монитор системы | ✅ | Plasma System Monitor | ❌ |
+| Умный диспетчер задач (советы, «Освободить память», Ctrl+Shift+Esc) | ✅ | Plasma System Monitor, без советов | ❌ |
 | Claude | ✅ | ✅ `claude-desk` | ❌ |
 | Первый запуск | — | ✅ `ashenos-firstboot` | ❌ |
 
