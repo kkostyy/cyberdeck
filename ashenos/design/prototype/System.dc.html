@@ -473,6 +473,7 @@ body{margin:0;background:#050506}
         <span style="{{chip.timer}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2M9.5 2.5h5"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{timer.text}}</span></span>
         <span style="{{chip.sw}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 13V9M12 2.5v2"></path></svg><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{sw.text}}</span></span>
         <span style="{{chip.prog}}"><span aria-hidden="true" style="{{prog.ring}}"><span style="width: 8px; height: 8px; border-radius: 50%; background: #000"></span></span><span style="font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums">{{prog.pctText}}</span></span>
+        <span title="Ещё живые действия — наведите или нажмите" style="{{chip.more}}"><span style="font-size: 12px; font-weight: 800">{{chipMore}}</span></span>
         <span style="{{chip.shelf}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L16 13h5"></path><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"></path></svg><span style="font-size: 12px; font-weight: 700">{{shelfCount}}</span></span>
       </div>
       <!-- transient: level / clipboard / drag -->
@@ -677,6 +678,16 @@ body{margin:0;background:#050506}
             <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
               <div style="{{fp.liveCard}}"><span style="{{nv.icon}};width:34px;height:34px;border-radius:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg></span><span style="display: flex; flex-direction: column; min-width: 0; flex: 1"><span style="font-size: 13px; font-weight: 700">{{nv.dist}}</span><span style="font-size: 11.5px; color: #8b8b93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.text}}</span></span></div>
             </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{fp.shelfOn}}" hint-placeholder-val="{{false}}">
+          <div aria-label="Полка" style="display: flex; flex-direction: column; gap: 8px; flex: none; padding: 10px 12px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.14)">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8b8b93"><span style="font-size: 13px; font-weight: 700; color: #f2f2f4">Полка</span>{{fp.shelfN}} · перетащите на рабочий стол или в Проводник<button onClick="{{shelfClear}}" style="margin-left: auto; height: 26px; padding: 0 10px; border-radius: 8px; font-size: 11.5px; font-weight: 600; background: rgba(255,255,255,0.08)">Очистить</button></div>
+            <div style="display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none">
+              <sc-for list="{{shelfItems}}" as="it" hint-placeholder-count="3">
+                <div draggable="true" onDragStart="{{it.drag}}" onDragEnd="{{it.end}}" style="{{it.style}}"><span style="{{it.tile}}">{{it.ext}}</span><span style="font-size: 11px; max-width: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</span><button aria-label="Убрать с полки" onClick="{{it.remove}}" style="position: absolute; right: -4px; top: -4px; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; background: #3a3a40; color: #fff">✕</button></div>
+              </sc-for>
+            </div>
           </div>
         </sc-if>
         <sc-if value="{{fp.idle}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: #8b8b93; padding: 2px 4px">Сейчас ничего не происходит — звонки, запись, таймеры и навигация появятся здесь.</span></sc-if>
@@ -1985,7 +1996,12 @@ class Component extends DCLogic {
     const speaker = st.call ? (st.call.muted ? Math.floor(nowMs / 2600) % 2 : Math.floor(nowMs / 2600) % 3) : 0;
     const fOn = IC.focus !== false, fRun = fOn && IC.focusChip !== false && !!(st.fcs && st.fcs.running);
     const chipOn = { focus: fRun, nav: !!st.navInfo, call: !!st.call, rec: !!st.rec, timer: !!tm, sw: !!st.sw, prog: !!st.prog, shelf: st.shelf.length > 0 };
-    const chipW = { focus: 52, nav: 84, call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44 };
+    /* в самом острове — не больше трёх значков, остальное прячется в «+N» (всё видно при наведении и по клику) */
+    let shownN = 0, hiddenN = 0;
+    ['call', 'nav', 'rec', 'timer', 'prog', 'sw', 'shelf', 'focus'].forEach((k) => { if (!chipOn[k]) return; if (shownN < 3) shownN++; else { chipOn[k] = false; hiddenN++; } });
+    chipOn.more = hiddenN > 0;
+    const chipMore = '+' + hiddenN;
+    const chipW = { focus: 52, nav: 84, call: 104, rec: 72, timer: 76, sw: 76, prog: 62, shelf: 44, more: 38 };
     const winW = Math.min(230, 34 + Math.round(winT.length * 7.3));
     const onChips = Object.keys(chipW).filter((c) => chipOn[c]);
     const rowW = 24 + winW + onChips.reduce((a2, c) => a2 + chipW[c], 0) + onChips.length * 12;
@@ -1994,7 +2010,9 @@ class Component extends DCLogic {
     const big = ((st.hoverPill === 'isl' && IC.hover !== false) || st.shDrag) && unlocked && !st.fp;
     const shelfShow = st.shelf.length > 0 || dragMode;
     const secs = [36, fOn ? 120 : 0, st.navInfo ? 74 : 0, chipOn.call ? 94 : 0, chipOn.rec ? 102 : 0, chipOn.timer ? 116 : 0, chipOn.sw ? 102 : 0, chipOn.prog ? 84 : 0, st.clip.length ? 20 + Math.min(3, st.clip.length) * 36 : 0, shelfShow ? 122 : 0].filter(Boolean);
-    const bigH = 28 + secs.reduce((a2, b2) => a2 + b2, 0) + (secs.length - 1) * 14;
+    const bigRaw = 28 + secs.reduce((a2, b2) => a2 + b2, 0) + (secs.length - 1) * 14;
+    /* много живых действий + полка: остров не вылезает за экран, внутри прокрутка */
+    const bigH = Math.min(bigRaw, 640), bigScroll = bigRaw > bigH;
     const chipS = (c) => `display:${chipOn[c] && !flashMode ? 'flex' : 'none'};align-items:center;gap:6px;flex:none;width:${chipW[c]}px;justify-content:center;height:22px;border-radius:11px;background:rgba(255,255,255,.08);animation:islPop .45s ${SPR} both`;
     const SBI = 60, DW = 384 + SBI * 2, eS = 'cubic-bezier(.32,.72,0,1)', eI = 'cubic-bezier(.65,0,.35,1)';
     const liquidP = (w, h) => {
@@ -2015,7 +2033,7 @@ class Component extends DCLogic {
       flash: `position:absolute;left:0;top:0;height:30px;width:${iW}px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:9px;opacity:${flashMode ? 1 : 0};filter:blur(${flashMode ? 0 : 5}px);transform:scale(${flashMode ? 1 : 1.08});transition:opacity .22s,filter .22s,transform .35s ${SPR};pointer-events:none`,
       drop: `position:absolute;left:720px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
       body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(24,24,28,.82);backdrop-filter:blur(20px) saturate(150%)' : THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
-      big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
+      big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;${bigScroll ? `height:${bigH}px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 46px),transparent);mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 46px),transparent);` : ''}display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
     };
     /* ---- фокус / навигация / панель «Сегодня» ---- */
     const accI = THV.accent || '#3b82f6';
@@ -2058,15 +2076,17 @@ class Component extends DCLogic {
     const fOnP = IC.focus !== false, tOnP = IC.tasks !== false;
     const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']].filter(([id]) => id === 'today' || (id === 'week' ? tOnP : fOnP));
     const tabNow = tabsFP.some(([id]) => id === st.fpTab) ? st.fpTab : 'today';
-    const liveP = !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo);
+    const liveN = [st.call, st.rec, st.timer, st.sw, st.prog, st.navInfo].filter(Boolean).length, liveP = liveN > 0;
+    const liveRows = Math.ceil(liveN / 3), shelfP = st.shelf.length > 0;
+    const extraP = (liveP ? liveRows * 62 + 8 : 0) + (shelfP ? 112 : 0);
     /* панель подстраивается: без фокуса и задач остаются только живые действия */
     const bodyP = tabNow === 'today' ? (fOnP || tOnP) : true;
-    const hP = bodyP ? (tabNow === 'today' && !tOnP ? 270 : 340) + (liveP ? 70 : 0) : 72 + (liveP ? 68 : 40);
+    const hP = Math.min(820, bodyP ? (tabNow === 'today' && !tOnP ? 270 : 340) + extraP : 72 + (liveP || shelfP ? extraP : 40));
     const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], wd = (new Date().getDay() + 6) % 7;
     const fp = {
-      grid: `display:grid;grid-template-columns:${fOnP && (tOnP || tabNow !== 'today') ? '250px minmax(0,1fr)' : 'minmax(0,1fr)'};gap:16px;flex:1;min-height:0`, tasksOn: tOnP, tasksOff: false, body: bodyP, idle: !bodyP && !liveP, showTabs: tabsFP.length > 1,
-      liveRow: `display:flex;gap:8px;flex:none;${bodyP ? 'overflow-x:auto;scrollbar-width:none' : 'flex-wrap:wrap'}`,
-      live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: (bodyP ? 'flex:none;' : 'flex:1 1 230px;') + 'min-width:230px;max-width:' + (bodyP ? '330px;' : '100%;') + 'height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
+      grid: `display:grid;grid-template-columns:${fOnP && (tOnP || tabNow !== 'today') ? '250px minmax(0,1fr)' : 'minmax(0,1fr)'};gap:16px;flex:1;min-height:0`, tasksOn: tOnP, tasksOff: false, body: bodyP, idle: !bodyP && !liveP && !shelfP, showTabs: tabsFP.length > 1,
+      liveRow: 'display:flex;gap:8px;flex:none;flex-wrap:wrap', idle2: !bodyP && !liveP && !shelfP, shelfOn: shelfP, shelfN: `${st.shelf.length} ${st.shelf.length === 1 ? 'файл' : st.shelf.length < 5 ? 'файла' : 'файлов'}`,
+      live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: 'flex:1 1 230px;min-width:230px;max-width:100%;height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
       on: !!st.fp && unlocked, isToday: tabNow === 'today', isTodayT: tabNow === 'today' && tOnP, isWeek: tabNow === 'week', isFocus: tabNow === 'focus',
       box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${hP}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
       tabs: tabsFP.map(([id, name]) => ({ name, on: tabNow === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${tabNow === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${tabNow === id ? '#ffffff' : '#a1a1a8'}` })),
@@ -2080,7 +2100,7 @@ class Component extends DCLogic {
       durs: [15, 25, 45, 60].map((n) => ({ name: n + ' мин', pick: () => this.setState({ fcs: { ...st.fcs, total: n * 60000, left: n * 60000, running: true, startAt: Date.now() } }), st: `height:44px;border-radius:12px;font-size:13px;font-weight:700;background:${fTot === n * 60000 ? '#f2f2f4' : 'rgba(255,255,255,.06)'};color:${fTot === n * 60000 ? '#0b0b0c' : '#e8e8ec'}` })),
       stats: [{ k: 'Сессий сегодня', v: String(st.fcs.sessions || 0) }, { k: 'В фокусе', v: `${Math.floor((st.fcs.sessions || 0) * fTot / 3600000)} ч ${Math.round(((st.fcs.sessions || 0) * fTot / 60000) % 60)} мин` }, { k: 'Задач закрыто', v: String(allT.length - openT.length) }]
     };
-    const chip = { focus: chipS('focus'), nav: chipS('nav'), call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
+    const chip = { more: chipS('more'), focus: chipS('focus'), nav: chipS('nav'), call: chipS('call'), rec: chipS('rec'), timer: chipS('timer') + (tDone ? 'background:#f2f2f4;color:#0b0b0c;' : ''), sw: chipS('sw'), prog: chipS('prog'), shelf: chipS('shelf') };
     const lvl = fl && (fl.kind === 'vol' || fl.kind === 'bright');
     const flash = !flashMode ? { glyph: '', label: '', text: '', track: 'display:none', fill: '', textStyle: 'display:none' } : flashMode === 'drag'
       ? { glyph: '⇣', label: 'Положить на полку', text: '', track: 'display:none', fill: '', textStyle: 'display:none' }
@@ -2410,7 +2430,7 @@ class Component extends DCLogic {
       swStop: () => this.setState({ sw: null }),
       progCancel: () => { clearTimeout(this.progT); this.progT = null; this.setState({ prog: null }); },
       clipClear: () => this.setState({ clip: [] }),
-      fo, nv, fp, ctlBtnL: 'width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)', focusToggle: this.focusToggle, focusDone: this.focusDone,
+      chipMore, fo, nv, fp, ctlBtnL: 'width:30px;height:30px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1)', focusToggle: this.focusToggle, focusDone: this.focusDone,
       islClick: (e) => { if (e && e.target && e.target.closest && e.target.closest('button')) return; if (IC.click === false) return; this.setState({ fp: !this.state.fp, hoverPill: null }); }, fpClose: () => this.setState({ fp: false }),
       isl, islEnter: () => { clearTimeout(this.pillT); if (this.state.hoverPill !== 'isl') this.setState({ hoverPill: 'isl' }); },
       appTitle: active === 'desk' ? '' : this.meta[active].title,
