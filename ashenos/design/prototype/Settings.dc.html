@@ -441,6 +441,9 @@ const SECTIONS = [
   ] },
   { cat: 'Рабочее пространство', items: [
     { id: 'behav', name: 'Общее поведение', glyph: '⚙', bg: '#3a3a40', sub: 'Клики, прокрутка, подсказки', groups: [
+      { title: 'Оформление', rows: [
+        { id: 'appear', t: 'seg', label: 'Оформление', hint: '«Авто» — светлое днём (7:00–19:00), тёмное вечером', opts: ['Тёмное', 'Светлое', 'Авто'], v: 'Тёмное' }
+      ] },
       { title: 'Нажатия', rows: [
         { id: 'click', t: 'seg', label: 'Открывать файлы', opts: ['Двойным щелчком', 'Одним щелчком'], v: 'Двойным щелчком' },
         { id: 'scroll', t: 'seg', label: 'Щелчок по полосе прокрутки', opts: ['Перейти к месту', 'Листать страницу'], v: 'Перейти к месту' },
@@ -542,6 +545,11 @@ const SECTIONS = [
         { id: 'vol', t: 'slider', label: 'Громкость', min: 0, max: 150, unit: '%', v: 64 },
         { id: 'over', t: 'toggle', label: 'Разрешить громкость выше 100%', v: false },
         { id: 'feedbackSnd', t: 'toggle', label: 'Звук при изменении громкости', v: true }
+      ] },
+      { title: 'Звуки системы', rows: [
+        { id: 'uiSnd', t: 'toggle', label: 'Звуки интерфейса', hint: 'Тихие щелчки кнопок, открытие окон, блокировка', v: true },
+        { id: 'notifSnd', t: 'toggle', label: 'Звук уведомлений', v: true },
+        { id: 'sndVol', t: 'slider', label: 'Громкость системных звуков', min: 0, max: 100, unit: '%', v: 40 }
       ] },
       { title: 'Ввод', rows: [
         { id: 'mic', t: 'select', label: 'Микрофон', opts: ['Встроенный в веб-камеру', 'USB-микрофон', 'Нет'], v: 'Встроенный в веб-камеру' },
@@ -1081,7 +1089,7 @@ class Component extends DCLogic {
     const wallPick = st.wPick === null || st.wPick === undefined ? curWallSys : st.wPick;
     try { localStorage.setItem('archSettings.v2', JSON.stringify(st.vals)); } catch (e) {}
     if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
-    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true), screen: (() => { const r = String(g('res', 'Авто')); return ['1920 × 1080', '1440 × 900', '1280 × 800', '1024 × 600', '800 × 480'].includes(r) ? r.replace(/\s*×\s*/, 'x') : 'auto'; })(), uiScale: g('scale', 'Авто'), dock: { size: g('dockSize', 40), mag: g('dockMag', 50), width: g('dockWidth', 'Половина экрана'), hide: g('dockHide', 'Умное'), run: g('dockRun', true), wave: g('dockWave', true) } })); }
+    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true), appear: g('appear', 'Тёмное'), snd: { ui: g('uiSnd', true), notif: g('notifSnd', true), vol: g('sndVol', 40) }, screen: (() => { const r = String(g('res', 'Авто')); return ['1920 × 1080', '1440 × 900', '1280 × 800', '1024 × 600', '800 × 480'].includes(r) ? r.replace(/\s*×\s*/, 'x') : 'auto'; })(), uiScale: g('scale', 'Авто'), dock: { size: g('dockSize', 40), mag: g('dockMag', 50), width: g('dockWidth', 'Половина экрана'), hide: g('dockHide', 'Умное'), run: g('dockRun', true), wave: g('dockWave', true) } })); }
     this.setState({ saved: { ...st.vals }, wPick: null });
     if (auto !== true) this.say('Изменения применены');
   }
@@ -1106,7 +1114,8 @@ class Component extends DCLogic {
     const changedIn = (pg) => groupsOf(pg).reduce((n, g) => n + g.rows.filter((r) => val(r) !== savedVal(r)).length, 0) + (pg.custom === 'wall' && wallPick !== curWallSys ? 1 : 0);
     const cur = pages.find((p) => p.id === st.sec) || pages[0];
     const ACC = this.props.themeTint || '#2f7cf6';
-    const icon = (bg, size) => `width:${size}px;height:${size}px;flex:none;border-radius:${Math.round(size * 0.26)}px;display:flex;align-items:center;justify-content:center;font:600 ${Math.round(size * 0.5)}px Inter,sans-serif;color:#fff;background:linear-gradient(180deg,${bg}dd,${bg});box-shadow:inset 0 0 0 .5px rgba(255,255,255,.22)`;
+    const glyphCol = (bg) => { const m = /^#?([0-9a-f]{6})$/i.exec(bg || ''); if (!m) return '#e6e6ea'; const n = parseInt(m[1], 16); const r = (n >> 16) & 255, gg = (n >> 8) & 255, b = n & 255; const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b); if (mx - mn < 30) return '#e6e6ea'; const k = 0.45; return `rgb(${Math.round(r + (255 - r) * k)},${Math.round(gg + (255 - gg) * k)},${Math.round(b + (255 - b) * k)})`; };
+    const icon = (bg, size) => `width:${size}px;height:${size}px;flex:none;border-radius:${Math.round(size * 0.26)}px;display:flex;align-items:center;justify-content:center;font:600 ${Math.round(size * 0.5)}px Inter,sans-serif;color:${glyphCol(bg)};background:radial-gradient(120% 90% at 85% 8%,#4a4a50 0%,#2e2e33 45%,#1c1c1f 85%);box-shadow:inset 0 1px 1px rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.06),0 1px 3px rgba(0,0,0,.4)`;
     const navStyle = (on) => `flex:none;display:flex;align-items:center;gap:9px;height:32px;padding:0 8px;border-radius:7px;border:0;color:${on ? '#fff' : '#e8e8ec'};font:inherit;background:${on ? ACC : 'transparent'};transition:background .15s`;
     const badge = (n) => n && st.hl ? 'min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#f2f2f4;color:#0b0b0c' : 'display:none';
     let nav = [];
