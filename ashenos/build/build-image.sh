@@ -48,6 +48,8 @@ echo "==> Накладываю файлы AshenOS"
 cp -a "$ROOT_OVERLAY/." "$MNT/"
 cat "$MNT/boot/config-ashenos.txt" >> "$MNT/boot/config.txt"
 rm "$MNT/boot/config-ashenos.txt"
+# настройки первого запуска лежат на загрузочном разделе — их можно править с любого компьютера
+cp "$ROOT_OVERLAY/boot/ashenos.conf" "$MNT/boot/ashenos.conf"
 install -Dm755 "$HERE/ashenos-info" "$MNT/usr/local/bin/ashenos-info"
 
 echo "==> Ставлю приложение Claude (claude-desk)"
@@ -64,7 +66,10 @@ arch-chroot "$MNT" /bin/bash -e <<CHROOT
 pacman-key --init
 pacman-key --populate archlinuxarm
 pacman -Syu --noconfirm --needed $PKGS
-systemctl enable sddm NetworkManager bluetooth sshd
+systemctl enable sddm NetworkManager bluetooth sshd ashenos-firstboot systemd-timesyncd
+# сразу применить настройки AshenOS для alarm при первом входе
+mkdir -p /home/alarm/.config/ashenos /etc/skel/.config/ashenos
+for g in video audio input uucp; do usermod -aG \$g alarm 2>/dev/null || true; done
 chown -R alarm:alarm /home/alarm
 echo 'alarm ALL=(ALL) ALL' > /etc/sudoers.d/alarm
 ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime

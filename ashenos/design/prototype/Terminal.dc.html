@@ -11,6 +11,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
+
+/* macOS traffic lights */
+.tl{display:flex;align-items:center;flex:none;margin-right:4px}
+.tl .tl-b{width:26px;height:44px;padding:0;margin:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:default;-webkit-tap-highlight-color:transparent}
+.tl .tl-b:first-child{width:30px;justify-content:flex-start;padding-left:4px}
+.tl .tl-b i{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.2);transition:filter .12s,transform .18s cubic-bezier(.3,1.4,.5,1)}
+.tl .tl-b svg{opacity:0;transition:opacity .12s}
+.tl:hover .tl-b svg,.tl:focus-within .tl-b svg{opacity:1}
+.tl .tl-b:active i{filter:brightness(.72);transform:scale(.92)}
+.tl .tl-b:focus-visible i{outline:2px solid #f2f2f4;outline-offset:2px}
 body{margin:0;background:#050506}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
@@ -36,6 +46,11 @@ input::placeholder{color:#6f6f77}
 
     <!-- title bar (explorer style) -->
     <header style="height: 66px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 20px">
+      <div class="tl" role="group" aria-label="Управление окном">
+        <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
+        <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
+        <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>
+      </div>
       <div style="display: flex; align-items: center; gap: 12px; width: 206px; flex: none">
         <span aria-hidden="true" style="position: relative; width: 38px; height: 38px; flex: none; border-radius: 11px; background: radial-gradient(120% 90% at 85% 8%, #46464c 0%, #2c2c31 50%, #1c1c1f 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.25)">
           <span style="position: absolute; left: 5px; right: 5px; bottom: 5px; height: 15px; border-radius: 8px; background: #141416; box-shadow: inset 0 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; padding-left: 5px; font: 700 9px/1 'JetBrains Mono', monospace; color: #8e8e93">&gt;_</span>
@@ -79,9 +94,6 @@ input::placeholder{color:#6f6f77}
       </div>
       <div style="display: flex; align-items: center; gap: 2px; margin-left: 4px; flex: none">
         <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
-        <button aria-label="Свернуть" onClick="{{minApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
-        <button aria-label="Развернуть" onClick="{{maxApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="4.5" width="15" height="15" rx="2.5"></rect></svg></button>
-        <button aria-label="Закрыть окно" onClick="{{closeApp}}" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
       </div>
     </header>
 

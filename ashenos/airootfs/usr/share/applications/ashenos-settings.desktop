@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Параметры AshenOS
+Comment=Тема, оттенок, обои, экран, клавиатура, ночной цвет, звук, уведомления
+Exec=ashenos-settings
+Icon=preferences-desktop-theme
+Categories=Settings;
+Keywords=тема;оттенок;обои;ночной;клавиатура;theme;accent;

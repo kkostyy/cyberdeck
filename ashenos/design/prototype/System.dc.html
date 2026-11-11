@@ -51,8 +51,10 @@ body{margin:0;background:#050506}
 @keyframes petIn{from{opacity:0;scale:.3}to{opacity:1;scale:1}}
 @keyframes sysLockIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
 @keyframes sysLockOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:scale(1.06);filter:blur(10px)}}
-@keyframes sysWinIn{from{opacity:0;transform:translateY(36px) scale(.9);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
-@keyframes sysWinOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:translateY(24px) scale(.9);filter:blur(6px)}}
+@keyframes sysWinIn{from{opacity:0;transform:translateY(24px) scale(.86)}to{opacity:1;transform:none}}
+@keyframes sysWinOut{from{opacity:1;transform:none}to{opacity:0;transform:scale(.94)}}
+@keyframes sysGenieMin{0%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:1}40%{clip-path:polygon(0 0,100% 22%,100% 78%,0 100%)}75%{clip-path:polygon(18% 12%,100% 34%,100% 66%,18% 88%);opacity:.9}100%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%);opacity:1}}
+@keyframes sysGenieRest{0%{clip-path:polygon(18% 12%,100% 34%,100% 66%,18% 88%);opacity:.85}45%{clip-path:polygon(0 0,100% 20%,100% 80%,0 100%);opacity:1}100%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}}
 @keyframes islPop{0%{opacity:0;transform:translateY(-34px) scale(.42);filter:blur(6px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none}}
 @keyframes islBack{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-46px) scale(.3);filter:blur(6px)}}
 @keyframes islBump{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}
@@ -1412,20 +1414,20 @@ class Component extends DCLogic {
   }
   minWin(id) {
     const w = this.state.wins[id]; if (!w) return;
-    this.patchWin(id, { min: true, minAt: Date.now() });
+    this.patchWin(id, { min: true, minAt: Date.now(), anim: 'min', animAt: Date.now() });
     const order = this.state.order.filter((o) => o !== id && !this.state.wins[o].min);
     this.setState({ focus: order[order.length - 1] || null });
     if (w.max) this.leaveFull();
   }
   restoreWin(id) {
     const w = this.state.wins[id]; if (!w) return;
-    this.setState({ wins: { ...this.state.wins, [id]: { ...w, min: false } }, peek: null, stackHover: false, order: [...this.state.order.filter((o) => o !== id), id], focus: id });
+    this.setState({ wins: { ...this.state.wins, [id]: { ...w, min: false, anim: 'rest', animAt: Date.now() } }, peek: null, stackHover: false, order: [...this.state.order.filter((o) => o !== id), id], focus: id });
     if (w.max) this.enterFull();
   }
   maxWin(id) {
     const w = this.state.wins[id]; if (!w) return;
     const max = !w.max;
-    this.patchWin(id, { max });
+    this.patchWin(id, { max, anim: max ? 'full' : 'unfull', animAt: Date.now() });
     this.focusWin(id);
     if (max) this.enterFull(); else this.leaveFull();
   }
@@ -1450,12 +1452,20 @@ class Component extends DCLogic {
     const yIn = (e.clientY - el.getBoundingClientRect().top) / k;
     if (yIn > 84 * (w.w / 1368)) return;
     e.preventDefault();
+    /* двойной щелчок по заголовку — во весь экран, как в macOS */
+    const nowT = Date.now();
+    if (this.lastDown && this.lastDown.id === id && nowT - this.lastDown.t < 320) { this.lastDown = null; this.maxWin(id); return; }
+    this.lastDown = { id, t: nowT };
     this.drag = { id, mode: 'move', sx: e.clientX, sy: e.clientY, k, o: { x: w.x, y: w.y, w: w.w, h: w.h }, el, tr: el.style.transition };
     this.live = { id, x: w.x, y: w.y, w: w.w, h: w.h };
-    el.style.transition = 'none';
+    /* окно «приподнимается»: глубже тень, чуть крупнее; позиция следует за курсором без задержки */
+    el.style.transition = 'box-shadow .22s ease, scale .28s cubic-bezier(.3,1.5,.5,1), opacity .2s';
+    el.style.scale = '1.012';
+    el.style.boxShadow = this.LIFT;
     window.addEventListener('mousemove', this.onDragMove);
     window.addEventListener('mouseup', this.onDragUp);
   }
+  LIFT = '0 50px 120px rgba(0,0,0,.66), 0 0 0 1px rgba(255,255,255,.1)';
   rsDown(e, id) {
     const w = this.state.wins[id]; if (!w || e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
@@ -1482,6 +1492,20 @@ class Component extends DCLogic {
       if (Math.abs(y - 40) < SN) y = 40;
       if (Math.abs(892 - (y + h)) < SN) y = 892 - h;
       x = Math.max(-w + 120, Math.min(1440 - 120, x)); y = Math.max(40, Math.min(900 - 60, y));
+      /* тянем к верхнему краю — превью «во весь экран» (как в macOS Sequoia) */
+      const host = d.el.parentNode, hr = host.getBoundingClientRect();
+      const full = (e.clientY - hr.top) / d.k < 14;
+      if (full !== !!d.full) {
+        d.full = full;
+        if (!d.pv) {
+          const pv = document.createElement('div');
+          pv.setAttribute('aria-hidden', 'true');
+          pv.style.cssText = 'position:absolute;left:6px;top:6px;right:6px;bottom:6px;z-index:84;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 30px 80px rgba(0,0,0,.4);pointer-events:none;opacity:0;scale:.92;transition:opacity .2s ease,scale .32s cubic-bezier(.3,1.3,.5,1)';
+          host.appendChild(pv); d.pv = pv; void pv.offsetWidth;
+        }
+        d.pv.style.opacity = full ? '1' : '0'; d.pv.style.scale = full ? '1' : '.92';
+        d.el.style.opacity = full ? '.82' : '';
+      }
     } else {
       const sgn = d.edge === 'se' || d.edge === 'ne' ? 1 : -1;
       w = Math.max(520, Math.min(1440, o.w + sgn * dx));
@@ -1496,7 +1520,7 @@ class Component extends DCLogic {
     el.style.left = x + 'px'; el.style.top = y + 'px';
     el.style.width = w + 'px'; el.style.height = h + 'px';
     el.style.borderRadius = (22 * w / 1368) + 'px';
-    el.style.boxShadow = (x === 8 || y === 40 || x + w === 1432 || y + h === 892) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : '';
+    el.style.boxShadow = (x === 8 || y === 40 || x + w === 1432 || y + h === 892) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : (d.mode === 'move' ? this.LIFT : '');
     if (d.inner) d.inner.style.transform = `scale(${w / 1368}) translate(-36px, -32px)`;
   };
   onDragUp = () => {
@@ -1506,6 +1530,14 @@ class Component extends DCLogic {
     const l = this.live;
     d.el.style.transition = d.tr;
     d.el.style.boxShadow = '';
+    d.el.style.scale = ''; d.el.style.opacity = '';
+    if (d.pv) { const pv = d.pv; pv.style.opacity = '0'; pv.style.scale = d.full ? '1.02' : '.92'; setTimeout(() => pv.remove(), 260); }
+    if (d.full) {
+      this.drag = null; this.live = null;
+      const w0 = this.state.wins[d.id];
+      if (w0) { this.setState({ wins: { ...this.state.wins, [d.id]: { ...w0, x: d.o.x, y: d.o.y } } }); setTimeout(() => this.maxWin(d.id), 0); }
+      return;
+    }
     if (d.inner) d.inner.style.transition = d.itr;
     this.drag = null; this.live = null;
     const w = this.state.wins[d.id];
@@ -1552,12 +1584,17 @@ class Component extends DCLogic {
       const s = r.w / (w.max && !w.min ? 1368 : 1368);
       const rad = w.max && !w.min ? 0 : 22 * s;
       const focused = st.focus === id && !w.min;
-      const tr = `left .46s ${SPR},top .46s ${SPR},width .46s ${SPR},height .46s ${SPR},border-radius .46s ${OUT},box-shadow .3s,opacity .3s`;
+      const an = w.anim && Date.now() - (w.animAt || 0) < 700 ? w.anim : '';
+      /* macOS: сворачивание «джинном» без отскока, полноэкранный режим — плавное ускорение/торможение */
+      const EZ = an === 'min' ? 'cubic-bezier(.55,0,.3,1)' : an === 'rest' ? 'cubic-bezier(.2,.75,.25,1)' : an ? 'cubic-bezier(.25,.9,.25,1)' : SPR;
+      const DU = an === 'min' || an === 'rest' ? '.55s' : an ? '.5s' : '.46s';
+      const tr = `left ${DU} ${EZ},top ${DU} ${EZ},width ${DU} ${EZ},height ${DU} ${EZ},border-radius ${DU} ${OUT},box-shadow .3s,opacity .3s,scale .35s ${SPR}`;
+      const genie = an === 'min' ? 'animation:sysGenieMin .55s cubic-bezier(.55,0,.3,1) both;' : an === 'rest' ? 'animation:sysGenieRest .55s cubic-bezier(.2,.75,.25,1) both;' : '';
       win[id] = {
         open: true, title: this.meta[id].title, pinned: w.pinned && !w.min,
         cover: !!w.min, handles: !w.min && !w.max,
-        box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:${THV.surface};box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .26s ease both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .45s cubic-bezier(.2,1.1,.3,1) both;' : '')}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
-        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform .46s ${SPR};${w.min ? 'pointer-events:none;' : ''}`
+        box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:${THV.surface};box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .22s cubic-bezier(.4,0,1,1) both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .42s cubic-bezier(.2,.9,.25,1) both;' : genie)}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
+        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform ${DU} ${EZ};${w.min ? 'pointer-events:none;' : ''}`
       };
     });
     const peekW = st.peek && st.wins[st.peek];

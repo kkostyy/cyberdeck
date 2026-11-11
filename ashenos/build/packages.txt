@@ -58,3 +58,12 @@ libnotify
 libcanberra
 curl
 jq
+
+# автонастройка AshenOS (ashenos-firstboot, ashenos-settings)
+cloud-guest-utils
+kdialog
+kconfig
+plasma-workspace
+kscreen
+iw
+wireless-regdb

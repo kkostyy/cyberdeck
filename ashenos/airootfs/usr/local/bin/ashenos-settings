@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+# ============================================================
+#  ashenos-settings — все «Параметры» AshenOS из одной команды
+#
+#  ashenos-settings                 окно настроек (kdialog)
+#  ashenos-settings list            все ключи и текущие значения
+#  ashenos-settings get КЛЮЧ
+#  ashenos-settings set КЛЮЧ ЗНАЧ   сохранить и сразу применить
+#  ashenos-settings apply           применить всё заново
+#  ashenos-settings apply --once    применить, только если что-то поменялось
+#                                   (так запускается при входе в сеанс)
+#  ashenos-settings reset           вернуть значения по умолчанию
+#  ashenos-settings themes          список тем
+# ============================================================
+set -u
+
+SYS_CONF=/etc/ashenos/settings.conf
+USR_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ashenos"
+USR_CONF="$USR_DIR/settings.conf"
+STAMP="$USR_DIR/.applied"
+THEMES=/usr/share/ashenos/themes.psv
+WALLS=/usr/share/wallpapers/ashenos
+LOG="$USR_DIR/apply.log"
+
+KW=$(command -v kwriteconfig6 || command -v kwriteconfig5 || true)
+QDBUS=$(command -v qdbus6 || command -v qdbus || true)
+
+mkdir -p "$USR_DIR"
+
+# ---------- чтение / запись ----------
+declare -A CFG
+load() {
+  local f line k v
+  for f in "$SYS_CONF" "$USR_CONF"; do
+    [ -r "$f" ] || continue
+    while IFS= read -r line || [ -n "$line" ]; do
+      case "$line" in ''|\#*) continue ;; esac
+      k=${line%%=*}; v=${line#*=}
+      k=$(echo "$k" | tr -d '[:space:]')
+      CFG[$k]=$v
+    done < "$f"
+  done
+}
+val() { echo "${CFG[$1]:-$2}"; }
+
+save() { # save KEY VALUE
+  local k=$1 v=$2
+  touch "$USR_CONF"
+  if grep -q "^$k=" "$USR_CONF"; then
+    local tmp; tmp=$(mktemp)
+    awk -v k="$k" -v v="$v" -F= '$1==k{print k"="v; next}{print}' "$USR_CONF" > "$tmp" && mv "$tmp" "$USR_CONF"
+  else
+    echo "$k=$v" >> "$USR_CONF"
+  fi
+  CFG[$k]=$v
+}
+
+kw() { [ -n "$KW" ] && "$KW" "$@"; }
+in_session() { [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]; }
+say() { echo "  · $*"; }
+
+# ---------- применение ----------
+apply_theme() {
+  local th acc tint name n acc_rgb
+  th=$(val THEME obsidian); acc=$(val ACCENT orange); tint=$(val TINT 0)
+  mkdir -p "$HOME/.local/share/color-schemes"
+  # Две схемы по очереди: Plasma не перечитывает схему с тем же именем
+  if grep -qs '^ColorScheme=AshenOSA' "$HOME/.config/kdeglobals"; then n=B; else n=A; fi
+  name="AshenOS$n"
+  acc_rgb=$(python3 /usr/lib/ashenos/mkscheme.py "$th" "$acc" "$tint" "$HOME/.local/share/color-schemes/$name.colors") || return
+  sed -i "s/^ColorScheme=AshenOS$/ColorScheme=$name/" "$HOME/.local/share/color-schemes/$name.colors"
+  rm -f "$HOME/.local/share/color-schemes/AshenOS$([ $n = A ] && echo B || echo A).colors"
+  kw --file kdeglobals --group General --key AccentColor "$acc_rgb"
+  kw --file kdeglobals --group General --key accentColorFromWallpaper false
+  if in_session && command -v plasma-apply-colorscheme >/dev/null; then
+    plasma-apply-colorscheme "$name" >/dev/null 2>&1
+  else
+    kw --file kdeglobals --group General --key ColorScheme "$name"
+  fi
+  kw --file kdeglobals --group Icons --key Theme breeze-dark
+  say "тема $th, оттенок $acc, окраска фона $tint"
+}
+
+apply_wallpaper() {
+  local w f
+  w=$(val WALLPAPER waves)
+  if [ -f "$w" ]; then f=$w; else f="$WALLS/$w.jpg"; fi
+  [ -f "$f" ] || { say "обои: нет файла $f"; return; }
+  if in_session && command -v plasma-apply-wallpaperimage >/dev/null; then
+    plasma-apply-wallpaperimage "$f" >/dev/null 2>&1
+  fi
+  kw --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key Image "file://$f"
+  kw --file kscreenlockerrc --group Greeter --group Wallpaper --group org.kde.image --group General --key PreviewImage "file://$f"
+  say "обои $(basename "$f")"
+}
+
+apply_fonts() {
+  local f s m
+  f=$(val FONT Inter); s=$(val FONT_SIZE 10); m=$(val FONT_MONO "JetBrains Mono")
+  for k in font menuFont toolBarFont; do
+    kw --file kdeglobals --group General --key $k "$f,$s,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+  done
+  kw --file kdeglobals --group General --key smallestReadableFont "$f,$((s > 8 ? s - 2 : s)),-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+  kw --file kdeglobals --group WM --key activeFont "$f,$s,-1,5,600,0,0,0,0,0,0,0,0,0,0,1"
+  kw --file kdeglobals --group General --key fixed "$m,$s,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+  say "шрифт $f $s, моноширинный $m"
+}
+
+apply_keyboard() {
+  local l o n vk
+  l=$(val KEYBOARD us,ru); o=$(val KEYBOARD_SWITCH grp:alt_shift_toggle); n=$(val NUMLOCK on)
+  kw --file kxkbrc --group Layout --key Use true
+  kw --file kxkbrc --group Layout --key LayoutList "$l"
+  kw --file kxkbrc --group Layout --key Options "$o"
+  kw --file kxkbrc --group Layout --key ResetOldOptions true
+  kw --file kxkbrc --group Layout --key ShowFlag false
+  kw --file kxkbrc --group Layout --key DisplayNames ""
+  kw --file kcminputrc --group Keyboard --key NumLock "$([ "$n" = on ] && echo 0 || echo 1)"
+  vk=$(val VIRTUAL_KEYBOARD on)
+  if [ "$vk" = on ]; then
+    kw --file kwinrc --group Wayland --key InputMethod /usr/share/applications/com.github.maliit.keyboard.desktop
+    kw --file kwinrc --group Wayland --key VirtualKeyboardEnabled true
+  else
+    kw --file kwinrc --group Wayland --key VirtualKeyboardEnabled false
+  fi
+  in_session && [ -n "$QDBUS" ] && "$QDBUS" org.kde.keyboard /Layouts org.kde.KeyboardLayouts.reloadConfig >/dev/null 2>&1
+  say "раскладки $l ($o), экранная клавиатура $vk"
+}
+
+apply_screen() {
+  local sc rot outs o
+  sc=$(val SCALE 1); rot=$(val ROTATION normal)
+  in_session && command -v kscreen-doctor >/dev/null || { say "экран: применится при входе"; return; }
+  outs=$(kscreen-doctor -j 2>/dev/null | jq -r '.outputs[] | select(.connected and .enabled) | .name' 2>/dev/null)
+  for o in $outs; do
+    kscreen-doctor "output.$o.scale.$sc" "output.$o.rotation.$rot" >/dev/null 2>&1
+  done
+  say "экран: масштаб $sc, поворот $rot"
+}
+
+apply_night() {
+  local m t
+  m=$(val NIGHT sunset); t=$(val NIGHT_TEMP 4200)
+  case "$m" in
+    off) kw --file kwinrc --group NightColor --key Active false ;;
+    always)
+      kw --file kwinrc --group NightColor --key Active true
+      kw --file kwinrc --group NightColor --key Mode Constant ;;
+    *)
+      kw --file kwinrc --group NightColor --key Active true
+      kw --file kwinrc --group NightColor --key Mode Times
+      kw --file kwinrc --group NightColor --key EveningBeginFixed 2000
+      kw --file kwinrc --group NightColor --key MorningBeginFixed 0700
+      kw --file kwinrc --group NightColor --key TransitionTime 30 ;;
+  esac
+  kw --file kwinrc --group NightColor --key NightTemperature "$t"
+  say "ночная схема $m, ${t}K"
+}
+
+apply_anim() {
+  local a f
+  a=$(val ANIM 60)
+  f=$(awk -v a="$a" 'BEGIN{ if (a<=0) print 0; else printf "%.2f", a/60 }')
+  kw --file kdeglobals --group KDE --key AnimationDurationFactor "$f"
+  kw --file kwinrc --group Plugins --key slidingpopupsEnabled "$([ "$a" -gt 0 ] && echo true || echo false)"
+  kw --file kwinrc --group Effect-slidingpopups --key SlideInTime 200
+  kw --file kwinrc --group Effect-slidingpopups --key SlideOutTime 200
+  say "анимации $a (множитель $f)"
+}
+
+apply_notify() {
+  local d s
+  d=$(val DND off); s=$(val NOTIFY_SHORT 3)
+  if [ "$d" = on ]; then
+    kw --file plasmanotifyrc --group DoNotDisturb --key Until "2099,1,1,0,0,0"
+  else
+    kw --file plasmanotifyrc --group DoNotDisturb --key Until --delete
+  fi
+  kw --file plasmanotifyrc --group Notifications --key PopupTimeout "$((s * 1000))"
+  kw --file plasmanotifyrc --group Notifications --key PopupPosition BottomRight
+  say "не беспокоить $d, уведомления ${s} с"
+}
+
+apply_lock() {
+  local m
+  m=$(val LOCK_AFTER_MIN 5)
+  if [ "$m" -gt 0 ] 2>/dev/null; then
+    kw --file kscreenlockerrc --group Daemon --key Autolock true
+    kw --file kscreenlockerrc --group Daemon --key Timeout "$m"
+  else
+    kw --file kscreenlockerrc --group Daemon --key Autolock false
+  fi
+  kw --file kscreenlockerrc --group Daemon --key LockOnResume true
+  say "блокировка через $m мин"
+}
+
+apply_sound() {
+  local v
+  v=$(val VOLUME 64)
+  command -v wpctl >/dev/null && wpctl set-volume @DEFAULT_AUDIO_SINK@ "$(awk -v v="$v" 'BEGIN{printf "%.2f", v/100}')" >/dev/null 2>&1
+  say "громкость $v%"
+}
+
+apply_radio() {
+  local w b
+  w=$(val WIFI on); b=$(val BLUETOOTH on)
+  command -v nmcli >/dev/null && nmcli radio wifi "$w" >/dev/null 2>&1
+  command -v bluetoothctl >/dev/null && bluetoothctl power "$b" >/dev/null 2>&1
+  say "Wi-Fi $w, Bluetooth $b"
+}
+
+reload_kwin() {
+  in_session || return
+  [ -n "$QDBUS" ] && "$QDBUS" org.kde.KWin /KWin reconfigure >/dev/null 2>&1
+  command -v dbus-send >/dev/null && dbus-send --session --type=signal /KGlobalSettings org.kde.KGlobalSettings.notifyChange int32:0 int32:0 >/dev/null 2>&1
+}
+
+apply_all() {
+  echo "AshenOS: применяю настройки"
+  apply_theme; apply_wallpaper; apply_fonts; apply_keyboard; apply_screen
+  apply_night; apply_anim; apply_notify; apply_lock; apply_sound; apply_radio
+  reload_kwin
+  conf_hash > "$STAMP"
+}
+
+apply_key() { # применить только то, что связано с ключом
+  case "$1" in
+    THEME|ACCENT|TINT) apply_theme ;;
+    WALLPAPER) apply_wallpaper ;;
+    FONT|FONT_SIZE|FONT_MONO) apply_fonts ;;
+    KEYBOARD|KEYBOARD_SWITCH|NUMLOCK|VIRTUAL_KEYBOARD) apply_keyboard ;;
+    SCALE|ROTATION) apply_screen ;;
+    NIGHT|NIGHT_TEMP) apply_night ;;
+    ANIM) apply_anim ;;
+    DND|NOTIFY_SHORT|NOTIFY_LONG) apply_notify ;;
+    LOCK_AFTER_MIN) apply_lock ;;
+    VOLUME) apply_sound ;;
+    WIFI|BLUETOOTH) apply_radio ;;
+    *) apply_all; return ;;
+  esac
+  reload_kwin
+  conf_hash > "$STAMP"
+}
+
+conf_hash() { cat "$SYS_CONF" "$USR_CONF" 2>/dev/null | md5sum | cut -d' ' -f1; }
+
+# ---------- окно настроек ----------
+pick() { # pick TITLE CURRENT  id label ...
+  local title=$1 cur=$2; shift 2
+  local args=() id lab
+  while [ $# -gt 1 ]; do
+    id=$1; lab=$2; shift 2
+    [ "$id" = "$cur" ] && lab="● $lab"
+    args+=("$id" "$lab")
+  done
+  kdialog --title "Параметры AshenOS" --menu "$title" "${args[@]}" 2>/dev/null
+}
+
+menu() {
+  command -v kdialog >/dev/null || { echo "Нужен kdialog: sudo pacman -S kdialog"; exit 1; }
+  local c v
+  while :; do
+    load
+    c=$(kdialog --title "Параметры AshenOS" --menu "Что настроить?" \
+      THEME "Тема — $(val THEME obsidian)" \
+      ACCENT "Оттенок — $(val ACCENT orange)" \
+      TINT "Окраска фона — $(val TINT 0)" \
+      WALLPAPER "Обои — $(basename "$(val WALLPAPER waves)")" \
+      FONT_SIZE "Размер шрифта — $(val FONT_SIZE 10)" \
+      SCALE "Масштаб экрана — $(val SCALE 1)" \
+      ROTATION "Поворот экрана — $(val ROTATION normal)" \
+      VIRTUAL_KEYBOARD "Экранная клавиатура — $(val VIRTUAL_KEYBOARD on)" \
+      KEYBOARD "Раскладки — $(val KEYBOARD us,ru)" \
+      NIGHT "Ночная схема — $(val NIGHT sunset)" \
+      NIGHT_TEMP "Температура ночью — $(val NIGHT_TEMP 4200)K" \
+      VOLUME "Громкость — $(val VOLUME 64)%" \
+      DND "Не беспокоить — $(val DND off)" \
+      NOTIFY_SHORT "Показ уведомлений — $(val NOTIFY_SHORT 3) с" \
+      ANIM "Анимации — $(val ANIM 60)" \
+      LOCK_AFTER_MIN "Блокировка — $(val LOCK_AFTER_MIN 5) мин" \
+      WIFI "Wi-Fi — $(val WIFI on)" \
+      BLUETOOTH "Bluetooth — $(val BLUETOOTH on)" \
+      APPLY "Применить всё заново" \
+      RESET "Сбросить к стандартным" 2>/dev/null) || break
+    v=""
+    case "$c" in
+      THEME)
+        local a=()
+        while IFS='|' read -r id name _; do a+=("$id" "$name"); done < "$THEMES"
+        v=$(pick "Тема" "$(val THEME obsidian)" "${a[@]}") ;;
+      ACCENT) v=$(pick "Оттенок" "$(val ACCENT orange)" auto "Из темы" orange Оранжевый red Красный pink Розовый yellow Жёлтый green Зелёный teal Бирюзовый blue Голубой purple Фиолетовый white Белый custom "Свой цвет…")
+        [ "$v" = custom ] && v=$(kdialog --getcolor 2>/dev/null) ;;
+      TINT) v=$(pick "Окраска фона оттенком" "$(val TINT 0)" 0 Нет 1 Лёгкие 2 Насыщенные) ;;
+      WALLPAPER) v=$(pick "Обои" "$(val WALLPAPER waves)" orange Апельсин lava Лава silk Шёлк rainbow Радуга waves Волны file "Свой файл…")
+        [ "$v" = file ] && v=$(kdialog --getopenfilename "$HOME" "image/jpeg image/png image/webp" 2>/dev/null) ;;
+      FONT_SIZE) v=$(kdialog --slider "Размер шрифта" 8 14 1 2>/dev/null) ;;
+      SCALE) v=$(pick "Масштаб" "$(val SCALE 1)" 1 "100 %" 1.25 "125 %" 1.5 "150 %") ;;
+      ROTATION) v=$(pick "Поворот" "$(val ROTATION normal)" normal Обычный left Влево right Вправо inverted "Вверх ногами") ;;
+      VIRTUAL_KEYBOARD|DND|WIFI|BLUETOOTH) v=$(pick "$c" "$(val $c on)" on Включено off Выключено) ;;
+      KEYBOARD) v=$(kdialog --inputbox "Раскладки через запятую (Alt+Shift)" "$(val KEYBOARD us,ru)" 2>/dev/null) ;;
+      NIGHT) v=$(pick "Ночная цветовая схема" "$(val NIGHT sunset)" off Выключена sunset "С заката до рассвета (20:00–7:00)" always Всегда) ;;
+      NIGHT_TEMP) v=$(kdialog --slider "Температура ночью, K" 2500 6500 100 2>/dev/null) ;;
+      VOLUME) v=$(kdialog --slider "Громкость, %" 0 100 2 2>/dev/null) ;;
+      NOTIFY_SHORT) v=$(pick "Сколько показывать уведомление" "$(val NOTIFY_SHORT 3)" 2 "2 с" 3 "3 с" 5 "5 с" 8 "8 с") ;;
+      ANIM) v=$(pick "Скорость анимаций" "$(val ANIM 60)" 0 Выключены 30 Быстро 60 Обычно 100 Медленно) ;;
+      LOCK_AFTER_MIN) v=$(pick "Блокировать экран через" "$(val LOCK_AFTER_MIN 5)" 1 "1 мин" 5 "5 мин" 15 "15 мин" 0 Никогда) ;;
+      APPLY) apply_all >/dev/null; kdialog --passivepopup "Настройки применены" 3 2>/dev/null; continue ;;
+      RESET) kdialog --yesno "Вернуть все настройки к стандартным?" 2>/dev/null && { rm -f "$USR_CONF"; CFG=(); load; apply_all >/dev/null; }; continue ;;
+    esac
+    [ -n "$v" ] && { save "$c" "$v"; apply_key "$c" >/dev/null; }
+  done
+}
+
+# ---------- main ----------
+load
+cmd=${1:-menu}
+case "$cmd" in
+  list)
+    for k in $(printf '%s\n' "${!CFG[@]}" | sort); do printf '%-18s %s\n' "$k" "${CFG[$k]}"; done ;;
+  get) val "${2:?ключ}" "" ;;
+  set)
+    k=${2:?ключ}; v=${3?значение}
+    grep -q "^$k=" "$SYS_CONF" || { echo "Нет такого ключа: $k (см. ashenos-settings list)"; exit 1; }
+    save "$k" "$v"; apply_key "$k" ;;
+  apply)
+    if [ "${2:-}" = "--once" ] && [ -f "$STAMP" ] && [ "$(cat "$STAMP")" = "$(conf_hash)" ]; then exit 0; fi
+    { date; apply_all; } 2>&1 | tee -a "$LOG" ;;
+  reset) rm -f "$USR_CONF"; CFG=(); load; apply_all ;;
+  themes) cut -d'|' -f1,2 "$THEMES" | tr '|' '\t' ;;
+  menu) menu ;;
+  -h|--help|help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) echo "Неизвестная команда: $cmd"; exit 1 ;;
+esac

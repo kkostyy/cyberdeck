@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# ============================================================
+#  AshenOS — первый запуск на Raspberry Pi (от root, до входа в систему)
+#  Читает /boot/ashenos.conf, настраивает систему и переименовывает
+#  файл в ashenos.conf.done, чтобы второй раз не запускаться.
+# ============================================================
+set -u
+CONF=/boot/ashenos.conf
+LOG=/var/log/ashenos-firstboot.log
+exec > >(tee -a "$LOG") 2>&1
+echo "=== AshenOS первый запуск: $(date) ==="
+
+declare -A C
+if [ -r "$CONF" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}                       # файл могли править в Windows
+    case "$line" in ''|\#*) continue ;; esac
+    k=$(echo "${line%%=*}" | tr -d '[:space:]'); C[$k]=${line#*=}
+  done < "$CONF"
+fi
+v() { echo "${C[$1]:-$2}"; }
+
+# --- 1. Растянуть корневой раздел на всю карту ---
+ROOTDEV=$(findmnt -no SOURCE /)
+DISK="/dev/$(lsblk -no PKNAME "$ROOTDEV")"
+PART=${ROOTDEV##*[!0-9]}
+if command -v growpart >/dev/null; then
+  growpart "$DISK" "$PART" && resize2fs "$ROOTDEV" && echo "Раздел растянут на всю карту"
+fi
+
+# --- 2. Имя, время, язык ---
+HN=$(v HOSTNAME ashenos)
+echo "$HN" > /etc/hostname
+hostnamectl set-hostname "$HN" 2>/dev/null
+sed -i "s/^127.0.1.1.*//" /etc/hosts; echo "127.0.1.1 $HN" >> /etc/hosts
+
+TZ=$(v TIMEZONE Europe/Tallinn)
+[ -f "/usr/share/zoneinfo/$TZ" ] && ln -sf "/usr/share/zoneinfo/$TZ" /etc/localtime
+timedatectl set-ntp true 2>/dev/null
+
+LC=$(v LOCALE ru_RU.UTF-8)
+if ! locale -a 2>/dev/null | grep -qi "^${LC%%.*}.utf8"; then
+  sed -i "s/^#\(${LC} UTF-8\)/\1/" /etc/locale.gen && locale-gen
+fi
+echo "LANG=$LC" > /etc/locale.conf
+
+KB=$(v KEYBOARD us,ru)
+localectl set-x11-keymap "$KB" pc105 "" grp:alt_shift_toggle 2>/dev/null
+echo "KEYMAP=${KB%%,*}" > /etc/vconsole.conf
+# те же раскладки для всех новых пользователей
+sed -i "s/^KEYBOARD=.*/KEYBOARD=$KB/" /etc/ashenos/settings.conf
+
+# --- 3. Пользователь ---
+U=$(v USERNAME alarm)
+if [ "$U" != alarm ] && ! id "$U" >/dev/null 2>&1; then
+  usermod -l "$U" -d "/home/$U" -m alarm && groupmod -n "$U" alarm
+  echo "$U ALL=(ALL) ALL" > /etc/sudoers.d/ashenos-user; rm -f /etc/sudoers.d/alarm
+  sed -i "s/^User=.*/User=$U/" /etc/sddm.conf.d/ashenos.conf
+  echo "Пользователь alarm переименован в $U"
+fi
+for g in wheel video audio input i2c gpio uucp; do getent group $g >/dev/null && usermod -aG $g "$U"; done
+P=$(v PASSWORD "")
+if [ -n "$P" ]; then echo "$U:$P" | chpasswd && echo "Пароль задан"; fi
+
+# --- 4. Wi-Fi ---
+CC=$(v WIFI_COUNTRY EE)
+command -v iw >/dev/null && iw reg set "$CC"
+echo "WIRELESS_REGDOM=\"$CC\"" > /etc/conf.d/wireless-regdom 2>/dev/null
+SSID=$(v WIFI_SSID ""); WPW=$(v WIFI_PASSWORD "")
+if [ -n "$SSID" ]; then
+  f="/etc/NetworkManager/system-connections/$SSID.nmconnection"
+  cat > "$f" <<EOF
+[connection]
+id=$SSID
+type=wifi
+autoconnect=true
+
+[wifi]
+mode=infrastructure
+ssid=$SSID
+
+$( [ -n "$WPW" ] && printf '[wifi-security]\nkey-mgmt=wpa-psk\npsk=%s\n' "$WPW" )
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+EOF
+  chmod 600 "$f"
+  nmcli connection reload 2>/dev/null
+  echo "Wi-Fi «$SSID» добавлен"
+fi
+
+# --- 5. Доступ ---
+if [ "$(v SSH yes)" = yes ]; then systemctl enable --now sshd; else systemctl disable --now sshd; fi
+if [ "$(v VNC no)" = yes ]; then
+  mkdir -p /etc/xdg/autostart
+  printf '[Desktop Entry]\nType=Application\nName=wayvnc\nExec=wayvnc 0.0.0.0\nNoDisplay=true\n' > /etc/xdg/autostart/wayvnc.desktop
+fi
+
+# --- 6. Внешний вид по умолчанию (дальше — ashenos-settings у пользователя) ---
+for k in THEME ACCENT TINT; do
+  val=$(v $k "")
+  [ -n "$val" ] && sed -i "s|^$k=.*|$k=$val|" /etc/ashenos/settings.conf
+done
+# пусть настройки применятся заново при следующем входе
+rm -f /home/*/.config/ashenos/.applied
+
+# --- 7. Готово ---
+[ -f "$CONF" ] && mv "$CONF" "$CONF.done"
+# не хранить пароль Wi-Fi и пользователя открытым текстом
+[ -f "$CONF.done" ] && sed -i 's/^\(PASSWORD\|WIFI_PASSWORD\)=.*/\1=***/' "$CONF.done"
+systemctl disable ashenos-firstboot.service
+echo "=== Первый запуск завершён ==="

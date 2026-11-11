@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=AshenOS: применить настройки
+Exec=ashenos-settings apply --once
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=1

@@ -1,0 +1,14 @@
+[Unit]
+Description=AshenOS — настройка при первом запуске
+ConditionPathExists=/boot/ashenos.conf
+After=local-fs.target NetworkManager.service
+Before=sddm.service display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ashenos-firstboot
+RemainAfterExit=yes
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
