@@ -408,6 +408,13 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.web.dot}}"></span>
         </button>
+        <button class="dock-btn" aria-label="Карты" onClick="{{openMaps}}" onMouseEnter="{{dh.maps}}" onFocus="{{dh.maps}}" style="{{dk.maps.btn}}">
+          <span style="{{dk.maps.tip}}">Карты</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.maps.tile}};background:linear-gradient(160deg,#2a2c31,#141518)">
+            <svg width="100%" height="100%" viewBox="0 0 40 40"><path d="M0 27 Q11 20 20 25 T40 18 V40 H0Z" fill="#1d2a22"></path><path d="M-2 14 L42 30" stroke="#3d3e45" stroke-width="3"></path><path d="M6 33 C14 29 15 16 24 14 S33 9 35 6" fill="none" stroke="#ef3b3b" stroke-width="2.6" stroke-dasharray="3.2 2.6" stroke-linecap="round"></path><circle cx="6" cy="33" r="3" fill="#f2f2f4"></circle><path d="M35 1.5a4.6 4.6 0 0 1 4.6 4.6c0 3.4-4.6 7.4-4.6 7.4s-4.6-4-4.6-7.4A4.6 4.6 0 0 1 35 1.5z" fill="#ef3b3b" stroke="#fff" stroke-width="1.2"></path></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.maps.dot}}"></span>
+        </button>
         <button class="dock-btn" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
           <span style="{{dk.music.tip}}">Музыка</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}};background:linear-gradient(180deg,#2a2a2e,#141416)">
@@ -1762,7 +1769,7 @@ class Component extends DCLogic {
       style: `height:38px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;${T};background:${st.out === o.id ? accent : 'rgba(255,255,255,.05)'};color:${st.out === o.id ? '#111113' : '#e8e8ec'}` }));
 
     /* ---------- dock ---------- */
-    const dockIds = ['files', 'term', 'claude', 'web', 'music', 'notes', 'photo', 'wid', 'set', 'lab', 'down', 'trash'];
+    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'set', 'lab', 'down', 'trash'];
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     const hi = dockIds.indexOf(st.dock);
     const dk = {}, dh = {};
@@ -2264,6 +2271,7 @@ class Component extends DCLogic {
       winSettings: st.win === 'settings', winTerm: st.win === 'term',
       winAnim: st.winClosing ? 'animation:winOut .22s ease both' : 'animation:winIn .42s cubic-bezier(.2,1.12,.3,1) both',
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
+      openMaps: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('maps', 'dock'); } },
       openWeb: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('web', 'dock'); } },
       expandWin: () => { const w = st.win; closeWin(); if (this.props.onOpenApp) this.props.onOpenApp(w === 'term' ? 'term' : 'set', 'place'); },
       powerOff: () => { this.setState({ shade: false, hov: null }); if (this.props.onPower) this.props.onPower(); else if (this.props.onLock) this.props.onLock(); },

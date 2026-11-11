@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Карты</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+/* macOS traffic lights */
+.tl{display:flex;flex-direction:row-reverse;align-items:center;flex:none;order:99;margin-left:6px}
+.tl .tl-b{width:26px;height:44px;padding:0;margin:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:default;-webkit-tap-highlight-color:transparent}
+.tl .tl-b:first-child{width:30px;justify-content:flex-end;padding-right:4px}
+.tl .tl-b i{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.2);transition:filter .12s,transform .18s cubic-bezier(.3,1.4,.5,1)}
+.tl .tl-b svg{opacity:0;transition:opacity .12s}
+.tl:hover .tl-b svg,.tl:focus-within .tl-b svg{opacity:1}
+.tl .tl-b:active i{filter:brightness(.72);transform:scale(.92)}
+.tl .tl-b:focus-visible i{outline:2px solid #f2f2f4;outline-offset:2px}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+
+.mp-scroll{scrollbar-width:none}.mp-scroll::-webkit-scrollbar{display:none}
+.mp-b{transition:background .15s,transform .2s cubic-bezier(.3,1.6,.5,1),filter .15s}
+.mp-b:hover{filter:brightness(1.12)}.mp-b:active{transform:scale(.94)}
+.mp-fab{transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}.mp-fab:hover{background:rgba(40,40,44,.95)!important}.mp-fab:active{transform:scale(.92)}
+.mp-chip:active{transform:scale(.95)}
+.mp-card{transition:background .18s,transform .25s cubic-bezier(.3,1.4,.5,1)}.mp-card:hover{background:rgba(255,255,255,.09)!important}
+.mp-in::placeholder{color:#6f6f77}
+@keyframes mpIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mpDrop{from{opacity:0;transform:translateY(-30px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes mpUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes mpDrawA{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes mpDrawB{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes mpFade{from{opacity:0}to{opacity:1}}
+@keyframes mpDash{to{stroke-dashoffset:-24}}
+@keyframes mpRing{0%{transform:scale(.35);opacity:.9}100%{transform:scale(1.1);opacity:0}}
+@keyframes mpPin{0%{scale:.4}60%{scale:1.15}100%{scale:1}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 0% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Карты" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden">
+
+    <header style="height: 60px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+      <div class="tl" role="group" aria-label="Управление окном">
+        <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
+        <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
+        <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>
+      </div>
+      <span aria-hidden="true" style="width: 36px; height: 36px; flex: none; border-radius: 11px; overflow: hidden; background: linear-gradient(135deg,#2b2d33,#16171a); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1)"><svg width="36" height="36" viewBox="0 0 36 36"><path d="M0 24 Q10 18 18 22 T36 16 V36 H0Z" fill="#1d2420"></path><path d="M4 30 C12 26 14 14 22 12 S30 8 33 5" fill="none" stroke="{{accent}}" stroke-width="2.4" stroke-dasharray="3 2.4" stroke-linecap="round"></path><circle cx="33" cy="5" r="2.6" fill="{{accent}}"></circle><circle cx="4" cy="30" r="2.6" fill="#f2f2f4"></circle></svg></span>
+      <div style="display: flex; flex-direction: column; line-height: 1.2">
+        <span style="font-size: 15px; font-weight: 600">Карты</span>
+        <span style="font-size: 12px; color: #8b8b93">{{headSub}}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; margin-left: auto">
+        <span style="{{srcBadge}}">{{srcText}}</span>
+        <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+      </div>
+    </header>
+
+    <div style="position: relative; flex: 1; min-height: 0; overflow: hidden; background: {{P.sea}}">
+      <!-- ===== карта ===== -->
+      <svg aria-label="Карта Таллина" role="img" width="1366" height="774" viewBox="0 0 1366 774" onMouseDown="{{panDown}}" onWheel="{{onWheel}}" onDoubleClick="{{onDbl}}" style="{{svgSt}}">
+        <g transform="{{camT}}">
+          <path d="{{W.land}}" fill="{{P.land}}"></path>
+          <path d="{{W.blocks}}" fill="{{P.block}}"></path>
+          <sc-for list="{{W.parks}}" as="pk" hint-placeholder-count="3"><path d="{{pk}}" fill="{{P.park}}"></path></sc-for>
+          <sc-for list="{{W.lakes}}" as="lk" hint-placeholder-count="2"><path d="{{lk}}" fill="{{P.sea}}" stroke="{{P.shore}}" stroke-width="1" vector-effect="non-scaling-stroke"></path></sc-for>
+          <path d="{{W.runway}}" fill="{{P.minor}}"></path>
+          <path d="{{W.minor}}" fill="none" stroke="{{P.minor}}" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+          <sc-for list="{{roads}}" as="r" hint-placeholder-count="6">
+            <path id="{{r.id}}" d="{{r.d}}" fill="none" stroke="{{r.col}}" stroke-width="{{r.w}}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
+          </sc-for>
+          <sc-for list="{{transit}}" as="tr" hint-placeholder-count="2">
+            <path d="{{tr.d}}" fill="none" stroke="{{tr.col}}" stroke-width="2.4" stroke-dasharray="7 5" stroke-linecap="round" vector-effect="non-scaling-stroke" style="{{tr.st}}"></path>
+          </sc-for>
+          <path d="{{rt.d}}" fill="none" stroke="{{accent}}" stroke-opacity=".28" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="{{rt.glow}}"></path>
+          <path d="{{rt.d}}" pathLength="1" fill="none" stroke="{{accent}}" stroke-width="{{rt.w}}" stroke-linecap="round" stroke-linejoin="round" style="{{rt.st}}"></path>
+          <path d="{{rt.done}}" fill="none" stroke="#8b8b93" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
+          <path d="{{rt.walk}}" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+        </g>
+      </svg>
+      <sc-for list="{{districts}}" as="dl" hint-placeholder-count="6"><span aria-hidden="true" style="{{dl.st}}">{{dl.name}}</span></sc-for>
+      <sc-for list="{{streetNames}}" as="sn" hint-placeholder-count="4"><span aria-hidden="true" style="{{sn.st}}">{{sn.name}}</span></sc-for>
+
+      <!-- ===== метки ===== -->
+      <sc-for list="{{pins}}" as="p" hint-placeholder-count="6">
+        <button aria-label="{{p.name}}" title="{{p.name}}" onClick="{{p.pick}}" style="{{p.st}}">
+          <svg aria-hidden="true" width="18" height="18" viewBox="-7 -7 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{p.icon}}"></path></svg>
+        </button>
+      </sc-for>
+      <sc-if value="{{tip.on}}" hint-placeholder-val="{{false}}">
+        <div role="status" style="{{tip.st}}"><span style="font-size: 13px; font-weight: 700; white-space: nowrap">{{tip.name}}</span><span style="font-size: 11.5px; color: #a1a1a8; white-space: nowrap">{{tip.sub}}</span></div>
+      </sc-if>
+      <div aria-label="Моё местоположение" title="Вы здесь" style="{{me.st}}"><span style="{{me.ring}}"></span><span style="{{me.dot}}"></span><span style="{{me.cone}}"></span></div>
+
+      <!-- ===== левая панель ===== -->
+      <aside aria-label="Поиск и места" style="{{panelSt}}">
+        <label style="position: relative; display: flex; align-items: center; height: 46px; flex: none">
+          <svg aria-hidden="true" style="position: absolute; left: 14px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input type="search" class="mp-in" aria-label="Поиск мест и адресов" placeholder="Поиск мест и адресов" value="{{q}}" onInput="{{onQ}}" style="width: 100%; height: 46px; padding: 0 40px 0 42px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.06); color: #f2f2f4; font: 14.5px Inter, sans-serif; outline: none">
+          <sc-if value="{{hasQ}}" hint-placeholder-val="{{false}}"><button aria-label="Очистить поиск" onClick="{{clearQ}}" class="mp-b" style="position: absolute; right: 8px; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #a1a1a8"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></sc-if>
+        </label>
+        <div role="group" aria-label="Категории" class="mp-scroll" style="display: flex; gap: 6px; overflow-x: auto; flex: none; padding-bottom: 2px">
+          <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+            <button aria-pressed="{{c.on}}" onClick="{{c.pick}}" class="mp-chip" style="{{c.st}}"><svg aria-hidden="true" width="14" height="14" viewBox="-7 -7 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"></path></svg>{{c.name}}</button>
+          </sc-for>
+        </div>
+
+        <!-- маршрут -->
+        <sc-if value="{{route.on}}" hint-placeholder-val="{{false}}">
+          <div style="display: flex; flex-direction: column; gap: 12px; min-height: 0; flex: 1; animation: mpIn .35s cubic-bezier(.22,1,.36,1) both">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <button aria-label="Назад к местам" onClick="{{route.close}}" class="mp-b" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+              <span style="font-size: 17px; font-weight: 700">Маршрут</span>
+              <span style="{{route.badge}}">{{route.badgeText}}</span>
+            </div>
+            <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 10px 34px; border-radius: 14px; background: rgba(255,255,255,0.05)">
+              <span aria-hidden="true" style="position: absolute; left: 14px; top: 17px; width: 8px; height: 8px; border-radius: 50%; background: #f2f2f4"></span>
+              <span aria-hidden="true" style="position: absolute; left: 17px; top: 28px; bottom: 26px; border-left: 2px dotted rgba(255,255,255,0.3)"></span>
+              <span aria-hidden="true" style="{{route.toDot}}"></span>
+              <span style="font-size: 13.5px; font-weight: 600">{{route.from}}</span>
+              <span style="height: 1px; background: rgba(255,255,255,0.07)"></span>
+              <span style="font-size: 13.5px; font-weight: 600">{{route.to}}</span>
+              <button aria-label="Поменять местами" onClick="{{route.swap}}" class="mp-b" style="position: absolute; right: 8px; top: 50%; margin-top: -16px; width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"></path></svg></button>
+            </div>
+            <div role="radiogroup" aria-label="Способ" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px">
+              <sc-for list="{{route.modes}}" as="m" hint-placeholder-count="3">
+                <button role="radio" aria-checked="{{m.on}}" onClick="{{m.pick}}" style="{{m.st}}"><svg aria-hidden="true" width="18" height="18" viewBox="-7 -7 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.icon}}"></path></svg><span style="font-size: 12.5px; font-weight: 700">{{m.time}}</span></button>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border-radius: 14px; overflow: hidden; background: rgba(255,255,255,0.07)">
+              <sc-for list="{{route.stats}}" as="s" hint-placeholder-count="3"><div style="display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; background: #141416"><span style="font-size: 11px; color: #8b8b93">{{s.k}}</span><span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{s.v}}</span></div></sc-for>
+            </div>
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #6f6f77; text-transform: uppercase">Шаги</span>
+            <ol class="mp-scroll" style="list-style: none; margin: 0; padding: 0; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 2px">
+              <sc-for list="{{route.steps}}" as="s" hint-placeholder-count="5">
+                <li style="{{s.st}}"><span style="{{s.ic}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.arrow}}"></path></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 600">{{s.text}}</span><span style="font-size: 11.5px; color: #8b8b93">{{s.dist}}</span></span></li>
+              </sc-for>
+            </ol>
+            <button onClick="{{route.go}}" class="mp-b" style="{{route.goSt}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 21 3l-8 18-2-8z"></path></svg>Поехали</button>
+          </div>
+        </sc-if>
+
+        <!-- места -->
+        <sc-if value="{{route.off}}" hint-placeholder-val="{{true}}">
+          <div class="mp-scroll" style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto; margin: 0 -4px; padding: 0 4px">
+            <sc-if value="{{showFav}}" hint-placeholder-val="{{true}}">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #6f6f77; text-transform: uppercase; margin-top: 4px">Избранное</span>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px">
+                <sc-for list="{{favs}}" as="f" hint-placeholder-count="2">
+                  <button onClick="{{f.pick}}" class="mp-card" style="{{f.st}}"><span style="{{f.ic}}"><svg aria-hidden="true" width="16" height="16" viewBox="-7 -7 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{f.icon}}"></path></svg></span><span style="display: flex; flex-direction: column; gap: 1px; min-width: 0; text-align: left"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{f.eta}}</span></span></button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: #6f6f77; text-transform: uppercase; margin-top: 6px">{{listTitle}}</span>
+            <sc-if value="{{noResults}}" hint-placeholder-val="{{false}}"><span style="padding: 18px 4px; font-size: 13px; color: #8b8b93">Ничего не нашлось. Попробуйте «кафе» или «вокзал».</span></sc-if>
+            <sc-for list="{{list}}" as="l" hint-placeholder-count="5">
+              <div style="{{l.box}}">
+                <button onClick="{{l.pick}}" style="display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: left">
+                  <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.name}}</span><span style="{{l.badge}}">{{l.badgeText}}</span></span>
+                  <span style="font-size: 12px; color: {{l.subCol}}">{{l.sub}}</span>
+                </button>
+                <sc-if value="{{l.open}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; flex-direction: column; gap: 10px; animation: mpIn .3s ease both">
+                    <div style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); overflow: hidden"><span style="{{l.bar}}"></span></div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px">
+                      <sc-for list="{{l.facts}}" as="fa" hint-placeholder-count="3"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 10.5px; opacity: .75">{{fa.k}}</span><span style="font-size: 13px; font-weight: 700">{{fa.v}}</span></span></sc-for>
+                    </div>
+                    <div style="display: flex; gap: 6px">
+                      <button onClick="{{l.route}}" class="mp-b" style="flex: 1; height: 34px; border-radius: 10px; border: 0; font-size: 12.5px; font-weight: 700; background: #ffffff; color: #111113">Маршрут</button>
+                      <button aria-label="{{l.favLabel}}" title="{{l.favLabel}}" onClick="{{l.fav}}" class="mp-b" style="width: 34px; height: 34px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); color: #ffffff"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="{{l.favFill}}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5 14.6 9l6 .6-4.5 4 1.3 5.9L12 16.6l-5.4 2.9L7.9 13.6l-4.5-4 6-.6z"></path></svg></button>
+                      <button aria-label="Скопировать координаты" title="Скопировать координаты" onClick="{{l.share}}" class="mp-b" style="width: 34px; height: 34px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); color: #ffffff"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"></path></svg></button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </aside>
+
+      <!-- ===== кнопки справа ===== -->
+      <div style="position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
+        <button aria-label="Слои карты" aria-expanded="{{layersOpen}}" onClick="{{toggleLayers}}" class="mp-fab" style="{{fab}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"></path><path d="m3 13 9 5 9-5"></path></svg></button>
+        <button aria-label="Моё местоположение" onClick="{{locate}}" class="mp-fab" style="{{fabLoc}}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"></circle><circle cx="12" cy="12" r="7.5"></circle><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"></path></svg></button>
+        <div style="display: flex; flex-direction: column; border-radius: 22px; overflow: hidden; background: rgba(20,20,22,0.9); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(14px)">
+          <button aria-label="Приблизить" onClick="{{zoomIn}}" class="mp-b" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #f2f2f4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          <span style="height: 1px; background: rgba(255,255,255,0.08)"></span>
+          <button aria-label="Отдалить" onClick="{{zoomOut}}" class="mp-b" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #f2f2f4"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+        </div>
+      </div>
+      <sc-if value="{{layersOpen}}" hint-placeholder-val="{{false}}">
+        <div role="dialog" aria-label="Слои карты" style="position: absolute; right: 70px; top: 16px; width: 290px; z-index: 7; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 18px; background: rgba(20,20,22,0.94); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(16px); animation: mpIn .28s cubic-bezier(.22,1,.36,1) both">
+          <span style="font-size: 14px; font-weight: 700">Слои</span>
+          <div role="radiogroup" aria-label="Вид карты" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px">
+            <sc-for list="{{looks}}" as="lk" hint-placeholder-count="2"><button role="radio" aria-checked="{{lk.on}}" onClick="{{lk.pick}}" style="{{lk.st}}"><span style="{{lk.sw}}"></span>{{lk.name}}</button></sc-for>
+          </div>
+          <sc-for list="{{layerSw}}" as="ls" hint-placeholder-count="3">
+            <button role="switch" aria-checked="{{ls.on}}" onClick="{{ls.toggle}}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 2px; border: 0; background: none; color: inherit; text-align: left"><span style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 13px; font-weight: 600">{{ls.name}}</span><span style="font-size: 11.5px; color: #8b8b93">{{ls.note}}</span></span><span style="{{ls.track}}"><span style="{{ls.knob}}"></span></span></button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ===== навигация ===== -->
+      <sc-if value="{{nav.on}}" hint-placeholder-val="{{false}}">
+        <div role="status" aria-live="polite" style="position: absolute; left: 50%; top: 16px; translate: -50% 0; z-index: 8; display: flex; align-items: center; gap: 14px; min-width: 430px; padding: 12px 18px 12px 12px; border-radius: 20px; background: {{accent}}; color: #ffffff; box-shadow: 0 18px 40px rgba(0,0,0,0.45); animation: mpDrop .45s cubic-bezier(.2,1.2,.3,1) both">
+          <span style="width: 52px; height: 52px; border-radius: 15px; flex: none; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.18)"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nav.arrow}}"></path></svg></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em">{{nav.dist}}</span><span style="font-size: 14px; font-weight: 600; opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nav.text}}</span></span>
+        </div>
+        <div style="position: absolute; left: 50%; bottom: 18px; translate: -50% 0; z-index: 8; display: flex; align-items: center; gap: 22px; padding: 14px 14px 14px 22px; border-radius: 20px; background: rgba(20,20,22,0.94); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 18px 40px rgba(0,0,0,0.5); backdrop-filter: blur(16px); animation: mpUp .45s cubic-bezier(.2,1.1,.3,1) both">
+          <sc-for list="{{nav.stats}}" as="s" hint-placeholder-count="3"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #8b8b93">{{s.k}}</span><span style="font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums">{{s.v}}</span></span></sc-for>
+          <span style="width: 1px; align-self: stretch; background: rgba(255,255,255,0.1)"></span>
+          <span style="display: flex; flex-direction: column; gap: 2px; max-width: 200px"><span style="font-size: 11px; color: #8b8b93">Куда</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nav.to}}</span></span>
+          <button onClick="{{nav.stop}}" class="mp-b" style="height: 40px; padding: 0 18px; border-radius: 12px; border: 0; font-size: 13.5px; font-weight: 700; background: rgba(255,92,92,0.18); color: #ff9a9a">Завершить</button>
+        </div>
+      </sc-if>
+
+      <!-- масштаб и источник -->
+      <div aria-hidden="true" style="position: absolute; right: 16px; bottom: 14px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 10.5px; color: {{P.label}}">
+        <span style="{{scaleBar}}"></span>
+        <span style="font-weight: 600">{{scaleText}}</span>
+        <span>{{attrib}}</span>
+      </div>
+
+      <sc-if value="{{toast.on}}" hint-placeholder-val="{{false}}">
+        <div role="status" style="position: absolute; left: 50%; bottom: 96px; translate: -50% 0; z-index: 9; padding: 10px 16px; border-radius: 14px; background: #f2f2f4; color: #111113; font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px rgba(0,0,0,0.4); animation: mpUp .3s ease both">{{toast.text}}</div>
+      </sc-if>
+    </div>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
+
+  </section>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"themeTint":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  VW = 1366; VH = 774; M_PER_U = 14;
+  KEY = 'ashenos.maps.v1';
+  state = { cam: { x: 600, y: 610, z: 0.92 }, q: '', cat: 'all', sel: null, route: null, mode: null, nav: null, layersOpen: false, toast: null, favs: ['home', 'work', 'tower'], cfg: {} };
+  /* ---------- мир: упрощённый Таллин (1 ед. ≈ 14 м) ---------- */
+  N = {
+    bj: [470, 480], vab: [540, 585], viru: [612, 540], kad: [760, 500], prt: [720, 420], pir: [860, 335], kose: [1000, 380], tv: [1100, 382],
+    ule: [740, 765], las: [1110, 640], lag: [900, 560], air: [905, 868], kri: [520, 720], ton: [460, 880], nom: [320, 1140], mus: [330, 850],
+    tul: [420, 682], hab: [150, 700], rocca: [130, 640], kal: [420, 422], tel: [400, 470], len: [440, 378], kop: [262, 300], old: [520, 520],
+    rot: [600, 455], kak: [40, 560], pal: [320, 600], prn: [480, 1000], sop: [400, 762], kkv: [880, 360], lasN: [1000, 600]
+  };
+  E = [
+    ['viru', 'kad', 'Narva mnt', 1], ['kad', 'prt', 'Narva mnt', 1], ['prt', 'pir', 'Pirita tee', 1, [[790, 380]]], ['pir', 'kkv', 'Kloostrimetsa tee', 2],
+    ['kkv', 'kose', 'Kose tee', 2], ['kose', 'tv', 'Kose tee', 2], ['viru', 'lag', 'Laagna tee', 1, [[760, 560]]], ['lag', 'lasN', 'Laagna tee', 1], ['lasN', 'las', 'Laagna tee', 1],
+    ['viru', 'ule', 'Tartu mnt', 1, [[680, 650]]], ['ule', 'air', 'Lennujaama tee', 2, [[830, 820]]], ['ule', 'las', 'Peterburi tee', 1, [[930, 700]]],
+    ['vab', 'kri', 'Pärnu mnt', 1, [[530, 650]]], ['kri', 'ton', 'Pärnu mnt', 1], ['ton', 'prn', 'Pärnu mnt', 1, [[475, 940]]], ['prn', 'nom', 'Valdeku tn', 2, [[400, 1080]]],
+    ['vab', 'tul', 'Endla tn', 2, [[470, 640]]], ['tul', 'sop', 'Sõpruse pst', 2], ['sop', 'mus', 'Sõpruse pst', 2], ['mus', 'hab', 'Ehitajate tee', 1, [[240, 790]]],
+    ['bj', 'pal', 'Paldiski mnt', 1, [[400, 540]]], ['pal', 'hab', 'Paldiski mnt', 1, [[230, 660]]], ['hab', 'rocca', 'Rannamõisa tee', 2], ['rocca', 'kak', 'Kakumäe tee', 2, [[90, 610]]],
+    ['kal', 'kop', 'Kopli tn', 2, [[330, 370]]], ['bj', 'kal', 'Põhja pst', 1, [[450, 450]]], ['kal', 'len', 'Vesilennuki tn', 2], ['bj', 'tel', 'Telliskivi tn', 2],
+    ['tel', 'pal', 'Kopli tn', 2, [[360, 530]]], ['bj', 'old', 'Toompuiestee', 2, [[495, 505]]], ['old', 'viru', 'Viru tn', 2], ['old', 'vab', 'Harju tn', 2],
+    ['viru', 'rot', 'Ahtri tn', 2], ['rot', 'prt', 'Ahtri tn', 2, [[665, 440]]], ['len', 'rot', 'Kalaranna tn', 2, [[520, 400]]], ['kri', 'ule', 'Järvevana tee', 1, [[640, 760]]],
+    ['ton', 'mus', 'Tondi tn', 2, [[400, 860]]], ['tul', 'pal', 'Tulika tn', 2], ['kri', 'tul', 'Tulika tn', 2]
+  ];
+  PL = [
+    { id: 'home', name: 'Дом', cat: 'home', addr: 'Telliskivi 60a', x: 400, y: 476 },
+    { id: 'work', name: 'Работа', cat: 'work', addr: 'Ülemiste City, Lõõtsa 5', x: 772, y: 790 },
+    { id: 'raek', name: 'Ратушная площадь', cat: 'sight', addr: 'Raekoja plats, Vanalinn', x: 516, y: 516 },
+    { id: 'kadp', name: 'Кадриоргский парк', cat: 'park', addr: 'A. Weizenbergi tn', x: 776, y: 470 },
+    { id: 'tower', name: 'Телебашня', cat: 'sight', addr: 'Kloostrimetsa tee 58a', x: 1100, y: 372 },
+    { id: 'air', name: 'Аэропорт Таллина', cat: 'transit', addr: 'Tartu mnt 101', x: 912, y: 878 },
+    { id: 'bjv', name: 'Балтийский вокзал', cat: 'transit', addr: 'Toompuiestee 37', x: 462, y: 494 },
+    { id: 'port', name: 'Пассажирский порт', cat: 'transit', addr: 'Sadama 25', x: 590, y: 418 },
+    { id: 'lenn', name: 'Лётная гавань', cat: 'sight', addr: 'Vesilennuki 6', x: 436, y: 370 },
+    { id: 'rocca', name: 'Rocca al Mare', cat: 'shop', addr: 'Paldiski mnt 102', x: 138, y: 652 },
+    { id: 'ulk', name: 'Ülemiste keskus', cat: 'shop', addr: 'Suur-Sõjamäe 4', x: 752, y: 752 },
+    { id: 'viruk', name: 'Viru keskus', cat: 'shop', addr: 'Viru väljak 4', x: 620, y: 552 },
+    { id: 'kohv', name: 'Kohvik Telliskivi', cat: 'food', addr: 'Telliskivi 62', x: 392, y: 458 },
+    { id: 'kala', name: 'Kalamaja kohvik', cat: 'food', addr: 'Salme 12', x: 428, y: 432 },
+    { id: 'rot', name: 'Rotermanni kohvik', cat: 'food', addr: 'Rotermanni 8', x: 604, y: 470 },
+    { id: 'pirb', name: 'Пляж Пирита', cat: 'park', addr: 'Pirita tee', x: 848, y: 320 },
+    { id: 'ckl', name: 'Circle K Laagna', cat: 'fuel', addr: 'Laagna tee 80', x: 1010, y: 590 },
+    { id: 'nst', name: 'Neste Pärnu mnt', cat: 'fuel', addr: 'Pärnu mnt 238', x: 492, y: 966 },
+    { id: 'nomt', name: 'Рынок Нымме', cat: 'shop', addr: 'Jaama 18', x: 312, y: 1128 },
+    { id: 'must', name: 'Mustamäe keskus', cat: 'shop', addr: 'Tammsaare tee 116', x: 336, y: 836 }
+  ];
+  ICON = {
+    all: 'M-5 -5h4v4h-4z M1 -5h4v4h-4z M-5 1h4v4h-4z M1 1h4v4h-4z',
+    food: 'M-4.5 -3h7v3.5a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3z M2.5 -2h1.2a1.6 1.6 0 0 1 0 3.2H2.5 M-3 -6v1.5 M0 -6v1.5',
+    fuel: 'M-4.5 5V-4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V5 M-5.5 5h7.5 M-3 -3h3 M1.5 -1.5l2.5 1.5v3.5a1 1 0 0 0 2 0V-2l-2-2',
+    shop: 'M-4.5 -2h9l-1 7h-7z M-2 -2v-1.2a2 2 0 0 1 4 0V-2',
+    park: 'M0 -5.5l4.5 6.5h-9z M0 -2.5l3.5 5h-7z M0 1v4.5',
+    sight: 'M0 -5.5l1.6 3.4 3.7.5-2.7 2.5.7 3.7L0 2.8l-3.3 1.8.7-3.7-2.7-2.5 3.7-.5z',
+    transit: 'M-4 -5h8a1 1 0 0 1 1 1v7h-10v-7a1 1 0 0 1 1-1z M-5 0h10 M-3 3v2 M3 3v2 M-2.5 -3h5',
+    home: 'M-5 0.5l5-5 5 5 M-3.5 -1v6h7v-6 M-1 5v-3h2v3',
+    work: 'M-5 -2h10v6.5h-10z M-2 -2v-2h4v2 M-5 1h10'
+  };
+  CATS = [['all', 'Все'], ['food', 'Кафе'], ['shop', 'Магазины'], ['sight', 'Места'], ['park', 'Парки'], ['transit', 'Транспорт'], ['fuel', 'Заправки']];
+  CATN = { food: 'Кафе', shop: 'Магазин', sight: 'Достопримечательность', park: 'Парк', transit: 'Транспорт', fuel: 'Заправка', home: 'Дом', work: 'Работа' };
+  MODES = { car: { name: 'Авто', kmh: 32, icon: 'M-5.5 2.5V0l1.5-3.5h8L5.5 0v2.5z M-5.5 2.5h11 M-3.5 4.5v-2 M3.5 4.5v-2 M-4 0h8' }, foot: { name: 'Пешком', kmh: 5, icon: 'M0 -5a1.2 1.2 0 1 0 0.1 0 M-1 -2.5l-2 2.5 M-1 -2.5l2 0 1.5 2 M-1 -2.5v3.5l-2 4 M-1 1l2.5 4' }, bike: { name: 'Велосипед', kmh: 15, icon: 'M-3.5 2.5a2.3 2.3 0 1 0 .1 0 M3.5 2.5a2.3 2.3 0 1 0 .1 0 M-3.5 4.8l2.5-5h4l1 5 M-1 -0.2l-1-2.3h-1.5 M2.5 -0.2l.6-2.6h1.6' } };
+  ARW = { start: 'M12 20V5M6 11l6-6 6 6', left: 'M18 20v-7a3 3 0 0 0-3-3H6M10 6l-4 4 4 4', right: 'M6 20v-7a3 3 0 0 1 3-3h9M14 6l4 4-4 4', straight: 'M12 20V4M7 9l5-5 5 5', end: 'M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z M12 8v.01' };
+
+  CFG_KEY = 'ashenos.maps.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Карта' },
+    { k: 'look', type: 'seg', name: 'Оформление', note: 'Тёмная повторяет стиль системы', def: 'dark', opts: [['dark', 'Тёмная'], ['light', 'Светлая']] },
+    { k: 'traffic', type: 'sw', name: 'Пробки', note: 'Цвет дорог и время в пути с учётом пробок', def: true },
+    { k: 'transit', type: 'sw', name: 'Общественный транспорт', note: 'Линии трамваев и автобусов', def: false },
+    { k: 'names', type: 'sw', name: 'Названия улиц', note: 'Подписи вдоль крупных дорог', def: true },
+    { type: 'head', name: 'Маршруты' },
+    { k: 'mode', type: 'seg', name: 'Способ по умолчанию', def: 'car', opts: [['car', 'Авто'], ['foot', 'Пешком'], ['bike', 'Велосипед']] },
+    { k: 'units', type: 'seg', name: 'Единицы', def: 'km', opts: [['km', 'Километры'], ['mi', 'Мили']] },
+    { k: 'island', type: 'sw', name: 'Навигация в острове', note: 'Следующий поворот виден в верхнем острове', def: true },
+    { type: 'head', name: 'Источник' },
+    { k: 'src', type: 'seg', name: 'Данные карты', note: 'Google работает только с вашим API-ключом (ashenos-settings set MAPS_GOOGLE_KEY …)', def: 'osm', opts: [['osm', 'OpenStreetMap'], ['google', 'Google']] },
+    { k: 'offline', type: 'sw', name: 'Офлайн-карта Эстонии', note: 'Скачано 412 МБ — работает без интернета', def: true }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+
+  cfgChanged(k, v) { if (k === 'src' && v === 'google') this.say('Google Maps: нужен API-ключ — пока показана карта OSM'); }
+
+  componentDidMount() {
+    this.cfgLoad();
+    try { const d = JSON.parse(localStorage.getItem(this.KEY) || 'null'); if (d && Array.isArray(d.favs)) this.setState({ favs: d.favs }); } catch (e) {}
+    this.buildWorld();
+    this.forceUpdate();
+  }
+  componentWillUnmount() { clearInterval(this.navT); cancelAnimationFrame(this.flyR); this.emitNav(null); }
+  save() { try { localStorage.setItem(this.KEY, JSON.stringify({ favs: this.state.favs })); } catch (e) {} }
+  say(text) { clearTimeout(this.toastT); this.setState({ toast: text }); this.toastT = setTimeout(() => this.setState({ toast: null }), 2600); }
+
+  /* ---------- геометрия ---------- */
+  rng(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  inPoly(x, y, P) { let c = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { const [xi, yi] = P[i], [xj, yj] = P[j]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
+  ell(cx, cy, rx, ry, n = 18, wob = 0.12, seed = 3) { const r = this.rng(seed); const P = []; for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2, k = 1 + (r() - 0.5) * wob * 2; P.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]); } return P; }
+  smooth(P) { /* замкнутый контур → плавный path */
+    const m = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], f = (n) => n.toFixed(1);
+    let d = `M${f(m(P[P.length - 1], P[0])[0])} ${f(m(P[P.length - 1], P[0])[1])}`;
+    P.forEach((p, i) => { const q = m(p, P[(i + 1) % P.length]); d += `Q${f(p[0])} ${f(p[1])} ${f(q[0])} ${f(q[1])}`; });
+    return d + 'Z';
+  }
+  openSmooth(P) { const f = (n) => n.toFixed(1); let d = `M${f(P[0][0])} ${f(P[0][1])}`; for (let i = 1; i < P.length - 1; i++) { const q = [(P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2]; d += `Q${f(P[i][0])} ${f(P[i][1])} ${f(q[0])} ${f(q[1])}`; } return d + `L${f(P[P.length - 1][0])} ${f(P[P.length - 1][1])}`; }
+  buildWorld() {
+    if (this.W) return;
+    const LAND = [[-400, 560], [40, 548], [110, 520], [170, 455], [205, 360], [240, 270], [275, 236], [312, 262], [330, 330], [372, 392], [420, 368], [470, 372], [520, 352], [560, 392], [610, 396], [660, 370], [705, 372], [760, 330], [810, 300], [835, 250], [860, 170], [905, 110], [980, 70], [1060, 80], [1120, 150], [1160, 220], [1250, 260], [1400, 280], [1600, 250], [1900, 300], [1900, 1600], [-400, 1600]];
+    this.LAND = LAND;
+    const lakes = [this.ell(705, 960, 115, 150, 20, 0.1, 7), this.ell(205, 770, 48, 58, 14, 0.12, 11)];
+    this.LAKES = lakes;
+    const parks = [this.ell(790, 470, 48, 40, 14, 0.18, 5), this.ell(490, 540, 18, 42, 10, 0.1, 9), this.ell(960, 300, 120, 70, 16, 0.2, 13), this.ell(260, 1180, 210, 120, 18, 0.2, 17), this.ell(560, 1120, 70, 50, 12, 0.2, 21), this.ell(1240, 460, 90, 60, 14, 0.2, 23)];
+    const land = (x, y) => this.inPoly(x, y, LAND) && !lakes.some((L) => this.inPoly(x, y, L));
+    const r = this.rng(42);
+    let blocks = '', minor = '';
+    for (let i = 0; i < 1500; i++) {
+      const x = -300 + r() * 2000, y = 200 + r() * 1300, w = 8 + r() * 18, h = 6 + r() * 14;
+      if (!land(x, y) || !land(x + w, y + h)) continue;
+      const nearC = Math.hypot(x - 560, y - 540) < 260;
+      if (!nearC && r() < 0.45) continue;
+      blocks += `M${x.toFixed(0)} ${y.toFixed(0)}h${w.toFixed(0)}v${h.toFixed(0)}h-${w.toFixed(0)}z`;
+    }
+    for (let i = 0; i < 420; i++) {
+      const x = -300 + r() * 2000, y = 200 + r() * 1300, a = (r() < 0.5 ? 0.15 : 1.7) + (r() - 0.5) * 0.4, L = 40 + r() * 90;
+      const x2 = x + Math.cos(a) * L, y2 = y + Math.sin(a) * L;
+      if (!land(x, y) || !land(x2, y2)) continue;
+      minor += `M${x.toFixed(0)} ${y.toFixed(0)}L${x2.toFixed(0)} ${y2.toFixed(0)}`;
+    }
+    const rw = (cx, cy, L, a, w) => { const c = Math.cos(a), s = Math.sin(a), p = [[-L / 2, -w / 2], [L / 2, -w / 2], [L / 2, w / 2], [-L / 2, w / 2]].map(([u, v]) => [cx + u * c - v * s, cy + u * s + v * c]); return 'M' + p.map((q) => q.map((n) => n.toFixed(0)).join(' ')).join('L') + 'Z'; };
+    this.W = { land: this.openSmooth(LAND.slice(0, 30)) + 'L1900 1600L-400 1600Z', blocks, minor, parks: parks.map((p) => this.smooth(p)), lakes: lakes.map((p) => this.smooth(p)), runway: rw(930, 900, 230, -0.42, 12) + rw(960, 870, 120, -0.42, 30) };
+    /* граф дорог */
+    this.EDGES = this.E.map(([a, b, name, cls, mid], i) => {
+      let pts = [this.N[a], ...(mid || []), this.N[b]];
+      let len = 0; for (let k = 1; k < pts.length; k++) len += Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+      return { i, a, b, name, cls, pts, len, jam: [0, 1, 0, 2, 0, 1, 0, 0, 2, 1][i % 10] };
+    });
+  }
+  path(pts) { return 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L'); }
+  nearNode(x, y) { let best = null, bd = 1e9; Object.entries(this.N).forEach(([id, p]) => { const d = Math.hypot(p[0] - x, p[1] - y); if (d < bd) { bd = d; best = id; } }); return best; }
+  place(id) { return id === 'me' ? { id: 'me', name: 'Моё местоположение', x: this.ME[0], y: this.ME[1], addr: 'GPS · ±8 м' } : this.PL.find((p) => p.id === id); }
+  ME = [404, 482];
+
+  /* Дейкстра по графу */
+  solve(fromId, toId, mode) {
+    const A = this.place(fromId), B = this.place(toId);
+    if (!A || !B) return null;
+    const s = this.nearNode(A.x, A.y), t = this.nearNode(B.x, B.y);
+    const jamK = mode === 'car' && this.cfgGet('traffic') ? [1, 1.35, 1.9] : [1, 1, 1];
+    const dist = {}, prev = {}, Q = new Set(Object.keys(this.N));
+    Object.keys(this.N).forEach((k) => { dist[k] = Infinity; }); dist[s] = 0;
+    while (Q.size) {
+      let u = null; Q.forEach((k) => { if (u === null || dist[k] < dist[u]) u = k; });
+      Q.delete(u); if (u === t || dist[u] === Infinity) break;
+      this.EDGES.forEach((e) => {
+        if (e.a !== u && e.b !== u) return;
+        const v = e.a === u ? e.b : e.a; if (!Q.has(v)) return;
+        const w = e.len * jamK[e.jam];
+        if (dist[u] + w < dist[v]) { dist[v] = dist[u] + w; prev[v] = { u, e }; }
+      });
+    }
+    const segs = []; let cur = t;
+    while (cur !== s && prev[cur]) { const { u, e } = prev[cur]; const pts = e.a === u ? e.pts.slice() : e.pts.slice().reverse(); segs.unshift({ name: e.name, pts, len: e.len, jam: e.jam }); cur = u; }
+    const head = [[A.x, A.y], this.N[s]], tail = [this.N[t], [B.x, B.y]];
+    let pts = [this.N[s]]; segs.forEach((g) => { pts = pts.concat(g.pts.slice(1)); });
+    const roadLen = segs.reduce((a, g) => a + g.len, 0);
+    const walk = Math.hypot(head[1][0] - head[0][0], head[1][1] - head[0][1]) + Math.hypot(tail[1][0] - tail[0][0], tail[1][1] - tail[0][1]);
+    const total = roadLen + walk;
+    const timeFor = (m) => { const kmh = this.MODES[m].kmh; let t2 = 0; segs.forEach((g) => { t2 += g.len * this.M_PER_U / 1000 / kmh * (m === 'car' && this.cfgGet('traffic') ? [1, 1.35, 1.9][g.jam] : 1); }); return (t2 + walk * this.M_PER_U / 1000 / 5) * 60 + (m === 'car' ? 2 : 0); };
+    /* шаги */
+    const steps = []; let acc = 0;
+    const dir = (p, q) => [q[0] - p[0], q[1] - p[1]];
+    segs.forEach((g, i) => {
+      const prevSeg = steps.length ? steps[steps.length - 1] : null;
+      if (prevSeg && prevSeg.name === g.name) { prevSeg.len += g.len; return; }
+      let turn = 'start';
+      if (i > 0) {
+        const P0 = segs[i - 1].pts, d1 = dir(P0[P0.length - 2], P0[P0.length - 1]), d2 = dir(g.pts[0], g.pts[1]);
+        const cr = d1[0] * d2[1] - d1[1] * d2[0], dt = d1[0] * d2[0] + d1[1] * d2[1];
+        const ang = Math.atan2(cr, dt) * 180 / Math.PI;
+        turn = Math.abs(ang) < 25 ? 'straight' : ang > 0 ? 'right' : 'left';
+      }
+      steps.push({ name: g.name, turn, len: g.len, at: acc }); acc += g.len;
+      if (prevSeg) { /* пересчёт at для слитых */ }
+    });
+    let a2 = Math.hypot(head[1][0] - head[0][0], head[1][1] - head[0][1]); steps.forEach((st) => { st.at = a2; a2 += st.len; });
+    steps.push({ name: B.name, turn: 'end', len: 0, at: total });
+    return { from: fromId, to: toId, d: this.path(pts), walk: this.path(head) + this.path(tail), full: [head[0], ...pts, tail[1]], total, timeFor, steps };
+  }
+  along(full, t) { /* точка на ломаной на расстоянии t */
+    let acc = 0;
+    for (let i = 1; i < full.length; i++) { const a = full[i - 1], b = full[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (acc + L >= t) { const k = L ? (t - acc) / L : 0; return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, ang: Math.atan2(b[1] - a[1], b[0] - a[0]), i }; } acc += L; }
+    const z = full[full.length - 1]; return { x: z[0], y: z[1], ang: 0, i: full.length - 1 };
+  }
+  donePath(full, t) { const out = [full[0]]; let acc = 0; for (let i = 1; i < full.length; i++) { const a = full[i - 1], b = full[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (acc + L >= t) { const p = this.along(full, t); out.push([p.x, p.y]); break; } out.push(b); acc += L; } return out.length > 1 ? this.path(out) : ''; }
+
+  /* ---------- камера ---------- */
+  fly(x, y, z, ms = 650) {
+    cancelAnimationFrame(this.flyR);
+    const c0 = { ...this.state.cam }, t0 = performance.now(), zz = Math.max(0.45, Math.min(4, z));
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (now) => { const k = Math.min(1, (now - t0) / ms), e = ease(k); this.setState({ cam: { x: c0.x + (x - c0.x) * e, y: c0.y + (y - c0.y) * e, z: c0.z + (zz - c0.z) * e } }); if (k < 1) this.flyR = requestAnimationFrame(step); };
+    this.flyR = requestAnimationFrame(step);
+  }
+  focus(p, z) { const zz = z || Math.max(this.state.cam.z, 1.7); this.fly(p.x - 190 / zz, p.y, zz); }
+  proj(x, y) { const c = this.state.cam; return [this.VW / 2 + (x - c.x) * c.z, this.VH / 2 + (y - c.y) * c.z]; }
+  panDown = (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault(); e.stopPropagation();
+    cancelAnimationFrame(this.flyR);
+    const svg = e.currentTarget, sf = svg.getBoundingClientRect().width / this.VW;
+    const s = { x: e.clientX, y: e.clientY, c: { ...this.state.cam }, sf, moved: false };
+    const mv = (ev) => { const dx = (ev.clientX - s.x) / s.sf, dy = (ev.clientY - s.y) / s.sf; if (Math.abs(dx) + Math.abs(dy) > 3) s.moved = true; this.follow = false; this.setState({ cam: { ...s.c, x: s.c.x - dx / s.c.z, y: s.c.y - dy / s.c.z }, grab: true }); };
+    const up = () => { window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up); this.setState({ grab: false }); if (!s.moved && this.state.layersOpen) this.setState({ layersOpen: false }); };
+    window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
+  };
+  zoomAt(f, sx, sy) {
+    const c = this.state.cam, z = Math.max(0.45, Math.min(4, c.z * f));
+    if (sx == null) { sx = this.VW / 2; sy = this.VH / 2; }
+    const wx = c.x + (sx - this.VW / 2) / c.z, wy = c.y + (sy - this.VH / 2) / c.z;
+    this.setState({ cam: { x: wx - (sx - this.VW / 2) / z, y: wy - (sy - this.VH / 2) / z, z } });
+  }
+  onWheel = (e) => { const r = e.currentTarget.getBoundingClientRect(), sf = r.width / this.VW; cancelAnimationFrame(this.flyR); this.zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, (e.clientX - r.left) / sf, (e.clientY - r.top) / sf); };
+
+  /* ---------- маршрут и навигация ---------- */
+  mode() { return this.state.mode || this.cfgGet('mode') || 'car'; }
+  startRoute(to, from = 'me') {
+    const R = this.solve(from, to, this.mode()); if (!R) return;
+    this.setState({ route: R, routeN: (this.state.routeN || 0) + 1, sel: to, nav: null });
+    const xs = R.full.map((p) => p[0]), ys = R.full.map((p) => p[1]);
+    const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+    const z = Math.max(0.5, Math.min(2.4, Math.min((this.VW - 480) / (w + 120), (this.VH - 120) / (h + 120))));
+    this.fly((Math.max(...xs) + Math.min(...xs)) / 2 - 200 / z, (Math.max(...ys) + Math.min(...ys)) / 2, z, 800);
+  }
+  go() {
+    const R = this.state.route; if (!R) return;
+    clearInterval(this.navT); this.follow = true;
+    this.setState({ nav: { t: 0, start: Date.now() }, layersOpen: false });
+    const speed = R.total / 45; /* весь путь ≈ 45 с — ускоренная демонстрация */
+    this.navT = setInterval(() => {
+      const n = this.state.nav; if (!n) return;
+      const t = Math.min(R.total, n.t + speed * 0.1);
+      this.setState({ nav: { ...n, t } });
+      const p = this.along(R.full, t);
+      if (this.follow) this.setState({ cam: { x: p.x, y: p.y + 60 / 2.3, z: 2.3 } });
+      this.emitNav(this.navInfo(R, t));
+      if (t >= R.total) { clearInterval(this.navT); this.say(`Вы прибыли: ${this.place(R.to).name}`); setTimeout(() => this.stopNav(), 1800); }
+    }, 100);
+    this.say(this.cfgGet('voice') === false ? 'Навигация начата' : 'Навигация начата · подсказки в острове');
+  }
+  stopNav() { clearInterval(this.navT); this.setState({ nav: null }); this.emitNav(null); }
+  navInfo(R, t) {
+    const next = R.steps.find((s) => s.at > t + 1) || R.steps[R.steps.length - 1];
+    const left = Math.max(0, next.at - t), rem = Math.max(0, R.total - t);
+    const mins = R.timeFor(this.mode()) * (rem / R.total);
+    const txt = next.turn === 'end' ? `Прибытие: ${next.name}` : next.turn === 'straight' ? `Прямо на ${next.name}` : `${next.turn === 'right' ? 'Направо' : 'Налево'} на ${next.name}`;
+    return { turn: next.turn, dist: this.fmtDist(left), text: txt, eta: this.clock(mins), left: this.fmtDist(rem), mins: Math.max(1, Math.round(mins)), to: this.place(R.to).name };
+  }
+  emitNav(info) {
+    const key = info ? info.text + info.dist : 'off';
+    if (key === this._navKey) return; this._navKey = key;
+    if (!this.props.onAction) return;
+    if (!info || !this.cfgGet('island')) { this.props.onAction('nav:off'); return; }
+    this.props.onAction('nav:' + JSON.stringify(info));
+  }
+  fmtDist(u) { const m = u * this.M_PER_U; if (this.cfgGet('units') === 'mi') { const mi = m / 1609; return mi < 0.2 ? `${Math.round(m * 3.28 / 10) * 10} фт` : `${mi.toFixed(1).replace('.', ',')} ми`; } return m < 950 ? `${Math.max(10, Math.round(m / 10) * 10)} м` : `${(m / 1000).toFixed(1).replace('.', ',')} км`; }
+  fmtMin(m) { m = Math.max(1, Math.round(m)); return m < 60 ? `${m} мин` : `${Math.floor(m / 60)} ч ${m % 60} мин`; }
+  clock(addMin) { const d = new Date(Date.now() + addMin * 60000); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+
+  renderVals() {
+    this.buildWorld();
+    const winCtl = { closeApp: () => this.props.onClose && this.props.onClose(), minApp: () => this.props.onMinimize && this.props.onMinimize(), maxApp: () => this.props.onMaximize && this.props.onMaximize() };
+    const st = this.state, c = st.cam, light = this.cfgGet('look') === 'light';
+    const accent = this.props.themeTint || '#ef3b3b';
+    const P = light
+      ? { land: '#ecebe6', sea: '#a8c8de', park: '#cfe2c2', block: '#dcdbd5', minor: '#ffffff', major: '#ffffff', major2: '#fdfdfd', label: '#6b6b72', dist: '#8a8a92', shore: '#8fb3cc', street: '#55555c' }
+      : { land: '#1a1b1e', sea: '#0d1317', park: '#1b231e', block: '#212226', minor: '#2a2b30', major: '#3d3e45', major2: '#33343a', label: '#80808a', dist: '#5f5f69', shore: '#1c262c', street: '#9a9aa3' };
+    const camT = `translate(${(this.VW / 2 - c.x * c.z).toFixed(1)} ${(this.VH / 2 - c.y * c.z).toFixed(1)}) scale(${c.z.toFixed(4)})`;
+    const traffic = this.cfgGet('traffic');
+    const JAM = ['#3fbf6b', '#f2a33a', '#e5484d'];
+    const roads = this.EDGES.slice().sort((a, b) => b.cls - a.cls).map((e) => {
+      const pts = e.pts[0][0] <= e.pts[e.pts.length - 1][0] ? e.pts : e.pts.slice().reverse();
+      return { id: 'mp-rd-' + e.i, d: this.path(pts), col: traffic && e.cls === 1 && e.jam ? JAM[e.jam] : e.cls === 1 ? P.major : P.major2, w: (e.cls === 1 ? 5.5 : 3.2) * Math.min(1.5, Math.max(0.7, c.z)) };
+    });
+    /* подписи улиц: по середине ребра, повёрнуты вдоль */
+    const names = this.cfgGet('names') && c.z > 1.15 ? this.EDGES.filter((e) => e.cls === 1 || c.z > 1.8).map((e) => {
+      const mid = this.along(e.pts, e.len / 2); let ang = mid.ang * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+      const [x, y] = this.proj(mid.x, mid.y);
+      return { name: e.name, x, y, st: `position:absolute;left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;translate:-50% -50%;rotate:${ang.toFixed(1)}deg;font:600 10.5px Inter,sans-serif;color:${P.street};white-space:nowrap;pointer-events:none;letter-spacing:.02em;text-shadow:0 0 3px ${P.land},0 0 3px ${P.land},0 0 2px ${P.land}` };
+    }).filter((s) => s.x > 380 && s.x < this.VW + 50 && s.y > -20 && s.y < this.VH + 20) : [];
+    const DIST = [['ВАНАЛИНН', 545, 505, 1], ['КЕСКЛИНН', 610, 610, 0], ['КАЛАМАЯ', 380, 410, 1], ['КАДРИОРГ', 820, 520, 1], ['ПИРИТА', 920, 270, 0], ['ЛАСНАМЯЭ', 1150, 560, 0], ['МУСТАМЯЭ', 300, 900, 0], ['НЫММЕ', 250, 1080, 0], ['ХААБЕРСТИ', 130, 760, 0], ['КРИСТИЙНЕ', 560, 800, 0], ['КОПЛИ', 250, 340, 0], ['ЮЛЕМИСТЕ', 830, 760, 1], ['Финский залив', 600, 180, 2]];
+    const districts = DIST.filter((d) => (d[3] !== 1 || c.z > 1) && this.proj(d[1], d[2])[0] > 400).map(([name, x, y, k]) => { const [sx, sy] = this.proj(x, y); return { name, st: `position:absolute;left:${sx.toFixed(0)}px;top:${sy.toFixed(0)}px;translate:-50% -50%;white-space:nowrap;font:${k === 2 ? 'italic 500 15px' : '700 ' + (c.z > 1.6 ? 13 : 11) + 'px'} Inter,sans-serif;letter-spacing:${k === 2 ? '.04em' : '.18em'};color:${k === 2 ? (light ? '#6d93ad' : '#2f4552') : P.dist};pointer-events:none;opacity:${c.z > 2.6 && k !== 2 ? 0.5 : 1}` }; });
+    const transit = this.cfgGet('transit') ? [
+      { d: this.path([[262, 300], [330, 370], [420, 422], [470, 480], [540, 520], [612, 540], [760, 500], [790, 470]]), col: '#e5484d' },
+      { d: this.path([[470, 480], [540, 585], [530, 650], [520, 720], [640, 760], [740, 765], [905, 868]]), col: '#4aa3ff' },
+      { d: this.path([[150, 700], [230, 660], [320, 600], [400, 540], [470, 480], [612, 540], [900, 560], [1110, 640]]), col: '#b48cff' }
+    ].map((t) => ({ ...t, st: 'animation:mpDash 1.4s linear infinite' })) : [];
+
+    /* список мест */
+    const q = st.q.trim().toLowerCase();
+    const match = (p) => (st.cat === 'all' || p.cat === st.cat) && (!q || (p.name + ' ' + p.addr + ' ' + (this.CATN[p.cat] || '')).toLowerCase().includes(q));
+    const me = this.ME;
+    const dU = (p) => Math.hypot(p.x - me[0], p.y - me[1]) * 1.25;
+    const found = this.PL.filter((p) => p.cat !== 'home' && p.cat !== 'work' && match(p)).sort((a, b) => dU(a) - dU(b));
+    const shown = q || st.cat !== 'all' ? found : found.slice(0, 8);
+    const BADGE = (on, txt, col) => ({ badge: `flex:none;height:20px;padding:0 8px;border-radius:6px;display:flex;align-items:center;font-size:10px;font-weight:800;letter-spacing:.04em;background:${col};color:#fff`, badgeText: txt });
+    const hr = new Date().getHours();
+    const list = shown.map((p, i) => {
+      const open = st.sel === p.id;
+      const isOpen = p.cat === 'park' || p.cat === 'transit' || p.cat === 'fuel' || (hr >= 8 && hr < 22);
+      const tCar = dU(p) * this.M_PER_U / 1000 / 32 * 60 + 2;
+      return {
+        open, name: p.name, sub: `${this.CATN[p.cat]} · ${p.addr} · ${this.fmtDist(dU(p))}`, subCol: open ? 'rgba(255,255,255,.8)' : '#8b8b93',
+        ...BADGE(isOpen, isOpen ? 'ОТКРЫТО' : 'ЗАКРЫТО', open ? 'rgba(0,0,0,.25)' : isOpen ? '#2f9e5b' : '#5b5b63'),
+        box: `display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:16px;flex:none;transition:background .25s;animation:mpIn .3s ease ${Math.min(i, 8) * 0.03}s both;background:${open ? accent : 'rgba(255,255,255,.05)'};color:${open ? '#fff' : '#e8e8ec'}`,
+        pick: () => { const s = open ? null : p.id; this.setState({ sel: s }); if (s) this.focus(p); },
+        bar: `display:block;height:100%;width:${Math.max(8, 100 - dU(p) / 12)}%;background:#fff;border-radius:2px`,
+        facts: [{ k: 'Расстояние', v: this.fmtDist(dU(p)) }, { k: 'На авто', v: this.fmtMin(tCar) }, { k: 'Пешком', v: this.fmtMin(dU(p) * this.M_PER_U / 1000 / 5 * 60) }],
+        route: () => this.startRoute(p.id), favLabel: st.favs.includes(p.id) ? 'Убрать из избранного' : 'В избранное', favFill: st.favs.includes(p.id) ? 'currentColor' : 'none',
+        fav: () => { const favs = st.favs.includes(p.id) ? st.favs.filter((x) => x !== p.id) : [...st.favs, p.id]; this.setState({ favs }, () => this.save()); this.say(st.favs.includes(p.id) ? 'Убрано из избранного' : 'Добавлено в избранное'); },
+        share: () => { const lat = (59.437 + (520 - p.y) * 0.000126).toFixed(5), lon = (24.745 + (p.x - 520) * 0.000247).toFixed(5); try { navigator.clipboard.writeText(`${p.name}: ${lat}, ${lon}`); } catch (e) {} this.say(`Скопировано: ${lat}, ${lon}`); }
+      };
+    });
+    const favs = st.favs.map((id) => this.place(id)).filter(Boolean).slice(0, 4).map((p) => ({
+      name: p.name, icon: this.ICON[p.cat], eta: `${this.fmtMin(dU(p) * this.M_PER_U / 1000 / 32 * 60 + 2)} · ${this.fmtDist(dU(p))}`,
+      pick: () => this.startRoute(p.id),
+      st: 'display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;border:0;background:rgba(255,255,255,.05);color:#e8e8ec;min-width:0',
+      ic: `width:32px;height:32px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:${p.cat === 'home' ? '#3a6ad6' : p.cat === 'work' ? '#8a5cf0' : accent};color:#fff`
+    }));
+    const cats = this.CATS.map(([id, name]) => ({ name, icon: this.ICON[id], on: st.cat === id, pick: () => this.setState({ cat: id, sel: null }),
+      st: `height:32px;padding:0 12px 0 10px;border-radius:16px;display:flex;align-items:center;gap:6px;flex:none;font-size:12.5px;font-weight:600;border:0;white-space:nowrap;transition:background .2s,color .2s;background:${st.cat === id ? '#f2f2f4' : 'rgba(255,255,255,.06)'};color:${st.cat === id ? '#111113' : '#d6d6db'}` }));
+
+    /* метки */
+    const R = st.route;
+    const pinIds = new Set(shown.map((p) => p.id)); st.favs.forEach((f) => pinIds.add(f)); if (st.sel) pinIds.add(st.sel); if (R) { pinIds.clear(); pinIds.add(R.to); if (R.from !== 'me') pinIds.add(R.from); }
+    const pins = this.PL.filter((p) => pinIds.has(p.id)).map((p) => {
+      const [x, y] = this.proj(p.x, p.y), on = st.sel === p.id || (R && R.to === p.id);
+      const col = p.cat === 'home' ? '#3a6ad6' : p.cat === 'work' ? '#8a5cf0' : on ? accent : '#2a2b30';
+      const s = on ? 40 : 30;
+      return { name: p.name, icon: this.ICON[p.cat], pick: () => { this.setState({ sel: p.id }); this.focus(p); },
+        st: `position:absolute;left:${(x - s / 2).toFixed(1)}px;top:${(y - s - 6).toFixed(1)}px;width:${s}px;height:${s}px;z-index:${on ? 4 : 3};border-radius:50% 50% 50% 4px;rotate:-45deg;display:flex;align-items:center;justify-content:center;border:2px solid #fff;background:${col};color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.45);transition:width .25s,height .25s,background .25s;${on ? 'animation:mpPin .5s cubic-bezier(.2,1.6,.4,1) both;' : ''}padding:0;cursor:pointer` };
+    });
+    pins.forEach((p) => { p.st = p.st.replace('rotate:-45deg;', 'rotate:-45deg;'); });
+    const selP = st.sel && this.place(st.sel);
+    const tip = selP && !st.nav ? (() => { const [x, y] = this.proj(selP.x, selP.y); return { on: x > 380 && x < this.VW && y > 0 && y < this.VH, name: selP.addr, sub: selP.name, st: `position:absolute;left:${(x + 26).toFixed(0)}px;top:${(y - 62).toFixed(0)}px;z-index:5;display:flex;flex-direction:column;gap:2px;padding:9px 13px;border-radius:12px;background:rgba(18,18,20,.94);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 26px rgba(0,0,0,.45);pointer-events:none;animation:mpIn .3s ease both` }; })() : { on: false };
+
+    /* я / автомобиль в навигации */
+    let mp = { x: me[0], y: me[1], ang: -Math.PI / 2 };
+    if (st.nav && R) mp = this.along(R.full, st.nav.t);
+    const [mx, my] = this.proj(mp.x, mp.y);
+    const meV = {
+      st: `position:absolute;left:${(mx - 30).toFixed(1)}px;top:${(my - 30).toFixed(1)}px;width:60px;height:60px;z-index:4;pointer-events:none`,
+      ring: 'position:absolute;inset:0;border-radius:50%;background:rgba(74,163,255,.22);animation:mpRing 2.2s ease-out infinite',
+      dot: `position:absolute;left:21px;top:21px;width:18px;height:18px;border-radius:50%;background:${st.nav ? accent : '#4aa3ff'};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5);box-sizing:border-box`,
+      cone: `position:absolute;left:22px;top:-2px;width:16px;height:26px;transform-origin:8px 32px;rotate:${(mp.ang * 180 / Math.PI + 90).toFixed(1)}deg;background:linear-gradient(0deg,rgba(74,163,255,.55),rgba(74,163,255,0));clip-path:polygon(50% 100%,0 0,100% 0);opacity:${st.nav ? 0 : 0.9}`
+    };
+
+    /* маршрут */
+    const mode = this.mode();
+    const rn = st.routeN || 0;
+    const rt = R ? { w: (5 / c.z).toFixed(3), d: R.d, walk: R.walk, done: st.nav ? this.donePath(R.full, st.nav.t) : '', st: `stroke-dasharray:1;stroke-dashoffset:0;animation:${rn % 2 ? 'mpDrawA' : 'mpDrawB'} 1.1s cubic-bezier(.4,0,.2,1) both`, glow: `animation:mpFade .9s ease .3s both` } : { w: 1, d: '', walk: '', done: '', st: '', glow: '' };
+    const route = R ? {
+      on: true, off: false, from: this.place(R.from).name, to: this.place(R.to).name,
+      toDot: `position:absolute;left:13px;bottom:16px;width:10px;height:10px;border-radius:3px;background:${accent}`,
+      badge: `margin-left:auto;height:22px;padding:0 9px;border-radius:7px;display:flex;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:.04em;background:${accent};color:#fff`, badgeText: st.nav ? 'В ПУТИ' : this.fmtDist(R.total).toUpperCase(),
+      close: () => { this.stopNav(); this.setState({ route: null }); },
+      swap: () => this.startRoute(R.from === 'me' ? 'home' : R.from, R.to),
+      modes: Object.entries(this.MODES).map(([id, M]) => ({ on: id === mode, icon: M.icon, time: this.fmtMin(R.timeFor(id)), pick: () => this.setState({ mode: id }, () => this.startRoute(R.to, R.from)),
+        st: `height:52px;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;transition:background .2s,color .2s;background:${id === mode ? '#f2f2f4' : 'rgba(255,255,255,.05)'};color:${id === mode ? '#111113' : '#d6d6db'}` })),
+      stats: [{ k: 'В пути', v: this.fmtMin(R.timeFor(mode)) }, { k: 'Расстояние', v: this.fmtDist(R.total) }, { k: 'Прибытие', v: this.clock(R.timeFor(mode)) }],
+      steps: R.steps.map((s, i) => {
+        const cur = st.nav && (R.steps.find((x) => x.at > st.nav.t + 1) || R.steps[R.steps.length - 1]) === s;
+        return { arrow: this.ARW[s.turn], text: s.turn === 'start' ? `Начните движение по ${s.name}` : s.turn === 'end' ? `Прибытие: ${s.name}` : s.turn === 'straight' ? `Продолжайте по ${s.name}` : `${s.turn === 'right' ? 'Поверните направо' : 'Поверните налево'} на ${s.name}`,
+          dist: s.turn === 'end' ? this.clock(R.timeFor(mode)) : this.fmtDist(s.len),
+          st: `display:flex;align-items:center;gap:12px;padding:8px 8px;border-radius:12px;background:${cur ? 'rgba(255,255,255,.08)' : 'transparent'};animation:mpIn .3s ease ${i * 0.04}s both`,
+          ic: `width:32px;height:32px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:${s.turn === 'end' ? accent : 'rgba(255,255,255,.07)'};color:#fff` };
+      }),
+      go: () => st.nav ? this.stopNav() : this.go(),
+      goSt: `height:48px;flex:none;border-radius:14px;border:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:800;background:${st.nav ? 'rgba(255,92,92,.18)' : accent};color:${st.nav ? '#ff9a9a' : '#fff'}`
+    } : { on: false, off: true, modes: [], stats: [], steps: [] };
+    const ni = st.nav && R ? this.navInfo(R, st.nav.t) : null;
+    const nav = ni ? { on: true, arrow: this.ARW[ni.turn], dist: ni.dist, text: ni.text, to: ni.to, stop: () => this.stopNav(),
+      stats: [{ k: 'Прибытие', v: ni.eta }, { k: 'Осталось', v: ni.left }, { k: 'Время', v: this.fmtMin(ni.mins) }] } : { on: false, stats: [] };
+
+    /* масштаб */
+    const nice = [50, 100, 200, 500, 1000, 2000, 5000];
+    const mPerPx = this.M_PER_U / c.z; const meters = nice.find((m) => m / mPerPx > 70) || 5000;
+    const sw = (on) => ({ track: `width:38px;height:22px;flex:none;border-radius:11px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .2s`, knob: `width:16px;height:16px;border-radius:50%;background:${on ? '#111113' : '#f2f2f4'};transform:translateX(${on ? 16 : 0}px);transition:transform .25s cubic-bezier(.3,1.4,.5,1)` });
+    const src = this.cfgGet('src');
+    const fab = 'width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(20,20,22,.9);border:1px solid rgba(255,255,255,.1);color:#f2f2f4;backdrop-filter:blur(14px);box-shadow:0 6px 16px rgba(0,0,0,.3)';
+    return {
+      winTheme: this.props.themeWin || 'rgba(16,16,18,0.96)', accent, P, W: this.W, camT, roads, transit, rt, route, nav, pins, tip, me: meV, districts, streetNames: names,
+      headSub: st.nav ? `Навигация · ${ni ? ni.left : ''}` : `Таллин · ${this.cfgGet('offline') ? 'офлайн-карта' : 'онлайн'}`,
+      srcText: src === 'google' ? 'Google · нужен ключ' : 'OpenStreetMap', srcBadge: `height:26px;padding:0 10px;border-radius:13px;display:flex;align-items:center;font-size:11.5px;font-weight:600;background:${src === 'google' ? 'rgba(245,200,75,.14)' : 'rgba(255,255,255,.06)'};color:${src === 'google' ? '#f5c84b' : '#a1a1a8'}`,
+      svgSt: `position:absolute;left:0;top:0;display:block;cursor:${st.grab ? 'grabbing' : 'grab'};touch-action:none`,
+      panelSt: `position:absolute;left:16px;top:16px;bottom:16px;width:360px;z-index:6;display:flex;flex-direction:column;gap:12px;padding:14px;box-sizing:border-box;border-radius:22px;background:rgba(18,18,20,.92);border:1px solid rgba(255,255,255,.09);box-shadow:0 24px 60px rgba(0,0,0,.45);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:translate .45s cubic-bezier(.22,1,.36,1),opacity .3s;${st.nav ? 'translate:-400px 0;opacity:0;pointer-events:none' : ''}`,
+      q: st.q, hasQ: !!st.q, onQ: (e) => this.setState({ q: e.target.value, sel: null }), clearQ: () => this.setState({ q: '' }),
+      cats, list, favs, showFav: !q && st.cat === 'all', listTitle: q ? `Найдено: ${found.length}` : st.cat !== 'all' ? this.CATS.find((x) => x[0] === st.cat)[1] : 'Рядом с вами', noResults: shown.length === 0,
+      layersOpen: !!st.layersOpen, toggleLayers: () => this.setState({ layersOpen: !st.layersOpen }),
+      looks: [['dark', 'Тёмная', 'linear-gradient(135deg,#1a1b1e 50%,#0d1317 50%)'], ['light', 'Светлая', 'linear-gradient(135deg,#ecebe6 50%,#a8c8de 50%)']].map(([id, name, g]) => ({ name, on: this.cfgGet('look') === id, pick: () => this.cfgSet('look', id),
+        st: `height:66px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;border:0;color:#e8e8ec;background:rgba(255,255,255,.05);box-shadow:${this.cfgGet('look') === id ? '0 0 0 2px #f2f2f4' : '0 0 0 1px rgba(255,255,255,.08)'}`, sw: `width:44px;height:26px;border-radius:7px;background:${g}` })),
+      layerSw: [['traffic', 'Пробки', 'Зелёный — свободно, красный — затор'], ['transit', 'Транспорт', 'Трамваи и автобусы'], ['names', 'Названия улиц', 'При приближении'], ['offline', 'Офлайн-карта', 'Эстония · 412 МБ']].map(([k, name, note]) => ({ name, note, on: !!this.cfgGet(k), toggle: () => this.cfgSet(k, !this.cfgGet(k)), ...sw(!!this.cfgGet(k)) })),
+      fab, fabLoc: fab + (this.follow && st.nav ? ';color:#4aa3ff' : ''),
+      locate: () => { if (st.nav) { this.follow = true; return; } this.fly(me[0] - 190 / 2, me[1], 2); this.say('Вы здесь · точность ±8 м (GPS)'); },
+      zoomIn: () => this.zoomAt(1.4), zoomOut: () => this.zoomAt(1 / 1.4), onDbl: (e) => { const r = e.currentTarget.getBoundingClientRect(), sf = r.width / this.VW; this.zoomAt(1.6, (e.clientX - r.left) / sf, (e.clientY - r.top) / sf); },
+      scaleBar: `display:block;height:6px;width:${(meters / mPerPx).toFixed(0)}px;border:2px solid ${P.label};border-top:0;box-sizing:border-box`, scaleText: meters >= 1000 ? `${meters / 1000} км` : `${meters} м`,
+      attrib: src === 'google' ? '© OpenStreetMap (Google — после ввода ключа)' : '© участники OpenStreetMap',
+      toast: { on: !!st.toast, text: st.toast || '' },
+      cfg: this.cfgView('Настройки карт'), cfgOpen: () => this.setState({ cfgOpen: true }), ...winCtl
+    };
+  }
+}
+</script>
+</body>
+</html>
