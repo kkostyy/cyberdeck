@@ -37,6 +37,13 @@
 Анимации попапов календаря, музыки и сети в прототипе повторяют тайминги и кривые из [`shell/animations`](shell/animations) (serpantinum, AGPL-3.0).
 
 
+## Документы
+
+- [Что готово](docs/STATUS.md) — что есть в прототипе, что уже в образе, что проверено на железе
+- [Проверка на железе](docs/HARDWARE-CHECKLIST.md) — чек-лист первого запуска на Raspberry Pi
+- Тема значков **Ashen** — `airootfs/usr/share/icons/ashen`, включена по умолчанию в `kdeglobals`;
+  исходные картинки в `design/icons`
+
 ## Структура
 
 ```

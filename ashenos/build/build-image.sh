@@ -78,6 +78,8 @@ sed -i 's/^#\(ru_RU.UTF-8\)/\1/; s/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen
 locale-gen
 echo 'LANG=ru_RU.UTF-8' > /etc/locale.conf
 npm install -g @anthropic-ai/claude-code || true
+# тема значков Ashen (пепельные объёмные иконки) — кэш для GTK-приложений
+gtk-update-icon-cache -f -q /usr/share/icons/ashen 2>/dev/null || true
 pacman -Scc --noconfirm
 CHROOT
 
