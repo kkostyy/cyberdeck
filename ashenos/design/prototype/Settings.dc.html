@@ -35,7 +35,7 @@ body{margin:0;background:#050506}
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: #1e1e20; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
+  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: var(--aw, 1368px); height: var(--ah, 836px); display: flex; flex-direction: column; border-radius: 22px; background: #1e1e20; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
 
     <div style="flex: 1; min-height: 0; display: flex">
       <!-- ===== sidebar ===== -->
@@ -521,10 +521,10 @@ const SECTIONS = [
   ] },
   { cat: 'Устройства', items: [
     { id: 'display', name: 'Экран', glyph: '▭', bg: '#4f7fb8', sub: 'KScreen: разрешение, масштаб', groups: [
-      { title: 'HDMI-A-1 · 27″', rows: [
-        { id: 'res', t: 'select', label: 'Разрешение', opts: ['2560 × 1440', '1920 × 1080', '1600 × 900', '1280 × 720'], v: '2560 × 1440' },
+      { title: 'Встроенный экран', rows: [
+        { id: 'res', t: 'select', label: 'Разрешение', hint: 'Интерфейс сам подстраивается: панели, Dock, виджеты и окна', opts: ['Авто', '1920 × 1080', '1440 × 900', '1280 × 800', '1024 × 600', '800 × 480'], v: 'Авто' },
         { id: 'hz', t: 'seg', label: 'Частота', opts: ['60 Гц', '75 Гц', '144 Гц'], v: '60 Гц' },
-        { id: 'scale', t: 'seg', label: 'Масштаб', opts: ['100%', '125%', '150%', '200%'], v: '125%' },
+        { id: 'scale', t: 'seg', label: 'Масштаб', opts: ['Авто', '80%', '90%', '100%', '125%'], v: 'Авто' },
         { id: 'rot', t: 'seg', label: 'Поворот', opts: ['0°', '90°', '180°', '270°'], v: '0°' },
         { id: 'vrr', t: 'seg', label: 'Адаптивная синхронизация', opts: ['Никогда', 'Автоматически', 'Всегда'], v: 'Автоматически' },
         { id: 'hdr', t: 'toggle', label: 'HDR', v: false },
@@ -1081,7 +1081,7 @@ class Component extends DCLogic {
     const wallPick = st.wPick === null || st.wPick === undefined ? curWallSys : st.wPick;
     try { localStorage.setItem('archSettings.v2', JSON.stringify(st.vals)); } catch (e) {}
     if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
-    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true), dock: { size: g('dockSize', 40), mag: g('dockMag', 50), width: g('dockWidth', 'Половина экрана'), hide: g('dockHide', 'Умное'), run: g('dockRun', true), wave: g('dockWave', true) } })); }
+    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true), screen: (() => { const r = String(g('res', 'Авто')); return ['1920 × 1080', '1440 × 900', '1280 × 800', '1024 × 600', '800 × 480'].includes(r) ? r.replace(/\s*×\s*/, 'x') : 'auto'; })(), uiScale: g('scale', 'Авто'), dock: { size: g('dockSize', 40), mag: g('dockMag', 50), width: g('dockWidth', 'Половина экрана'), hide: g('dockHide', 'Умное'), run: g('dockRun', true), wave: g('dockWave', true) } })); }
     this.setState({ saved: { ...st.vals }, wPick: null });
     if (auto !== true) this.say('Изменения применены');
   }

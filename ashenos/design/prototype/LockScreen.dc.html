@@ -33,7 +33,7 @@ a{color:#c9c9cf}a:hover{color:#ffffff}
 </style>
 </helmet>
 
-<div onMouseMove="{{px}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: {{tBg}}; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased">
+<div onMouseMove="{{px}}" style="{{lsRoot}}">
 
   <!-- ===== SCREEN (wallpaper inside the black frame) ===== -->
   <div style="position: absolute; left: 8px; right: 8px; top: 40px; bottom: 8px; border-radius: 20px; overflow: hidden">
@@ -141,7 +141,7 @@ a{color:#c9c9cf}a:hover{color:#ffffff}
     </span>
     <span style="font: 500 12.5px 'JetBrains Mono', monospace; color: #8b8b93">user@ashenos</span>
   </div>
-  <div aria-label="Состояние" style="position: absolute; left: 720px; top: 4px; translate: -50% 0; z-index: 30; height: 32px; padding: 0 14px; border-radius: 16px; background: #000; border: 1px solid #1f1f23; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #f2f2f4; animation: lpulse 3s ease-in-out infinite">
+  <div aria-label="Состояние" style="position: absolute; left: 50%; top: 4px; translate: -50% 0; z-index: 30; height: 32px; padding: 0 14px; border-radius: 16px; background: #000; border: 1px solid #1f1f23; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #f2f2f4; animation: lpulse 3s ease-in-out infinite">
     <span aria-hidden="true" style="{{islandDot}}"></span>
     {{islandText}}
   </div>
@@ -250,6 +250,7 @@ class Component extends DCLogic {
     };
     const focusPw = () => setTimeout(() => { const i = document.getElementById('lock-pw'); if (i) i.focus(); }, 380);
     return {
+      lsRoot: `position:relative;width:${+this.props.screenW || 1440}px;height:${+this.props.screenH || 900}px;overflow:hidden;background:${this.props.themeBg || '#050506'};font-family:Inter,system-ui,sans-serif;color:#f2f2f4;-webkit-font-smoothing:antialiased`,
       tBg,
       px: (e) => { const el = e.currentTarget; const b = el.getBoundingClientRect(); if (this.pxR) return; this.pxR = requestAnimationFrame(() => { this.pxR = null; el.style.setProperty('--mx', ((e.clientX - b.left) / b.width - 0.5).toFixed(3)); el.style.setProperty('--my', ((e.clientY - b.top) / b.height - 0.5).toFixed(3)); }); },
       m: { pw: st.method === 'pw', pin: st.method === 'pin', face: st.method === 'face', notFace: st.method !== 'face' },
@@ -286,8 +287,8 @@ class Component extends DCLogic {
       drop, open: st.open,
       openDrop: () => { if (!this.state.open) { this.setState({ open: true }); focusPw(); } },
       toggleDrop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); const o = !this.state.open; this.setState({ open: o, err: '' }); if (o) focusPw(); },
-      clockWrap: `position:absolute;left:0;right:0;top:${st.method === 'pin' ? 18 : 92}px;display:flex;flex-direction:column;align-items:center;gap:4px;scale:${st.method === 'pin' ? 0.6 : 1};transform-origin:50% 0;transition:top .6s cubic-bezier(.3,1.2,.4,1),scale .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) both`,
-      loginWrap: `position:absolute;left:50%;top:${st.method === 'pin' ? 196 : 400}px;width:320px;margin-left:-160px;display:flex;flex-direction:column;align-items:center;gap:12px;transition:top .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) .15s both`,
+      clockWrap: `position:absolute;left:0;right:0;top:${st.method === 'pin' ? 18 : ((+this.props.screenH || 900) < 760 ? 26 : 92)}px;display:flex;flex-direction:column;align-items:center;gap:4px;scale:${st.method === 'pin' ? 0.6 : ((+this.props.screenH || 900) < 760 ? 0.74 : 1)};transform-origin:50% 0;transition:top .6s cubic-bezier(.3,1.2,.4,1),scale .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) both`,
+      loginWrap: `position:absolute;left:50%;top:${st.method === 'pin' ? Math.round(196 * Math.min(1, ((+this.props.screenH || 900) - 48) / 852)) : Math.round(400 * Math.min(1, ((+this.props.screenH || 900) - 48) / 852) - ((+this.props.screenH || 900) < 760 ? 40 : 0))}px;width:320px;margin-left:-160px;display:flex;flex-direction:column;align-items:center;gap:12px;transition:top .6s cubic-bezier(.3,1.2,.4,1);animation:lwIn .8s cubic-bezier(.2,1,.3,1) .15s both`,
       hintStyle: `margin-top:18px;font-size:14px;font-weight:500;color:rgba(255,255,255,.7);opacity:${st.open ? 0 : 1};transition:opacity .3s;${st.open ? '' : 'animation:lbreath 2.8s ease-in-out infinite'}`,
       timeAnim: `display:inline-block;animation:${now.getMinutes() % 2 ? 'ltA' : 'ltB'} .7s cubic-bezier(.2,1,.3,1) both`,
       date: (() => { const d = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }); return d.charAt(0).toUpperCase() + d.slice(1); })(),

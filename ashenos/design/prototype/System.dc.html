@@ -69,11 +69,11 @@ body{margin:0;background:#050506}
 @keyframes islPower{0%{opacity:0}15%{opacity:1}85%{opacity:1}100%{opacity:0}}
 </style>
 </helmet>
-<div data-sys-root="1" onMouseLeave="{{curHide}}" style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: {{thBg}}; transition: background .5s; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none">
+<div data-sys-screen="1" style="{{scrSt}}"><div data-sys-root="1" onMouseLeave="{{curHide}}" style="{{rootSt}}">
 
   <!-- ============ DESKTOP (wallpaper, widgets, dock) ============ -->
   <div style="position: absolute; inset: 0">
-    <dc-import name="Desktop" open-apps="{{openApps}}" dock-cfg="{{dockCfg}}" any-max="{{anyMax}}" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" sys-vol="{{sysVol}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
+    <dc-import name="Desktop" screen-w="{{scrW}}" screen-h="{{scrH}}" open-apps="{{openApps}}" dock-cfg="{{dockCfg}}" any-max="{{anyMax}}" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" sys-vol="{{sysVol}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
   </div>
 
   <!-- minimized stack hover zone -->
@@ -1047,7 +1047,7 @@ body{margin:0;background:#050506}
   <!-- ============ LOCK SCREEN ============ -->
   <sc-if value="{{showLock}}" hint-placeholder-val="{{true}}">
     <div style="{{lockStyle}}">
-      <dc-import name="LockScreen" cur-wall="{{curWall}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" on-unlock="{{unlock}}" hint-size="1440px,900px"></dc-import>
+      <dc-import name="LockScreen" screen-w="{{scrW}}" screen-h="{{scrH}}" cur-wall="{{curWall}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" on-unlock="{{unlock}}" hint-size="1440px,900px"></dc-import>
     </div>
   </sc-if>
 
@@ -1057,7 +1057,7 @@ body{margin:0;background:#050506}
     <svg data-c="text" width="30" height="30" viewBox="0 0 24 24" style="position: absolute; left: -12px; top: -12px; overflow: visible; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: opacity .12s"><path d="M9 3.5h6M9 20.5h6M12 3.5v17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"></path><path d="M9 3.5h6M9 20.5h6M12 3.5v17" fill="none" stroke="#0b0b0c" stroke-width="2.2" stroke-linecap="round"></path></svg>
     <svg data-c="resize" width="30" height="30" viewBox="0 0 24 24" style="position: absolute; left: -15px; top: -15px; overflow: visible; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: opacity .12s, transform .16s"><path d="M3.5 3.5 11 6 6 11Z" fill="#0b0b0c" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path><path d="M20.5 20.5 13 18 18 13Z" fill="#0b0b0c" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"></path></svg>
   </div>
-</div>
+</div></div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
 const THEMES = [
@@ -1080,6 +1080,18 @@ const THEMES = [
   { id: 'rose', name: 'Rose Dusk', bg: '#141018', surface: '#1f1a24', text: '#e0def4', accent: '#ebbcba', dots: ['#ebbcba', '#f6c177', '#c4a7e7', '#9ccfd8', '#eb6f92'] },
   { id: 'horizon', name: 'Horizon', bg: '#16161c', surface: '#1c1e26', text: '#e0e0e0', accent: '#e95678', dots: ['#e95678', '#fab795', '#25b0bc', '#29d398', '#b877db'] }
 ];
+const SCR = { W: 1440, H: 900, K: 1, pw: 1440, ph: 900, compact: false };
+const SCR_PRESETS = { '1440x900': [1440, 900], '1280x800': [1280, 800], '1024x600': [1024, 600], '800x480': [800, 480], '1920x1080': [1920, 1080] };
+function screenCalc(req) {
+  let pw = 1440, ph = 900;
+  if (req && req !== 'auto') { const p = SCR_PRESETS[req] || String(req).split('x').map(Number); if (p[0] > 300 && p[1] > 200) { pw = +p[0]; ph = +p[1]; } }
+  else { try { const iw = window.innerWidth, ih = window.innerHeight; if (iw > 300 && ih > 200 && (Math.abs(iw - 1440) > 48 || Math.abs(ih - 900) > 48)) { pw = iw; ph = ih; } } catch (e) {} }
+  let K = pw >= 1280 && ph >= 760 ? 1 : pw >= 1000 && ph >= 580 ? 0.9 : 0.8;
+  if (pw > 1700) K = Math.min(1.25, pw / 1536);
+  const us = SCR.forceK; if (us && us !== 'Авто') K = Math.max(0.6, parseInt(us, 10) / 100 || K);
+  SCR.pw = pw; SCR.ph = ph; SCR.K = K; SCR.W = Math.round(pw / K); SCR.H = Math.round(ph / K); SCR.compact = SCR.W < 1200 || SCR.H < 720;
+  return SCR;
+}
 const TINTS = [
   ['', 'Из темы'], ['#ff8a3d', 'Оранжевый'], ['#ff5c5c', 'Красный'], ['#ff6fae', 'Розовый'], ['#f5c84b', 'Жёлтый'],
   ['#59c27a', 'Зелёный'], ['#2ec4b6', 'Бирюзовый'], ['#5aa8ff', 'Голубой'], ['#b48cff', 'Фиолетовый'], ['#f2f2f4', 'Белый']
@@ -1131,6 +1143,7 @@ class Component extends DCLogic {
 
   /* ---------------- lifecycle ---------------- */
   componentDidMount() {
+    this.onWinResize = () => { clearTimeout(this.rzT); this.rzT = setTimeout(() => this.setState({ rsz: Date.now() }), 150); }; window.addEventListener('resize', this.onWinResize);
     const start = new Date(Date.now() + 18 * 60000);
     start.setSeconds(0, 0);
     this.evStart = start;
@@ -1357,7 +1370,7 @@ class Component extends DCLogic {
   petDown = (e) => {
     if (e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
-    const root = document.querySelector('[data-sys-root]'); const rr = root.getBoundingClientRect(); const k = rr.width / 1440 || 1;
+    const root = document.querySelector('[data-sys-root]'); const rr = root.getBoundingClientRect(); const k = rr.width / SCR.W || 1;
     const pt = this.state.pet;
     this.petDrag = { sx: e.clientX, sy: e.clientY, x: pt.x, y: pt.y, k, moved: false };
     const el = document.getElementById('sys-pet'); if (el) el.style.transition = 'none';
@@ -1435,7 +1448,7 @@ class Component extends DCLogic {
     if (id.startsWith('open:')) { this.openApp(id.slice(5), 'place'); return; }
     if (id.startsWith('winsize:')) { try { const q = JSON.parse(id.slice(8)); const w = st.wins[q.id]; if (!w || !this.meta[q.id] || !this.meta[q.id].nat) return; const old = w.nat || this.meta[q.id].nat; if (old[0] === q.w && old[1] === q.h) return;
       const k = w.w / old[0]; const nw = Math.round(q.w * k), nh = Math.round(q.h * k); const cx = w.x + w.w / 2;
-      const x = Math.max(8, Math.min(1432 - nw, Math.round(cx - nw / 2))), y = Math.max(44, Math.min(892 - nh, w.y + Math.round((w.h - nh) / 2)));
+      const x = Math.max(8, Math.min((SCR.W - 8) - nw, Math.round(cx - nw / 2))), y = Math.max(44, Math.min((SCR.H - 8) - nh, w.y + Math.round((w.h - nh) / 2)));
       this.setState({ wins: { ...st.wins, [q.id]: { ...w, nat: [q.w, q.h], x, y, w: nw, h: nh, anim: 'resize', animAt: Date.now() } } }); } catch (e) {} return; }
     if (id.startsWith('openfile:')) {
       let f = {}; try { f = JSON.parse(id.slice(9)); } catch (e) { return; }
@@ -1475,7 +1488,7 @@ class Component extends DCLogic {
     if (id.startsWith('nav:')) { let nv = null; if (id !== 'nav:off') { try { nv = JSON.parse(id.slice(4)); } catch (e) {} } this.setState({ navInfo: nv }); return; }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
     if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); const volNew = Math.min(100, Math.round(c.vol)); const volChanged = volNew !== st.vol;
-      this.setState({ vol: volNew, wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false, dockCfg: c.dock ? JSON.stringify(c.dock) : st.dockCfg });
+      this.setState({ vol: volNew, wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false, dockCfg: c.dock ? JSON.stringify(c.dock) : st.dockCfg, scrPick: c.screen || st.scrPick, uiScale: c.uiScale || st.uiScale });
       localStorage.setItem('ashenos.sys', JSON.stringify(c)); if (c.islLvl !== false && volChanged) this.onLevel('vol', volNew); } catch (e) {} return; }
     if (id.startsWith('theme:')) { try { const t = JSON.parse(id.slice(6)); this.setState({ theme: t }); localStorage.setItem('ashenos.theme', JSON.stringify(t)); } catch (e) {} return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
@@ -1550,10 +1563,10 @@ class Component extends DCLogic {
 
   /* ---------------- helpers ---------------- */
   root() { return document.querySelector('[data-sys-root]'); }
-  scale() { const r = this.root(); return r ? (r.getBoundingClientRect().width / 1440 || 1) : 1; }
+  scale() { const r = this.root(); return r ? (r.getBoundingClientRect().width / SCR.W || 1) : 1; }
   local(e) {
     const r = this.root(); if (!r) return { x: 0, y: 0 };
-    const b = r.getBoundingClientRect(), k = b.width / 1440 || 1;
+    const b = r.getBoundingClientRect(), k = b.width / SCR.W || 1;
     return { x: (e.clientX - b.left) / k, y: (e.clientY - b.top) / k };
   }
   saveProfile(p) { try { localStorage.setItem('archIslands.profile', p); } catch (e) {} }
@@ -1589,7 +1602,7 @@ class Component extends DCLogic {
     this.cur.kind = this.kindAt(e.target);
     this.paintCursor();
     const r0 = this.root();
-    if (r0 && !this.pxRaf) { this.pxRaf = requestAnimationFrame(() => { this.pxRaf = null; r0.style.setProperty('--mx', (this.cur.x / 1440 - 0.5).toFixed(3)); r0.style.setProperty('--my', (this.cur.y / 900 - 0.5).toFixed(3)); }); }
+    if (r0 && !this.pxRaf) { this.pxRaf = requestAnimationFrame(() => { this.pxRaf = null; r0.style.setProperty('--mx', (this.cur.x / SCR.W - 0.5).toFixed(3)); r0.style.setProperty('--my', (this.cur.y / SCR.H - 0.5).toFixed(3)); }); }
     /* autohide: reveal at the top edge, hide 2 s after leaving */
     if (this.autohide() && this.state.lock === 'off') {
       if (p.y < 8) { clearTimeout(this.hideT); this.hideT = null; if (!this.state.barShown) this.setState({ barShown: true }); }
@@ -1717,8 +1730,9 @@ class Component extends DCLogic {
     const w = this.state.wins[id];
     if (w && !w.closing) { if (w.min) this.restoreWin(id); else if (from === 'dock') this.closeWin(id); else this.focusWin(id); return; }
     const n = Object.keys(this.state.wins).length;
-    const NT = this.meta[id].nat; const ww = NT ? NT[0] : 940, hh = NT ? NT[1] : Math.round(ww * this.R);
-    const rect = NT ? { x: Math.round((1440 - ww) / 2) + n * 20, y: Math.max(44, Math.round((900 - hh) / 2) - 10), w: ww, h: hh } : { x: 250 + n * 40, y: 120 + n * 30, w: ww, h: hh };
+    const NT = this.meta[id].nat; const ww = NT ? NT[0] : SCR.compact ? Math.round(SCR.W * 0.86) : Math.min(940, Math.round(SCR.W * 0.66)), hh = NT ? NT[1] : SCR.compact ? Math.round((SCR.H - 110) * 0.92) : Math.round(ww * this.R);
+    let rect = NT ? { x: Math.round((SCR.W - ww) / 2) + n * 20, y: Math.max(44, Math.round((SCR.H - hh) / 2) - 10), w: ww, h: hh } : SCR.compact ? { x: Math.round((SCR.W - ww) / 2) + n * 16, y: 48 + n * 12, w: ww, h: hh } : { x: Math.round(SCR.W * 0.17) + n * 40, y: Math.round(SCR.H * 0.13) + n * 30, w: ww, h: hh };
+    if (NT && (rect.h > SCR.H - 130 || rect.w > SCR.W - 20)) { const k = Math.min((SCR.H - 130) / hh, (SCR.W - 20) / ww); rect = { x: Math.round((SCR.W - ww * k) / 2), y: 44, w: Math.round(ww * k), h: Math.round(hh * k) }; }
     this.setState({ wins: { ...this.state.wins, [id]: { ...rect, min: false, max: false, pinned: false, closing: false, born: Date.now() } }, order: [...this.state.order.filter((o) => o !== id), id], focus: id, menu: false, q: '', right: null });
   };
   focusWin(id) { if (this.state.focus !== id || this.state.order[this.state.order.length - 1] !== id) this.setState({ focus: id, order: [...this.state.order.filter((o) => o !== id), id] }); }
@@ -1809,10 +1823,10 @@ class Component extends DCLogic {
       x = o.x + dx; y = o.y + dy;
       /* magnetic edges: 24 px */
       if (Math.abs(x - 8) < SN) x = 8;
-      if (Math.abs(1432 - (x + w)) < SN) x = 1432 - w;
+      if (Math.abs((SCR.W - 8) - (x + w)) < SN) x = (SCR.W - 8) - w;
       if (Math.abs(y - 40) < SN) y = 40;
-      if (Math.abs(892 - (y + h)) < SN) y = 892 - h;
-      x = Math.max(-w + 120, Math.min(1440 - 120, x)); y = Math.max(40, Math.min(900 - 60, y));
+      if (Math.abs((SCR.H - 8) - (y + h)) < SN) y = (SCR.H - 8) - h;
+      x = Math.max(-w + 120, Math.min(SCR.W - 120, x)); y = Math.max(40, Math.min(SCR.H - 60, y));
       /* тянем к верхнему краю — превью «во весь экран» (как в macOS Sequoia) */
       const host = d.el.parentNode, hr = host.getBoundingClientRect();
       const full = (e.clientY - hr.top) / d.k < 14;
@@ -1829,21 +1843,21 @@ class Component extends DCLogic {
       }
     } else {
       const sgn = d.edge === 'se' || d.edge === 'ne' ? 1 : -1;
-      const NR = this.natOf(d.id); const RR = NR[1] / NR[0]; const MINW = this.isNat(d.id) ? Math.round(NR[0] * 0.7) : 520;
-      w = Math.max(MINW, Math.min(1440, o.w + sgn * dx, Math.floor(880 / RR)));
+      const NR = this.natOf(d.id); const RR = this.isNat(d.id) || !SCR.compact ? NR[1] / NR[0] : o.h / o.w; const MINW = this.isNat(d.id) ? Math.round(NR[0] * 0.7) : SCR.compact ? 380 : 520;
+      w = Math.max(MINW, Math.min(SCR.W, o.w + sgn * dx, Math.floor((SCR.H - 20) / RR)));
       h = Math.round(w * RR);
       if (d.edge === 'sw' || d.edge === 'nw') x = o.x + (o.w - w);
       if (d.edge === 'ne' || d.edge === 'nw') y = o.y + (o.h - h);
       if (Math.abs(x) < SN) { const nw = w + x; if (d.edge.endsWith('w')) { w = Math.max(MINW, nw); x = 0; h = Math.round(w * RR); } }
-      if (Math.abs(1440 - (x + w)) < SN && d.edge.endsWith('e') && !this.isNat(d.id)) { w = 1440 - x; h = Math.round(w * RR); }
+      if (Math.abs(SCR.W - (x + w)) < SN && d.edge.endsWith('e') && !this.isNat(d.id)) { w = SCR.W - x; h = Math.round(w * RR); }
     }
     this.live = { id: d.id, x, y, w, h };
     const el = d.el;
     el.style.left = x + 'px'; el.style.top = y + 'px';
     el.style.width = w + 'px'; el.style.height = h + 'px';
     const NW0 = this.natOf(d.id)[0]; el.style.borderRadius = (22 * w / NW0) + 'px';
-    el.style.boxShadow = (x === 8 || y === 40 || x + w === 1432 || y + h === 892) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : (d.mode === 'move' ? this.LIFT : '');
-    if (d.inner) d.inner.style.transform = `scale(${w / NW0}) translate(-36px, -32px)`;
+    el.style.boxShadow = (x === 8 || y === 40 || x + w === (SCR.W - 8) || y + h === (SCR.H - 8)) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : (d.mode === 'move' ? this.LIFT : '');
+    if (d.inner) { const S2 = this.isNat(d.id) ? w / NW0 : SCR.compact ? Math.min(1, w / 900) : w / 1368; d.inner.style.transform = `scale(${S2}) translate(-36px, -32px)`; d.inner.style.setProperty('--aw', Math.round(w / S2) + 'px'); d.inner.style.setProperty('--ah', Math.round(h / S2) + 'px'); }
   };
   onDragUp = () => {
     const d = this.drag; if (!d) return;
@@ -1868,6 +1882,8 @@ class Component extends DCLogic {
 
   /* ---------------- render ---------------- */
   renderVals() {
+    SCR.forceK = this.state.uiScale || (() => { try { return (JSON.parse(localStorage.getItem('ashenos.sys') || '{}') || {}).uiScale; } catch (e) { return null; } })();
+    screenCalc(this.props.screen || this.state.scrPick || (() => { try { return (JSON.parse(localStorage.getItem('ashenos.sys') || '{}') || {}).screen || 'auto'; } catch (e) { return 'auto'; } })());
     const st0 = this.state, IC = st0.islCfg || {};
     /* выключенные в «Параметры › Остров» живые действия просто не показываются в острове */
     const st = { ...st0, call: IC.call === false ? null : st0.call, rec: IC.rec === false ? null : st0.rec, timer: IC.timer === false ? null : st0.timer, sw: IC.timer === false ? null : st0.sw, prog: IC.prog === false ? null : st0.prog, navInfo: IC.nav === false ? null : st0.navInfo };
@@ -1893,11 +1909,11 @@ class Component extends DCLogic {
       if (st.peek === id) {
         const pw = RT > 1 ? 260 : 460, ph = Math.round(pw * RT);
         const base = st.stackHover ? 300 + i * (TH + 12) : 340 + i * 12;
-        return { x: 1440 - 16 - TW - 24 - pw, y: Math.max(80, Math.min(900 - ph - 70, base - 80)), w: pw, h: ph, z: 80 };
+        return { x: SCR.W - 16 - TW - 24 - pw, y: Math.max(80, Math.min(SCR.H - ph - 70, base - 80)), w: pw, h: ph, z: 80 };
       }
-      if (st.stackHover) { const tw = RT > 1 ? Math.round(TH / RT) : TW; return { x: 1440 - 16 - tw, y: 450 - (n * (TH + 12)) / 2 + i * (TH + 12), w: tw, h: Math.round(tw * RT), z: 60 + i }; }
+      if (st.stackHover) { const tw = RT > 1 ? Math.round(TH / RT) : TW; return { x: SCR.W - 16 - tw, y: 450 - (n * (TH + 12)) / 2 + i * (TH + 12), w: tw, h: Math.round(tw * RT), z: 60 + i }; }
       const ww = TW - (n - 1 - i) * 10;
-      const w2 = RT > 1 ? Math.round(ww * 0.6) : ww; return { x: 1440 - 16 - w2, y: 360 - (n - 1 - i) * 12, w: w2, h: Math.round(w2 * RT), z: 60 + i };
+      const w2 = RT > 1 ? Math.round(ww * 0.6) : ww; return { x: SCR.W - 16 - w2, y: 360 - (n - 1 - i) * 12, w: w2, h: Math.round(w2 * RT), z: 60 + i };
     };
     const win = {}, h = {};
     ids.forEach((id) => {
@@ -1907,10 +1923,13 @@ class Component extends DCLogic {
       let r = (this.live && this.live.id === id) ? this.live : { x: w.x, y: w.y, w: w.w, h: w.h };
       let z = 20 + st.order.indexOf(id) + (w.pinned ? 20 : 0);
       const NAT = this.natOf(id), natApp = this.isNat(id);
-      if (w.max && !w.min) { if (natApp) { const k = Math.min(1300 / NAT[0], 800 / NAT[1]); r = { x: Math.round((1440 - NAT[0] * k) / 2), y: Math.round(48 + (840 - NAT[1] * k) / 2), w: Math.round(NAT[0] * k), h: Math.round(NAT[1] * k) }; } else r = { x: 0, y: 0, w: 1440, h: 900 }; z = 85; }
+      if (w.max && !w.min) { if (natApp) { const k = Math.min(1300 / NAT[0], 800 / NAT[1]); r = { x: Math.round((SCR.W - NAT[0] * k) / 2), y: Math.round(48 + (840 - NAT[1] * k) / 2), w: Math.round(NAT[0] * k), h: Math.round(NAT[1] * k) }; } else r = { x: 0, y: 0, w: SCR.W, h: SCR.H }; z = 85; }
       if (w.min) { const s = slot(id); r = s; z = s.z; }
-      const s = r.w / NAT[0];
-      const rad = w.max && !w.min && !natApp ? 0 : 22 * s;
+      const fullNow = w.max && !w.min && !natApp;
+      const S2 = natApp ? r.w / NAT[0] : SCR.compact ? Math.min(1, r.w / 900) : (fullNow ? SCR.W / 1368 : r.w / 1368);
+      const AW = natApp ? NAT[0] : Math.round(r.w / S2), AH = natApp ? NAT[1] : Math.round(r.h / S2);
+      const s = S2;
+      const rad = fullNow ? 0 : 22 * s;
       const focused = st.focus === id && !w.min;
       const an = w.anim && Date.now() - (w.animAt || 0) < 700 ? w.anim : '';
       /* macOS: сворачивание «джинном» без отскока, полноэкранный режим — плавное ускорение/торможение */
@@ -1922,7 +1941,7 @@ class Component extends DCLogic {
         open: true, title: this.meta[id].title, pinned: w.pinned && !w.min,
         cover: !!w.min, handles: !w.min && !w.max,
         box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:${THV.surface};box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .22s cubic-bezier(.4,0,1,1) both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .42s cubic-bezier(.2,.9,.25,1) both;' : genie)}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
-        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min && !natApp ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform ${DU} ${EZ};${w.min ? 'pointer-events:none;' : ''}`
+        inner: `width:1440px;height:900px;--aw:${AW}px;--ah:${AH}px;transform-origin:0 0;transform:scale(${S2}) translate(-36px, -32px);transition:transform ${DU} ${EZ};${w.min ? 'pointer-events:none;' : ''}`
       };
     });
     const peekW = st.peek && st.wins[st.peek];
@@ -2047,7 +2066,7 @@ class Component extends DCLogic {
         label: `display:${mini ? 'none' : 'block'};font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0`
       };
     });
-    const center = `position:absolute;left:720px;top:0;translate:-50% 0;display:flex;align-items:flex-start;pointer-events:${searching ? 'none' : 'auto'};opacity:${searching ? 0 : 1};filter:blur(${searching ? 6 : 0}px);transition:opacity .25s,filter .25s`;
+    const center = `position:absolute;left:${SCR.W / 2}px;top:0;translate:-50% 0;display:flex;align-items:flex-start;pointer-events:${searching ? 'none' : 'auto'};opacity:${searching ? 0 : 1};filter:blur(${searching ? 6 : 0}px);transition:opacity .25s,filter .25s`;
     const fmt = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
     const music = {
       title: tr.title, artist: tr.artist, playing: st.music.playing, paused: !st.music.playing,
@@ -2116,7 +2135,7 @@ class Component extends DCLogic {
     };
     const g = glyphOf[active];
     const isl = {
-      box: `position:absolute;left:720px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(30,30,34,.55);backdrop-filter:blur(16px) saturate(150%)' : THV.bg};border:1px solid ${tDone ? (THV.accent || '#f2f2f4') : 'rgba(255,255,255,.08)'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
+      box: `position:absolute;left:${SCR.W / 2}px;top:0;translate:-50% 0;width:${iW}px;height:32px;border-radius:16px;overflow:hidden;background:${big ? 'rgba(255,255,255,.08)' : IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(30,30,34,.55);backdrop-filter:blur(16px) saturate(150%)' : THV.bg};border:1px solid ${tDone ? (THV.accent || '#f2f2f4') : 'rgba(255,255,255,.08)'};opacity:${unlocked ? 1 : 0};transition:width .42s ${SPR},background .25s,border-color .25s;pointer-events:auto;${tDone ? 'animation:islPulse 1s ease-in-out infinite;' : ''}`,
       row: `position:absolute;left:0;top:0;height:30px;width:${rowW}px;box-sizing:border-box;padding:0 12px;display:flex;align-items:center;gap:12px;opacity:${flashMode ? 0 : 1};filter:blur(${flashMode ? 5 : 0}px);transform:scale(${flashMode ? 0.9 : 1});transition:opacity .22s,filter .22s,transform .3s ${SPR}`,
       win: `display:flex;align-items:center;gap:8px;flex:none;width:${winW}px;min-width:0`,
       glyph: `width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font:700 9px 'JetBrains Mono',monospace;background:${g[1]};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)`,
@@ -2125,7 +2144,7 @@ class Component extends DCLogic {
       sub: active === 'desk' ? `Пространство ${st.ws} · открытых окон нет` : `${this.meta[active].sub} · активное окно`,
       hasWin: active !== 'desk',
       flash: `position:absolute;left:0;top:0;height:30px;width:${iW}px;box-sizing:border-box;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:9px;opacity:${flashMode ? 1 : 0};filter:blur(${flashMode ? 0 : 5}px);transform:scale(${flashMode ? 1 : 1.08});transition:opacity .22s,filter .22s,transform .35s ${SPR};pointer-events:none`,
-      drop: `position:absolute;left:720px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
+      drop: `position:absolute;left:${SCR.W / 2}px;top:36px;translate:-50% 0;width:${DW}px;height:${big ? bigH : 0}px;pointer-events:${big ? 'auto' : 'none'};filter:drop-shadow(0 18px 30px rgba(0,0,0,.45));transition:height ${big ? `.75s ${eS}` : `.42s ${eI}`}`,
       body: `position:absolute;left:0;top:0;width:${DW}px;height:${(big ? bigH : 0) + 2}px;overflow:hidden;background:${IC.style === 'black' ? '#000' : IC.style === 'glass' ? 'rgba(24,24,28,.82);backdrop-filter:blur(20px) saturate(150%)' : THV.bg};clip-path:path('${liquidP(DW, (big ? bigH : 0) + 2)}');transition:${big ? `height .75s ${eS},clip-path .75s ${eS}` : `height .42s ${eI},clip-path .42s ${eI}`}`,
       big: `position:absolute;left:${SBI}px;top:0;width:384px;box-sizing:border-box;padding:12px 16px 14px;${bigScroll ? `height:${bigH}px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-webkit-mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 46px),transparent);mask-image:linear-gradient(180deg,#000 0,#000 calc(100% - 46px),transparent);` : ''}display:flex;flex-direction:column;gap:14px;opacity:${big ? 1 : 0};filter:blur(${big ? 0 : 6}px);transform:translateY(${big ? 0 : -24}px);transition:opacity ${big ? '.45s ease .24s' : '.14s'},filter ${big ? '.5s ease .2s' : '.14s'},transform ${big ? `.9s ${eS} .08s` : '.3s ease'};pointer-events:${big ? 'auto' : 'none'}`
     };
@@ -2182,7 +2201,7 @@ class Component extends DCLogic {
       liveRow: 'display:flex;gap:8px;flex:none;flex-wrap:wrap', idle2: !bodyP && !liveP && !shelfP, shelfOn: shelfP, shelfN: `${st.shelf.length} ${st.shelf.length === 1 ? 'файл' : st.shelf.length < 5 ? 'файла' : 'файлов'}`,
       live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: 'flex:1 1 230px;min-width:230px;max-width:100%;height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
       on: !!st.fp && unlocked, isToday: tabNow === 'today', isTodayT: tabNow === 'today' && tOnP, isWeek: tabNow === 'week', isFocus: tabNow === 'focus',
-      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${hP}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
+      box: `position:absolute;left:${SCR.W / 2}px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${hP}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
       tabs: tabsFP.map(([id, name]) => ({ name, on: tabNow === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${tabNow === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${tabNow === id ? '#ffffff' : '#a1a1a8'}` })),
       music: `margin-left:auto;height:30px;padding:0 12px 0 6px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.06);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
       musicDot: 'width:20px;height:20px;border-radius:50%;flex:none;background:conic-gradient(#ff6fae,#ff8a3d,#b48cff,#ff6fae)',
@@ -2504,6 +2523,9 @@ class Component extends DCLogic {
         this.setState({ shelf: [...this.state.shelf.filter((x) => !names.has(x.name)), ...add], shDrag: false, hoverPill: 'isl' });
       },
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
+      scrW: SCR.W, scrH: SCR.H,
+      scrSt: `position:relative;width:${SCR.pw}px;height:${SCR.ph}px;overflow:hidden;background:#000`,
+      rootSt: `position:absolute;left:0;top:0;width:${SCR.W}px;height:${SCR.H}px;transform:scale(${SCR.K});transform-origin:0 0;overflow:hidden;background:${this.themeVals().bg};transition:background .5s;font-family:Inter,system-ui,sans-serif;color:#f2f2f4;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none`,
       filesPlace: st.filesPlace || '', openReq: st.openReq || '', openApps: ids.filter((id) => st.wins[id] && !st.wins[id].closing).join(','), dockCfg: st.dockCfg || (() => { try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); return c && c.dock ? JSON.stringify(c.dock) : ''; } catch (e) { return ''; } })(), anyMax: ids.some((id) => st.wins[id] && st.wins[id].max && !this.isNat(id) && !st.wins[id].min && !st.wins[id].closing),
       powerOff: this.powerOff,
       sysVol: st.vol,
