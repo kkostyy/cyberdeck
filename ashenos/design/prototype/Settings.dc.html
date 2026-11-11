@@ -1081,7 +1081,7 @@ class Component extends DCLogic {
     const wallPick = st.wPick === null || st.wPick === undefined ? curWallSys : st.wPick;
     try { localStorage.setItem('archSettings.v2', JSON.stringify(st.vals)); } catch (e) {}
     if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
-    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true) })); }
+    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true), dock: { size: g('dockSize', 40), mag: g('dockMag', 50), width: g('dockWidth', 'Половина экрана'), hide: g('dockHide', 'Умное'), run: g('dockRun', true), wave: g('dockWave', true) } })); }
     this.setState({ saved: { ...st.vals }, wPick: null });
     if (auto !== true) this.say('Изменения применены');
   }

@@ -73,7 +73,7 @@ body{margin:0;background:#050506}
 
   <!-- ============ DESKTOP (wallpaper, widgets, dock) ============ -->
   <div style="position: absolute; inset: 0">
-    <dc-import name="Desktop" open-apps="{{openApps}}" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" sys-vol="{{sysVol}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
+    <dc-import name="Desktop" open-apps="{{openApps}}" dock-cfg="{{dockCfg}}" any-max="{{anyMax}}" reveal="{{reveal}}" wave-on="{{waveOn}}" on-wave="{{onWaveSet}}" wall-req="{{wallReq}}" on-wall="{{onWall}}" bare="{{false}}" island-title="{{true}}" on-level="{{onLevel}}" app-title="{{appTitle}}" ext-notes="{{extNotes}}" on-shade="{{onShade}}" on-clear-notes="{{clearAll}}" on-lock="{{lock}}" on-power="{{powerOff}}" on-open-app="{{openApp}}" on-osk="{{toggleOsk}}" osk-on="{{oskOn}}" sys-vol="{{sysVol}}" theme-bg="{{thBg}}" theme-accent="{{thAccent}}" theme-surface="{{thSurface}}" hint-size="1440px,900px"></dc-import>
   </div>
 
   <!-- minimized stack hover zone -->
@@ -1468,7 +1468,9 @@ class Component extends DCLogic {
     }
     if (id.startsWith('nav:')) { let nv = null; if (id !== 'nav:off') { try { nv = JSON.parse(id.slice(4)); } catch (e) {} } this.setState({ navInfo: nv }); return; }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
-    if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false }); localStorage.setItem('ashenos.sys', JSON.stringify(c)); if (c.islLvl !== false) this.onLevel('vol', Math.min(100, Math.round(c.vol))); this.notify({ app: 'Параметры', title: 'Изменения применены', body: `Громкость ${Math.min(100, Math.round(c.vol))}% · Wi-Fi ${c.wifi ? 'вкл' : 'выкл'}${c.dnd ? ' · не беспокоить' : ''}`, kind: 'short', glyph: '⚙', sys: true }); } catch (e) {} return; }
+    if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); const volNew = Math.min(100, Math.round(c.vol)); const volChanged = volNew !== st.vol;
+      this.setState({ vol: volNew, wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim, nShort: +(c.nShort || 3), nLong: +(c.nLong || 6), islLvl: c.islLvl !== false, dockCfg: c.dock ? JSON.stringify(c.dock) : st.dockCfg });
+      localStorage.setItem('ashenos.sys', JSON.stringify(c)); if (c.islLvl !== false && volChanged) this.onLevel('vol', volNew); } catch (e) {} return; }
     if (id.startsWith('theme:')) { try { const t = JSON.parse(id.slice(6)); this.setState({ theme: t }); localStorage.setItem('ashenos.theme', JSON.stringify(t)); } catch (e) {} return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
     const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
@@ -2492,7 +2494,7 @@ class Component extends DCLogic {
         this.setState({ shelf: [...this.state.shelf.filter((x) => !names.has(x.name)), ...add], shDrag: false, hoverPill: 'isl' });
       },
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
-      filesPlace: st.filesPlace || '', openReq: st.openReq || '', openApps: ids.filter((id) => st.wins[id] && !st.wins[id].closing).join(','),
+      filesPlace: st.filesPlace || '', openReq: st.openReq || '', openApps: ids.filter((id) => st.wins[id] && !st.wins[id].closing).join(','), dockCfg: st.dockCfg || (() => { try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); return c && c.dock ? JSON.stringify(c.dock) : ''; } catch (e) { return ''; } })(), anyMax: ids.some((id) => st.wins[id] && st.wins[id].max && !st.wins[id].min && !st.wins[id].closing),
       powerOff: this.powerOff,
       sysVol: st.vol,
       calmCss: (st.anim !== undefined && st.anim < 15) ? '[data-sys-root] *,[data-sys-root] *::before,[data-sys-root] *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;transition-delay:0s!important}' : (st.anim !== undefined && st.anim < 40 ? '[data-sys-root] *{transition-duration:.12s!important}' : ''),

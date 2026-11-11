@@ -406,7 +406,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
     <!-- dock -->
     <div aria-hidden="true" onMouseEnter="{{peekOn}}" style="position: absolute; left: 0; right: 0; bottom: 0; height: 12px; z-index: 9"></div>
     <div onMouseEnter="{{peekOn}}" onMouseLeave="{{dockLeave}}" style="{{dockWrap}}">
-      <nav aria-label="Док" style="width: 720px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-evenly; gap: 4px; padding: 7px 14px; border-radius: 19px; background: {{dockBg}}; transition: background .5s; backdrop-filter: blur(34px) saturate(140%); -webkit-backdrop-filter: blur(34px) saturate(140%); border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)">
+      <nav aria-label="Док" style="{{dockNav}}">
         <button class="dock-btn" aria-label="Проводник" onClick="{{openFiles}}" onMouseEnter="{{dh.files}}" onFocus="{{dh.files}}" style="{{dk.files.btn}}">
           <span style="{{dk.files.tip}}">Проводник</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.files.tile}};background:#1c1c1f">
@@ -1839,12 +1839,22 @@ class Component extends DCLogic {
     const runP = String(this.props.openApps || '').split(',').filter(Boolean);
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     runP.forEach((id) => { running[id] = true; });
+    let DC = {}; try { DC = JSON.parse(this.props.dockCfg || '{}') || {}; } catch (e) { DC = {}; }
+    if (DC.run === false) Object.keys(running).forEach((k) => { running[k] = false; });
+    const DSCR = 1440, nD = dockIds.length, DGAP = 4, DSEP = 9;
+    const mag = Math.max(0, Math.min(1, (DC.mag === undefined ? 50 : +DC.mag) / 100));
+    const wMode = DC.width === 'По содержимому' ? 'fit' : DC.width === 'Во всю ширину' ? 'full' : 'half';
+    const maxNav = DSCR - 48;
+    // icon size that fits the screen even with the magnified neighbours
+    const want = Math.max(24, Math.min(64, +DC.size || 40));
+    const fitS = Math.floor((maxNav - 28 - DGAP * (nD - 1) - DSEP) / (nD + mag * 2.32));
+    const B = Math.max(22, Math.min(want, fitS));
     const hi = dockIds.indexOf(st.dock);
     const dk = {}, dh = {};
-    let filesSize = 40;
+    let filesSize = B;
     dockIds.forEach((id, i) => {
       const dist = hi < 0 ? 9 : Math.abs(i - hi);
-      const s = Math.round(40 * (dist === 0 ? 1.5 : dist === 1 ? 1.25 : dist === 2 ? 1.08 : 1));
+      const s = Math.round(B * (dist === 0 ? 1 + mag : dist === 1 ? 1 + mag / 2 : dist === 2 ? 1 + mag * 0.16 : 1));
       if (id === 'files') filesSize = s;
       const on = dist === 0;
       dh[id] = () => { if (this.state.dock !== id) this.setState({ dock: id, peek: true }); };
@@ -1856,10 +1866,17 @@ class Component extends DCLogic {
       };
     });
     dk.fileScale = `position:absolute;left:50%;top:50%;width:40px;height:31px;margin:-15.5px 0 0 -20px;transform:scale(${(filesSize * 0.78 / 40).toFixed(3)});transition:transform .16s ease`;
-    const dockHidden = st.autohide && !st.peek;
+    const padY = Math.round(B * 0.17), padX = Math.round(B * 0.35);
+    const contentW = B * nD + DGAP * (nD - 1) + DSEP + padX * 2;
+    const targetW = wMode === 'full' ? DSCR - 24 : wMode === 'half' ? DSCR / 2 : 0;
+    const navW = wMode === 'fit' || contentW >= targetW ? null : targetW;
+    const dockNavSt = `${navW ? `width:${navW}px;justify-content:space-evenly;` : 'width:max-content;justify-content:center;'}max-width:${DSCR - 24}px;box-sizing:border-box;display:flex;align-items:flex-end;gap:${DGAP}px;padding:${padY}px ${padX}px;border-radius:${Math.round(B * 0.47)}px;background:${(() => { const n = parseInt(tSurf.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.74)`; })()};transition:background .5s,width .3s ease,padding .2s;backdrop-filter:blur(34px) saturate(140%);-webkit-backdrop-filter:blur(34px) saturate(140%);border:1px solid rgba(255,255,255,0.11);box-shadow:0 30px 80px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)`;
+    const hideMode = DC.hide === 'Всегда' ? 'always' : DC.hide === 'Никогда' ? 'never' : 'smart';
+    const autoH = st.autohide || hideMode === 'always' || (hideMode === 'smart' && !!this.props.anyMax);
+    const dockHidden = hideMode !== 'never' && autoH && !st.peek;
 
     /* ---------- wave ---------- */
-    const waveOnEff = this.props.waveOn !== undefined && this.props.waveOn !== '' ? !!this.props.waveOn : st.wave;
+    const waveOnEff = (this.props.waveOn !== undefined && this.props.waveOn !== '' ? !!this.props.waveOn : st.wave) && DC.wave !== false;
     const setWave = (v) => { if (this.props.onWave) this.props.onWave(v); this.setState({ wave: v }); };
     const sinePath = (amp, len, phase) => { let d = 'M 0 90 L 0 ' + (60 - amp * Math.sin(phase)).toFixed(1); for (let x = 20; x <= 2880; x += 20) d += ' L ' + x + ' ' + (60 - amp * Math.sin((x / len) * Math.PI * 2 + phase)).toFixed(1); return d + ' L 2880 90 Z'; };
     const playing = st.playing;
@@ -2395,6 +2412,7 @@ class Component extends DCLogic {
       dk, dh,
       peekOn: () => { if (!this.state.peek) this.setState({ peek: true }); },
       dockLeave: () => this.setState({ dock: null, peek: false }),
+      dockNav: dockNavSt,
       dockWrap: `position:absolute;left:50%;bottom:12px;z-index:42;transform:translateX(-50%) translateY(${dockHidden ? 'calc(100% + 20px)' : '0'});transition:transform .4s cubic-bezier(.3,1.2,.4,1);${rvN ? `animation:${rvN % 2 ? 'dockA' : 'dockB'} .9s cubic-bezier(.2,1.25,.3,1) .55s both;` : ''}`,
       wave,
       waveWrap: `position:absolute;left:0;right:0;bottom:0;height:90px;z-index:4;pointer-events:none;overflow:hidden;opacity:${waveOnEff ? 1 : 0};transform:translateY(${waveOnEff ? 0 : 60}px);transition:opacity .4s,transform .5s cubic-bezier(.3,1.2,.4,1)`,
