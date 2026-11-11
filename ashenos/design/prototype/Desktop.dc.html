@@ -1543,6 +1543,7 @@ class Component extends DCLogic {
   renderVals() {
     const st = this.state;
     DSK.W = +this.props.screenW || 1440; DSK.H = +this.props.screenH || 900; DSK.auto = DSK.W !== 1440 || DSK.H !== 900;
+    const pk = +this.props.dockPeek || 0; if (pk && pk !== DSK.peekSeen) { DSK.peekSeen = pk; setTimeout(() => { this.setState({ peek: true }); clearTimeout(this.pkT); this.pkT = setTimeout(() => this.setState({ peek: false }), 4000); }, 0); }
     const W = this.walls();
     const curWall = st.front === 'A' ? st.wallA : st.wallB;
     const wall = W[curWall];
@@ -1874,7 +1875,7 @@ class Component extends DCLogic {
     const wMode = DC.width === 'По содержимому' ? 'fit' : DC.width === 'Во всю ширину' ? 'full' : 'half';
     const maxNav = DSCR - 48;
     // icon size that fits the screen even with the magnified neighbours
-    const want = Math.max(24, Math.min(64, +DC.size || 40));
+    const want = Math.max(this.props.touch ? 46 : 24, Math.min(64, +DC.size || 40));
     const fitS = Math.floor((maxNav - 28 - DGAP * (nD - 1) - DSEP) / (nD + mag * 2.32));
     const B = Math.max(22, Math.min(want, fitS));
     const hi = dockIds.indexOf(st.dock);
