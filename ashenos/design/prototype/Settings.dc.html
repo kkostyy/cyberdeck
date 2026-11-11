@@ -13,9 +13,9 @@
 <style>
 
 /* macOS traffic lights */
-.tl{display:flex;align-items:center;flex:none;margin-right:4px}
+.tl{display:flex;flex-direction:row-reverse;align-items:center;flex:none;order:99;margin-left:6px}
 .tl .tl-b{width:26px;height:44px;padding:0;margin:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:default;-webkit-tap-highlight-color:transparent}
-.tl .tl-b:first-child{width:30px;justify-content:flex-start;padding-left:4px}
+.tl .tl-b:first-child{width:30px;justify-content:flex-end;padding-right:4px}
 .tl .tl-b i{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.2);transition:filter .12s,transform .18s cubic-bezier(.3,1.4,.5,1)}
 .tl .tl-b svg{opacity:0;transition:opacity .12s}
 .tl:hover .tl-b svg,.tl:focus-within .tl-b svg{opacity:1}
