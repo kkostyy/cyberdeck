@@ -101,6 +101,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 @keyframes wob{from{transform:rotate(-.6deg)}to{transform:rotate(.6deg)}}
 @keyframes sheetIn{from{opacity:0;transform:translateY(40px) scale(.95)}to{opacity:1;transform:none}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+.cw-k{transition:filter .12s,transform .08s}.cw-k:hover{filter:brightness(1.2)}.cw-k:active{transform:scale(.92)}
+@keyframes phKb{from{transform:scale(1.08)}to{transform:scale(1)}}
 </style>
 </helmet>
 
@@ -390,6 +392,42 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
         <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
           <button aria-label="Убрать виджет «Диск»" onClick="{{wOff.disk}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
           <button aria-label="Размер виджета" onClick="{{wSize.disk}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.disk}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.calc}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Калькулятор»" onMouseDown="{{drag.calc}}" class="wlift" style="{{wpos.calc}}">
+        <div style="{{wcase.calc}}">
+          <div onMouseDown="{{stop}}" style="height: 100%; display: flex; flex-direction: column; gap: 6px">
+            <button onClick="{{cw.open}}" title="Открыть Калькулятор" style="display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; height: 50px; padding: 0 6px; border-radius: 12px; text-align: right">
+              <span style="font-size: 11px; color: #8b8b93; min-height: 13px">{{cw.sub}}</span>
+              <span style="{{cw.dispSt}}">{{cw.disp}}</span>
+            </button>
+            <div role="group" aria-label="Клавиши калькулятора" style="flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px">
+              <sc-for list="{{cw.keys}}" as="k" hint-placeholder-count="20"><button onClick="{{k.press}}" class="cw-k" style="{{k.st}}">{{k.k}}</button></sc-for>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Калькулятор»" onClick="{{wOff.calc}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.calc}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.calc}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{wOn.photo}}" hint-placeholder-val="{{false}}">
+      <section aria-label="Виджет «Фото»" onMouseDown="{{drag.photo}}" class="wlift" style="{{wpos.photo}}">
+        <div style="{{wcase.photo}}">
+          <button onClick="{{ph.open}}" onMouseDown="{{stop}}" title="Открыть Фото" style="position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #111">
+            <img alt="{{ph.title}}" src="{{ph.src}}" style="{{ph.imgSt}}">
+            <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 100%)"></span>
+            <span style="position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; align-items: flex-start; color: #fff; text-align: left"><span style="font-size: 14px; font-weight: 700">{{ph.title}}</span><span style="font-size: 11.5px; opacity: 0.75">{{ph.sub}}</span></span>
+          </button>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Фото»" onClick="{{wOff.photo}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.photo}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.photo}}</button>
         </sc-if>
       </section>
     </sc-if>
@@ -1411,6 +1449,8 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"sysVol":{"editor":null},"onPower":{"editor":null},"themeBg":{"editor":null},"themeAccent":{"editor":null},"themeSurface":{"editor":null},"onOsk":{"editor":null},"oskOn":{"editor":null},"onLock":{"editor":null},"onOpenApp":{"editor":null},"appTitle":{"editor":null},"bare":{"editor":null},"islandTitle":{"editor":null},"wallReq":{"editor":null},"waveOn":{"editor":null},"reveal":{"editor":null},"onWave":{"editor":null},"onWall":{"editor":null},"onLevel":{"editor":null},"extNotes":{"editor":null},"onShade":{"editor":null},"onClearNotes":{"editor":null},"$preview":{"width":1440,"height":900}}'>
 const DSK = { W: 1440, H: 900, auto: false };
+const WDEF = { calc: { x: 248, y: 456 }, photo: { x: 536, y: 168 } };
+const DESK_PHOTOS = [{"u": "/_blob/9e4f9b6c776e965d210a2aa7ed37adb0", "t": "Альпы на рассвете"}, {"u": "/_blob/be25336c6b4de12fd28f2698ac63de93", "t": "Закат в горах"}, {"u": "/_blob/7bb0dd8cc50915ab4e8913af82b01711", "t": "Сияние"}, {"u": "/_blob/da40808c7cedc452948cf1e25e214d1b", "t": "Отражение"}, {"u": "/_blob/334abd8ca851fb895224433595e91742", "t": "Огни города"}, {"u": "/_blob/7523176b2840b6609e13cd241a3b66e7", "t": "Еловый лес"}, {"u": "/_blob/a115f6ca5536c9c7eef0bb94e6ad63c7", "t": "Розовое утро"}, {"u": "/_blob/f57719e08880eaa5bfc0dfa96babdd1f", "t": "Штиль"}];
 class Component extends DCLogic {
   /* Plasma calendar: MonthView (InfiniteList, 200 ms), Days/Months/Years swipe */
   calStep(d) {
@@ -2018,15 +2058,15 @@ class Component extends DCLogic {
     const bandAnim = lp === 'in' ? 'animation:bandDown .8s cubic-bezier(.7,0,.25,1) both' : lp === 'out' ? 'animation:bandUp .7s cubic-bezier(.7,0,.25,1) both' : 'display:none';
 
     /* ---------- widgets ---------- */
-    const WS = { cover: [272, 272], music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272], cal: [272, 272], note: [272, 272], pomo: [272, 272], batt: [272, 128], net: [272, 128], disk: [272, 128] };
-    const WN = { cover: 'Обложка', music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи', cal: 'Календарь', note: 'Заметка', pomo: 'Помодоро', batt: 'Батарея', net: 'Сеть', disk: 'Диск' };
+    const WS = { calc: [272, 272], photo: [272, 272], cover: [272, 272], music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272], cal: [272, 272], note: [272, 272], pomo: [272, 272], batt: [272, 128], net: [272, 128], disk: [272, 128] };
+    const WN = { calc: 'Калькулятор', photo: 'Фото', cover: 'Обложка', music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи', cal: 'Календарь', note: 'Заметка', pomo: 'Помодоро', batt: 'Батарея', net: 'Сеть', disk: 'Диск' };
     const editing = st.gallery;
     const rvN = +this.props.reveal || 0;
     const wpos = {}, wcase = {}, wOn = {}, wOff = {}, drag = {}, wSize = {}, wSizeText = {};
     const SZ = [1, 0.85, 0.7, 0.55], SZN = { 1: 'L', 0.85: 'M', 0.7: 'S', 0.55: 'XS' };
     const AUTO = {};
     if (DSK.auto) {
-      const ids0 = Object.keys(WS).filter((id) => st.wOn[id]).sort((a, b) => (st.wpos[a].y - st.wpos[b].y) || (st.wpos[b].x - st.wpos[a].x));
+      const PZ = (id) => st.wpos[id] || (WDEF[id] || { x: 40, y: 168 }); const ids0 = Object.keys(WS).filter((id) => st.wOn[id]).sort((a, b) => (PZ(a).y - PZ(b).y) || (PZ(b).x - PZ(a).x));
       const aw = DSK.W - 16 - 32, ah = DSK.H - 48 - 120;
       for (const sc of [1, 0.85, 0.72, 0.6, 0.5]) {
         const cw = 288 * sc, rh = 144 * sc; const cols = Math.max(1, Math.floor((aw + 16 * sc) / cw)), rows = Math.max(1, Math.floor((ah + 16 * sc) / rh));
@@ -2042,7 +2082,7 @@ class Component extends DCLogic {
     }
     Object.keys(WS).forEach((id, i) => {
       const [w, h] = WS[id];
-      const p = AUTO[id] || st.wpos[id];
+      const p = AUTO[id] || st.wpos[id] || (WDEF[id] || { x: 40, y: 168 });
       const dragging = st.dragId === id;
       wOn[id] = !!st.wOn[id];
       wpos[id] = `position:absolute;left:${p.x + (this.props.bare ? 8 : 0)}px;top:${p.y + (this.props.bare ? 40 : 0)}px;width:${w}px;height:${h}px;scale:${AUTO[id] ? AUTO[id].sc : (st.wsc && st.wsc[id]) || 1};transform-origin:0 0;transition:scale .45s cubic-bezier(.3,1.3,.4,1),translate .4s cubic-bezier(.3,1.5,.5,1);z-index:${dragging ? 8 : 3};animation:${rvN ? `${rvN % 2 ? 'revA' : 'revB'} .95s cubic-bezier(.2,1.15,.3,1) ${(0.25 + Object.keys(WS).indexOf(id) * 0.09).toFixed(2)}s both` : 'wIn .55s cubic-bezier(.2,1.3,.3,1) both'};cursor:${editing ? (dragging ? 'grabbing' : 'grab') : 'default'};user-select:none;-webkit-user-select:none`;
@@ -2056,7 +2096,7 @@ class Component extends DCLogic {
         e.preventDefault();
         const root = e.currentTarget.closest('[data-root]');
         const k = root ? (root.getBoundingClientRect().width / DSK.W || 1) : 1;
-        const q = this.state.wpos[id];
+        const q = this.state.wpos[id] || (WDEF[id] || { x: 40, y: 168 });
         const scl = (this.state.wsc && this.state.wsc[id]) || 1;
         this.drag = { id, sx: e.clientX, sy: e.clientY, ox: q.x, oy: q.y, k, w: w * scl, h: h * scl };
         this.setState({ dragId: id });
@@ -2113,7 +2153,7 @@ class Component extends DCLogic {
     const leftN = tasks.filter((t) => !t.done).length;
     const wdS = now.toLocaleDateString('ru-RU', { weekday: 'short' }).replace('.', '');
     const monS = now.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '');
-    const sizeName = { cover: 'Квадрат · 2×2', music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2', cal: 'Квадрат · 2×2', note: 'Квадрат · 2×2', pomo: 'Квадрат · 2×2', batt: 'Малый · 2×1', net: 'Малый · 2×1', disk: 'Малый · 2×1' };
+    const sizeName = { calc: 'Квадрат · 2×2', photo: 'Квадрат · 2×2', cover: 'Квадрат · 2×2', music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2', cal: 'Квадрат · 2×2', note: 'Квадрат · 2×2', pomo: 'Квадрат · 2×2', batt: 'Малый · 2×1', net: 'Малый · 2×1', disk: 'Малый · 2×1' };
     const galWave = { id: 'wave', name: 'Аудиоволна', size: 'Во всю ширину · снизу', on: waveOnEff, label: waveOnEff ? 'Убрать' : 'Добавить', toggle: () => setWave(!waveOnEff) };
     const gal0 = Object.keys(WS).map((id) => {
       const on = !!st.wOn[id];
@@ -2470,6 +2510,19 @@ class Component extends DCLogic {
       icoLabel: `position:absolute;right:12%;bottom:13%;width:30%;height:15%;border-radius:2px;background:linear-gradient(135deg,${ASH.acc},#2a2a2e);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)`,
       icoAcc: ASH.acc,
       deskRoot: `position:relative;width:${DSK.W}px;height:${DSK.H}px;overflow:hidden;background:${tBg};transition: background .5s; font-family: Inter, system-ui, sans-serif; color: #f2f2f4; -webkit-font-smoothing: antialiased`,
+      cw: (() => { const c = st.calcW || { e: '', r: '' }; const keys = ['C', '±', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '−', '1', '2', '3', '+', '0', ',', '⌫', '='];
+        const ev = (e) => { const t = e.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/,/g, '.'); if (!/^[0-9+\-*/.() %]+$/.test(t)) return NaN; try { return Function('return (' + t.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)') + ')')(); } catch (x) { return NaN; } };
+        const fmt = (v) => !isFinite(v) ? 'Ошибка' : String(+v.toPrecision(10)).replace('.', ',').replace('-', '−');
+        const press = (k) => () => { const cur = this.state.calcW || { e: '', r: '' }; let e = cur.e, r = cur.r;
+          if (k === 'C') { e = ''; r = ''; } else if (k === '⌫') e = e.slice(0, -1); else if (k === '=') { const v = ev(e); r = fmt(v); e = isFinite(v) ? r : e; } else if (k === '±') e = e.startsWith('−') ? e.slice(1) : '−' + e; else { if (r && /[0-9,]/.test(k) && e === r) e = ''; e += k; r = ''; }
+          this.setState({ calcW: { e, r } }); };
+        const isOp = (k) => ['÷', '×', '−', '+', '='].includes(k);
+        const prevV = c.e && /[+×÷−%]/.test(c.e.slice(1)) ? ev(c.e) : NaN;
+        return { disp: c.e || '0', sub: c.r ? '' : isFinite(prevV) ? '= ' + fmt(prevV) : '', dispSt: `font:300 ${Math.max(18, Math.min(32, Math.floor(220 / Math.max(1, (c.e || '0').length) / 0.56)))}px Inter,sans-serif;letter-spacing:-.02em;color:#f7f7f9;white-space:nowrap;overflow:hidden;text-align:right;font-variant-numeric:tabular-nums`,
+          keys: keys.map((k) => ({ k, press: press(k), st: `height:30px;border:0;border-radius:15px;font:${isOp(k) ? 600 : 500} 14px Inter,sans-serif;background:${isOp(k) ? accent : ['C', '±', '%'].includes(k) ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.09)'};color:${isOp(k) ? '#111113' : '#f2f2f4'}` })),
+          open: () => { if (this.props.onOpenApp) this.props.onOpenApp('calc', 'dock'); } }; })(),
+      ph: (() => { const i = Math.floor(Date.now() / 9000) % DESK_PHOTOS.length; const p = DESK_PHOTOS[i];
+        return { src: p.u, title: p.t, sub: `${i + 1} из ${DESK_PHOTOS.length} · Медиатека`, open: () => { if (this.props.onOpenApp) this.props.onOpenApp('photos', 'dock'); }, imgSt: 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:phKb 9s ease-in-out both' }; })(),
       dockNav: dockNavSt,
       dockWrap: `position:absolute;left:50%;bottom:12px;z-index:42;transform:translateX(-50%) translateY(${dockHidden ? 'calc(100% + 20px)' : '0'});transition:transform .4s cubic-bezier(.3,1.2,.4,1);${rvN ? `animation:${rvN % 2 ? 'dockA' : 'dockB'} .9s cubic-bezier(.2,1.25,.3,1) .55s both;` : ''}`,
       wave,
