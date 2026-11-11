@@ -304,6 +304,22 @@ body{margin:0;background:#050506}
         </footer>
       </div>
     </div>
+    <sc-if value="{{dlg.on}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{dlg.close}}" style="position: absolute; inset: 0; z-index: 40; background: rgba(0,0,0,0.45); backdrop-filter: blur(3px)"></div>
+      <div role="dialog" aria-label="{{dlg.title}}" style="position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 41; width: 400px; display: flex; flex-direction: column; gap: 12px; padding: 22px; border-radius: 22px; background: #141416; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 30px 80px rgba(0,0,0,0.6); animation: setPage .3s ease both">
+        <span style="font-size: 18px; font-weight: 700">{{dlg.title}}</span>
+        <span style="font-size: 12.5px; color: #8b8b93; margin-top: -6px; font-family: 'JetBrains Mono', monospace">{{dlg.sub}}</span>
+        <sc-if value="{{dlg.file}}" hint-placeholder-val="{{false}}">
+          <label style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 11px; border: 1px dashed rgba(255,255,255,0.25); cursor: pointer; font-size: 13px; color: #c9c9cf"><input type="file" accept=".conf,.ovpn" aria-label="Файл VPN" onChange="{{dlg.onFile}}" style="position: absolute; width: 1px; height: 1px; opacity: 0">Выбрать файл… <span style="margin-left: auto; color: #8b8b93">{{dlg.fileName}}</span></label>
+        </sc-if>
+        <input aria-label="{{dlg.f1}}" placeholder="{{dlg.f1}}" type="{{dlg.type}}" value="{{dlg.v1}}" onInput="{{dlg.on1}}" onKeyDown="{{dlg.key}}" style="{{dlg.fld}}">
+        <sc-if value="{{dlg.two}}" hint-placeholder-val="{{false}}"><input aria-label="{{dlg.f2}}" placeholder="{{dlg.f2}}" type="password" value="{{dlg.v2}}" onInput="{{dlg.on2}}" onKeyDown="{{dlg.key}}" style="{{dlg.fld}}"></sc-if>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px">
+          <button onClick="{{dlg.close}}" style="height: 38px; padding: 0 16px; border-radius: 11px; border: 0; font: 600 13px Inter, sans-serif; background: rgba(255,255,255,0.08); color: #f2f2f4">Отмена</button>
+          <button onClick="{{dlg.go}}" style="height: 38px; padding: 0 16px; border-radius: 11px; border: 0; font: 700 13px Inter, sans-serif; background: #f2f2f4; color: #0b0b0c">{{dlg.ok}}</button>
+        </div>
+      </div>
+    </sc-if>
   </section>
 
   <div role="status" aria-live="polite" style="{{toast}}">{{toastText}}</div>
@@ -966,6 +982,44 @@ class Component extends DCLogic {
   }
   componentWillUnmount() { clearTimeout(this.tt); }
   say(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+  /* кнопки-действия в разделах: каждая что-то делает — прогресс в острове, итог в тосте */
+  runBtn(r) {
+    const act = (id) => this.props.onAction && this.props.onAction(id);
+    const done = (txt) => this.setState({ done: { ...(this.state.done || {}), [r.id]: txt } });
+    const later = (ms, fn) => setTimeout(fn, ms);
+    switch (r.id) {
+      case 'upNow': act('update'); this.say('Обновление запущено — прогресс в острове'); later(4500, () => { done('Система актуальна'); this.say('Обновлено 14 пакетов · перезагрузка не нужна'); }); break;
+      case 'cache': act('copy'); later(2200, () => { done('Очищено'); this.say('paccache -r: освобождено 1,6 ГБ'); }); break;
+      case 'btInstall': case 'plasmaNm': act('update'); this.say(`Установка: ${r.v.replace('sudo pacman -S ', '')}`); later(4500, () => { done('Установлено ✓'); this.say('Пакеты установлены'); }); break;
+      case 'sddmSync': this.say('Тема и обои скопированы в /usr/share/sddm'); done('Синхронизировано ✓'); break;
+      case 'prAdd': this.say('Поиск принтеров в сети…'); done('Поиск…'); later(2500, () => { done('Найти снова'); this.say('Найден: HP LaserJet M110 (ipp://192.168.1.31) — добавлен'); }); break;
+      case 'vpnAdd': this.setState({ dlg: 'vpn' }); break;
+      case 'uPw': this.setState({ dlg: 'pw', pw1: '', pw2: '' }); break;
+      case 'uAdd': this.setState({ dlg: 'user', uName: '' }); break;
+      case 'abCopy': {
+        const info = 'AshenOS 1.0 (Arch Linux ARM)\nKDE Plasma 6 · Wayland\nRaspberry Pi 4 Model B · 4 ГБ\nЯдро 6.6 aarch64';
+        try { navigator.clipboard.writeText(info); } catch (e) {}
+        act('clipCmd'); done('Скопировано ✓'); this.say('Сведения о системе в буфере обмена'); break;
+      }
+      default: this.say(r.label);
+    }
+  }
+  dlgView() {
+    const st = this.state, close = () => this.setState({ dlg: null });
+    const fld = 'height:40px;padding:0 12px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f2f2f4;font:14px Inter,sans-serif;outline:none';
+    const D = {
+      pw: { title: 'Смена пароля', sub: 'Пароль пользователя alarm (passwd)', f1: 'Новый пароль', f2: 'Ещё раз', two: true, type: 'password', ok: 'Сменить',
+        go: () => { if ((st.pw1 || '').length < 4) return this.say('Минимум 4 символа'); if (st.pw1 !== st.pw2) return this.say('Пароли не совпадают'); close(); this.setState({ done: { ...(st.done || {}), uPw: 'Пароль изменён ✓' } }); this.say('Пароль изменён'); } },
+      user: { title: 'Новый пользователь', sub: 'useradd -m -G wheel,video,audio', f1: 'Имя входа (латиницей)', two: false, type: 'text', ok: 'Добавить',
+        go: () => { const n = (st.pw1 || '').trim(); if (!/^[a-z_][a-z0-9_-]{1,30}$/.test(n)) return this.say('Только маленькие латинские буквы и цифры'); close(); this.setState({ done: { ...(st.done || {}), uAdd: `Добавлен: ${n}` } }); this.say(`Пользователь ${n} создан`); } },
+      vpn: { title: 'Импорт VPN', sub: 'WireGuard или OpenVPN (.conf / .ovpn)', f1: 'Имя подключения', two: false, type: 'text', ok: 'Импортировать', file: true,
+        go: () => { const n = (st.pw1 || '').trim() || st.vpnFile || 'wg0'; close(); this.setState({ done: { ...(st.done || {}), vpnAdd: `${n} ✓` } }); this.say(`VPN «${n}» добавлен в NetworkManager`); } }
+    }[st.dlg];
+    if (!D) return { on: false };
+    return { on: true, ...D, fld, v1: st.pw1 || '', v2: st.pw2 || '', on1: (e) => this.setState({ pw1: e.target.value }), on2: (e) => this.setState({ pw2: e.target.value }), close,
+      noFile: !D.file, fileName: st.vpnFile || 'Файл не выбран', onFile: (e) => { const fl = e.target.files && e.target.files[0]; if (fl) this.setState({ vpnFile: fl.name.replace(/\.(conf|ovpn)$/i, '') }); },
+      key: (e) => { if (e.key === 'Enter') D.go(); if (e.key === 'Escape') close(); } };
+  }
   renderVals() {
     const st = this.state;
     const pages = [];
@@ -1030,7 +1084,7 @@ class Component extends DCLogic {
           dot: `width:18px;height:18px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px ${v === id ? '#f2f2f4' : 'rgba(255,255,255,.3)'}`,
           dotIn: `width:8px;height:8px;border-radius:50%;background:#f2f2f4;transform:scale(${v === id ? 1 : 0});transition:transform .25s cubic-bezier(.34,1.5,.6,1)` }));
         if (r.t === 'keys') Object.assign(o, { keyText: st.keyEdit === r.id ? 'Нажмите сочетание…' : v, toggle: () => this.setState({ keyEdit: st.keyEdit === r.id ? null : r.id }), keyStyle: `height:32px;padding:0 12px;border-radius:9px;flex:none;border:0;font:600 12px 'JetBrains Mono',monospace;color:${st.keyEdit === r.id ? '#0b0b0c' : '#f2f2f4'};background:${st.keyEdit === r.id ? '#f2f2f4' : 'rgba(255,255,255,.08)'};box-shadow:inset 0 -2px 0 rgba(0,0,0,.35)` });
-        if (r.t === 'button') Object.assign(o, { btnText: r.v, toggle: () => this.say(`${r.label}: ${r.v} — в макете действие не выполняется`), btnStyle: 'height:34px;padding:0 14px;border-radius:10px;flex:none;border:0;font:600 12.5px Inter,sans-serif;background:rgba(255,255,255,.1);color:#f2f2f4' });
+        if (r.t === 'button') Object.assign(o, { toggle: () => this.runBtn(r), btnText: (st.done || {})[r.id] || r.v, btnStyle: 'height:34px;padding:0 14px;border-radius:10px;flex:none;border:0;font:600 12.5px Inter,sans-serif;background:rgba(255,255,255,.1);color:#f2f2f4' });
         return o;
       })
     }));
@@ -1132,7 +1186,7 @@ class Component extends DCLogic {
       },
       defBtn: btn(true, false), revBtn: btn(curDirty, false), applyBtn: btn(anyDirty, true),
       toast: `position:absolute;left:50%;bottom:110px;translate:-50% 0;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;background:rgba(17,17,19,.95);border:1px solid #2e2e33;box-shadow:0 14px 40px rgba(0,0,0,.45);opacity:${st.toast ? 1 : 0};transform:translateY(${st.toast ? 0 : 10}px);transition:opacity .25s,transform .35s cubic-bezier(.34,1.4,.6,1);pointer-events:none`,
-      toastText: st.toast || '',
+      toastText: st.toast || '', dlg: this.dlgView(),
       closeApp: () => { if (this.props.onClose) this.props.onClose(); },
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); }

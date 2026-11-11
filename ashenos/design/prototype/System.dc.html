@@ -503,29 +503,6 @@ body{margin:0;background:#050506}
             </sc-if>
           </div>
 
-          <!-- фокус: текущее дело (как notch на Mac) -->
-          <div style="{{secStyle}}">
-            <div style="display: flex; align-items: center; gap: 12px">
-              <span style="position: relative; width: 52px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="52" height="52" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
-              <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1">
-                <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1a8"><span style="{{fo.logo}}">A</span>AshenOS · Фокус<span style="{{fo.dot}}"></span></span>
-                <span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{fo.task}}</span>
-              </span>
-              <button aria-label="{{fo.pauseLabel}}" onClick="{{focusToggle}}" style="{{ctlBtnL}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="{{fo.pauseIcon}}"></path></svg></button>
-              <button aria-label="Готово" onClick="{{focusDone}}" style="{{fo.doneBtn}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></button>
-            </div>
-            <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{fo.bar}}"></span></span>
-            <div style="display: flex; font-size: 11.5px; color: #8b8b93"><span>{{fo.left}}</span><span style="margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px">{{fo.next}}</span></div>
-          </div>
-
-          <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
-            <div style="{{secStyle}};flex-direction:row;align-items:center;gap:12px">
-              <span style="{{nv.icon}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg></span>
-              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1"><span style="font-size: 16px; font-weight: 800">{{nv.dist}}</span><span style="font-size: 12px; color: #c9c9cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.text}}</span></span>
-              <span style="display: flex; flex-direction: column; align-items: flex-end; font-size: 11.5px; color: #8b8b93"><span style="font-size: 14px; font-weight: 700; color: #f2f2f4">{{nv.eta}}</span>{{nv.left}}</span>
-            </div>
-          </sc-if>
-
           <!-- call -->
           <sc-if value="{{call.on}}" hint-placeholder-val="{{false}}">
             <div style="{{secStyle}}">
@@ -601,6 +578,29 @@ body{margin:0;background:#050506}
             </div>
           </sc-if>
 
+          <!-- фокус: текущее дело (как notch на Mac) -->
+          <div style="{{secStyle}}">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <span style="position: relative; width: 52px; height: 52px; flex: none; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="52" height="52" viewBox="0 0 40 40" style="flex: none; rotate: -90deg"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="4"></circle><circle cx="20" cy="20" r="16" fill="none" stroke="{{fo.ringCol}}" stroke-width="4" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="{{fo.dash}}" style="transition: stroke-dashoffset .9s linear"></circle></svg><span style="position: absolute; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums">{{fo.min}}</span></span>
+              <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1">
+                <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1a8"><span style="{{fo.logo}}">A</span>AshenOS · Фокус<span style="{{fo.dot}}"></span></span>
+                <span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{fo.task}}</span>
+              </span>
+              <button aria-label="{{fo.pauseLabel}}" onClick="{{focusToggle}}" style="{{ctlBtnL}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="{{fo.pauseIcon}}"></path></svg></button>
+              <button aria-label="Готово" onClick="{{focusDone}}" style="{{fo.doneBtn}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></button>
+            </div>
+            <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="{{fo.bar}}"></span></span>
+            <div style="display: flex; font-size: 11.5px; color: #8b8b93"><span>{{fo.left}}</span><span style="margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px">{{fo.next}}</span></div>
+          </div>
+
+          <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
+            <div style="{{secStyle}};flex-direction:row;align-items:center;gap:12px">
+              <span style="{{nv.icon}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg></span>
+              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1"><span style="font-size: 16px; font-weight: 800">{{nv.dist}}</span><span style="font-size: 12px; color: #c9c9cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.text}}</span></span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; font-size: 11.5px; color: #8b8b93"><span style="font-size: 14px; font-weight: 700; color: #f2f2f4">{{nv.eta}}</span>{{nv.left}}</span>
+            </div>
+          </sc-if>
+
           <!-- clipboard history -->
           <sc-if value="{{clip.has}}" hint-placeholder-val="{{false}}">
             <div style="display: flex; flex-direction: column; gap: 4px">
@@ -655,6 +655,28 @@ body{margin:0;background:#050506}
           <span style="{{fp.music}}"><span style="{{fp.musicDot}}"></span>{{fp.musicText}}</span>
           <button aria-label="Закрыть" onClick="{{fpClose}}" style="{{ctlBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
         </div>
+        <sc-if value="{{fp.live}}" hint-placeholder-val="{{false}}">
+          <div aria-label="Сейчас" style="display: flex; gap: 8px; overflow-x: auto; flex: none; scrollbar-width: none">
+            <sc-if value="{{call.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="{{call.badge}}">{{call.letter}}</span><span style="display: flex; flex-direction: column; min-width: 0; flex: 1"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{call.title}}</span><span style="font-size: 11.5px; color: #8b8b93; white-space: nowrap">{{call.sub}}</span></span><button aria-label="{{call.micLabel}}" aria-pressed="{{call.muted}}" onClick="{{callMic}}" style="{{call.micBtn}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button><button aria-label="Завершить звонок" onClick="{{callEnd}}" style="width: 32px; height: 32px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e5484d; color: #fff"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 15.5c5-5 13-5 18 0l-2.4 2.4-3.4-1.6v-2.4a11 11 0 0 0-6.4 0v2.4L5.4 17.9z"></path></svg></button></div>
+            </sc-if>
+            <sc-if value="{{rec.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="{{recDotBig}}"></span><span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13px; font-weight: 700">Запись экрана</span><span style="font: 700 12px 'JetBrains Mono', monospace; color: #c9c9cf">{{rec.text}}</span></span><button onClick="{{recStop}}" style="height: 30px; padding: 0 12px; border-radius: 10px; font-size: 12px; font-weight: 700; background: #f2f2f4; color: #0b0b0c">Стоп</button></div>
+            </sc-if>
+            <sc-if value="{{timer.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13px; font-weight: 700">{{timer.title}}</span><span style="font: 700 12px 'JetBrains Mono', monospace; color: #c9c9cf">{{timer.text}}</span></span><button onClick="{{timerStop}}" style="height: 30px; padding: 0 12px; border-radius: 10px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1)">{{timer.stopText}}</button></div>
+            </sc-if>
+            <sc-if value="{{sw.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="display: flex; flex-direction: column; flex: 1"><span style="font-size: 13px; font-weight: 700">Секундомер</span><span style="font: 700 12px 'JetBrains Mono', monospace; color: #c9c9cf">{{sw.textLong}}</span></span><button onClick="{{swStop}}" style="height: 30px; padding: 0 12px; border-radius: 10px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1)">Сброс</button></div>
+            </sc-if>
+            <sc-if value="{{prog.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="display: flex; flex-direction: column; flex: 1; min-width: 0"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{prog.title}}</span><span style="font-size: 12px; color: #c9c9cf">{{prog.pctText}}</span></span><button onClick="{{progCancel}}" style="height: 30px; padding: 0 12px; border-radius: 10px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1)">Отмена</button></div>
+            </sc-if>
+            <sc-if value="{{nv.on}}" hint-placeholder-val="{{false}}">
+              <div style="{{fp.liveCard}}"><span style="{{nv.icon}};width:34px;height:34px;border-radius:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{nv.arrow}}"></path></svg></span><span style="display: flex; flex-direction: column; min-width: 0; flex: 1"><span style="font-size: 13px; font-weight: 700">{{nv.dist}}</span><span style="font-size: 11.5px; color: #8b8b93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.text}}</span></span></div>
+            </sc-if>
+          </div>
+        </sc-if>
         <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0">
           <div style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); overflow: hidden">
             <span aria-hidden="true" style="{{fp.glow}}"></span>
@@ -983,7 +1005,7 @@ const mixHex = (a, b, k) => { const p = (h) => [1, 3, 5].map((i) => parseInt(h.s
 class Component extends DCLogic {
   state = {
     now: new Date(), lock: 'on', power: null,
-    profile: 'work', autoProfile: true, prevProfile: null, barShown: false, fcs: { total: 1500000, left: 1080000, running: true, startAt: Date.now(), task: null, sessions: 3, doneN: 0 }, fp: false, fpTab: 'today', fpQ: '', notesRev: 0,
+    profile: 'work', autoProfile: false, prevProfile: null, barShown: false, fcs: { total: 1500000, left: 1080000, running: true, startAt: Date.now(), task: null, sessions: 3, doneN: 0 }, fp: false, fpTab: 'today', fpQ: '', notesRev: 0,
     menu: false, q: '', hitSel: 0,
     right: null, det: 'wifi', calOff: 0, calSel: null, evDraft: '', syncAt: Date.now() - 60000, syncing: false,
     wifi: true, bt: true, dnd: false, bright: 72, vol: 64, net: 'home-5G', netBusy: null, btOn: { 'WH-1000XM5': true, 'MX Master 3S': true, 'Keychron K3': false },
@@ -1491,7 +1513,7 @@ class Component extends DCLogic {
     this.saveProfile(p);
     this.setState({ profile: p, barShown: false, prevProfile: auto ? this.state.profile : null });
     const names = { work: 'Работа', game: 'Игры', min: 'Минимализм' };
-    this.notify({ app: 'Система', title: `Профиль «${names[p]}»`, body: auto ? 'Включён автоматически для полноэкранного окна' : 'Оформление панели обновлено', kind: 'short', glyph: '◐', sys: true });
+    if (!auto) this.notify({ app: 'Система', title: `Профиль «${names[p]}»`, body: auto ? 'Включён автоматически для полноэкранного окна' : 'Оформление панели обновлено', kind: 'short', glyph: '◐', sys: true });
   };
   toggleAuto = () => this.setState({ autoProfile: !this.state.autoProfile });
 
@@ -2017,8 +2039,9 @@ class Component extends DCLogic {
     const tabsFP = [['today', 'Сегодня'], ['week', 'Неделя'], ['focus', 'Фокус']];
     const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'], wd = (new Date().getDay() + 6) % 7;
     const fp = {
+      live: !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo), liveCard: 'flex:none;min-width:230px;max-width:330px;height:54px;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);animation:islRow .3s ease both',
       on: !!st.fp && unlocked, isToday: st.fpTab === 'today', isWeek: st.fpTab === 'week', isFocus: st.fpTab === 'focus',
-      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:340px;box-sizing:border-box;padding:14px 16px 16px;border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
+      box: `position:absolute;left:720px;top:40px;translate:-50% 0;z-index:97;width:760px;height:${(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo) ? 410 : 340}px;box-sizing:border-box;padding:14px 16px 16px;transition:height .4s cubic-bezier(.3,1.2,.5,1);border-radius:26px;display:flex;flex-direction:column;gap:14px;background:${THV.bg};border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.55);transform-origin:50% 0;animation:fpIn .45s cubic-bezier(.2,1.1,.3,1) both;pointer-events:auto`,
       tabs: tabsFP.map(([id, name]) => ({ name, on: st.fpTab === id, pick: () => this.setState({ fpTab: id }), st: `height:28px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:600;background:${st.fpTab === id ? 'rgba(255,255,255,.14)' : 'transparent'};color:${st.fpTab === id ? '#ffffff' : '#a1a1a8'}` })),
       music: `margin-left:auto;height:30px;padding:0 12px 0 6px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.06);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`,
       musicDot: 'width:20px;height:20px;border-radius:50%;flex:none;background:conic-gradient(#ff6fae,#ff8a3d,#b48cff,#ff6fae)',
