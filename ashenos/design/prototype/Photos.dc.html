@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Фото</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050506}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+/* macOS traffic lights */
+.tl{display:flex;flex-direction:row-reverse;align-items:center;flex:none;order:99;margin-left:6px}
+.tl .tl-b{width:26px;height:44px;padding:0;margin:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:default;-webkit-tap-highlight-color:transparent}
+.tl .tl-b:first-child{width:30px;justify-content:flex-end;padding-right:4px}
+.tl .tl-b i{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.2);transition:filter .12s,transform .18s cubic-bezier(.3,1.4,.5,1)}
+.tl .tl-b svg{opacity:0;transition:opacity .12s}
+.tl:hover .tl-b svg,.tl:focus-within .tl-b svg{opacity:1}
+.tl .tl-b:active i{filter:brightness(.72);transform:scale(.92)}
+.tl .tl-b:focus-visible i{outline:2px solid #f2f2f4;outline-offset:2px}
+@keyframes cfgIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes cfgFade{from{opacity:0}to{opacity:1}}
+.cfg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.16) transparent}
+.vw-b{transition:background .15s,transform .1s,filter .15s}.vw-b:hover{background-color:rgba(255,255,255,.1)}.vw-b:active{transform:scale(.95)}
+.vw-row{transition:background .12s}.vw-row:hover{background-color:rgba(255,255,255,.06)}.vw-row[aria-current=page]:hover{filter:brightness(1.08)}
+.vw-tile{transition:transform .2s cubic-bezier(.3,1.4,.5,1),box-shadow .2s}.vw-tile:hover{box-shadow:0 0 0 2px rgba(255,255,255,.5);z-index:1}.vw-tile:active{transform:scale(.97)}
+.vw-tile img{user-select:none}
+.vw-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+.vw-range{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.2);outline:none}
+.vw-range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer}
+.vw-range::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:#fff}
+.vw-nav{position:absolute;top:50%;translate:0 -50%;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(30,30,32,.55);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);opacity:0;transition:opacity .2s,background .15s;z-index:2}
+.vw-stage:hover .vw-nav{opacity:1}.vw-nav:hover{background:rgba(60,60,64,.75)}
+.vw-cb{width:34px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#f2f2f4;transition:background .15s}.vw-cb:hover{background:rgba(255,255,255,.12)}
+.vw-seek:hover span:last-child{transform:scale(1.15)}
+.vw-thirds{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.5) calc(33.33% - .5px),rgba(255,255,255,.5) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.5) calc(66.66% - .5px),rgba(255,255,255,.5) calc(66.66% + .5px),transparent calc(66.66% + .5px)),linear-gradient(180deg,transparent calc(33.33% - .5px),rgba(255,255,255,.5) calc(33.33% - .5px),rgba(255,255,255,.5) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.5) calc(66.66% - .5px),rgba(255,255,255,.5) calc(66.66% + .5px),transparent calc(66.66% + .5px))}
+video::cue{background:rgba(0,0,0,.65);color:#fff;font:600 20px Inter,sans-serif}
+@keyframes vwIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes vwFade{from{opacity:0}to{opacity:1}}
+</style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 0% 0%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
+  <section aria-label="Фото и видео" tabindex="0" onKeyDown="{{onKey}}" onDragOver="{{onDragOver}}" onDragLeave="{{onDragLeave}}" onDrop="{{onDrop}}" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.11); box-shadow: 0 40px 120px rgba(0,0,0,0.6); overflow: hidden; outline: none">
+    <header style="height: 52px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px 0 14px; border-bottom: 1px solid rgba(0,0,0,0.5); background: rgba(255,255,255,0.03); position: relative; z-index: 3">
+      <sc-if value="{{isGrid}}" hint-placeholder-val="{{true}}">
+        <button aria-label="Боковая панель" aria-pressed="{{sideOpen}}" onClick="{{toggleSide}}" class="vw-b" style="width: 32px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #c9c9cf"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="15" rx="3"></rect><path d="M9 4.5v15"></path></svg></button>
+        <div style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 4px; min-width: 0"><span style="font-size: 15px; font-weight: 700">{{albumName}}</span><span style="font-size: 11.5px; color: #8b8b93">{{albumSub}}</span></div>
+        <span style="flex: 1"></span>
+        <label aria-label="Размер миниатюр" style="display: flex; align-items: center; gap: 8px; color: #8b8b93">
+          <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"></rect></svg>
+          <input type="range" min="96" max="300" value="{{tile}}" onInput="{{onTile}}" class="vw-range" style="width: 110px">
+          <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="4"></rect></svg>
+        </label>
+        <label style="display: flex; align-items: center; gap: 6px; height: 30px; width: 200px; padding: 0 9px; border-radius: 8px; background: rgba(255,255,255,0.08)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Поиск" placeholder="Поиск" value="{{q}}" onInput="{{onQ}}" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 13px Inter, sans-serif"></label>
+        <label class="vw-b" title="Открыть фото и видео с компьютера" style="height: 30px; padding: 0 11px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.08); cursor: pointer">
+          <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 14v4.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V14"></path></svg>Импорт
+          <input type="file" multiple accept="image/*,video/*" onChange="{{onImport}}" style="display: none">
+        </label>
+        <button onClick="{{startShow}}" class="vw-b" title="Слайд-шоу" style="height: 30px; padding: 0 11px; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.08)"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"></path></svg>Слайд-шоу</button>
+      </sc-if>
+      <sc-if value="{{isDetail}}" hint-placeholder-val="{{false}}">
+        <button onClick="{{back}}" class="vw-b" style="height: 30px; padding: 0 10px 0 6px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #e8e8ec"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg>{{albumName}}</button>
+        <div style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 6px; min-width: 0"><span style="font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px">{{cur.title}}</span><span style="font-size: 11.5px; color: #8b8b93">{{cur.when}}</span></div>
+        <span style="flex: 1"></span>
+        <sc-if value="{{inTrash}}" hint-placeholder-val="{{false}}">
+          <button onClick="{{restore}}" class="vw-b" style="height: 30px; padding: 0 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.08)">Восстановить</button>
+          <button onClick="{{purge}}" class="vw-b" style="height: 30px; padding: 0 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: rgba(255,69,58,0.18); color: #ff6961">Удалить навсегда</button>
+        </sc-if>
+        <sc-if value="{{notTrash}}" hint-placeholder-val="{{true}}">
+          <span style="font-size: 12px; color: #8b8b93; margin-right: 4px">{{zoomText}}</span>
+          <button aria-label="Уменьшить" onClick="{{zoomOut}}" class="vw-b" style="{{iconBtn}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4-4M8 11h6"></path></svg></button>
+          <button aria-label="Увеличить" onClick="{{zoomIn}}" class="vw-b" style="{{iconBtn}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4-4M8 11h6M11 8v6"></path></svg></button>
+          <span style="width: 1px; height: 18px; background: rgba(255,255,255,0.1); margin: 0 2px"></span>
+          <button aria-label="{{favLabel}}" aria-pressed="{{cur.fav}}" onClick="{{toggleFav}}" class="vw-b" style="{{favBtn}}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="{{favFill}}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"></path></svg></button>
+          <button aria-label="Сведения" aria-pressed="{{infoOpen}}" onClick="{{toggleInfo}}" class="vw-b" style="{{infoBtn}}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5.5M12 7.6v.01"></path></svg></button>
+          <sc-if value="{{cur.isPhoto}}" hint-placeholder-val="{{true}}">
+            <button aria-label="Повернуть" onClick="{{rotate}}" class="vw-b" style="{{iconBtn}}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"></path></svg></button>
+            <button onClick="{{startEdit}}" class="vw-b" style="height: 30px; padding: 0 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.1)">Изменить</button>
+          </sc-if>
+          <button aria-label="Скачать" title="Сохранить на компьютер" onClick="{{exportCur}}" class="vw-b" style="{{iconBtn}}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"></path></svg></button>
+          <button aria-label="Удалить" onClick="{{remove}}" class="vw-b" style="{{iconBtn}}"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M7 7l1 12.5h8L17 7"></path></svg></button>
+        </sc-if>
+      </sc-if>
+      <sc-if value="{{isEdit}}" hint-placeholder-val="{{false}}">
+        <button onClick="{{cancelEdit}}" class="vw-b" style="height: 30px; padding: 0 12px; border-radius: 8px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.08)">Отменить</button>
+        <span style="flex: 1; text-align: center; font-size: 13.5px; font-weight: 700">{{cur.title}}</span>
+        <button onClick="{{resetEdit}}" class="vw-b" style="height: 30px; padding: 0 12px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #c9c9cf">Вернуть оригинал</button>
+        <button onClick="{{doneEdit}}" class="vw-b" style="{{doneBtn}}">Готово</button>
+      </sc-if>
+      <button aria-label="Настройки приложения" aria-expanded="{{cfg.open}}" onClick="{{cfgOpen}}" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #c9c9cf; background: none; border: 0; flex: none"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+      <div class="tl" role="group" aria-label="Управление окном">
+        <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
+        <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
+        <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>
+      </div>
+    </header>
+
+    <div style="flex: 1; min-height: 0; display: flex; position: relative">
+      <!-- sidebar -->
+      <sc-if value="{{showSide}}" hint-placeholder-val="{{true}}">
+        <aside aria-label="Альбомы" class="vw-scroll" style="width: 220px; flex: none; overflow-y: auto; padding: 12px 8px; display: flex; flex-direction: column; gap: 1px; background: rgba(0,0,0,0.2); border-right: 1px solid rgba(0,0,0,0.45)">
+          <sc-for list="{{side}}" as="s" hint-placeholder-count="9">
+            <sc-if value="{{s.head}}" hint-placeholder-val="{{false}}"><span style="padding: 14px 10px 5px; font-size: 11.5px; font-weight: 700; color: #7d7d86">{{s.name}}</span></sc-if>
+            <sc-if value="{{s.item}}" hint-placeholder-val="{{true}}">
+              <button onClick="{{s.pick}}" aria-current="{{s.cur}}" class="vw-row" style="{{s.st}}"><span aria-hidden="true" style="{{s.icon}}">{{s.glyph}}</span><span style="flex: 1; min-width: 0; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.name}}</span><span style="font-size: 11.5px; opacity: 0.6">{{s.n}}</span></button>
+            </sc-if>
+          </sc-for>
+          <button onClick="{{newAlbum}}" class="vw-row" style="display: flex; align-items: center; gap: 9px; height: 30px; padding: 0 9px; border-radius: 7px; color: #a1a1a8; font-size: 13px; margin-top: 2px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Новый альбом</button>
+          <span style="margin-top: auto; padding: 14px 8px 2px; font-size: 11.5px; line-height: 1.5; color: #6f6f77">Перетащите фото или видео в окно, чтобы добавить их в «Импорт».</span>
+        </aside>
+      </sc-if>
+
+      <!-- grid -->
+      <sc-if value="{{isGrid}}" hint-placeholder-val="{{true}}">
+        <main class="vw-scroll" style="flex: 1; min-width: 0; overflow-y: auto; padding: 6px 20px 24px">
+          <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #8b8b93; padding-top: 140px">
+              <svg aria-hidden="true" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="m4 17 5-4.5 4 3.5 3-2.5 4 3.5"></path></svg>
+              <span style="font-size: 15px; font-weight: 600; color: #d6d6dc">{{emptyTitle}}</span>
+              <span style="font-size: 13px">{{emptyText}}</span>
+            </div>
+          </sc-if>
+          <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+            <section aria-label="{{g.title}}" style="display: flex; flex-direction: column; gap: 10px; padding-top: 16px">
+              <div style="display: flex; align-items: baseline; gap: 10px; position: sticky; top: -6px; z-index: 1; padding: 8px 2px; background: linear-gradient(180deg, rgba(20,20,22,0.96) 70%, rgba(20,20,22,0))"><span style="font-size: 19px; font-weight: 700; letter-spacing: -0.01em">{{g.title}}</span><span style="font-size: 12.5px; color: #8b8b93">{{g.sub}}</span></div>
+              <div style="{{gridSt}}">
+                <sc-for list="{{g.items}}" as="it" hint-placeholder-count="6">
+                  <button onClick="{{it.open}}" aria-label="{{it.label}}" class="vw-tile" style="{{it.st}}">
+                    <img alt="" src="{{it.thumb}}" loading="lazy" draggable="false" style="{{it.imgSt}}">
+                    <span aria-hidden="true" style="{{it.vig}}"></span>
+                    <sc-if value="{{it.isVideo}}" hint-placeholder-val="{{false}}"><span style="position: absolute; right: 6px; bottom: 6px; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,0.55); font-size: 11.5px; font-weight: 600"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 24 24" fill="#fff"><path d="M6 3.5v17l14-8.5z"></path></svg>{{it.dur}}</span></sc-if>
+                    <sc-if value="{{it.fav}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="position: absolute; left: 7px; bottom: 7px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.6))"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"></path></svg></sc-if>
+                    <sc-if value="{{it.edited}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="position: absolute; right: 6px; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></span></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+          </sc-for>
+        </main>
+      </sc-if>
+
+      <!-- detail + edit stage -->
+      <sc-if value="{{showStage}}" hint-placeholder-val="{{false}}">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #0c0c0d">
+          <div class="vw-stage" onPointerDown="{{panDown}}" onPointerMove="{{panMove}}" onPointerUp="{{panUp}}" onDblClick="{{dbl}}" onWheel="{{onWheel}}" style="{{stageSt}}">
+            <sc-if value="{{cur.isPhoto}}" hint-placeholder-val="{{true}}">
+              <div style="{{frameSt}}">
+                <img alt="{{cur.title}}" src="{{cur.src}}" draggable="false" style="{{photoSt}}">
+                <span aria-hidden="true" style="{{vigSt}}"></span>
+                <sc-if value="{{showThirds}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" class="vw-thirds"></span></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{cur.isVideo}}" hint-placeholder-val="{{false}}">
+              <div class="vw-vbox" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000">
+                <video class="vw-video" src="{{cur.src}}" poster="{{cur.poster}}" preload="metadata" playsinline onTimeUpdate="{{vTime}}" onLoadedMetadata="{{vMeta}}" onPlay="{{vPlay}}" onPause="{{vPause}}" onEnded="{{vEnd}}" onProgress="{{vProg}}" onVolumeChange="{{vVol}}" onClick="{{vToggle}}" style="max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; background: #000"></video>
+                <sc-if value="{{vBig}}" hint-placeholder-val="{{false}}"><button aria-label="Воспроизвести" onClick="{{vToggle}}" class="vw-b" style="position: absolute; width: 76px; height: 76px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,32,0.6); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.15)"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"></path></svg></button></sc-if>
+                <div class="vw-ctrl" style="{{ctrlSt}}">
+                  <div style="display: flex; align-items: center; gap: 10px">
+                    <span style="font: 600 12px 'JetBrains Mono', monospace; min-width: 44px; text-align: right">{{vCur}}</span>
+                    <div onClick="{{vSeek}}" role="slider" aria-label="Позиция" aria-valuenow="{{vPct}}" class="vw-seek" style="flex: 1; height: 16px; display: flex; align-items: center; cursor: pointer; position: relative">
+                      <span style="position: absolute; left: 0; right: 0; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.18)"></span>
+                      <span style="{{vBufSt}}"></span>
+                      <span style="{{vFillSt}}"></span>
+                      <span style="{{vKnobSt}}"></span>
+                    </div>
+                    <span style="font: 600 12px 'JetBrains Mono', monospace; min-width: 44px; color: #c9c9cf">{{vDur}}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 4px">
+                    <button aria-label="Назад 10 секунд" onClick="{{vBack}}" class="vw-cb"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"></path><text x="12" y="15.5" font-size="7" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">10</text></svg></button>
+                    <button aria-label="{{vPlayLabel}}" onClick="{{vToggle}}" class="vw-cb" style="width: 42px"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="{{vPlayPath}}"></path></svg></button>
+                    <button aria-label="Вперёд 10 секунд" onClick="{{vFwd}}" class="vw-cb"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4.5h-4.5"></path><text x="12" y="15.5" font-size="7" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">10</text></svg></button>
+                    <button aria-label="{{vMuteLabel}}" onClick="{{vMute}}" class="vw-cb" style="margin-left: 8px"><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"></path><path d="{{vVolPath}}"></path></svg></button>
+                    <input type="range" min="0" max="100" value="{{vVolV}}" onInput="{{vSetVol}}" aria-label="Громкость" class="vw-range" style="width: 90px">
+                    <span style="flex: 1"></span>
+                    <button onClick="{{vSpeed}}" aria-label="Скорость воспроизведения" class="vw-cb" style="width: auto; padding: 0 9px; font: 700 12.5px Inter, sans-serif">{{vRate}}</button>
+                    <button onClick="{{vCC}}" aria-pressed="{{vCCOn}}" aria-label="Субтитры" class="vw-cb" style="{{vCCSt}}">CC</button>
+                    <button onClick="{{vLoop}}" aria-pressed="{{vLoopOn}}" aria-label="Повтор" class="vw-cb" style="{{vLoopSt}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3.5 20 6.5l-3 3M4 11.5v-1a4 4 0 0 1 4-4h12M7 20.5l-3-3 3-3M20 12.5v1a4 4 0 0 1-4 4H4"></path></svg></button>
+                    <button onClick="{{vPip}}" aria-label="Картинка в картинке" class="vw-cb"><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><rect x="12" y="12" width="7" height="5" rx="1" fill="currentColor"></rect></svg></button>
+                    <button onClick="{{vFull}}" aria-label="Во весь экран" class="vw-cb"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{navArrows}}" hint-placeholder-val="{{true}}">
+              <button aria-label="Предыдущее" onClick="{{prev}}" class="vw-nav" style="left: 16px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+              <button aria-label="Следующее" onClick="{{next}}" class="vw-nav" style="right: 16px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></button>
+            </sc-if>
+            <sc-if value="{{showing}}" hint-placeholder-val="{{false}}">
+              <button onClick="{{stopShow}}" class="vw-b" style="position: absolute; top: 14px; left: 50%; translate: -50% 0; height: 30px; padding: 0 14px; border-radius: 15px; font-size: 12.5px; font-weight: 600; background: rgba(30,30,32,0.7); backdrop-filter: blur(12px)">Слайд-шоу · {{showPos}} · Остановить</button>
+            </sc-if>
+          </div>
+          <sc-if value="{{isDetail}}" hint-placeholder-val="{{true}}">
+            <div aria-label="Лента" class="vw-strip" style="height: 66px; flex: none; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 12px; border-top: 1px solid rgba(255,255,255,0.05); overflow: hidden">
+              <sc-for list="{{strip}}" as="sp" hint-placeholder-count="9"><button onClick="{{sp.open}}" aria-label="{{sp.label}}" style="{{sp.st}}"><img alt="" src="{{sp.thumb}}" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block"></button></sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- info panel -->
+      <sc-if value="{{showInfo}}" hint-placeholder-val="{{false}}">
+        <aside aria-label="Сведения" class="vw-scroll" style="width: 280px; flex: none; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; background: #19191b; border-left: 1px solid rgba(0,0,0,0.5); animation: vwIn .25s ease both">
+          <div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 15px; font-weight: 700; word-break: break-word">{{cur.title}}</span><span style="font-size: 12.5px; color: #8b8b93">{{cur.when}}</span></div>
+          <div style="display: flex; flex-direction: column; border-radius: 12px; background: rgba(255,255,255,0.05); overflow: hidden">
+            <sc-for list="{{infoRows}}" as="r" hint-placeholder-count="5"><div style="display: flex; gap: 10px; padding: 9px 12px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 12.5px"><span style="color: #8b8b93; width: 82px; flex: none">{{r.k}}</span><span style="flex: 1; min-width: 0; text-align: right; word-break: break-word">{{r.v}}</span></div></sc-for>
+          </div>
+          <span style="font-size: 12px; font-weight: 700; color: #8b8b93">Альбомы</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+            <sc-for list="{{albumChips}}" as="c" hint-placeholder-count="4"><button aria-pressed="{{c.on}}" onClick="{{c.toggle}}" class="vw-b" style="{{c.st}}">{{c.name}}</button></sc-for>
+          </div>
+          <span style="font-size: 12px; font-weight: 700; color: #8b8b93">Подпись</span>
+          <textarea aria-label="Подпись" placeholder="Добавьте подпись…" value="{{cur.caption}}" onInput="{{onCaption}}" style="min-height: 64px; resize: vertical; padding: 9px 11px; border-radius: 10px; border: 0; outline: none; background: rgba(255,255,255,0.06); color: #f2f2f4; font: 13px/1.45 Inter, sans-serif"></textarea>
+        </aside>
+      </sc-if>
+
+      <!-- edit panel -->
+      <sc-if value="{{isEdit}}" hint-placeholder-val="{{false}}">
+        <aside aria-label="Правка" class="vw-scroll" style="width: 300px; flex: none; overflow-y: auto; display: flex; flex-direction: column; background: #19191b; border-left: 1px solid rgba(0,0,0,0.5)">
+          <div role="tablist" style="display: flex; gap: 2px; margin: 14px 14px 6px; padding: 2px; border-radius: 8px; background: rgba(255,255,255,0.07)">
+            <sc-for list="{{etabs}}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="{{t.st}}">{{t.name}}</button></sc-for>
+          </div>
+          <sc-if value="{{tabAdj}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 8px 14px 16px">
+              <sc-for list="{{adj}}" as="a" hint-placeholder-count="6">
+                <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px 2px; border-bottom: 1px solid rgba(255,255,255,0.05)">
+                  <div style="display: flex; align-items: center"><span style="font-size: 13px; font-weight: 600">{{a.name}}</span><button onDblClick="{{a.reset}}" onClick="{{a.reset}}" title="Сбросить" style="{{a.valSt}}">{{a.text}}</button></div>
+                  <input type="range" min="{{a.min}}" max="{{a.max}}" value="{{a.v}}" onInput="{{a.set}}" aria-label="{{a.name}}" class="vw-range" style="width: 100%">
+                </div>
+              </sc-for>
+              <button onClick="{{autoFix}}" class="vw-b" style="margin-top: 10px; height: 32px; border-radius: 9px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; gap: 7px"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 19 9-9M14 4v3M19 9h-3M17.5 5.5l-2 2M12 2.8l.6 1.4M21 12l-1.4-.6"></path></svg>Авто</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{tabFil}}" hint-placeholder-val="{{false}}">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 14px 16px">
+              <sc-for list="{{filters}}" as="fl" hint-placeholder-count="6">
+                <button onClick="{{fl.pick}}" aria-pressed="{{fl.on}}" class="vw-b" style="display: flex; flex-direction: column; gap: 6px; padding: 0; border-radius: 10px; text-align: left">
+                  <span style="{{fl.box}}"><img alt="" src="{{fl.src}}" style="{{fl.imgSt}}"></span>
+                  <span style="font-size: 12px; font-weight: 600; padding: 0 2px">{{fl.name}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{tabCrop}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 12px; padding: 10px 14px 16px">
+              <span style="font-size: 12px; font-weight: 700; color: #8b8b93">Формат</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                <sc-for list="{{aspects}}" as="as" hint-placeholder-count="5"><button aria-pressed="{{as.on}}" onClick="{{as.pick}}" class="vw-b" style="{{as.st}}">{{as.name}}</button></sc-for>
+              </div>
+              <sc-for list="{{cropSl}}" as="a" hint-placeholder-count="2">
+                <div style="display: flex; flex-direction: column; gap: 6px; padding: 6px 2px">
+                  <div style="display: flex; align-items: center"><span style="font-size: 13px; font-weight: 600">{{a.name}}</span><button onClick="{{a.reset}}" title="Сбросить" style="{{a.valSt}}">{{a.text}}</button></div>
+                  <input type="range" min="{{a.min}}" max="{{a.max}}" value="{{a.v}}" onInput="{{a.set}}" aria-label="{{a.name}}" class="vw-range" style="width: 100%">
+                </div>
+              </sc-for>
+              <div style="display: flex; gap: 8px">
+                <button onClick="{{rotate}}" class="vw-b" style="flex: 1; height: 34px; border-radius: 9px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; gap: 6px"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"></path></svg>Повернуть</button>
+                <button onClick="{{flip}}" class="vw-b" style="{{flipBtn}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M9 7 4 17h5zM15 7l5 10h-5z"></path></svg>Отразить</button>
+              </div>
+              <span style="font-size: 12px; color: #6f6f77; line-height: 1.5">Перетащите снимок мышью, чтобы выбрать кадр. Масштаб — колесом мыши.</span>
+            </div>
+          </sc-if>
+        </aside>
+      </sc-if>
+
+      <sc-if value="{{dragOn}}" hint-placeholder-val="{{false}}">
+        <div style="{{dropSt}}">Отпустите, чтобы импортировать</div>
+      </sc-if>
+    </div>
+    <sc-if value="{{toast.on}}" hint-placeholder-val="{{false}}">
+      <div role="status" style="position: absolute; left: 50%; bottom: 84px; translate: -50% 0; z-index: 9; padding: 10px 16px; border-radius: 14px; background: #f2f2f4; color: #111113; font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px rgba(0,0,0,0.4); animation: vwIn .3s ease both">{{toast.text}}</div>
+    </sc-if>
+    <!-- ===== app settings sheet ===== -->
+    <sc-if value="{{cfg.open}}" hint-placeholder-val="{{false}}">
+      <div onClick="{{cfg.close}}" style="position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,0.45); animation: cfgFade .2s ease both"></div>
+      <aside role="dialog" aria-label="{{cfg.title}}" style="position: absolute; top: 12px; right: 12px; bottom: 12px; width: 380px; z-index: 61; display: flex; flex-direction: column; border-radius: 20px; background: #131315; border: 1px solid #2e2e33; box-shadow: -30px 0 80px rgba(0,0,0,0.55); animation: cfgIn .38s cubic-bezier(.22,1,.36,1) both; font-family: Inter, system-ui, sans-serif; color: #e8e8ec">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 18px 18px 12px">
+          <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.07)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">{{cfg.title}}</span><span style="font-size: 12px; color: #8b8b93">Применяется сразу и запоминается</span></div>
+          <button aria-label="Закрыть настройки" onClick="{{cfg.close}}" style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+        </div>
+        <div class="cfg-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{cfg.rows}}" as="r" hint-placeholder-count="6">
+            <div style="{{r.box}}">
+              <sc-if value="{{r.isHead}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6f6f77">{{r.name}}</span></sc-if>
+              <sc-if value="{{r.isSw}}" hint-placeholder-val="{{true}}">
+                <button role="switch" aria-checked="{{r.on}}" onClick="{{r.toggle}}" style="width: 100%; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; color: #e8e8ec; text-align: left">
+                  <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                  <span style="{{r.track}}"><span style="{{r.knob}}"></span></span>
+                </button>
+              </sc-if>
+              <sc-if value="{{r.isSeg}}" hint-placeholder-val="{{false}}">
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13.5px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #8b8b93; line-height: 1.4">{{r.note}}</span></span>
+                <div role="radiogroup" aria-label="{{r.name}}" style="display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: 11px; background: rgba(255,255,255,0.06); margin-top: 8px">
+                  <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button></sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid rgba(255,255,255,0.06)">
+          <button onClick="{{cfg.reset}}" style="height: 36px; padding: 0 14px; border-radius: 11px; font-size: 12.5px; font-weight: 600; background: rgba(255,255,255,0.06); color: #e8e8ec; border: 0">По умолчанию</button>
+          <button onClick="{{cfg.close}}" style="margin-left: auto; height: 36px; padding: 0 18px; border-radius: 11px; font-size: 13px; font-weight: 700; background: #f2f2f4; color: #111113; border: 0">Готово</button>
+        </div>
+      </aside>
+    </sc-if>
+
+  </section>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"themeWin":{"editor":null},"themeTint":{"editor":null},"onClose":{"editor":null},"onMinimize":{"editor":null},"onMaximize":{"editor":null},"onAction":{"editor":null},"$preview":{"width":1440,"height":900}}'>
+const VW = { panning: null, dragCrop: null };
+const MEDIA = {"alps.jpg": "/_blob/9e4f9b6c776e965d210a2aa7ed37adb0", "aurora.jpg": "/_blob/7bb0dd8cc50915ab4e8913af82b01711", "city.jpg": "/_blob/334abd8ca851fb895224433595e91742", "clip-aurora.jpg": "/_blob/4345f6a4fd0a4f5a53e840de482341bb", "clip-aurora.mp4": "/_blob/a6a35a88f921384b5b9f0e8fd4d2dc5c", "clip-sunset.jpg": "/_blob/34da9a7aead0cc2aa023280fc5eb043a", "clip-sunset.mp4": "/_blob/30326981a175e0947491eae1ff3e4b76", "dawn.jpg": "/_blob/a115f6ca5536c9c7eef0bb94e6ad63c7", "dunes.jpg": "/_blob/0341fc2b48caf634d3f649b3a6247af1", "forest.jpg": "/_blob/7523176b2840b6609e13cd241a3b66e7", "lake.jpg": "/_blob/da40808c7cedc452948cf1e25e214d1b", "night.jpg": "/_blob/efd6dfa58f27cf78067de768452dd692", "ocean.jpg": "/_blob/f57719e08880eaa5bfc0dfa96babdd1f", "sunset.jpg": "/_blob/be25336c6b4de12fd28f2698ac63de93", "wall-lava.jpg": "/_blob/1c136ec279a7a89d3c1249331b22baa9", "wall-orange.jpg": "/_blob/9e5207b4fdd2733609dce81db3b4b718", "wall-rainbow.jpg": "/_blob/e96e652629578bdcfd9f5ad47144c481", "wall-silk.jpg": "/_blob/8780049cc1c7cae1677996f86a9c7a61", "wall-waves.jpg": "/_blob/9f084b5fed0458ea5ce026a0f4d01b0b"};
+const M = (f) => MEDIA[f] || f;
+const LIB = [
+  { id: 'p1', file: 'alps.jpg', name: 'Альпы на рассвете', date: '2026-10-28T07:42', place: 'Церматт', albums: ['nature', 'trips'], w: 1600, h: 1066, size: 84059 },
+  { id: 'p2', file: 'sunset.jpg', name: 'Закат в горах', date: '2026-10-28T18:05', place: 'Церматт', albums: ['nature', 'trips'], w: 1600, h: 1066, size: 92310, fav: true },
+  { id: 'p3', file: 'night.jpg', name: 'Полнолуние', date: '2026-10-12T23:18', place: 'Домбай', albums: ['nature'], w: 1600, h: 1066, size: 83332 },
+  { id: 'p4', file: 'lake.jpg', name: 'Отражение', date: '2026-09-21T10:30', place: 'Телецкое озеро', albums: ['nature', 'trips'], w: 1600, h: 1066, size: 91771, fav: true },
+  { id: 'p5', file: 'dawn.jpg', name: 'Розовое утро', date: '2026-09-21T06:12', place: 'Телецкое озеро', albums: ['nature', 'trips'], w: 1600, h: 1066, size: 80014 },
+  { id: 'p6', file: 'aurora.jpg', name: 'Сияние', date: '2026-11-03T01:40', place: 'Териберка', albums: ['nature', 'trips'], w: 1600, h: 1066, size: 87025, fav: true },
+  { id: 'p7', file: 'city.jpg', name: 'Огни города', date: '2026-11-08T19:55', place: 'Москва', albums: ['city'], w: 1600, h: 1066, size: 114991 },
+  { id: 'p8', file: 'ocean.jpg', name: 'Штиль', date: '2026-08-14T13:20', place: 'Анапа', albums: ['trips'], w: 1600, h: 1066, size: 81016 },
+  { id: 'p9', file: 'forest.jpg', name: 'Еловый лес', date: '2026-08-02T09:05', place: 'Карелия', albums: ['nature'], w: 1600, h: 1066, size: 94115 },
+  { id: 'p10', file: 'dunes.jpg', name: 'Дюны', date: '2026-08-15T17:40', place: 'Анапа', albums: ['trips'], w: 1600, h: 1066, size: 54514 },
+  { id: 'v1', file: 'clip-sunset.mp4', poster: 'clip-sunset.jpg', cues: [[0.5, 3.5, 'Вечер над городом. Небо меняет цвет.'], [4, 7.5, 'Снято на AshenCam, 14 секунд.'], [8, 13.5, 'Субтитры включаются кнопкой «CC» или клавишей C.']], video: true, dur: 14, name: 'Вечернее небо', date: '2026-11-08T20:10', place: 'Москва', albums: ['city'], w: 1280, h: 720, size: 332941 },
+  { id: 'v2', file: 'clip-aurora.mp4', poster: 'clip-aurora.jpg', cues: [[0.5, 4.5, 'Сияние над озером, таймлапс.'], [5, 9.5, 'Звук — тон 262 Гц (до первой октавы).']], video: true, dur: 10, name: 'Сияние, таймлапс', date: '2026-11-03T01:55', place: 'Териберка', albums: ['trips', 'nature'], w: 1280, h: 720, size: 371678, fav: true },
+  { id: 'w1', file: 'wall-orange.jpg', name: 'Апельсин', date: '2026-06-01T12:00', place: 'AshenOS', albums: ['walls'], w: 1600, h: 960, size: 22887 },
+  { id: 'w2', file: 'wall-lava.jpg', name: 'Лава', date: '2026-06-01T12:01', place: 'AshenOS', albums: ['walls'], w: 1600, h: 960, size: 28366 },
+  { id: 'w3', file: 'wall-silk.jpg', name: 'Шёлк', date: '2026-06-01T12:02', place: 'AshenOS', albums: ['walls'], w: 1600, h: 960, size: 195325 },
+  { id: 'w4', file: 'wall-rainbow.jpg', name: 'Радуга', date: '2026-06-01T12:03', place: 'AshenOS', albums: ['walls'], w: 1600, h: 960, size: 31080 },
+  { id: 'w5', file: 'wall-waves.jpg', name: 'Волны', date: '2026-06-01T12:04', place: 'AshenOS', albums: ['walls'], w: 1600, h: 960, size: 16336 }
+];
+const BASE_ALBUMS = [['nature', 'Природа', '#30d158'], ['city', 'Город', '#ff9f0a'], ['trips', 'Поездки', '#0a84ff'], ['walls', 'Обои', '#bf5af2'], ['import', 'Импорт', '#8e8e93']];
+const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const MONTHS_G = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+const ADJ = [['exp', 'Экспозиция', -100, 100], ['con', 'Контраст', -100, 100], ['sat', 'Насыщенность', -100, 100], ['warm', 'Теплота', -100, 100], ['fade', 'Выцветание', 0, 100], ['vig', 'Виньетка', 0, 100], ['blur', 'Размытие', 0, 100]];
+const FILTERS = [['none', 'Оригинал', {}], ['vivid', 'Яркий', { sat: 45, con: 15, exp: 5 }], ['warm', 'Тёплый', { warm: 55, sat: 10 }], ['cool', 'Холодный', { warm: -55, con: 8 }], ['drama', 'Драма', { con: 55, exp: -12, sat: -15, vig: 45 }], ['mono', 'Ч/Б', { sat: -100, con: 20 }], ['noir', 'Нуар', { sat: -100, con: 60, exp: -15, vig: 55 }], ['vintage', 'Винтаж', { warm: 40, fade: 45, sat: -25, vig: 30 }]];
+const ASPECTS = [['orig', 'Оригинал', 0], ['free', 'Как есть', 0], ['1', 'Квадрат', 1], ['16/9', '16:9', 16 / 9], ['4/3', '4:3', 4 / 3], ['3/2', '3:2', 3 / 2], ['9/16', '9:16', 9 / 16]];
+const E0 = { exp: 0, con: 0, sat: 0, warm: 0, fade: 0, vig: 0, blur: 0, rot: 0, flip: false, aspect: 'orig', zoom: 100, straight: 0, ox: 0, oy: 0, filter: 'none' };
+const cssFilter = (e) => { if (!e) return 'none'; const w = e.warm || 0; const f = [`brightness(${(1 + (e.exp || 0) / 160).toFixed(3)})`, `contrast(${(1 + (e.con || 0) / 160 - (e.fade || 0) / 300).toFixed(3)})`, `saturate(${(1 + (e.sat || 0) / 100).toFixed(3)})`];
+  if (w > 0) f.push(`sepia(${(w / 260).toFixed(3)})`, `hue-rotate(${(-w / 14).toFixed(1)}deg)`); if (w < 0) f.push(`hue-rotate(${(w / 6).toFixed(1)}deg)`, `saturate(${(1 + w / 500).toFixed(3)})`);
+  if (e.blur) f.push(`blur(${(e.blur / 25).toFixed(2)}px)`); if (e.fade) f.push(`brightness(${(1 + e.fade / 900).toFixed(3)})`); return f.join(' '); };
+const fmtDur = (s) => { s = Math.max(0, Math.floor(s || 0)); const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, '0')}`; };
+const fmtSize = (b) => b > 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' МБ' : Math.max(1, Math.round(b / 1024)) + ' КБ';
+
+class Component extends DCLogic {
+  state = { album: 'all', view: 'grid', curId: null, sideOpen: true, tile: 170, q: '', favs: {}, deleted: {}, extraAlb: {}, albumsUser: [], edits: {}, captions: {}, imported: [],
+    infoOpen: false, zoom: 1, panX: 0, panY: 0, draft: null, etab: 'adj', showing: false, dragOn: false, toast: { on: false, text: '' },
+    v: { t: 0, d: 0, playing: false, buf: 0, vol: 1, muted: false, rate: 1, cc: false, loop: false, started: false }, ctrlShow: true, cfg: {} };
+  CFG_KEY = 'ashenos.photos.cfg';
+  CFG_DEFS = [
+    { type: 'head', name: 'Медиатека' },
+    { k: 'square', type: 'sw', name: 'Квадратные миниатюры', note: 'Иначе — с исходными пропорциями', def: true },
+    { k: 'meta', type: 'sw', name: 'Показывать место в заголовках', def: true },
+    { type: 'head', name: 'Просмотр' },
+    { k: 'show', type: 'seg', name: 'Слайд-шоу', note: 'Время на один снимок', def: '3', opts: [['2', '2 с'], ['3', '3 с'], ['5', '5 с']] },
+    { k: 'autoplay', type: 'sw', name: 'Автовоспроизведение видео', def: false },
+    { k: 'cc', type: 'sw', name: 'Субтитры по умолчанию', def: false }
+  ];
+  /* ---------- app settings (shared) ---------- */
+  cfgLoad() { try { const c = JSON.parse(localStorage.getItem(this.CFG_KEY) || 'null'); if (c && typeof c === 'object') this.setState({ cfg: c }); } catch (e) {} }
+  cfgGet(k) { const c = this.state.cfg || {}; if (c[k] !== undefined) return c[k]; const d = this.CFG_DEFS.find((x) => x.k === k); return d ? d.def : undefined; }
+  cfgSet(k, v) { const cfg = { ...(this.state.cfg || {}), [k]: v }; this.setState({ cfg }); try { localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); } catch (e) {} if (this.cfgChanged) this.cfgChanged(k, v); }
+  cfgView(title) {
+    const sw = (on) => ({ track: `width:40px;height:24px;flex:none;border-radius:12px;padding:3px;box-sizing:border-box;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.14)'};transition:background .25s`, knob: `width:18px;height:18px;border-radius:50%;background:${on ? '#111113' : '#e8e8ec'};transform:translateX(${on ? 16 : 0}px);transition:transform .3s cubic-bezier(.3,1.4,.4,1)` });
+    return {
+      open: !!this.state.cfgOpen, title,
+      close: () => this.setState({ cfgOpen: false }),
+      reset: () => { this.setState({ cfg: {} }); try { localStorage.removeItem(this.CFG_KEY); } catch (e) {} if (this.cfgChanged) this.cfgChanged('*'); },
+      rows: this.CFG_DEFS.map((d) => {
+        const v = d.k ? this.cfgGet(d.k) : null;
+        const base = { isHead: d.type === 'head', isSw: d.type === 'sw', isSeg: d.type === 'seg', name: d.name, note: d.note || '', on: !!v,
+          box: d.type === 'head' ? 'padding:12px 6px 2px' : 'padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04)',
+          toggle: () => this.cfgSet(d.k, !v), ...sw(!!v), opts: [] };
+        if (d.type === 'seg') base.opts = d.opts.map(([ov, on]) => ({ name: on, on: ov === v, pick: () => this.cfgSet(d.k, ov),
+          style: `flex:1;min-width:60px;height:30px;padding:0 10px;border-radius:8px;border:0;font-size:12.5px;font-weight:600;white-space:nowrap;transition:background .2s,color .2s;background:${ov === v ? '#f2f2f4' : 'transparent'};color:${ov === v ? '#111113' : '#a1a1a8'}` }));
+        return base;
+      })
+    };
+  }
+
+  componentDidMount() {
+    this.cfgLoad();
+    try { const s = JSON.parse(localStorage.getItem('ashenos.photos.v1') || 'null'); if (s) this.setState({ favs: s.favs || {}, deleted: s.deleted || {}, extraAlb: s.extraAlb || {}, albumsUser: s.albumsUser || [], edits: s.edits || {}, captions: s.captions || {}, tile: s.tile || 170, sideOpen: s.sideOpen !== false }); } catch (e) {}
+    setTimeout(() => this.focusRoot(), 200);
+  }
+  componentWillUnmount() { clearInterval(this.showT); clearTimeout(this.tt); clearTimeout(this.ctT); }
+  focusRoot() { const el = document.querySelector('section[aria-label="Фото и видео"]'); if (el && document.activeElement && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) el.focus(); }
+  persist(patch) { const s = { ...this.state, ...patch }; try { localStorage.setItem('ashenos.photos.v1', JSON.stringify({ favs: s.favs, deleted: s.deleted, extraAlb: s.extraAlb, albumsUser: s.albumsUser, edits: s.edits, captions: s.captions, tile: s.tile, sideOpen: s.sideOpen })); } catch (e) {} }
+  up(p) { this.setState(p); this.persist(p); }
+  say(t) { clearTimeout(this.tt); this.setState({ toast: { on: true, text: t } }); this.tt = setTimeout(() => this.setState({ toast: { on: false, text: '' } }), 2200); }
+  all() { const st = this.state; return [...LIB.map((x) => ({ ...x, src: M(x.file), thumb: M(x.poster || x.file), posterUrl: x.poster ? M(x.poster) : '' })), ...st.imported]
+    .map((x) => ({ ...x, fav: st.favs[x.id] !== undefined ? st.favs[x.id] : !!x.fav, albums: [...new Set([...(x.albums || []), ...((st.extraAlb[x.id] || []).filter((a) => a[0] !== '-'))])].filter((a) => !(st.extraAlb[x.id] || []).includes('-' + a)), deleted: !!st.deleted[x.id] })); }
+  albums() { return [...BASE_ALBUMS, ...this.state.albumsUser.map((a) => [a.id, a.name, '#64d2ff'])]; }
+  list() {
+    const st = this.state; const q = st.q.trim().toLowerCase();
+    let L = this.all().filter((x) => (st.album === 'trash' ? x.deleted : !x.deleted));
+    if (st.album === 'fav') L = L.filter((x) => x.fav); else if (st.album === 'video') L = L.filter((x) => x.video); else if (!['all', 'trash'].includes(st.album)) L = L.filter((x) => x.albums.includes(st.album));
+    if (q) L = L.filter((x) => (x.name + ' ' + (x.place || '') + ' ' + (st.captions[x.id] || '')).toLowerCase().includes(q));
+    return L.sort((a, b) => b.date.localeCompare(a.date));
+  }
+  open(id) { clearInterval(this.showT); const L = this.list(); this.setState({ view: 'detail', curId: id, zoom: 1, panX: 0, panY: 0, showing: false, v: { ...this.state.v, t: 0, d: 0, playing: false, buf: 0, started: false, cc: !!this.cfgGet('cc') } }); this.listSnap = L.map((x) => x.id); setTimeout(() => { this.focusRoot(); this.syncVideo(); }, 60); }
+  syncVideo() { const v = this.vid(); if (!v) return; v.playbackRate = this.state.v.rate; v.loop = this.state.v.loop; v.volume = this.state.v.vol; v.muted = this.state.v.muted; this.setCC(this.state.v.cc); if (this.cfgGet('autoplay')) v.play().catch(() => {}); }
+  vid() { return document.querySelector('video.vw-video'); }
+  step(d) {
+    const ids = this.list().map((x) => x.id); if (!ids.length) return;
+    let i = ids.indexOf(this.state.curId); i = (i + d + ids.length) % ids.length;
+    const v = this.vid(); if (v) v.pause();
+    this.setState({ curId: ids[i], zoom: 1, panX: 0, panY: 0, v: { ...this.state.v, t: 0, d: 0, playing: false, buf: 0, started: false } }); setTimeout(() => this.syncVideo(), 60);
+  }
+  back() { const v = this.vid(); if (v) v.pause(); clearInterval(this.showT); this.setState({ view: 'grid', showing: false, draft: null, infoOpen: false }); }
+  startShow() { const L = this.list().filter((x) => !x.video); if (!L.length) { this.say('Нет снимков для слайд-шоу'); return; } this.open(L[0].id); this.setState({ showing: true, sideOpen: this.state.sideOpen });
+    clearInterval(this.showT); this.showT = setInterval(() => { const ids = this.list().filter((x) => !x.video).map((x) => x.id); const i = ids.indexOf(this.state.curId); this.setState({ curId: ids[(i + 1) % ids.length], zoom: 1, panX: 0, panY: 0 }); }, (+this.cfgGet('show') || 3) * 1000); }
+  stopShow() { clearInterval(this.showT); this.setState({ showing: false }); }
+  /* import */
+  importFiles(list) {
+    const arr = Array.from(list || []).filter((f) => /^(image|video)\//.test(f.type)); if (!arr.length) { this.say('Поддерживаются изображения и видео'); return; }
+    const now = new Date(); const items = arr.slice(0, 60).map((f, i) => { const url = URL.createObjectURL(f); const vid = f.type.startsWith('video/');
+      const d = new Date(f.lastModified || now); const iso = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      const it = { id: 'u' + Date.now().toString(36) + i, file: f.name, src: url, thumb: url, poster: '', vtt: '', video: vid, dur: 0, name: f.name.replace(/\.[^.]+$/, ''), date: iso, place: 'С компьютера', albums: ['import'], w: 0, h: 0, size: f.size, local: true };
+      if (vid) { const v = document.createElement('video'); v.preload = 'metadata'; v.muted = true; v.src = url; v.onloadedmetadata = () => { this.patchImp(it.id, { dur: v.duration, w: v.videoWidth, h: v.videoHeight }); try { v.currentTime = Math.min(1, v.duration / 3); } catch (e) {} };
+        v.onseeked = () => { try { const c = document.createElement('canvas'); c.width = 480; c.height = Math.round(480 * v.videoHeight / Math.max(1, v.videoWidth)); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height); this.patchImp(it.id, { thumb: c.toDataURL('image/jpeg', 0.75), poster: c.toDataURL('image/jpeg', 0.75) }); } catch (e) {} }; }
+      else { const im = new Image(); im.onload = () => this.patchImp(it.id, { w: im.naturalWidth, h: im.naturalHeight }); im.src = url; }
+      return it; });
+    this.setState({ imported: [...this.state.imported, ...items], album: 'import', view: 'grid' });
+    this.say(`Импортировано: ${items.length}. Файлы доступны, пока открыто приложение`);
+  }
+  patchImp(id, p) { this.setState({ imported: this.state.imported.map((x) => (x.id === id ? { ...x, ...p } : x)) }); }
+  /* edit */
+  ed(id) { return { ...E0, ...(this.state.edits[id] || {}) }; }
+  cur() { return this.all().find((x) => x.id === this.state.curId); }
+  setDraft(p) { this.setState({ draft: { ...this.state.draft, ...p } }); }
+  exportCur() {
+    const c = this.cur(); if (!c) return;
+    if (c.video || !this.state.edits[c.id]) { this.dl(c.src, c.file || c.name); return; }
+    const e = this.ed(c.id); const img = new Image(); img.onload = () => {
+      try {
+        const rot = ((e.rot % 360) + 360) % 360; const sw = rot % 180 ? img.naturalHeight : img.naturalWidth, sh = rot % 180 ? img.naturalWidth : img.naturalHeight;
+        const ar = this.aspectOf(e, sw / sh); let cw = sw, ch = sw / ar; if (ch > sh) { ch = sh; cw = sh * ar; }
+        const cv = document.createElement('canvas'); cv.width = Math.round(cw); cv.height = Math.round(ch); const x = cv.getContext('2d');
+        x.filter = cssFilter(e); x.translate(cw / 2 + e.ox / 100 * cw, ch / 2 + e.oy / 100 * ch); x.rotate((rot + e.straight) * Math.PI / 180); const z = e.zoom / 100 * (1 + Math.abs(e.straight) / 40); x.scale(z * (e.flip ? -1 : 1), z);
+        const cover = Math.max(cw / sw, ch / sh); x.scale(cover, cover); x.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+        x.setTransform(1, 0, 0, 1, 0, 0); x.filter = 'none';
+        if (e.vig) { const g = x.createRadialGradient(cw / 2, ch / 2, Math.min(cw, ch) * 0.3, cw / 2, ch / 2, Math.hypot(cw, ch) / 2); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${e.vig / 110})`); x.fillStyle = g; x.fillRect(0, 0, cw, ch); }
+        cv.toBlob((b) => { if (b) this.dl(URL.createObjectURL(b), c.name + ' (изм.).jpg'); }, 'image/jpeg', 0.92);
+      } catch (err) { this.say('Не удалось экспортировать снимок'); }
+    }; img.src = c.src;
+  }
+  dl(href, name) { try { const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove(); this.say(`«${name}» сохраняется в Загрузки`); } catch (e) { this.say('Скачивание недоступно'); } }
+  aspectOf(e, nat) { const a = ASPECTS.find((x) => x[0] === e.aspect); return !a || !a[2] ? nat : a[2]; }
+  setCC(on) { const v = this.vid(); if (!v) return; const c = this.cur(); let tr = Array.from(v.textTracks || []).find((t) => t.label === 'Русский');
+    if (!tr && c && c.cues && v.addTextTrack) { try { tr = v.addTextTrack('subtitles', 'Русский', 'ru'); c.cues.forEach(([a, b, t]) => { const q = new VTTCue(a, b, t); q.snapToLines = false; q.line = 74; tr.addCue(q); }); } catch (e) { tr = null; } }
+    if (tr) tr.mode = on ? 'showing' : 'hidden'; }
+  vPoke() { this.setState({ ctrlShow: true }); clearTimeout(this.ctT); this.ctT = setTimeout(() => { if (this.state.v.playing) this.setState({ ctrlShow: false }); }, 2600); }
+  onKey(e) {
+    const st = this.state; const tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT') return;
+    const k = e.key; const c = this.cur(); const v = this.vid();
+    if (st.view === 'grid') { if (k === '+' || k === '=') this.up({ tile: Math.min(300, st.tile + 20) }); else if (k === '-') this.up({ tile: Math.max(96, st.tile - 20) }); else return; e.preventDefault(); return; }
+    if (k === 'Escape') { if (st.view === 'edit') this.setState({ view: 'detail', draft: null }); else if (st.showing) this.stopShow(); else this.back(); }
+    else if (st.view === 'edit') return;
+    else if (k === 'ArrowRight' && !(c && c.video && e.shiftKey)) { if (c && c.video && v && e.altKey) v.currentTime += 5; else this.step(1); }
+    else if (k === 'ArrowLeft') this.step(-1);
+    else if (c && c.video && v && (k === ' ' || k === 'k')) { if (v.paused) v.play(); else v.pause(); }
+    else if (c && c.video && v && (k === 'm' || k === 'ь')) v.muted = !v.muted;
+    else if (c && c.video && (k === 'c' || k === 'с')) { const on = !st.v.cc; this.setCC(on); this.setState({ v: { ...st.v, cc: on } }); }
+    else if (c && c.video && v && (k === 'l' || k === 'д')) v.currentTime = Math.min(v.duration || 0, v.currentTime + 10);
+    else if (c && c.video && v && (k === 'j' || k === 'о')) v.currentTime = Math.max(0, v.currentTime - 10);
+    else if (k === 'f' || k === 'а') { if (c && c.video) this.full(); else this.toggleFav(); }
+    else if (k === 'i' || k === 'ш') this.setState({ infoOpen: !st.infoOpen });
+    else if ((k === 'e' || k === 'у') && c && !c.video) this.startEdit();
+    else if (k === 'Delete' || k === 'Backspace') this.remove();
+    else if (k === '+' || k === '=') this.setState({ zoom: Math.min(6, st.zoom * 1.25) });
+    else if (k === '-') { const z = Math.max(1, st.zoom / 1.25); this.setState({ zoom: z, panX: z === 1 ? 0 : st.panX, panY: z === 1 ? 0 : st.panY }); }
+    else if (k === '0') this.setState({ zoom: 1, panX: 0, panY: 0 });
+    else if (k === ' ' && st.showing) this.stopShow();
+    else return;
+    e.preventDefault();
+  }
+  full() { const box = document.querySelector('.vw-vbox'); try { if (document.fullscreenElement) document.exitFullscreen(); else if (box && box.requestFullscreen) box.requestFullscreen(); else this.say('Полноэкранный режим недоступен'); } catch (e) { this.say('Полноэкранный режим недоступен'); } }
+  toggleFav() { const c = this.cur(); if (!c) return; this.up({ favs: { ...this.state.favs, [c.id]: !c.fav } }); this.say(c.fav ? 'Убрано из избранного' : 'Добавлено в избранное'); }
+  remove() { const c = this.cur(); if (!c || c.deleted) return; const ids = this.list().map((x) => x.id); const i = ids.indexOf(c.id); const nx = ids[i + 1] || ids[i - 1];
+    this.up({ deleted: { ...this.state.deleted, [c.id]: Date.now() } }); this.say('Перемещено в «Недавно удалённые»'); if (nx) this.setState({ curId: nx }); else this.back(); }
+  startEdit() { const c = this.cur(); if (!c || c.video) return; this.setState({ view: 'edit', draft: this.ed(c.id), etab: 'adj', infoOpen: false, zoom: 1, panX: 0, panY: 0 }); }
+  renderVals() {
+    const st = this.state; const accent = this.props.themeTint || '#0a84ff';
+    const lum = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return 0; const n = parseInt(m[1], 16); return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+    const onAcc = lum(accent) > 160 ? '#111113' : '#ffffff';
+    const A = this.albums(); const ALL = this.all(); const live = ALL.filter((x) => !x.deleted);
+    const L = st.view === 'grid' ? this.list() : null;
+    const albumName = { all: 'Медиатека', fav: 'Избранное', video: 'Видео', trash: 'Недавно удалённые' }[st.album] || (A.find((a) => a[0] === st.album) || [0, 'Альбом'])[1];
+    const cnt = (f) => live.filter(f).length;
+    const sideItem = (id, name, glyph, col, n) => ({ head: false, item: true, name, glyph, n: n ? String(n) : '', cur: st.album === id ? 'page' : 'false', pick: () => this.setState({ album: id, view: 'grid', q: '' }),
+      icon: `width:22px;height:22px;flex:none;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;background:${col}`,
+      st: `display:flex;align-items:center;gap:9px;height:32px;padding:0 9px;border-radius:7px;background:${st.album === id ? accent : 'transparent'};color:${st.album === id ? onAcc : '#e8e8ec'}` });
+    const side = [{ head: true, item: false, name: 'Фото' }, sideItem('all', 'Медиатека', '▦', '#0a84ff', live.length), sideItem('fav', 'Избранное', '♥', '#ff375f', cnt((x) => x.fav)), sideItem('video', 'Видео', '▶', '#5e5ce6', cnt((x) => x.video)), sideItem('trash', 'Недавно удалённые', '⌫', '#636366', ALL.filter((x) => x.deleted).length),
+      { head: true, item: false, name: 'Альбомы' }, ...A.map(([id, name, col]) => sideItem(id, name, name[0], col, cnt((x) => x.albums.includes(id))))];
+    const sq = this.cfgGet('square');
+    const tileSt = (x, big) => `position:relative;display:block;padding:0;border:0;overflow:hidden;border-radius:${big ? 4 : 3}px;background:#222;${sq ? 'aspect-ratio:1' : `aspect-ratio:${x.w && x.h ? (x.w / x.h).toFixed(3) : 1.5}`};cursor:pointer`;
+    const imgFx = (x) => { const e = st.edits[x.id]; if (!e) return 'width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s ease'; const E = { ...E0, ...e };
+      return `width:100%;height:100%;object-fit:cover;display:block;filter:${cssFilter(E)};transform:rotate(${E.rot + E.straight}deg) scale(${(E.zoom / 100 * (E.rot % 180 ? 1.5 : 1)).toFixed(3)}) scaleX(${E.flip ? -1 : 1})`; };
+    const vigFx = (x) => { const e = st.edits[x.id]; return e && e.vig ? `position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,${(e.vig / 110).toFixed(2)}) 100%)` : 'display:none'; };
+    let groups = [];
+    if (L) { const byM = {}; L.forEach((x) => { const k = x.date.slice(0, 7); (byM[k] = byM[k] || []).push(x); });
+      groups = Object.keys(byM).sort().reverse().map((k) => { const items = byM[k]; const [y, m] = k.split('-'); const places = [...new Set(items.map((x) => x.place).filter(Boolean))].slice(0, 2);
+        return { title: `${MONTHS[+m - 1]} ${y}`, sub: `${items.length} ${items.length % 10 === 1 && items.length % 100 !== 11 ? 'объект' : [2, 3, 4].includes(items.length % 10) && ![12, 13, 14].includes(items.length % 100) ? 'объекта' : 'объектов'}${this.cfgGet('meta') && places.length ? ' · ' + places.join(', ') : ''}`,
+          items: items.map((x) => ({ label: (x.video ? 'Видео: ' : 'Фото: ') + x.name, thumb: x.thumb, isVideo: !!x.video, dur: fmtDur(x.dur), fav: x.fav, edited: !!st.edits[x.id], open: () => this.open(x.id), st: tileSt(x), imgSt: imgFx(x), vig: vigFx(x) })) }; }); }
+    const gridSt = `display:grid;grid-template-columns:repeat(auto-fill,minmax(${st.tile}px,1fr));gap:3px`;
+    // current
+    const c = st.view !== 'grid' ? this.cur() : null;
+    const E = st.view === 'edit' && st.draft ? st.draft : c ? this.ed(c.id) : E0;
+    const d = c ? new Date(c.date) : null;
+    const when = d ? `${d.getDate()} ${MONTHS_G[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}${c.place && this.cfgGet('meta') ? ' · ' + c.place : ''}` : '';
+    const curV = c ? { title: c.name, when, src: c.src, poster: c.posterUrl || c.poster || '', isPhoto: !c.video, isVideo: !!c.video, fav: String(!!c.fav), caption: st.captions[c.id] || '' } : { title: '', when: '', src: '', poster: '', isPhoto: false, isVideo: false, fav: 'false', caption: '' };
+    // stage
+    const editing = st.view === 'edit'; const crop = editing && st.etab === 'crop';
+    const nat = c && c.w && c.h ? c.w / c.h : 1.5; const rotQ = ((E.rot % 360) + 360) % 360; const natR = rotQ % 180 ? 1 / nat : nat;
+    const ar = this.aspectOf(E, natR); const infoW = st.infoOpen && st.view === 'detail' ? 280 : 0; const sideW = 0;
+    const stageW = 1366 - (editing ? 300 : infoW) - sideW - 80, stageH = 836 - 52 - (st.view === 'detail' ? 66 : 0) - 60;
+    let fw = stageW, fh = fw / ar; if (fh > stageH) { fh = stageH; fw = fh * ar; }
+    const hasCrop = E.aspect !== 'orig' || E.zoom !== 100 || E.straight !== 0 || E.ox || E.oy;
+    const frameSt = `position:relative;width:${Math.round(fw)}px;height:${Math.round(fh)}px;overflow:${hasCrop || editing ? 'hidden' : 'visible'};transform:translate(${st.panX}px,${st.panY}px) scale(${st.zoom});transition:${VW.panning ? 'none' : 'transform .25s ease'};${crop ? 'outline:2px solid rgba(255,255,255,.9);outline-offset:0;box-shadow:0 0 0 2000px rgba(0,0,0,.45)' : 'box-shadow:0 10px 40px rgba(0,0,0,.5)'};border-radius:${crop ? 0 : 3}px;animation:vwFade .35s ease both`;
+    const sz = (E.zoom / 100) * (1 + Math.abs(E.straight) / 40);
+    const photoSt = `position:absolute;left:50%;top:50%;width:${rotQ % 180 ? Math.round(fh) : Math.round(fw)}px;height:${rotQ % 180 ? Math.round(fw) : Math.round(fh)}px;object-fit:cover;filter:${cssFilter(E)};transform:translate(-50%,-50%) translate(${E.ox}%,${E.oy}%) rotate(${E.rot + E.straight}deg) scale(${sz.toFixed(3)}) scaleX(${E.flip ? -1 : 1});transition:${VW.dragCrop ? 'none' : 'filter .2s,transform .3s ease'};user-select:none`;
+    const vigSt = E.vig ? `position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,${(E.vig / 110).toFixed(2)}) 100%)` : 'display:none';
+    const stageSt = `flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:${crop ? 'move' : st.zoom > 1 ? (VW.panning ? 'grabbing' : 'grab') : 'default'};touch-action:none`;
+    // strip
+    const ids = this.list().map((x) => x.id); const ci = ids.indexOf(st.curId); const byId = Object.fromEntries(ALL.map((x) => [x.id, x]));
+    const strip = st.view === 'detail' ? ids.slice(Math.max(0, ci - 8), ci + 9).map((id) => { const x = byId[id]; const on = id === st.curId;
+      return { label: x.name, thumb: x.thumb, open: () => { this.setState({ curId: id, zoom: 1, panX: 0, panY: 0 }); setTimeout(() => this.syncVideo(), 60); }, st: `width:${on ? 64 : 36}px;height:48px;flex:none;padding:0;border:0;border-radius:4px;overflow:hidden;opacity:${on ? 1 : 0.6};transition:width .25s ease,opacity .2s;box-shadow:${on ? '0 0 0 2px ' + accent : 'none'}` }; }) : [];
+    // video
+    const V = st.v; const pct = V.d ? V.t / V.d * 100 : 0;
+    const iconBtn = 'width:32px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#d6d6dc';
+    const albumChips = c ? A.map(([id, name, col]) => { const on = c.albums.includes(id); return { name, on: String(on), toggle: () => { const cur = (st.extraAlb[c.id] || []).filter((a) => a !== id && a !== '-' + id); this.up({ extraAlb: { ...st.extraAlb, [c.id]: [...cur, on ? '-' + id : id] } }); },
+      st: `height:28px;padding:0 11px;border-radius:14px;font-size:12px;font-weight:600;background:${on ? col : 'rgba(255,255,255,.07)'};color:${on ? '#fff' : '#c9c9cf'}` }; }) : [];
+    const infoRows = c ? [['Тип', c.video ? 'Видео' : (extOf(c.file) || 'Изображение').toUpperCase()], ['Размер', `${c.w && c.h ? `${c.w}×${c.h} · ` : ''}${fmtSize(c.size || 0)}`], c.video ? ['Длительность', fmtDur(c.dur || V.d)] : ['Камера', c.local ? '—' : 'AshenCam · f/1.8 · 1/250'], ['Место', c.place || '—'], ['Файл', c.local ? c.file : '~/Изображения/' + c.file], ['Правка', st.edits[c.id] ? 'Есть изменения' : 'Оригинал']].map(([k, v]) => ({ k, v })) : [];
+    // edit panel
+    const D = st.draft || E0;
+    const sl = (key, name, min, max, unit) => ({ name, min, max, v: D[key], text: (D[key] > 0 && min < 0 ? '+' : '') + D[key] + (unit || ''), set: (e) => this.setDraft({ [key]: +e.target.value, filter: key === 'zoom' || key === 'straight' ? D.filter : 'custom' }), reset: () => this.setDraft({ [key]: E0[key] }),
+      valSt: `margin-left:auto;font:600 12px 'JetBrains Mono',monospace;color:${D[key] !== E0[key] ? accent : '#6f6f77'};padding:2px 4px;border-radius:5px` });
+    const adj = ADJ.map(([k, n, mi, ma]) => sl(k, n, mi, ma));
+    const filters = FILTERS.map(([id, name, p]) => { const fx = { ...E0, ...p }; return { name, on: String(D.filter === id), src: c ? c.thumb : '', pick: () => this.setDraft({ ...Object.fromEntries(ADJ.map(([k]) => [k, 0])), ...p, filter: id }),
+      box: `display:block;aspect-ratio:1.3;border-radius:9px;overflow:hidden;box-shadow:${D.filter === id ? '0 0 0 2.5px ' + accent : '0 0 0 1px rgba(255,255,255,.08)'}`, imgSt: `width:100%;height:100%;object-fit:cover;display:block;filter:${cssFilter(fx)}` }; });
+    const aspects = ASPECTS.filter((a) => a[0] !== 'free').map(([id, name]) => ({ name, on: String(D.aspect === id), pick: () => this.setDraft({ aspect: id, ox: 0, oy: 0 }), st: `height:28px;padding:0 11px;border-radius:14px;font-size:12px;font-weight:600;background:${D.aspect === id ? '#f2f2f4' : 'rgba(255,255,255,.07)'};color:${D.aspect === id ? '#111113' : '#c9c9cf'}` }));
+    const cropSl = [sl('zoom', 'Масштаб', 100, 300, '%'), sl('straight', 'Выпрямление', -20, 20, '°')];
+    const etabs = [['adj', 'Коррекция'], ['fil', 'Фильтры'], ['crop', 'Обрезка']].map(([id, name]) => ({ name, on: String(st.etab === id), pick: () => this.setState({ etab: id }), st: `flex:1;height:26px;border-radius:6px;font:600 12.5px Inter,sans-serif;background:${st.etab === id ? '#636366' : 'transparent'};color:${st.etab === id ? '#fff' : '#a1a1a8'}` }));
+    const empty = !!L && !L.length;
+    return {
+      winTheme: this.props.themeWin || 'rgba(22,22,24,0.97)', accent,
+      isGrid: st.view === 'grid', isDetail: st.view === 'detail', isEdit: editing, showStage: st.view !== 'grid' && !!c,
+      sideOpen: String(st.sideOpen), toggleSide: () => this.up({ sideOpen: !st.sideOpen }), showSide: st.view === 'grid' && st.sideOpen,
+      albumName, albumSub: L ? `${L.length} ${L.length % 10 === 1 && L.length % 100 !== 11 ? 'объект' : [2, 3, 4].includes(L.length % 10) && ![12, 13, 14].includes(L.length % 100) ? 'объекта' : 'объектов'}${st.album === 'trash' && L.length ? ' · хранятся 30 дней' : ''}` : '',
+      tile: st.tile, onTile: (e) => this.up({ tile: +e.target.value }), q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      onImport: (e) => { this.importFiles(e.target.files); try { e.target.value = ''; } catch (x) {} }, startShow: () => this.startShow(), stopShow: () => this.stopShow(), showing: st.showing,
+      showPos: st.showing ? `${Math.max(1, this.list().filter((x) => !x.video).findIndex((x) => x.id === st.curId) + 1)} из ${this.list().filter((x) => !x.video).length}` : '',
+      side, newAlbum: () => { const n = st.albumsUser.length + 1; const id = 'ua' + Date.now().toString(36); this.up({ albumsUser: [...st.albumsUser, { id, name: `Альбом ${n}` }] }); this.setState({ album: id }); this.say(`Создан «Альбом ${n}». Добавляйте снимки через ⓘ → Альбомы`); },
+      empty, emptyTitle: st.q ? 'Ничего не найдено' : st.album === 'trash' ? 'Корзина пуста' : st.album === 'import' ? 'Здесь появятся ваши файлы' : 'Пусто', emptyText: st.q ? 'Попробуйте другое название или место' : st.album === 'import' ? 'Нажмите «Импорт» или перетащите фото и видео в окно' : 'Добавьте снимки через панель сведений',
+      groups, gridSt,
+      back: () => this.back(), cur: curV, inTrash: !!(c && c.deleted), notTrash: !(c && c.deleted),
+      restore: () => { const dd = { ...st.deleted }; delete dd[c.id]; this.up({ deleted: dd }); this.say('Восстановлено'); this.back(); },
+      purge: () => { if (c.local) this.setState({ imported: st.imported.filter((x) => x.id !== c.id) }); const dd = { ...st.deleted, [c.id]: -1 }; this.up({ deleted: dd, favs: { ...st.favs, [c.id]: false } }); this.say('Удалено навсегда'); this.back(); },
+      zoomText: st.zoom > 1.001 ? Math.round(st.zoom * 100) + '%' : '', zoomIn: () => this.setState({ zoom: Math.min(6, st.zoom * 1.25) }), zoomOut: () => { const z = Math.max(1, st.zoom / 1.25); this.setState({ zoom: z, panX: z === 1 ? 0 : st.panX, panY: z === 1 ? 0 : st.panY }); },
+      iconBtn, favLabel: c && c.fav ? 'Убрать из избранного' : 'В избранное', favFill: c && c.fav ? 'currentColor' : 'none', toggleFav: () => this.toggleFav(),
+      favBtn: `${iconBtn};color:${c && c.fav ? '#ff375f' : '#d6d6dc'}`, infoOpen: String(st.infoOpen), toggleInfo: () => this.setState({ infoOpen: !st.infoOpen }),
+      infoBtn: `${iconBtn};background:${st.infoOpen ? 'rgba(255,255,255,.12)' : 'transparent'}`,
+      rotate: () => { if (!c) return; if (editing) this.setDraft({ rot: (D.rot + 270) % 360 }); else { const e = this.ed(c.id); this.up({ edits: { ...st.edits, [c.id]: { ...e, rot: (e.rot + 270) % 360 } } }); } },
+      flip: () => this.setDraft({ flip: !D.flip }), flipBtn: `flex:1;height:34px;border-radius:9px;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;background:${D.flip ? accent : 'rgba(255,255,255,.08)'};color:${D.flip ? onAcc : '#e8e8ec'}`,
+      startEdit: () => this.startEdit(), exportCur: () => this.exportCur(), remove: () => this.remove(),
+      cancelEdit: () => this.setState({ view: 'detail', draft: null }), resetEdit: () => this.setState({ draft: { ...E0 } }),
+      doneEdit: () => { const changed = JSON.stringify({ ...E0, ...D, filter: 0 }) !== JSON.stringify({ ...E0, filter: 0 }); const ed = { ...st.edits }; if (changed) ed[c.id] = D; else delete ed[c.id]; this.up({ edits: ed }); this.setState({ view: 'detail', draft: null }); this.say(changed ? 'Изменения сохранены — оригинал не тронут' : 'Возвращён оригинал'); },
+      doneBtn: `height:30px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:700;background:${accent};color:${onAcc}`,
+      stageSt, frameSt, photoSt, vigSt, showThirds: crop,
+      panDown: (e) => { if (crop) { VW.dragCrop = { x: e.clientX, y: e.clientY, ox: D.ox, oy: D.oy }; e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId); return; } if (st.zoom <= 1) return; VW.panning = { x: e.clientX - st.panX, y: e.clientY - st.panY }; e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId); this.setState({}); },
+      panMove: (e) => { if (c && c.video) { const n = Date.now(); if (!st.ctrlShow || n - (VW.poke || 0) > 700) { VW.poke = n; this.vPoke(); } } if (VW.dragCrop) { const g = VW.dragCrop; const lim = Math.max(0, (sz - 1) * 50 + 8); this.setDraft({ ox: Math.max(-lim, Math.min(lim, Math.round(g.ox + (e.clientX - g.x) / fw * 100))), oy: Math.max(-lim, Math.min(lim, Math.round(g.oy + (e.clientY - g.y) / fh * 100))) }); return; } if (!VW.panning) return; this.setState({ panX: e.clientX - VW.panning.x, panY: e.clientY - VW.panning.y }); },
+      panUp: () => { VW.dragCrop = null; if (VW.panning) { VW.panning = null; this.setState({}); } },
+      dbl: (e) => { if (editing || (c && c.video)) return; if (st.zoom > 1) this.setState({ zoom: 1, panX: 0, panY: 0 }); else { const r = e.currentTarget.getBoundingClientRect(); const dx = e.clientX - r.left - r.width / 2, dy = e.clientY - r.top - r.height / 2; this.setState({ zoom: 2.5, panX: -dx * 1.5, panY: -dy * 1.5 }); } },
+      onWheel: (e) => { if (crop) { this.setDraft({ zoom: Math.max(100, Math.min(300, D.zoom - Math.sign(e.deltaY) * 8)) }); return; } if (editing || (c && c.video)) return; const z = Math.max(1, Math.min(6, st.zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12))); this.setState({ zoom: z, panX: z === 1 ? 0 : st.panX, panY: z === 1 ? 0 : st.panY }); },
+      navArrows: st.view === 'detail' && ids.length > 1, prev: () => this.step(-1), next: () => this.step(1), strip,
+      // video
+      vTime: (e) => { const v = e.target; this.setState({ v: { ...this.state.v, t: v.currentTime, d: v.duration || this.state.v.d } }); },
+      vMeta: (e) => { const v = e.target; this.setState({ v: { ...this.state.v, d: v.duration } }); this.syncVideo(); },
+      vPlay: () => { this.setState({ v: { ...this.state.v, playing: true, started: true } }); this.vPoke(); }, vPause: () => this.setState({ v: { ...this.state.v, playing: false }, ctrlShow: true }), vEnd: () => this.setState({ v: { ...this.state.v, playing: false }, ctrlShow: true }),
+      vProg: (e) => { const v = e.target; try { if (v.buffered.length) this.setState({ v: { ...this.state.v, buf: v.buffered.end(v.buffered.length - 1) } }); } catch (x) {} },
+      vVol: (e) => { const v = e.target; this.setState({ v: { ...this.state.v, vol: v.volume, muted: v.muted } }); },
+      vToggle: () => { const v = this.vid(); if (!v) return; if (v.paused) v.play().catch(() => this.say('Не удалось воспроизвести')); else v.pause(); },
+      vBig: !!(c && c.video && !V.playing && !V.started),
+      vSeek: (e) => { const v = this.vid(); if (!v || !v.duration) return; const r = e.currentTarget.getBoundingClientRect(); v.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * v.duration; this.vPoke(); },
+      vBack: () => { const v = this.vid(); if (v) v.currentTime = Math.max(0, v.currentTime - 10); }, vFwd: () => { const v = this.vid(); if (v) v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); },
+      vMute: () => { const v = this.vid(); if (v) v.muted = !v.muted; }, vSetVol: (e) => { const v = this.vid(); if (v) { v.volume = +e.target.value / 100; v.muted = false; } },
+      vVolV: Math.round((V.muted ? 0 : V.vol) * 100), vMuteLabel: V.muted ? 'Включить звук' : 'Выключить звук', vVolPath: V.muted || V.vol === 0 ? 'M16 9.5l5 5M21 9.5l-5 5' : V.vol < 0.5 ? 'M15.5 9a4 4 0 0 1 0 6' : 'M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11',
+      vSpeed: () => { const R = [0.5, 0.75, 1, 1.25, 1.5, 2]; const r = R[(R.indexOf(V.rate) + 1) % R.length]; const v = this.vid(); if (v) v.playbackRate = r; this.setState({ v: { ...V, rate: r } }); this.say('Скорость ×' + String(r).replace('.', ',')); },
+      vRate: String(V.rate).replace('.', ',') + '×',
+      vCC: () => { const on = !V.cc; this.setCC(on); this.setState({ v: { ...V, cc: on } }); if (on && c && !c.cues) this.say('У этого видео нет субтитров'); }, vCCOn: String(V.cc),
+      vCCSt: `width:auto;padding:0 8px;font:800 11.5px Inter,sans-serif;letter-spacing:.04em;border-radius:6px;${V.cc ? `background:#f2f2f4;color:#111113` : ''}`,
+      vLoop: () => { const v = this.vid(); if (v) v.loop = !V.loop; this.setState({ v: { ...V, loop: !V.loop } }); }, vLoopOn: String(V.loop), vLoopSt: V.loop ? `color:${accent}` : '',
+      vPip: () => { const v = this.vid(); try { if (document.pictureInPictureElement) document.exitPictureInPicture(); else if (v && v.requestPictureInPicture) v.requestPictureInPicture().catch(() => this.say('«Картинка в картинке» недоступна здесь')); else this.say('«Картинка в картинке» недоступна здесь'); } catch (x) { this.say('«Картинка в картинке» недоступна здесь'); } },
+      vFull: () => this.full(),
+      vCur: fmtDur(V.t), vDur: fmtDur(V.d || (c && c.dur)), vPct: String(Math.round(pct)), vPlayLabel: V.playing ? 'Пауза' : 'Воспроизвести', vPlayPath: V.playing ? 'M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z' : 'M7 4.5v15l12-7.5z',
+      vBufSt: `position:absolute;left:0;height:5px;border-radius:3px;width:${V.d ? Math.min(100, V.buf / V.d * 100) : 0}%;background:rgba(255,255,255,.28)`,
+      vFillSt: `position:absolute;left:0;height:5px;border-radius:3px;width:${pct}%;background:${accent}`,
+      vKnobSt: `position:absolute;left:calc(${pct}% - 7px);width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5)`,
+      ctrlSt: `position:absolute;left:50%;bottom:18px;translate:-50% 0;width:min(860px,calc(100% - 40px));display:flex;flex-direction:column;gap:8px;padding:12px 16px 10px;border-radius:18px;background:rgba(28,28,30,.72);backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 40px rgba(0,0,0,.45);transition:opacity .3s,transform .3s;opacity:${st.ctrlShow || !V.playing ? 1 : 0};transform:translateY(${st.ctrlShow || !V.playing ? 0 : 10}px)`,
+      // info + edit
+      showInfo: st.view === 'detail' && st.infoOpen && !!c, infoRows, albumChips, onCaption: (e) => this.up({ captions: { ...st.captions, [c.id]: e.target.value } }),
+      etabs, tabAdj: st.etab === 'adj', tabFil: st.etab === 'fil', tabCrop: st.etab === 'crop', adj, filters, aspects, cropSl,
+      autoFix: () => this.setDraft({ exp: 8, con: 14, sat: 18, warm: 6, filter: 'custom' }),
+      dragOn: st.dragOn, dropSt: `position:absolute;inset:12px;z-index:6;border-radius:18px;border:2px dashed ${accent};background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;pointer-events:none`,
+      onDragOver: (e) => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) { e.preventDefault(); if (!st.dragOn) this.setState({ dragOn: true }); } },
+      onDragLeave: (e) => { if (!e.currentTarget.contains(e.relatedTarget)) this.setState({ dragOn: false }); },
+      onDrop: (e) => { if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) { e.preventDefault(); this.importFiles(e.dataTransfer.files); } this.setState({ dragOn: false }); },
+      onKey: (e) => { this.onKey(e); if (c && c.video) this.vPoke(); },
+      toast: st.toast,
+      cfg: this.cfgView('Настройки «Фото»'), cfgOpen: () => this.setState({ cfgOpen: true }),
+      closeApp: () => this.props.onClose && this.props.onClose(), minApp: () => this.props.onMinimize && this.props.onMinimize(), maxApp: () => this.props.onMaximize && this.props.onMaximize()
+    };
+  }
+}
+const extOf = (n) => { const m = /\.([^.]+)$/.exec(n || ''); return m ? m[1] : ''; };
+</script>
+</body>
+</html>

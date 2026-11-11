@@ -28,39 +28,44 @@ body{margin:0;background:#050506}
 .set-nav:hover{background:rgba(255,255,255,.05)}
 .set-opt:hover{filter:brightness(1.15)}
 .set-range{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:transparent;outline:none}
-.set-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f2f2f4;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.set-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.45)}
 .set-range::-moz-range-thumb{width:18px;height:18px;border:0;border-radius:50%;background:#f2f2f4}
 .set-select{appearance:none;-webkit-appearance:none}
 </style>
 </helmet>
 
 <div style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #e8e8ec; -webkit-font-smoothing: antialiased; background: radial-gradient(120% 90% at 100% 110%, #1b1b1f 0%, #0b0b0d 60%), #0b0b0d">
-  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: {{winTheme}}; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
+  <section aria-label="Параметры системы" style="position: absolute; left: 36px; top: 32px; width: 1368px; height: 836px; display: flex; flex-direction: column; border-radius: 22px; background: #1e1e20; border: 1px solid rgba(255,255,255,0.13); box-shadow: 0 40px 120px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07); overflow: hidden; animation: setIn .5s cubic-bezier(.2,1.1,.3,1) both">
 
     <div style="flex: 1; min-height: 0; display: flex">
       <!-- ===== sidebar ===== -->
-      <aside aria-label="Разделы" style="width: 316px; flex: none; display: flex; flex-direction: column; background: #0a0a0b; border-right: 1px solid rgba(255,255,255,0.06)">
-        <div style="height: 58px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px">
+      <aside aria-label="Разделы" style="width: 270px; flex: none; display: flex; flex-direction: column; background: rgba(40,40,44,0.72); border-right: 1px solid rgba(0,0,0,0.5)">
+        <div style="height: 52px; flex: none; display: flex; align-items: flex-end; gap: 8px; padding: 0 10px 6px 12px">
           <sc-if value="{{inSub}}" hint-placeholder-val="{{false}}">
             <button aria-label="Назад" onClick="{{back}}" style="width: 36px; height: 36px; flex: none; border-radius: 10px; border: 0; display: flex; align-items: center; justify-content: center; color: #e8e8ec; background: rgba(255,255,255,0.06)"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
           </sc-if>
-          <label style="flex: 1; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06)">
+          <label style="flex: 1; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 9px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05)">
             <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-            <input aria-label="Поиск" placeholder="Поиск…" value="{{q}}" onInput="{{onQ}}" style="flex: 1; min-width: 0; height: 34px; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 13px Inter, sans-serif">
+            <input aria-label="Поиск" placeholder="Поиск…" value="{{q}}" onInput="{{onQ}}" style="flex: 1; min-width: 0; height: 28px; border: 0; outline: none; background: transparent; color: #f2f2f4; font: 13px Inter, sans-serif">
           </label>
-          <button aria-label="Меню" onClick="{{menuTap}}" style="width: 36px; height: 36px; flex: none; border-radius: 10px; border: 0; display: flex; align-items: center; justify-content: center; color: #e8e8ec; background: transparent"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+          
         </div>
         <sc-if value="{{inSub}}" hint-placeholder-val="{{false}}">
           <div style="padding: 2px 16px 8px; font-size: 15px; font-weight: 700">{{subTitle}}</div>
         </sc-if>
-        <div class="set-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: 0 10px 12px">
+        <div class="set-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; padding: 4px 10px 12px">
+          <button onClick="{{acctPick}}" style="{{acctSt}}">
+            <span aria-hidden="true" style="width: 40px; height: 40px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 600 16px Inter, sans-serif; color: #fff; background: linear-gradient(160deg, #8e8e93, #48484a)">A</span>
+            <span style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; min-width: 0"><span style="font-size: 13.5px; font-weight: 600">alarm</span><span style="font-size: 11.5px; color: #9a9aa2">Учётная запись AshenOS</span></span>
+          </button>
+
           <sc-for list="{{nav}}" as="n" hint-placeholder-count="14">
             <sc-if value="{{n.head}}" hint-placeholder-val="{{false}}">
-              <div style="flex: none; padding: 18px 12px 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #7d7d86">{{n.cat}}</div>
+              <div aria-hidden="true" style="flex: none; height: 12px"></div>
             </sc-if>
             <button class="set-nav" aria-current="{{n.current}}" onClick="{{n.pick}}" style="{{n.style}}">
               <span aria-hidden="true" style="{{n.icon}}">{{n.glyph}}</span>
-              <span style="flex: 1; min-width: 0; text-align: left; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.name}}</span>
+              <span style="flex: 1; min-width: 0; text-align: left; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{n.name}}</span>
               <span style="{{n.badge}}">{{n.changed}}</span>
               <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b8b93" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="{{n.chev}}"><path d="m9 6 6 6-6 6"></path></svg>
             </button>
@@ -69,31 +74,33 @@ body{margin:0;background:#050506}
             <div style="padding: 20px 10px; font-size: 13px; color: #8b8b93; text-align: center">Ничего не найдено</div>
           </sc-if>
         </div>
-        <div style="flex: none; padding: 8px 10px 10px; border-top: 1px solid rgba(255,255,255,0.06)">
+        <div style="flex: none; padding: 6px 10px 10px">
           <button aria-pressed="{{hl}}" onClick="{{toggleHl}}" style="{{hlBtn}}">
             <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path><path d="m13.5 6.5 4 4"></path></svg>
-            Выделять изменённые параметры
+            Выделять изменённые
           </button>
         </div>
       </aside>
 
       <!-- ===== page ===== -->
-      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #050506">
-        <header style="height: 58px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 22px; border-bottom: 1px solid rgba(255,255,255,0.06)">
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #1e1e20">
+        <header style="height: 52px; flex: none; display: flex; align-items: center; gap: 4px; padding: 0 8px 0 14px; border-bottom: 1px solid rgba(0,0,0,0.45); background: rgba(255,255,255,0.025)">
+          <button aria-label="Назад" onClick="{{goBack}}" style="{{navBack}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+          <button aria-label="Вперёд" onClick="{{goFwd}}" style="{{navFwd}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></button>
+          <span style="margin-left: 8px; font-size: 15px; font-weight: 700">{{cur.name}}</span>
           <div class="tl" role="group" aria-label="Управление окном" style="margin-left:auto">
         <button class="tl-b" aria-label="Закрыть окно" title="Закрыть" onClick="{{closeApp}}"><i style="background:#ff5f57"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#4d0000" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 2.6l4.8 4.8M7.4 2.6 2.6 7.4"></path></svg></i></button>
         <button class="tl-b" aria-label="Свернуть" title="Свернуть" onClick="{{minApp}}"><i style="background:#febc2e"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="#985700" stroke-width="1.7" stroke-linecap="round"><path d="M2.2 5h5.6"></path></svg></i></button>
         <button class="tl-b" aria-label="Во весь экран" title="Во весь экран" onClick="{{maxApp}}"><i style="background:#28c840"><svg aria-hidden="true" width="9" height="9" viewBox="0 0 10 10" fill="#0a5f12"><path d="M2.4 2.4h4L2.4 6.4z"></path><path d="M7.6 7.6h-4l4-4z"></path></svg></i></button>
       </div>
-      <span style="font-size: 14px; font-weight: 600; color: #a1a1a8">Параметры системы</span>
-        </header>
+              </header>
 
         <main class="set-scroll" style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 22px 30px 30px">
-         <div style="width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 18px">
-          <div style="display: flex; align-items: center; gap: 16px; padding: 2px 4px 4px; animation: setPage .3s ease both">
+         <div style="width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 10px 4px 6px; animation: setPage .3s ease both">
             <span aria-hidden="true" style="{{heroIcon}}">{{cur.glyph}}</span>
-            <span style="display: flex; flex-direction: column; gap: 3px">
-              <span style="font-size: 24px; font-weight: 700; letter-spacing: -0.015em">{{cur.name}}</span>
+            <span style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+              <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">{{cur.name}}</span>
               <span style="font-size: 13px; color: #8b8b93">{{crumb}}</span>
             </span>
           </div>
@@ -211,12 +218,13 @@ body{margin:0;background:#050506}
           </sc-if>
 
           <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; gap: 7px">
+            <div style="padding: 0 10px; font-size: 13px; font-weight: 700; color: #e5e5ea">{{g.title}}</div>
             <section aria-label="{{g.title}}" style="{{g.style}}">
-              <div style="padding: 12px 16px 6px; font-size: 13px; font-weight: 700; color: #f2f2f4">{{g.title}}</div>
               <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
               <div style="{{r.rowStyle}}">
                 <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1">
-                  <span style="font-size: 14px; font-weight: 500">{{r.label}}</span>
+                  <span style="font-size: 13.5px; font-weight: 400; color: #f2f2f4">{{r.label}}</span>
                   <span style="{{r.hintStyle}}">{{r.hint}}</span>
                 </div>
 
@@ -225,17 +233,17 @@ body{margin:0;background:#050506}
                 </sc-if>
 
                 <sc-if value="{{r.is.slider}}" hint-placeholder-val="{{false}}">
-                  <div style="display: flex; align-items: center; gap: 12px; width: 340px; flex: none">
-                    <span style="position: relative; flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12)">
+                  <div style="display: flex; align-items: center; gap: 12px; width: 300px; flex: none">
+                    <span style="position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.16)">
                       <span style="{{r.fill}}"></span>
-                      <input class="set-range" type="range" min="{{r.min}}" max="{{r.max}}" value="{{r.v}}" aria-label="{{r.label}}" onInput="{{r.set}}" style="position: absolute; left: -2px; right: -2px; top: -6px; width: calc(100% + 4px); height: 18px; margin: 0; background: transparent">
+                      <input class="set-range" type="range" min="{{r.min}}" max="{{r.max}}" value="{{r.v}}" aria-label="{{r.label}}" onInput="{{r.set}}" style="position: absolute; left: -2px; right: -2px; top: -7px; width: calc(100% + 4px); height: 18px; margin: 0; background: transparent">
                     </span>
                     <span style="width: 64px; text-align: right; font: 600 12.5px 'JetBrains Mono', monospace">{{r.text}}</span>
                   </div>
                 </sc-if>
 
                 <sc-if value="{{r.is.seg}}" hint-placeholder-val="{{false}}">
-                  <div role="radiogroup" aria-label="{{r.label}}" style="display: flex; gap: 3px; padding: 3px; border-radius: 12px; background: rgba(255,255,255,0.06); flex: none">
+                  <div role="radiogroup" aria-label="{{r.label}}" style="display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgba(255,255,255,0.08); flex: none">
                     <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3">
                       <button class="set-opt" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="{{o.style}}">{{o.name}}</button>
                     </sc-for>
@@ -244,10 +252,10 @@ body{margin:0;background:#050506}
 
                 <sc-if value="{{r.is.select}}" hint-placeholder-val="{{false}}">
                   <span style="position: relative; display: flex; flex: none">
-                    <select class="set-select" aria-label="{{r.label}}" onChange="{{r.set}}" value="{{r.v}}" style="height: 36px; min-width: 220px; padding: 0 36px 0 12px; border-radius: 11px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.06); color: #f2f2f4; font: 500 13px Inter, sans-serif; outline: none">
+                    <select class="set-select" aria-label="{{r.label}}" onChange="{{r.set}}" value="{{r.v}}" style="height: 26px; min-width: 170px; padding: 0 28px 0 10px; border-radius: 7px; border: 0; box-shadow: 0 1px 1px rgba(0,0,0,0.3); background: rgba(255,255,255,0.12); color: #f2f2f4; font: 500 13px Inter, sans-serif; outline: none">
                       <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><option value="{{o.name}}">{{o.name}}</option></sc-for>
                     </select>
-                    <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a1a1a8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 12px; top: 12px; pointer-events: none"><path d="m6 9 6 6 6-6"></path></svg>
+                    <svg aria-hidden="true" width="11" height="13" viewBox="0 0 12 16" fill="none" stroke="#e8e8ec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 9px; top: 6.5px; pointer-events: none"><path d="m3 6 3-3 3 3M3 10l3 3 3-3"></path></svg>
                   </span>
                 </sc-if>
 
@@ -284,24 +292,17 @@ body{margin:0;background:#050506}
               </sc-if>
             </sc-for>
             </section>
+            </div>
           </sc-for>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 4px 2px 10px">
+            <button onClick="{{resetSec}}" style="height: 26px; padding: 0 12px; border-radius: 7px; border: 0; font: 500 13px Inter, sans-serif; color: #f2f2f4; background: rgba(255,255,255,0.12); box-shadow: 0 1px 1px rgba(0,0,0,0.3)">По умолчанию…</button>
+            <span style="flex: 1"></span>
+            <button aria-label="Справка" onClick="{{help}}" style="width: 22px; height: 22px; border-radius: 50%; border: 0; font: 600 13px Inter, sans-serif; color: #f2f2f4; background: rgba(255,255,255,0.14); box-shadow: 0 1px 1px rgba(0,0,0,0.3)">?</button>
+          </div>
          </div>
         </main>
 
-        <!-- Plasma-style footer -->
-        <footer style="height: 58px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-top: 1px solid rgba(255,255,255,0.06); background: #0a0a0b">
-          <button onClick="{{help}}" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 0; display: flex; align-items: center; gap: 7px; font: 600 13px Inter, sans-serif; color: #d6d6dc; background: rgba(255,255,255,0.06)">
-            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.5h.01"></path></svg>
-            Справка
-          </button>
-          <button onClick="{{resetSec}}" style="{{defBtn}}">По умолчанию</button>
-          <span style="flex: 1"></span>
-          <button onClick="{{revert}}" style="{{revBtn}}">Сбросить</button>
-          <button onClick="{{apply}}" style="{{applyBtn}}">
-            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
-            Применить
-          </button>
-        </footer>
+        
       </div>
     </div>
     <sc-if value="{{dlg.on}}" hint-placeholder-val="{{false}}">
@@ -998,6 +999,29 @@ const CATS = [
   ] }
 ];
 
+/* macOS-порядок: группы без заголовков, разделы как в System Settings */
+const MAC_ORDER = [
+  ['net', 'bt', 'netset', 'remote'],
+  ['notif', 'sound', 'island', 'capture'],
+  ['behav', 'theme', 'themes', 'fontsP', 'access', 'panel', 'search'],
+  ['wall', 'display', 'power', 'vdesk', 'edges', 'wm'],
+  ['lock', 'users', 'recent'],
+  ['keyboard', 'mouse', 'touchscreen', 'vkbd', 'tablet', 'game', 'printers', 'disks'],
+  ['defapps', 'filetypes', 'shortcuts', 'autostart', 'files'],
+  ['region', 'datetime', 'spell', 'about', 'updates', 'services', 'memory', 'session', 'qtquick', 'feedback']
+];
+const MAC_COL = { net: '#2f7cf6', bt: '#2f7cf6', netset: '#2f7cf6', remote: '#2f7cf6', notif: '#ff453a', sound: '#ff375f', island: '#2c2c2e', capture: '#8e8e93', behav: '#8e8e93', theme: '#1c1c1e', themes: '#bf5af2', fontsP: '#8e8e93', access: '#2f7cf6', panel: '#8e8e93', search: '#8e8e93', wall: '#32ade6', display: '#2f7cf6', power: '#30d158', vdesk: '#5e5ce6', edges: '#8e8e93', wm: '#5e5ce6', lock: '#1c1c1e', users: '#2f7cf6', recent: '#2f7cf6', keyboard: '#8e8e93', mouse: '#8e8e93', touchscreen: '#8e8e93', vkbd: '#8e8e93', tablet: '#8e8e93', game: '#8e8e93', printers: '#8e8e93', disks: '#8e8e93', defapps: '#2f7cf6', filetypes: '#2f7cf6', shortcuts: '#8e8e93', autostart: '#30d158', files: '#2f7cf6', region: '#2f7cf6', datetime: '#2f7cf6', spell: '#8e8e93', about: '#8e8e93', updates: '#8e8e93', services: '#8e8e93', memory: '#8e8e93', session: '#8e8e93', qtquick: '#8e8e93', feedback: '#8e8e93' };
+const MAC_NAME = { net: 'Wi‑Fi и интернет', netset: 'Сеть', behav: 'Основные', theme: 'Оформление', panel: 'Пункт управления и Dock', power: 'Аккумулятор', display: 'Дисплеи', lock: 'Экран блокировки', users: 'Пользователи и группы', mouse: 'Мышь и трекпад', access: 'Универсальный доступ', recent: 'Конфиденциальность' };
+(() => {
+  const byId = {}; CATS.forEach((c) => c.items.forEach((it) => { byId[it.id] = it; }));
+  const NC = MAC_ORDER.map((ids, gi) => ({ cat: 'g' + gi, items: ids.filter((id) => byId[id]).map((id) => ({ ...byId[id], name: MAC_NAME[id] || byId[id].name, bg: MAC_COL[id] || byId[id].bg })) }));
+  const used = new Set(MAC_ORDER.flat());
+  const rest = []; CATS.forEach((c) => c.items.forEach((it) => { if (!used.has(it.id)) rest.push(it); }));
+  if (rest.length) NC.push({ cat: 'g' + NC.length, items: rest });
+  CATS.length = 0; NC.forEach((x) => CATS.push(x));
+})();
+
+const DESC_MAC = { net: 'Подключения Wi‑Fi, Ethernet и VPN', bt: 'Беспроводные устройства поблизости', notif: 'Как приложения сообщают о событиях', sound: 'Громкость, выход и вход звука', island: 'Живые действия, фокус и задачи в острове', theme: 'Светлое, тёмное и акцентный цвет', wall: 'Рабочий стол и экран блокировки', display: 'Разрешение, масштаб и ночной режим', power: 'Аккумулятор, сон и энергосбережение', users: 'Учётные записи и пароли', lock: 'Блокировка экрана и вход', about: 'Сведения о системе AshenOS', keyboard: 'Раскладки, повтор клавиш и сочетания', behav: 'Общие параметры поведения системы' };
 class Component extends DCLogic {
   state = { sec: 'theme', parent: null, q: '', vals: {}, saved: {}, toast: null, keyEdit: null, hl: true, wTarget: 'desk', wPick: null };
   componentDidMount() {
@@ -1052,6 +1076,20 @@ class Component extends DCLogic {
       noFile: !D.file, fileName: st.vpnFile || 'Файл не выбран', onFile: (e) => { const fl = e.target.files && e.target.files[0]; if (fl) this.setState({ vpnFile: fl.name.replace(/\.(conf|ovpn)$/i, '') }); },
       key: (e) => { if (e.key === 'Enter') D.go(); if (e.key === 'Escape') close(); } };
   }
+  doApply(auto) {
+    const st = this.state; const curWallSys = typeof this.props.curWall === 'number' ? this.props.curWall : 4;
+    const wallPick = st.wPick === null || st.wPick === undefined ? curWallSys : st.wPick;
+    try { localStorage.setItem('archSettings.v2', JSON.stringify(st.vals)); } catch (e) {}
+    if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
+    if (this.props.onAction) { const g = (id, d) => (id in st.vals ? st.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true) })); }
+    this.setState({ saved: { ...st.vals }, wPick: null });
+    if (auto !== true) this.say('Изменения применены');
+  }
+  autoApply() { clearTimeout(this.autoT); this.autoT = setTimeout(() => this.doApply(true), 300); }
+  go(sec, parent, extra) {
+    const h = (this.state.hist || [{ sec: this.state.sec, parent: this.state.parent }]).slice(0, (this.state.hi || 0) + 1);
+    h.push({ sec, parent }); this.setState({ sec, parent, hist: h, hi: h.length - 1, ...(extra || {}) });
+  }
   renderVals() {
     const st = this.state;
     const pages = [];
@@ -1059,7 +1097,7 @@ class Component extends DCLogic {
     const groupsOf = (pg) => pg.groups || [];
     const val = (r) => (r.id in st.vals ? st.vals[r.id] : r.v);
     const savedVal = (r) => (r.id in st.saved ? st.saved[r.id] : r.v);
-    const set = (id, v) => { this.setState({ vals: { ...this.state.vals, [id]: v } }); if (id.startsWith('isl_')) this.islSend(id, v); };
+    const set = (id, v) => { this.setState({ vals: { ...this.state.vals, [id]: v } }); if (id.startsWith('isl_')) this.islSend(id, v); this.autoApply(); };
     const ql = st.q.trim().toLowerCase();
     const matchRow = (r) => (r.label + ' ' + (r.hint || '') + ' ' + (Array.isArray(r.opts) ? r.opts.map((o) => Array.isArray(o) ? o.join(' ') : o).join(' ') : '')).toLowerCase().includes(ql);
     const pageHit = (pg) => !ql || pg.name.toLowerCase().includes(ql) || groupsOf(pg).some((g) => g.title.toLowerCase().includes(ql) || g.rows.some(matchRow));
@@ -1067,36 +1105,37 @@ class Component extends DCLogic {
     const wallPick = st.wPick === null ? curWallSys : st.wPick;
     const changedIn = (pg) => groupsOf(pg).reduce((n, g) => n + g.rows.filter((r) => val(r) !== savedVal(r)).length, 0) + (pg.custom === 'wall' && wallPick !== curWallSys ? 1 : 0);
     const cur = pages.find((p) => p.id === st.sec) || pages[0];
-    const icon = (bg, size) => `width:${size}px;height:${size}px;flex:none;border-radius:${Math.round(size * 0.3)}px;display:flex;align-items:center;justify-content:center;font:700 ${Math.round(size * 0.44)}px Inter,sans-serif;background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),${bg};color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 2px 6px rgba(0,0,0,.35)`;
-    const navStyle = (on) => `flex:none;display:flex;align-items:center;gap:12px;height:46px;padding:0 12px 0 10px;border-radius:12px;border:0;color:${on ? '#fff' : '#d6d6dc'};font:inherit;background:${on ? 'rgba(255,255,255,.1)' : 'transparent'};box-shadow:${on ? 'inset 0 0 0 1px rgba(255,255,255,.09)' : 'none'};transition:background .15s`;
+    const ACC = this.props.themeTint || '#2f7cf6';
+    const icon = (bg, size) => `width:${size}px;height:${size}px;flex:none;border-radius:${Math.round(size * 0.26)}px;display:flex;align-items:center;justify-content:center;font:600 ${Math.round(size * 0.5)}px Inter,sans-serif;color:#fff;background:linear-gradient(180deg,${bg}dd,${bg});box-shadow:inset 0 0 0 .5px rgba(255,255,255,.22)`;
+    const navStyle = (on) => `flex:none;display:flex;align-items:center;gap:9px;height:32px;padding:0 8px;border-radius:7px;border:0;color:${on ? '#fff' : '#e8e8ec'};font:inherit;background:${on ? ACC : 'transparent'};transition:background .15s`;
     const badge = (n) => n && st.hl ? 'min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#f2f2f4;color:#0b0b0c' : 'display:none';
     let nav = [];
     const inSub = !ql && st.parent;
     if (ql) {
       let pc = '';
       nav = pages.filter(pageHit).map((pg) => { const head = pg.cat !== pc; pc = pg.cat; const on = pg.id === cur.id; const ch = changedIn(pg);
-        return { cat: pg.cat, head, name: pg.parent ? `${pg.parent.name} › ${pg.name}` : pg.name, glyph: pg.glyph, current: on ? 'page' : 'false', changed: ch ? String(ch) : '', pick: () => this.setState({ sec: pg.id, parent: pg.parent ? pg.parent.id : null }), style: navStyle(on), icon: icon(pg.bg, 30), badge: badge(ch), chev: 'display:none' }; });
+        return { cat: pg.cat, head, name: pg.parent ? `${pg.parent.name} › ${pg.name}` : pg.name, glyph: pg.glyph, current: on ? 'page' : 'false', changed: ch ? String(ch) : '', pick: () => this.go(pg.id, pg.parent ? pg.parent.id : null, { }), style: navStyle(on), icon: icon(pg.bg, 30), badge: badge(ch), chev: 'display:none' }; });
     } else if (inSub) {
       const par = CATS.flatMap((c) => c.items).find((it) => it.id === st.parent);
       nav = (par ? par.children : []).map((ch2) => { const on = ch2.id === cur.id; const n = changedIn(ch2);
-        return { cat: '', head: false, name: ch2.name, glyph: ch2.glyph, current: on ? 'page' : 'false', changed: n ? String(n) : '', pick: () => this.setState({ sec: ch2.id }), style: navStyle(on), icon: icon(ch2.bg, 30), badge: badge(n), chev: 'display:none' }; });
+        return { cat: '', head: false, name: ch2.name, glyph: ch2.glyph, current: on ? 'page' : 'false', changed: n ? String(n) : '', pick: () => this.go(ch2.id, st.parent), style: navStyle(on), icon: icon(ch2.bg, 30), badge: badge(n), chev: 'display:none' }; });
     } else {
       CATS.forEach((c) => c.items.forEach((it, i) => {
         const kids = it.children;
         const on = kids ? kids.some((k) => k.id === cur.id) : it.id === cur.id;
         const n = kids ? kids.reduce((a, k) => a + changedIn(k), 0) : changedIn(it);
         nav.push({ cat: c.cat, head: i === 0, name: it.name, glyph: it.glyph, current: on ? 'page' : 'false', changed: n ? String(n) : '',
-          pick: () => kids ? this.setState({ parent: it.id, sec: kids.some((k) => k.id === st.sec) ? st.sec : kids[0].id }) : this.setState({ sec: it.id, parent: null }),
+          pick: () => kids ? this.go(kids.some((k) => k.id === st.sec) ? st.sec : kids[0].id, it.id) : this.go(it.id, null),
           style: navStyle(on), icon: icon(it.bg, 30), badge: badge(n), chev: kids ? 'flex:none' : 'display:none' });
       }));
     }
     const par2 = cur.parent;
-    const sw = (on) => `width:46px;height:26px;flex:none;border-radius:13px;padding:3px;box-sizing:border-box;border:0;display:flex;background:${on ? '#f2f2f4' : 'rgba(255,255,255,.16)'};transition:background .25s`;
-    const knob = (on) => `width:20px;height:20px;border-radius:50%;background:${on ? '#0b0b0c' : '#f2f2f4'};transform:translateX(${on ? 20 : 0}px);transition:transform .3s cubic-bezier(.34,1.4,.6,1),background .25s`;
-    const segStyle = (on) => `height:30px;padding:0 12px;border-radius:9px;border:0;font:600 12.5px Inter,sans-serif;white-space:nowrap;background:${on ? '#f2f2f4' : 'transparent'};color:${on ? '#0b0b0c' : '#d6d6dc'};transition:background .2s,color .2s`;
+    const sw = (on) => `width:38px;height:22px;flex:none;border-radius:11px;padding:2px;box-sizing:border-box;border:0;display:flex;background:${on ? ACC : 'rgba(255,255,255,.18)'};transition:background .2s`;
+    const knob = (on) => `width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transform:translateX(${on ? 16 : 0}px);transition:transform .22s cubic-bezier(.3,1.3,.5,1)`;
+    const segStyle = (on) => `height:24px;padding:0 11px;border-radius:6px;border:0;font:500 12.5px Inter,sans-serif;white-space:nowrap;background:${on ? '#636366' : 'transparent'};color:#f2f2f4;box-shadow:${on ? '0 1px 2px rgba(0,0,0,.35)' : 'none'};transition:background .15s`;
     const groups = groupsOf(cur).map((g, gi) => ({
       title: g.title,
-      style: `display:flex;flex-direction:column;border-radius:20px;background:#0d0d0f;border:1px solid rgba(255,255,255,.07);box-shadow:0 1px 0 rgba(255,255,255,.03) inset;padding:4px 4px 8px;animation:setPage .35s ease ${(gi * 0.04).toFixed(2)}s both`,
+      style: `display:flex;flex-direction:column;border-radius:12px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.06);overflow:hidden;animation:setPage .3s ease ${(gi * 0.03).toFixed(2)}s both`,
       rows: g.rows.map((r, ri) => {
         const v = val(r), changed = v !== savedVal(r);
         const hit = ql && matchRow(r);
@@ -1104,10 +1143,10 @@ class Component extends DCLogic {
           ...r, v,
           is: { toggle: r.t === 'toggle', slider: r.t === 'slider', seg: r.t === 'seg', select: r.t === 'select', swatch: r.t === 'swatch', info: r.t === 'info', keys: r.t === 'keys', button: r.t === 'button', list: r.t === 'list' },
           hint: r.hint || '', hintStyle: r.hint ? 'font-size:12px;color:#8b8b93;line-height:1.4' : 'display:none',
-          rowStyle: `display:flex;align-items:center;gap:18px;min-height:${r.t === 'list' ? 44 : 58}px;padding:8px 16px;border-radius:12px;${ri && r.t !== 'list' ? 'border-top:1px solid rgba(255,255,255,.05);' : ''}${hit ? 'background:rgba(255,255,255,.06);' : ''}${changed && st.hl ? 'box-shadow:inset 3px 0 0 #f2f2f4;background:rgba(255,255,255,.03);' : ''}`
+          rowStyle: `display:flex;align-items:center;gap:14px;min-height:${r.t === 'list' ? 40 : 44}px;padding:7px 16px;${ri && r.t !== 'list' ? 'border-top:1px solid rgba(255,255,255,.07);' : ''}${hit ? 'background:rgba(255,255,255,.07);' : ''}${changed && st.hl ? `box-shadow:inset 3px 0 0 ${ACC};` : ''}`,
         };
         if (r.t === 'toggle') Object.assign(o, { on: !!v, toggle: () => set(r.id, !v), sw: sw(!!v), knob: knob(!!v) });
-        if (r.t === 'slider') Object.assign(o, { min: r.min, max: r.max, text: `${v}${r.unit}`, set: (e) => set(r.id, +e.target.value), fill: `position:absolute;left:0;top:0;bottom:0;width:${((v - r.min) / (r.max - r.min) * 100).toFixed(1)}%;border-radius:3px;background:#f2f2f4;pointer-events:none` });
+        if (r.t === 'slider') Object.assign(o, { min: r.min, max: r.max, text: `${v}${r.unit}`, set: (e) => set(r.id, +e.target.value), fill: `position:absolute;left:0;top:0;bottom:0;width:${((v - r.min) / (r.max - r.min) * 100).toFixed(1)}%;border-radius:3px;background:${ACC};pointer-events:none` });
         if (r.t === 'seg') o.opts = r.opts.map((n) => ({ name: n, on: v === n, pick: () => set(r.id, n), style: segStyle(v === n) }));
         if (r.t === 'select') Object.assign(o, { opts: r.opts.map((n) => ({ name: n })), set: (e) => set(r.id, e.target.value) });
         if (r.t === 'swatch') o.opts = r.opts.map((c) => ({ name: c, on: v === c, pick: () => set(r.id, c), style: `width:30px;height:30px;border-radius:50%;border:0;background:${c};box-shadow:${v === c ? '0 0 0 2px #050506,0 0 0 4px #f2f2f4' : 'inset 0 0 0 1px rgba(255,255,255,.2)'};transition:box-shadow .2s` }));
@@ -1116,7 +1155,7 @@ class Component extends DCLogic {
           dot: `width:18px;height:18px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px ${v === id ? '#f2f2f4' : 'rgba(255,255,255,.3)'}`,
           dotIn: `width:8px;height:8px;border-radius:50%;background:#f2f2f4;transform:scale(${v === id ? 1 : 0});transition:transform .25s cubic-bezier(.34,1.5,.6,1)` }));
         if (r.t === 'keys') Object.assign(o, { keyText: st.keyEdit === r.id ? 'Нажмите сочетание…' : v, toggle: () => this.setState({ keyEdit: st.keyEdit === r.id ? null : r.id }), keyStyle: `height:32px;padding:0 12px;border-radius:9px;flex:none;border:0;font:600 12px 'JetBrains Mono',monospace;color:${st.keyEdit === r.id ? '#0b0b0c' : '#f2f2f4'};background:${st.keyEdit === r.id ? '#f2f2f4' : 'rgba(255,255,255,.08)'};box-shadow:inset 0 -2px 0 rgba(0,0,0,.35)` });
-        if (r.t === 'button') Object.assign(o, { toggle: () => this.runBtn(r), btnText: (st.done || {})[r.id] || r.v, btnStyle: 'height:34px;padding:0 14px;border-radius:10px;flex:none;border:0;font:600 12.5px Inter,sans-serif;background:rgba(255,255,255,.1);color:#f2f2f4' });
+        if (r.t === 'button') Object.assign(o, { toggle: () => this.runBtn(r), btnText: (st.done || {})[r.id] || r.v, btnStyle: 'height:26px;padding:0 12px;border-radius:7px;flex:none;border:0;font:500 13px Inter,sans-serif;background:rgba(255,255,255,.12);color:#f2f2f4;box-shadow:0 1px 1px rgba(0,0,0,.3);white-space:nowrap' });
         return o;
       })
     }));
@@ -1141,7 +1180,7 @@ class Component extends DCLogic {
     const wType = ['Изображение', 'Слайд-шоу', 'Цвет'].map((n) => ({ name: n, on: wtype === n, pick: () => set('wtype', n), style: segStyle(wtype === n) }));
     const wFit = ['Заполнить', 'Вписать', 'По центру'].map((n) => ({ name: n, on: fit === n, pick: () => set('wfit', n), style: segStyle(fit === n) }));
     const wGrid = WALLS.map((w, i) => ({
-      name: w.name, on: i === wallPick, pick: () => this.setState({ wPick: i }),
+      name: w.name, on: i === wallPick, pick: () => { this.setState({ wPick: i }); this.autoApply(); },
       tagText: i === curWallSys ? 'включены' : i === wallPick ? 'выбраны' : '',
       tag: i === curWallSys || i === wallPick ? `font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:${i === curWallSys ? '#f2f2f4' : 'rgba(255,255,255,.12)'};color:${i === curWallSys ? '#0b0b0c' : '#f2f2f4'}` : 'display:none',
       card: `display:flex;flex-direction:column;padding:8px;border-radius:16px;border:0;color:#f2f2f4;font:inherit;text-align:left;background:${i === wallPick ? 'rgba(255,255,255,.08)' : '#0e0e10'};box-shadow:${i === wallPick ? 'inset 0 0 0 2px #f2f2f4' : 'inset 0 0 0 1px rgba(255,255,255,.07)'};transition:background .2s,box-shadow .2s`,
@@ -1158,8 +1197,12 @@ class Component extends DCLogic {
       menuTap: () => this.say('Меню: «Настроить параметры системы…», «О программе»'),
       hl: st.hl, toggleHl: () => this.setState({ hl: !st.hl }),
       hlBtn: `width:100%;height:36px;border-radius:10px;border:0;display:flex;align-items:center;justify-content:center;gap:8px;font:600 12.5px Inter,sans-serif;background:${st.hl ? 'rgba(255,255,255,.1)' : 'transparent'};color:${st.hl ? '#f2f2f4' : '#a1a1a8'};box-shadow:${st.hl ? 'inset 0 0 0 1px rgba(255,255,255,.12)' : 'none'}`,
-      heroIcon: icon(cur.bg, 54) + ';border-radius:17px;font-size:24px',
-      cur, crumb: par2 ? `${cur.cat} › ${par2.name}` : cur.cat,
+      heroIcon: icon(cur.bg, 64) + ';border-radius:16px;font-size:30px;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 0 0 .5px rgba(255,255,255,.25)',
+      cur, crumb: par2 ? `${par2.name} › ${cur.name}` : (DESC_MAC[cur.id] || `Параметры раздела «${cur.name}»`),
+      acctSt: `width:100%;display:flex;align-items:center;gap:11px;padding:8px;border-radius:10px;border:0;color:inherit;background:${cur.id === 'users' ? 'rgba(255,255,255,.08)' : 'transparent'}`, acctPick: () => this.go('users', null),
+      goBack: () => { const h = this.state.hist || []; const k = (this.state.hi || 0) - 1; if (k >= 0 && h[k]) this.setState({ hi: k, sec: h[k].sec, parent: h[k].parent }); }, goFwd: () => { const h = this.state.hist || []; const k = (this.state.hi || 0) + 1; if (h[k]) this.setState({ hi: k, sec: h[k].sec, parent: h[k].parent }); },
+      navBack: `width:30px;height:28px;border-radius:7px;border:0;display:flex;align-items:center;justify-content:center;color:${(st.hi || 0) > 0 ? '#e8e8ec' : '#5a5a62'};background:${(st.hi || 0) > 0 ? 'rgba(255,255,255,.06)' : 'transparent'}`,
+      navFwd: `width:30px;height:28px;border-radius:7px;border:0;display:flex;align-items:center;justify-content:center;color:${(st.hi || 0) < (st.hist || []).length - 1 ? '#e8e8ec' : '#5a5a62'};background:${(st.hi || 0) < (st.hist || []).length - 1 ? 'rgba(255,255,255,.06)' : 'transparent'}`,
       groups, q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
       winTheme: (() => { const tid = st.thId || this.props.themeId || 'obsidian'; const T = THEMES.find((x) => x.id === tid) || THEMES[0]; const tint = st.thTint !== undefined ? st.thTint : (this.props.themeTint || ''); const lvl = st.thLevel !== undefined ? st.thLevel : (+this.props.themeLevel || 0); if (tid === 'obsidian' && !lvl) return '#050506'; return mixHex(T.bg, tint || T.accent || T.dots[0], [0, .07, .16][lvl] || 0); })(),
       isTheme: cur.custom === 'theme',
@@ -1208,14 +1251,7 @@ class Component extends DCLogic {
       help: () => this.say(`Справка: «${cur.name}» — docs.kde.org`),
       resetSec: () => { const v = { ...this.state.vals }; groupsOf(cur).forEach((g) => g.rows.forEach((r) => { delete v[r.id]; })); this.setState({ vals: v, wPick: cur.custom === 'wall' ? 4 : this.state.wPick }); this.say(`«${cur.name}»: значения по умолчанию`); },
       revert: () => { if (!curDirty) return; const v = { ...this.state.vals }; groupsOf(cur).forEach((g) => g.rows.forEach((r) => { if (r.id in this.state.saved) v[r.id] = this.state.saved[r.id]; else delete v[r.id]; })); this.setState({ vals: v, wPick: cur.custom === 'wall' ? null : this.state.wPick }); },
-      apply: () => {
-        if (!anyDirty) return;
-        try { localStorage.setItem('archSettings.v2', JSON.stringify(this.state.vals)); } catch (e) {}
-        if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
-        if (this.props.onAction) { const g = (id, d) => (id in this.state.vals ? this.state.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60), nShort: g('nShort', 3), nLong: g('nLong', 6), islLvl: g('islLvl', true) })); }
-        this.setState({ saved: { ...this.state.vals }, wPick: null });
-        this.say('Изменения применены');
-      },
+      apply: () => this.doApply(false),
       defBtn: btn(true, false), revBtn: btn(curDirty, false), applyBtn: btn(anyDirty, true),
       toast: `position:absolute;left:50%;bottom:110px;translate:-50% 0;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:600;background:rgba(17,17,19,.95);border:1px solid #2e2e33;box-shadow:0 14px 40px rgba(0,0,0,.45);opacity:${st.toast ? 1 : 0};transform:translateY(${st.toast ? 0 : 10}px);transition:opacity .25s,transform .35s cubic-bezier(.34,1.4,.6,1);pointer-events:none`,
       toastText: st.toast || '', dlg: this.dlgView(),
@@ -1223,6 +1259,7 @@ class Component extends DCLogic {
       minApp: () => { if (this.props.onMinimize) this.props.onMinimize(); else if (this.props.onClose) this.props.onClose(); },
       maxApp: () => { if (this.props.onMaximize) this.props.onMaximize(); }
     };
+    return R;
   }
 }
 

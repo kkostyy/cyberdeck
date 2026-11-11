@@ -489,6 +489,27 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
           </span>
           <span aria-hidden="true" style="{{dk.mon.dot}}"></span>
         </button>
+        <button class="dock-btn" aria-label="Фото" onClick="{{openPhotos}}" onMouseEnter="{{dh.photos}}" onFocus="{{dh.photos}}" style="{{dk.photos.btn}}">
+          <span style="{{dk.photos.tip}}">Фото</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.photos.tile}};background:linear-gradient(160deg,#ffffff,#ececf0)">
+            <svg width="100%" height="100%" viewBox="0 0 40 40"><g transform="translate(20 20)"><ellipse rx="4.5" ry="9" cy="-8" fill="#ff9f0a" opacity=".9"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ffd60a" opacity=".85" transform="rotate(45)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#30d158" opacity=".85" transform="rotate(90)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#64d2ff" opacity=".85" transform="rotate(135)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#0a84ff" opacity=".85" transform="rotate(180)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#bf5af2" opacity=".85" transform="rotate(225)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ff375f" opacity=".85" transform="rotate(270)"></ellipse><ellipse rx="4.5" ry="9" cy="-8" fill="#ff453a" opacity=".85" transform="rotate(315)"></ellipse></g></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.photos.dot}}"></span>
+        </button>
+        <button class="dock-btn" aria-label="Блокнот" onClick="{{openPad}}" onMouseEnter="{{dh.pad}}" onFocus="{{dh.pad}}" style="{{dk.pad.btn}}">
+          <span style="{{dk.pad.tip}}">Блокнот</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.pad.tile}};background:linear-gradient(160deg,#f6f6f2,#d9d9d2)">
+            <svg width="100%" height="100%" viewBox="0 0 40 40"><path d="M11 11h18M11 17h18M11 23h12M11 29h15" stroke="#6f6f77" stroke-width="2.2" stroke-linecap="round"></path><path d="M27 31l7-7" stroke="#0a84ff" stroke-width="3" stroke-linecap="round"></path></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.pad.dot}}"></span>
+        </button>
+        <button class="dock-btn" aria-label="Калькулятор" onClick="{{openCalc}}" onMouseEnter="{{dh.calc}}" onFocus="{{dh.calc}}" style="{{dk.calc.btn}}">
+          <span style="{{dk.calc.tip}}">Калькулятор</span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.calc.tile}};background:linear-gradient(160deg,#3a3a40,#1c1c20)">
+            <svg width="100%" height="100%" viewBox="0 0 40 40"><rect x="9" y="9" width="9.5" height="9.5" rx="3" fill="#a1a1a8"></rect><rect x="21.5" y="9" width="9.5" height="9.5" rx="3" fill="#ff9f0a"></rect><rect x="9" y="21.5" width="9.5" height="9.5" rx="3" fill="#5a5a62"></rect><rect x="21.5" y="21.5" width="9.5" height="9.5" rx="3" fill="#5a5a62"></rect></svg>
+          </span>
+          <span aria-hidden="true" style="{{dk.calc.dot}}"></span>
+        </button>
         <button class="dock-btn" aria-label="Настройки" onClick="{{openSettings}}" onMouseEnter="{{dh.set}}" onFocus="{{dh.set}}" style="{{dk.set.btn}}">
           <span style="{{dk.set.tip}}">Настройки</span>
           <span aria-hidden="true" class="dock-tile" style="{{dk.set.tile}};background:linear-gradient(180deg,#b9b9be,#6d6d73)">
@@ -1814,7 +1835,7 @@ class Component extends DCLogic {
       style: `height:38px;padding:0 12px;border-radius:11px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;${T};background:${st.out === o.id ? accent : 'rgba(255,255,255,.05)'};color:${st.out === o.id ? '#111113' : '#e8e8ec'}` }));
 
     /* ---------- dock ---------- */
-    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'set', 'lab', 'down', 'trash'];
+    const dockIds = ['files', 'term', 'claude', 'web', 'maps', 'music', 'notes', 'photo', 'wid', 'mon', 'photos', 'pad', 'calc', 'set', 'lab', 'down', 'trash'];
     const running = { files: true, term: st.win === 'term', web: true, music: st.playing, set: st.win === 'settings', photo: st.picker, wid: st.gallery };
     const hi = dockIds.indexOf(st.dock);
     const dk = {}, dh = {};
@@ -2337,6 +2358,9 @@ class Component extends DCLogic {
       openSettings: () => { if (this.props.onOpenApp) { this.setState({ hov: null, shade: false }); this.props.onOpenApp('set', 'dock'); } else openWin('settings')(); }, closeWin,
       openMon: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('mon', 'dock'); } },
       openMaps: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('maps', 'dock'); } },
+      openCalc: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('calc', 'dock'); } },
+      openPad: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('pad', 'dock'); } },
+      openPhotos: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('photos', 'dock'); } },
       openWeb: () => { if (this.props.onOpenApp) { this.setState({ shade: false, hov: null }); this.props.onOpenApp('web', 'dock'); } },
       expandWin: () => { const w = st.win; closeWin(); if (this.props.onOpenApp) this.props.onOpenApp(w === 'term' ? 'term' : 'set', 'place'); },
       powerOff: () => { this.setState({ shade: false, hov: null }); if (this.props.onPower) this.props.onPower(); else if (this.props.onLock) this.props.onLock(); },
