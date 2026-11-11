@@ -1121,11 +1121,13 @@ class Component extends DCLogic {
     web: { title: 'Браузер', sub: 'ashen://start', comp: 'Browser' },
     maps: { title: 'Карты', sub: 'Таллин · OSM', comp: 'Maps' },
     mon: { title: 'Монитор', sub: 'Система · живые данные', comp: 'Monitor' },
-    calc: { title: 'Калькулятор', sub: 'Обычный · научный · программист', comp: 'Calculator' },
+    calc: { title: 'Калькулятор', sub: 'Обычный · научный · программист', comp: 'Calculator', nat: [400, 720] },
     pad: { title: 'Блокнот', sub: '~/Документы', comp: 'Notepad' },
     photos: { title: 'Фото', sub: 'Медиатека', comp: 'Photos' }
   };
   R = 836 / 1368;
+  natOf(id) { const w = this.state.wins[id]; return (w && w.nat) || (this.meta[id] && this.meta[id].nat) || [1368, 836]; }
+  isNat(id) { return !!(this.meta[id] && this.meta[id].nat); }
 
   /* ---------------- lifecycle ---------------- */
   componentDidMount() {
@@ -1431,6 +1433,10 @@ class Component extends DCLogic {
     const st = this.state, now = Date.now();
     if (/^(timer|sw$|rec$|call$|update$|copy$|vol|br|lang$|clip|nav:(?!off))/.test(id)) this.peekBar();
     if (id.startsWith('open:')) { this.openApp(id.slice(5), 'place'); return; }
+    if (id.startsWith('winsize:')) { try { const q = JSON.parse(id.slice(8)); const w = st.wins[q.id]; if (!w || !this.meta[q.id] || !this.meta[q.id].nat) return; const old = w.nat || this.meta[q.id].nat; if (old[0] === q.w && old[1] === q.h) return;
+      const k = w.w / old[0]; const nw = Math.round(q.w * k), nh = Math.round(q.h * k); const cx = w.x + w.w / 2;
+      const x = Math.max(8, Math.min(1432 - nw, Math.round(cx - nw / 2))), y = Math.max(44, Math.min(892 - nh, w.y + Math.round((w.h - nh) / 2)));
+      this.setState({ wins: { ...st.wins, [q.id]: { ...w, nat: [q.w, q.h], x, y, w: nw, h: nh, anim: 'resize', animAt: Date.now() } } }); } catch (e) {} return; }
     if (id.startsWith('openfile:')) {
       let f = {}; try { f = JSON.parse(id.slice(9)); } catch (e) { return; }
       const ext = (/\.([^.]+)$/.exec(f.name || '') || [0, ''])[1].toLowerCase();
@@ -1711,8 +1717,8 @@ class Component extends DCLogic {
     const w = this.state.wins[id];
     if (w && !w.closing) { if (w.min) this.restoreWin(id); else if (from === 'dock') this.closeWin(id); else this.focusWin(id); return; }
     const n = Object.keys(this.state.wins).length;
-    const ww = 940, hh = Math.round(ww * this.R);
-    const rect = { x: 250 + n * 40, y: 120 + n * 30, w: ww, h: hh };
+    const NT = this.meta[id].nat; const ww = NT ? NT[0] : 940, hh = NT ? NT[1] : Math.round(ww * this.R);
+    const rect = NT ? { x: Math.round((1440 - ww) / 2) + n * 20, y: Math.max(44, Math.round((900 - hh) / 2) - 10), w: ww, h: hh } : { x: 250 + n * 40, y: 120 + n * 30, w: ww, h: hh };
     this.setState({ wins: { ...this.state.wins, [id]: { ...rect, min: false, max: false, pinned: false, closing: false, born: Date.now() } }, order: [...this.state.order.filter((o) => o !== id), id], focus: id, menu: false, q: '', right: null });
   };
   focusWin(id) { if (this.state.focus !== id || this.state.order[this.state.order.length - 1] !== id) this.setState({ focus: id, order: [...this.state.order.filter((o) => o !== id), id] }); }
@@ -1723,7 +1729,7 @@ class Component extends DCLogic {
       const wins = { ...this.state.wins }; const was = wins[id]; delete wins[id];
       const order = this.state.order.filter((o) => o !== id);
       this.setState({ wins, order, focus: order[order.length - 1] || null, peek: this.state.peek === id ? null : this.state.peek });
-      if (was && was.max) this.leaveFull();
+      if (was && was.max && !this.isNat(id)) this.leaveFull();
     }, 260);
   }
   minWin(id) {
@@ -1731,18 +1737,19 @@ class Component extends DCLogic {
     this.patchWin(id, { min: true, minAt: Date.now(), anim: 'min', animAt: Date.now() });
     const order = this.state.order.filter((o) => o !== id && !this.state.wins[o].min);
     this.setState({ focus: order[order.length - 1] || null });
-    if (w.max) this.leaveFull();
+    if (w.max && !this.isNat(id)) this.leaveFull();
   }
   restoreWin(id) {
     const w = this.state.wins[id]; if (!w) return;
     this.setState({ wins: { ...this.state.wins, [id]: { ...w, min: false, anim: 'rest', animAt: Date.now() } }, peek: null, stackHover: false, order: [...this.state.order.filter((o) => o !== id), id], focus: id });
-    if (w.max) this.enterFull();
+    if (w.max && !this.isNat(id)) this.enterFull();
   }
   maxWin(id) {
     const w = this.state.wins[id]; if (!w) return;
     const max = !w.max;
     this.patchWin(id, { max, anim: max ? 'full' : 'unfull', animAt: Date.now() });
     this.focusWin(id);
+    if (this.isNat(id)) return;
     if (max) this.enterFull(); else this.leaveFull();
   }
   enterFull() { if (this.state.autoProfile && this.state.profile !== 'game') this.setProfile('game', true); this.setState({ barShown: false, menu: false, right: null }); }
@@ -1764,7 +1771,7 @@ class Component extends DCLogic {
     const el = e.currentTarget;
     const k = this.scale();
     const yIn = (e.clientY - el.getBoundingClientRect().top) / k;
-    if (yIn > 84 * (w.w / 1368)) return;
+    if (yIn > 84 * (w.w / this.natOf(id)[0])) return;
     e.preventDefault();
     /* двойной щелчок по заголовку — во весь экран, как в macOS */
     const nowT = Date.now();
@@ -1822,20 +1829,21 @@ class Component extends DCLogic {
       }
     } else {
       const sgn = d.edge === 'se' || d.edge === 'ne' ? 1 : -1;
-      w = Math.max(520, Math.min(1440, o.w + sgn * dx));
-      h = Math.round(w * this.R);
+      const NR = this.natOf(d.id); const RR = NR[1] / NR[0]; const MINW = this.isNat(d.id) ? Math.round(NR[0] * 0.7) : 520;
+      w = Math.max(MINW, Math.min(1440, o.w + sgn * dx, Math.floor(880 / RR)));
+      h = Math.round(w * RR);
       if (d.edge === 'sw' || d.edge === 'nw') x = o.x + (o.w - w);
       if (d.edge === 'ne' || d.edge === 'nw') y = o.y + (o.h - h);
-      if (Math.abs(x) < SN) { const nw = w + x; if (d.edge.endsWith('w')) { w = Math.max(520, nw); x = 0; h = Math.round(w * this.R); } }
-      if (Math.abs(1440 - (x + w)) < SN && d.edge.endsWith('e')) { w = 1440 - x; h = Math.round(w * this.R); }
+      if (Math.abs(x) < SN) { const nw = w + x; if (d.edge.endsWith('w')) { w = Math.max(MINW, nw); x = 0; h = Math.round(w * RR); } }
+      if (Math.abs(1440 - (x + w)) < SN && d.edge.endsWith('e') && !this.isNat(d.id)) { w = 1440 - x; h = Math.round(w * RR); }
     }
     this.live = { id: d.id, x, y, w, h };
     const el = d.el;
     el.style.left = x + 'px'; el.style.top = y + 'px';
     el.style.width = w + 'px'; el.style.height = h + 'px';
-    el.style.borderRadius = (22 * w / 1368) + 'px';
+    const NW0 = this.natOf(d.id)[0]; el.style.borderRadius = (22 * w / NW0) + 'px';
     el.style.boxShadow = (x === 8 || y === 40 || x + w === 1432 || y + h === 892) ? '0 0 0 2px rgba(255,255,255,.55), 0 30px 80px rgba(0,0,0,.55)' : (d.mode === 'move' ? this.LIFT : '');
-    if (d.inner) d.inner.style.transform = `scale(${w / 1368}) translate(-36px, -32px)`;
+    if (d.inner) d.inner.style.transform = `scale(${w / NW0}) translate(-36px, -32px)`;
   };
   onDragUp = () => {
     const d = this.drag; if (!d) return;
@@ -1881,14 +1889,15 @@ class Component extends DCLogic {
     const TW = 168, TH = Math.round(TW * this.R);
     const slot = (id) => {
       const i = minimized.indexOf(id), n = minimized.length;
+      const RT = this.natOf(id)[1] / this.natOf(id)[0];
       if (st.peek === id) {
-        const pw = 460, ph = Math.round(pw * this.R);
+        const pw = RT > 1 ? 260 : 460, ph = Math.round(pw * RT);
         const base = st.stackHover ? 300 + i * (TH + 12) : 340 + i * 12;
         return { x: 1440 - 16 - TW - 24 - pw, y: Math.max(80, Math.min(900 - ph - 70, base - 80)), w: pw, h: ph, z: 80 };
       }
-      if (st.stackHover) return { x: 1440 - 16 - TW, y: 450 - (n * (TH + 12)) / 2 + i * (TH + 12), w: TW, h: TH, z: 60 + i };
+      if (st.stackHover) { const tw = RT > 1 ? Math.round(TH / RT) : TW; return { x: 1440 - 16 - tw, y: 450 - (n * (TH + 12)) / 2 + i * (TH + 12), w: tw, h: Math.round(tw * RT), z: 60 + i }; }
       const ww = TW - (n - 1 - i) * 10;
-      return { x: 1440 - 16 - ww, y: 360 - (n - 1 - i) * 12, w: ww, h: Math.round(ww * this.R), z: 60 + i };
+      const w2 = RT > 1 ? Math.round(ww * 0.6) : ww; return { x: 1440 - 16 - w2, y: 360 - (n - 1 - i) * 12, w: w2, h: Math.round(w2 * RT), z: 60 + i };
     };
     const win = {}, h = {};
     ids.forEach((id) => {
@@ -1897,10 +1906,11 @@ class Component extends DCLogic {
       if (!w) { win[id] = { open: false }; return; }
       let r = (this.live && this.live.id === id) ? this.live : { x: w.x, y: w.y, w: w.w, h: w.h };
       let z = 20 + st.order.indexOf(id) + (w.pinned ? 20 : 0);
-      if (w.max && !w.min) { r = { x: 0, y: 0, w: 1440, h: 900 }; z = 85; }
+      const NAT = this.natOf(id), natApp = this.isNat(id);
+      if (w.max && !w.min) { if (natApp) { const k = Math.min(1300 / NAT[0], 800 / NAT[1]); r = { x: Math.round((1440 - NAT[0] * k) / 2), y: Math.round(48 + (840 - NAT[1] * k) / 2), w: Math.round(NAT[0] * k), h: Math.round(NAT[1] * k) }; } else r = { x: 0, y: 0, w: 1440, h: 900 }; z = 85; }
       if (w.min) { const s = slot(id); r = s; z = s.z; }
-      const s = r.w / (w.max && !w.min ? 1368 : 1368);
-      const rad = w.max && !w.min ? 0 : 22 * s;
+      const s = r.w / NAT[0];
+      const rad = w.max && !w.min && !natApp ? 0 : 22 * s;
       const focused = st.focus === id && !w.min;
       const an = w.anim && Date.now() - (w.animAt || 0) < 700 ? w.anim : '';
       /* macOS: сворачивание «джинном» без отскока, полноэкранный режим — плавное ускорение/торможение */
@@ -1912,7 +1922,7 @@ class Component extends DCLogic {
         open: true, title: this.meta[id].title, pinned: w.pinned && !w.min,
         cover: !!w.min, handles: !w.min && !w.max,
         box: `position:absolute;left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;z-index:${z};overflow:hidden;border-radius:${rad}px;background:${THV.surface};box-shadow:${w.min ? '0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12)' : focused ? '0 34px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)' : '0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.05)'};transition:${tr};${w.closing ? 'animation:sysWinOut .22s cubic-bezier(.4,0,1,1) both;pointer-events:none;' : (Date.now() - w.born < 600 ? 'animation:sysWinIn .42s cubic-bezier(.2,.9,.25,1) both;' : genie)}${!focused && !w.min ? 'filter:saturate(.92) brightness(.94);' : ''}`,
-        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform ${DU} ${EZ};${w.min ? 'pointer-events:none;' : ''}`
+        inner: `width:1440px;height:900px;transform-origin:0 0;transform:scale(${w.max && !w.min && !natApp ? 1440 / 1368 : s}) translate(-36px, -32px);transition:transform ${DU} ${EZ};${w.min ? 'pointer-events:none;' : ''}`
       };
     });
     const peekW = st.peek && st.wins[st.peek];
@@ -2494,7 +2504,7 @@ class Component extends DCLogic {
         this.setState({ shelf: [...this.state.shelf.filter((x) => !names.has(x.name)), ...add], shDrag: false, hoverPill: 'isl' });
       },
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
-      filesPlace: st.filesPlace || '', openReq: st.openReq || '', openApps: ids.filter((id) => st.wins[id] && !st.wins[id].closing).join(','), dockCfg: st.dockCfg || (() => { try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); return c && c.dock ? JSON.stringify(c.dock) : ''; } catch (e) { return ''; } })(), anyMax: ids.some((id) => st.wins[id] && st.wins[id].max && !st.wins[id].min && !st.wins[id].closing),
+      filesPlace: st.filesPlace || '', openReq: st.openReq || '', openApps: ids.filter((id) => st.wins[id] && !st.wins[id].closing).join(','), dockCfg: st.dockCfg || (() => { try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); return c && c.dock ? JSON.stringify(c.dock) : ''; } catch (e) { return ''; } })(), anyMax: ids.some((id) => st.wins[id] && st.wins[id].max && !this.isNat(id) && !st.wins[id].min && !st.wins[id].closing),
       powerOff: this.powerOff,
       sysVol: st.vol,
       calmCss: (st.anim !== undefined && st.anim < 15) ? '[data-sys-root] *,[data-sys-root] *::before,[data-sys-root] *::after{animation-duration:.001s!important;animation-delay:0s!important;transition-duration:.001s!important;transition-delay:0s!important}' : (st.anim !== undefined && st.anim < 40 ? '[data-sys-root] *{transition-duration:.12s!important}' : ''),
