@@ -138,7 +138,7 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
               <div role="progressbar" aria-label="Прогресс трека" aria-valuenow="{{posPct}}" aria-valuemin="0" aria-valuemax="100" style="height: 30px; border-radius: 15px; background: rgba(17,17,19,0.16); overflow: hidden"><div style="{{posBar}}"></div></div>
               <div style="display: flex; align-items: flex-end; gap: 6px; margin-top: auto">
                 <span style="font-size: 40px; font-weight: 500; line-height: 0.9; font-variant-numeric: tabular-nums; letter-spacing: -0.02em">{{posTime}}</span>
-                <span style="font-size: 12px; font-weight: 600; opacity: 0.7; align-self: flex-start; margin-top: 2px">03:58</span>
+                <span style="font-size: 12px; font-weight: 600; opacity: 0.7; align-self: flex-start; margin-top: 2px">{{durTime}}</span>
                 <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" onMouseDown="{{stop}}" style="{{playBtn}}">
                   <sc-if value="{{playing}}" hint-placeholder-val="{{true}}">
                     <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1.2"></rect><rect x="14" y="5" width="4" height="14" rx="1.2"></rect></svg>
@@ -1357,7 +1357,9 @@ class Component extends DCLogic {
   }
   calHead = () => { const v = this.state.calView || 'days'; if (v !== 'years') this.calGo(v === 'days' ? 'months' : 'years', undefined, 1); };
   /* Plasma media controller: metadata first, art loads, busy after 200 ms, new art fades in */
+  musicCmd(cmd) { if (window.__ashenMusicApp) { try { window.dispatchEvent(new CustomEvent('ashen-music-cmd', { detail: { cmd } })); } catch (e) {} return true; } return false; }
   trkGo(d) {
+    if (this.musicCmd(d > 0 ? 'next' : 'prev')) { clearTimeout(this.trkT); this.setState({ artLoad: true }); this.trkT = setTimeout(() => this.setState({ artPrev: this.state.artIdx || 0, artIdx: ((this.state.artIdx || 0) + 1) % 3, artN: (this.state.artN || 0) + 1, artLoad: false }), 450); return; }
     const s = this.state, n = ((s.trk || 0) + d + 3) % 3;
     clearTimeout(this.trkT);
     this.setState({ trk: n, artLoad: true });
@@ -1409,6 +1411,7 @@ class Component extends DCLogic {
   componentDidMount() {
     this.timer = setInterval(() => this.setState((s) => { const o = { now: new Date(), pos: s.playing ? (s.pos + 1) % 238 : s.pos }; if (s.pomo && s.pomo.run) { if (s.pomo.left > 1) o.pomo = { ...s.pomo, left: s.pomo.left - 1 }; else { o.pomo = { left: 1500, run: false, round: s.pomo.round + 1 }; if (this.props.onLevel) setTimeout(() => this.props.onLevel('clip', 'Помодоро: перерыв 5 минут'), 0); } } return o; }), 1000);
     this.onNotes = () => { this._note = null; this.forceUpdate(); }; window.addEventListener('ashen-notes', this.onNotes);
+    window.addEventListener('ashen-music', this.onMusic); if (window.__ashenNow) this.setState({ ext: window.__ashenNow });
     this.mt = setInterval(() => {
       if (this.state.hov === 'music' && !this.state.exp) this.setState({ mphase: this.state.mphase ? 0 : 1 });
       else if (this.state.mphase) this.setState({ mphase: 0 });
@@ -1418,7 +1421,9 @@ class Component extends DCLogic {
       this.setState((s) => ({ cpu: Math.round(j(s.cpu, 6, 4, 88)), ram: Math.round(j(s.ram, 2, 34, 52)), down: Math.round(j(s.down, 0.8, 0.1, 9.5) * 10) / 10 }));
     }, 2000);
   }
+  onMusic = (e) => { this.setState({ ext: e.detail || null }); };
   componentWillUnmount() {
+    window.removeEventListener('ashen-music', this.onMusic);
     clearInterval(this.timer);
     clearInterval(this.sys);
     clearInterval(this.mt);
@@ -2075,7 +2080,7 @@ class Component extends DCLogic {
       ledBig: `font:32px/32px 'Press Start 2P',monospace;color:#ededf0;-webkit-mask-image:radial-gradient(circle,#000 1.55px,rgba(0,0,0,0) 1.9px);-webkit-mask-size:4px 4px;mask-image:radial-gradient(circle,#000 1.55px,rgba(0,0,0,0) 1.9px);mask-size:4px 4px`,
       accTile: `background:${accent};color:#111113;border-radius:18px;transition:background .6s ease`,
       platter: `position:relative;width:136px;height:136px;border-radius:50%;background:conic-gradient(from 30deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.07) 40deg,rgba(255,255,255,0) 80deg,rgba(255,255,255,0) 200deg,rgba(255,255,255,.05) 240deg,rgba(255,255,255,0) 280deg),repeating-radial-gradient(circle,#141416 0 1.5px,#1f1f23 1.5px 3px);box-shadow:0 0 0 2px #050506;animation:spin 6s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
-      posTime: fmt(st.pos), posPct: Math.round(st.pos / 238 * 100),
+      posTime: fmt(st.ext ? st.ext.pos : st.pos), posPct: st.ext ? Math.round(st.ext.pos / st.ext.dur * 100) : Math.round(st.pos / 238 * 100), durTime: st.ext ? fmt(st.ext.dur) : '03:58',
       posBar: `width:${(st.pos / 238 * 100).toFixed(2)}%;height:100%;border-radius:15px;background:#111113;transition:width 1s linear`,
       playBtn: `width:44px;height:44px;margin-left:auto;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#111113;color:${accent};transition:color .6s`,
       rmBtn: 'position:absolute;left:-8px;top:-8px;z-index:2;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e8e8ec;color:#111113;box-shadow:0 4px 12px rgba(0,0,0,.4);animation:wIn .3s cubic-bezier(.2,1.4,.3,1) both',
@@ -2106,23 +2111,24 @@ class Component extends DCLogic {
       cpu: st.cpu, ram: st.ram, ramGb: (st.ram / 100 * 16).toFixed(1).replace('.', ','),
       cpuDash: dash(st.cpu, C), ramDash: dash(st.ram, C), cpuDashS: dash(st.cpu, Cs),
       down: `${st.down.toFixed(1).replace('.', ',')} МБ/с`,
-      playing: st.playing, paused: !st.playing,
+      playing: st.ext ? st.ext.playing : st.playing, paused: st.ext ? !st.ext.playing : !st.playing,
       playLabel: st.playing ? 'Пауза' : 'Воспроизвести',
       dockMusicLabel: st.playing ? 'Музыка: пауза' : 'Музыка: играть',
-      togglePlay: () => this.setState({ playing: !st.playing }),
+      togglePlay: () => { if (!this.musicCmd('toggle')) this.setState({ playing: !st.playing }); },
       navArt: `width:20px;height:20px;border-radius:50%;flex:none;background:conic-gradient(from 30deg,#c2412f,#2a3150,#4f7fb8,#c2412f);box-shadow:inset 0 0 0 5px rgba(0,0,0,.4);animation:spin 6s linear infinite;animation-play-state:${st.playing ? 'running' : 'paused'}`,
       eq1: eqb(10, 0.9), eq2: eqb(12, 0.7), eq3: eqb(8, 1.1),
       ...(() => {
         const TR = [{ t: 'Трек.mp3', a: 'user', len: '03:58', at: '01:42', p: 43, c: accent }, { t: 'Полночь.flac', a: 'Ashen', len: '04:21', at: '00:07', p: 3, c: '#7fb8ff' }, { t: 'Дождь.ogg', a: 'user', len: '02:47', at: '00:05', p: 3, c: '#e07a5f' }];
         const tr = TR[st.trk || 0], art = TR[st.artIdx || 0], prevArt = TR[st.artPrev === undefined || st.artPrev === null ? (st.artIdx || 0) : st.artPrev];
         const ready = !st.artLoad;
-        return { trkT: tr.t, trkA: tr.a, trkLen: tr.len, trkAt: tr.at, trkPrev: this.trkPrevH, trkNext: this.trkNextH,
+        const X = st.ext; const mmss = (v) => `${String(Math.floor(v / 60)).padStart(2, '0')}:${String(Math.floor(v % 60)).padStart(2, '0')}`;
+        return { trkT: X ? X.title : tr.t, trkA: X ? X.artist : tr.a, trkLen: X ? mmss(X.dur) : tr.len, trkAt: X ? mmss(X.pos) : tr.at, trkPrev: this.trkPrevH, trkNext: this.trkNextH,
           bigVinyl: vinyl('78px', art.c), dockVinyl: vinyl('78%', art.c),
           artOld: st.artN ? 'position:absolute;left:25px;top:25px;' + vinyl('78px', prevArt.c) : 'display:none',
           artFade: `position:absolute;left:25px;top:25px;width:78px;height:78px;${st.artN ? `animation:${st.artN % 2 ? 'artA' : 'artB'} .2s linear both` : ''}`,
           busy: st.artLoad ? `position:absolute;left:50px;top:50px;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#f2f2f4;z-index:2;animation:busyIn .01s .2s both,spin .8s linear infinite` : 'display:none',
           seekBar: `height:4px;border-radius:4px;background:rgba(255,255,255,.12);opacity:${ready ? 1 : 0};transition:opacity .2s`,
-          seekFill: `width:${tr.p}%;height:100%;border-radius:4px;background:${accent};transition:background .6s,width .2s`,
+          seekFill: `width:${X ? Math.round(X.pos / X.dur * 100) : tr.p}%;height:100%;border-radius:4px;background:${accent};transition:background .6s,width .2s`,
           seekTimes: `display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#a1a1a8;font-family:'JetBrains Mono',monospace;opacity:${ready ? 1 : 0};transition:opacity .2s` };
       })(), lockVinyl: vinyl('30px'),
       emptyVinyl: vinyl('74px'),

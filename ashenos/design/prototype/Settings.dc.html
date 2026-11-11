@@ -1116,6 +1116,7 @@ class Component extends DCLogic {
         if (!anyDirty) return;
         try { localStorage.setItem('archSettings.v2', JSON.stringify(this.state.vals)); } catch (e) {}
         if (wallPick !== curWallSys && this.props.onAction) this.props.onAction('wall:' + wallPick);
+        if (this.props.onAction) { const g = (id, d) => (id in this.state.vals ? this.state.vals[id] : d); this.props.onAction('sys:' + JSON.stringify({ vol: g('vol', 64), wifi: g('wifiOn', true), dnd: g('dnd', false), night: g('night', 'Закат—рассвет'), temp: g('nightTemp', 4200), anim: g('anim', 60) })); }
         this.setState({ saved: { ...this.state.vals }, wPick: null });
         this.say('Изменения применены');
       },

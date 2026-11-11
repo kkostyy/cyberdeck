@@ -791,6 +791,9 @@ body{margin:0;background:#050506}
     </sc-for>
   </section>
 
+  <!-- night colour (Settings → Night colour) -->
+  <div aria-hidden="true" style="{{nightSt}}"></div>
+
   <!-- power overlay (sleep / reboot) -->
   <sc-if value="{{power.on}}" hint-placeholder-val="{{false}}">
     <div style="position: absolute; inset: 0; z-index: 200; background: #000; display: flex; align-items: center; justify-content: center; animation: islPower 2.4s ease both">
@@ -900,6 +903,7 @@ class Component extends DCLogic {
     try { const p = localStorage.getItem('archIslands.profile'); if (p === 'work' || p === 'game' || p === 'min') profile = p; } catch (e) {}
     this.setState({ events: evs, calSel: today, profile });
     try { const t = JSON.parse(localStorage.getItem('ashenos.theme') || 'null'); if (t && t.id) this.setState({ theme: t }); } catch (e) {}
+    try { const c = JSON.parse(localStorage.getItem('ashenos.sys') || 'null'); if (c) this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim }); } catch (e) {}
     this.tick = setInterval(() => this.onTick(), 1000);
     window.addEventListener('mousemove', this.onCurMove, true);
     window.addEventListener('mousedown', this.onCurDown, true);
@@ -1153,6 +1157,7 @@ class Component extends DCLogic {
       return;
     }
     if (id.startsWith('wave:')) { this.setState({ waveOn: id === 'wave:1' }); return; }
+    if (id.startsWith('sys:')) { try { const c = JSON.parse(id.slice(4)); this.setState({ vol: Math.min(100, Math.round(c.vol)), wifi: !!c.wifi, dnd: !!c.dnd, night: c.night, nightTemp: +c.temp, anim: +c.anim }); localStorage.setItem('ashenos.sys', JSON.stringify(c)); this.onLevel('vol', Math.min(100, Math.round(c.vol))); } catch (e) {} return; }
     if (id.startsWith('theme:')) { try { const t = JSON.parse(id.slice(6)); this.setState({ theme: t }); localStorage.setItem('ashenos.theme', JSON.stringify(t)); } catch (e) {} return; }
     if (id.startsWith('wall:')) { this.setState({ wallReq: id.slice(5) + ':' + now, curWall: +id.slice(5) }); return; }
     const flash = (kind, val) => { this.setState({ flash: { kind, val, at: Date.now() } }); clearTimeout(this.flT); this.flT = setTimeout(() => this.forceUpdate(), 1750); };
@@ -2058,6 +2063,7 @@ class Component extends DCLogic {
       chip, flash, callBars, call, rec, recDot, recDotBig, timer, sw, prog, clip, quick, quickWrap, secStyle, btnSoft, btnMain, shelfShow,
       filesPlace: st.filesPlace || '',
       powerOff: this.powerOff,
+      nightSt: (() => { const mode = st.night || 'Закат—рассвет', h = new Date().getHours(); const on = mode === 'Всегда' || (mode === 'Закат—рассвет' && (h >= 20 || h < 7)); const k = Math.max(0, Math.min(1, (6500 - (st.nightTemp || 4200)) / 4000)); return `position:absolute;inset:0;z-index:400;pointer-events:none;background:rgb(255,140,40);mix-blend-mode:multiply;opacity:${on ? (0.08 + k * 0.22).toFixed(3) : 0};transition:opacity 1.2s ease`; })(),
       thWin: (() => { const v = this.themeVals(); if (v.id === 'obsidian' && !v.level) return ''; const n = parseInt(v.surface.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},.9)`; })(),
       thBg: this.themeVals().bg, thAccent: this.themeVals().accent, thId: this.themeVals().id, thTint: this.themeVals().tint, thLevel: String(this.themeVals().level), thSurface: this.themeVals().surface,
       onLevel: this.onLevel, labAction: this.labAction, onWall: this.onWall, reveal: st.reveal || 0, onWaveSet: this.onWaveSet, waveOn: st.waveOn !== false, curWall: typeof st.curWall === 'number' ? st.curWall : 4, wallReq: st.wallReq || '',

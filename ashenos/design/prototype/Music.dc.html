@@ -380,6 +380,7 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    window.__ashenMusicApp = true; window.addEventListener('ashen-music-cmd', this.onCmd); setTimeout(() => this.emit(false), 0);
     this.cfgLoad(); setTimeout(() => this.setState({ queueOn: this.cfgGet('queue') }), 0);
     this.timer = setInterval(() => {
       const s = this.state;
@@ -389,7 +390,16 @@ class Component extends DCLogic {
       else this.setState({ pos: s.pos + 1 });
     }, 1000);
   }
-  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.busyT); clearTimeout(this.popT); }
+  componentWillUnmount() { clearInterval(this.timer); clearTimeout(this.busyT); clearTimeout(this.popT); window.removeEventListener('ashen-music-cmd', this.onCmd); window.__ashenMusicApp = false; this.emit(true); }
+  /* shared now-playing bus: the bar panel on the desktop follows this app */
+  onCmd = (e) => { const c = e.detail && e.detail.cmd; if (c === 'toggle') this.setState({ playing: !this.state.playing }); if (c === 'next') this.step(1); if (c === 'prev') this.step(-1); if (c === 'seek') this.setState({ pos: Math.round(e.detail.pct * ((this.allTracks().find((x) => x.id === this.state.cur) || { dur: 200 }).dur)) }); };
+  emit(gone) {
+    const s = this.state, t = this.allTracks().find((x) => x.id === s.cur);
+    const d = gone || !t ? null : { title: t.title, artist: t.artist, playing: s.playing, pos: s.pos, dur: t.dur, id: t.id };
+    window.__ashenNow = d;
+    try { window.dispatchEvent(new CustomEvent('ashen-music', { detail: d })); } catch (e) {}
+  }
+  componentDidUpdate() { const s = this.state; const k = `${s.cur}|${s.playing}|${s.pos}`; if (k !== this._ek) { this._ek = k; this.emit(false); } }
 
   sources() {
     return [
