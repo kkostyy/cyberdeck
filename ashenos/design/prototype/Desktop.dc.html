@@ -64,6 +64,10 @@ input[type=range]{width:100%;height:22px;margin:0;cursor:pointer}
 @keyframes calHB{from{opacity:0;transform:translateX(calc(var(--cd)*38%))}to{opacity:1;transform:none}}
 @keyframes dotIn{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
 @keyframes artA{from{opacity:0}to{opacity:1}}
+.cv-b{color:#fff;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}.cv-b:hover{background:rgba(60,60,66,.55)!important}.cv-b:active{transform:scale(.9)}
+@keyframes cvA{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+@keyframes cvB{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+@keyframes cvBeat{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
 @keyframes artB{from{opacity:0}to{opacity:1}}
 @keyframes busyIn{from{opacity:0}to{opacity:1}}
 .pday{transition:box-shadow .05s cubic-bezier(.25,.46,.45,.94)}
@@ -109,6 +113,38 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
     <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 2; background: radial-gradient(rgba(0,0,0,0.06) 1px, rgba(0,0,0,0) 1.2px) 0 0/3px 3px"></div>
 
     <!-- ================= WIDGETS ================= -->
+    <sc-if value="{{wOn.cover}}" hint-placeholder-val="{{true}}">
+      <section aria-label="Виджет «Обложка»" onMouseDown="{{drag.cover}}" class="wlift" style="{{wpos.cover}}">
+        <div style="{{wcase.cover}}">
+          <div style="position: relative; width: 100%; height: 100%; border-radius: 18px; overflow: hidden; color: #ffffff">
+            <span aria-hidden="true" style="{{cv.artOld}}"></span>
+            <span aria-hidden="true" style="{{cv.art}}"></span>
+            <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.55) 100%)"></span>
+            <div style="position: absolute; left: 10px; right: 10px; top: 10px; display: flex; align-items: center; gap: 6px">
+              <span style="flex: 1; min-width: 0; height: 44px; padding: 0 12px 0 5px; border-radius: 22px; display: flex; align-items: center; gap: 8px; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)">
+                <span aria-hidden="true" style="{{cv.avatar}}"></span>
+                <span style="display: flex; flex-direction: column; min-width: 0; line-height: 1.15"><span style="font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{trkT}}</span><span style="font-size: 11px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">@{{trkA}}</span></span>
+              </span>
+              <button aria-label="Поделиться треком" title="Скопировать название" onClick="{{cv.share}}" onMouseDown="{{stop}}" class="cv-b" style="width: 40px; height: 40px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg></button>
+              <button aria-label="{{cv.likeLabel}}" aria-pressed="{{cv.liked}}" onClick="{{cv.like}}" onMouseDown="{{stop}}" class="cv-b" style="width: 40px; height: 40px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)"><svg width="17" height="17" viewBox="0 0 24 24" style="{{cv.heart}}"><path d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.6 4 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.3 0 5.7 3.1 4.5 6.7-1.7 4.7-9.2 9.3-9.2 9.3z"></path></svg></button>
+            </div>
+            <div style="position: absolute; left: 14px; right: 14px; bottom: 10px; display: flex; flex-direction: column; gap: 8px">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px rgba(0,0,0,0.5)"><span>{{trkAt}}</span><span>{{cv.left}}</span></div>
+              <span style="height: 4px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden"><span style="{{cv.fill}}"></span></span>
+              <div style="display: flex; justify-content: center; gap: 18px; margin-top: 2px">
+                <button aria-label="Предыдущий трек" onClick="{{trkPrev}}" onMouseDown="{{stop}}" class="cv-b" style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2.4v14H6zM20 5v14L9.5 12z"></path></svg></button>
+                <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" onMouseDown="{{stop}}" class="cv-b" style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="{{cv.playIcon}}"></path></svg></button>
+                <button aria-label="Следующий трек" onClick="{{trkNext}}" onMouseDown="{{stop}}" class="cv-b" style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(30,30,34,0.42); backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%); border: 1px solid rgba(255,255,255,0.14)"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 5H18v14h-2.4zM4 5v14l10.5-7z"></path></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{editing}}" hint-placeholder-val="{{false}}">
+          <button aria-label="Убрать виджет «Обложка»" onClick="{{wOff.cover}}" onMouseDown="{{stop}}" style="{{rmBtn}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+          <button aria-label="Размер виджета" onClick="{{wSize.cover}}" onMouseDown="{{stop}}" style="{{szBtn}}">{{wSizeText.cover}}</button>
+        </sc-if>
+      </section>
+    </sc-if>
     <sc-if value="{{wOn.music}}" hint-placeholder-val="{{true}}">
       <section aria-label="Виджет «Музыка»" onMouseDown="{{drag.music}}" class="wlift" style="{{wpos.music}}">
         <div style="{{wcase.music}}">
@@ -417,8 +453,10 @@ nav[aria-label="Строка состояния"] > button:hover{transform:trans
         </button>
         <button class="dock-btn" aria-label="{{dockMusicLabel}}" onClick="{{dockMusic}}" onMouseEnter="{{dh.music}}" onFocus="{{dh.music}}" style="{{dk.music.btn}}">
           <span style="{{dk.music.tip}}">Музыка</span>
-          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}};background:linear-gradient(180deg,#2a2a2e,#141416)">
-            <span style="{{dockVinyl}}"></span>
+          <span aria-hidden="true" class="dock-tile" style="{{dk.music.tile}};background:linear-gradient(180deg,#ffffff,#e9e9ec)">
+            <span style="{{dockSleeveV}}"></span>
+            <span style="position: absolute; left: 7%; right: 7%; bottom: 7%; height: 47%; border-radius: 6% 6% 22% 22%; background: linear-gradient(180deg,#f7f7f9,#d9d9de); box-shadow: 0 -1px 0 rgba(0,0,0,.06), inset 0 2px 3px rgba(255,255,255,.9); -webkit-mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%); mask: radial-gradient(42% 46% at 50% 0, transparent 97%, #000 100%)"></span>
+            <span style="position: absolute; right: 12%; bottom: 13%; width: 30%; height: 15%; border-radius: 2px; background: conic-gradient(from 40deg,#c9f2ff,#f9c9ff,#fff2b8,#b8ffd9,#c9f2ff); box-shadow: inset 0 0 0 1px rgba(0,0,0,.18)"></span>
           </span>
           <span aria-hidden="true" style="{{dk.music.dot}}"></span>
         </button>
@@ -1394,10 +1432,10 @@ class Component extends DCLogic {
     setSec: 'screen', out: 'phones', ws: 1,
     lock: null, pw: '', pwErr: 0,
     pos: 102, gallery: false, dragId: null,
-    wOn: { music: true, clock: true, weather: true, system: true, tasks: false, cal: false, note: false, pomo: false, batt: false, net: false, disk: false },
+    wOn: { cover: true, music: true, clock: true, weather: true, system: true, tasks: false, cal: false, note: false, pomo: false, batt: false, net: false, disk: false },
     pomo: { left: 1500, run: false, round: 1 },
-    wsc: { music: 1, clock: 1, weather: 1, system: 1, tasks: 1, disk: 0.7 },
-    wpos: { clock: { x: 840, y: 24 }, weather: { x: 840, y: 168 }, system: { x: 1128, y: 168 }, music: { x: 840, y: 456 }, tasks: { x: 536, y: 456 }, cal: { x: 536, y: 168 }, note: { x: 248, y: 168 }, pomo: { x: 248, y: 456 }, batt: { x: 536, y: 24 }, net: { x: 248, y: 24 }, disk: { x: 40, y: 24 } },
+    wsc: { cover: 1, music: 1, clock: 1, weather: 1, system: 1, tasks: 1, disk: 0.7 },
+    wpos: { cover: { x: 536, y: 456 }, clock: { x: 840, y: 24 }, weather: { x: 840, y: 168 }, system: { x: 1128, y: 168 }, music: { x: 840, y: 456 }, tasks: { x: 536, y: 456 }, cal: { x: 536, y: 168 }, note: { x: 248, y: 168 }, pomo: { x: 248, y: 456 }, batt: { x: 536, y: 24 }, net: { x: 248, y: 24 }, disk: { x: 40, y: 24 } },
     done: { 0: true },
     shelf: [], shelfPage: 0, shelfOver: false
   };
@@ -1911,8 +1949,8 @@ class Component extends DCLogic {
     const bandAnim = lp === 'in' ? 'animation:bandDown .8s cubic-bezier(.7,0,.25,1) both' : lp === 'out' ? 'animation:bandUp .7s cubic-bezier(.7,0,.25,1) both' : 'display:none';
 
     /* ---------- widgets ---------- */
-    const WS = { music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272], cal: [272, 272], note: [272, 272], pomo: [272, 272], batt: [272, 128], net: [272, 128], disk: [272, 128] };
-    const WN = { music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи', cal: 'Календарь', note: 'Заметка', pomo: 'Помодоро', batt: 'Батарея', net: 'Сеть', disk: 'Диск' };
+    const WS = { cover: [272, 272], music: [560, 272], clock: [560, 128], weather: [272, 272], system: [272, 272], tasks: [272, 272], cal: [272, 272], note: [272, 272], pomo: [272, 272], batt: [272, 128], net: [272, 128], disk: [272, 128] };
+    const WN = { cover: 'Обложка', music: 'Музыка', clock: 'Часы', weather: 'Погода', system: 'Система', tasks: 'Задачи', cal: 'Календарь', note: 'Заметка', pomo: 'Помодоро', batt: 'Батарея', net: 'Сеть', disk: 'Диск' };
     const editing = st.gallery;
     const rvN = +this.props.reveal || 0;
     const wpos = {}, wcase = {}, wOn = {}, wOff = {}, drag = {}, wSize = {}, wSizeText = {};
@@ -1990,7 +2028,7 @@ class Component extends DCLogic {
     const leftN = tasks.filter((t) => !t.done).length;
     const wdS = now.toLocaleDateString('ru-RU', { weekday: 'short' }).replace('.', '');
     const monS = now.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '');
-    const sizeName = { music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2', cal: 'Квадрат · 2×2', note: 'Квадрат · 2×2', pomo: 'Квадрат · 2×2', batt: 'Малый · 2×1', net: 'Малый · 2×1', disk: 'Малый · 2×1' };
+    const sizeName = { cover: 'Квадрат · 2×2', music: 'Большой · 4×2', clock: 'Широкий · 4×1', weather: 'Квадрат · 2×2', system: 'Квадрат · 2×2', tasks: 'Квадрат · 2×2', cal: 'Квадрат · 2×2', note: 'Квадрат · 2×2', pomo: 'Квадрат · 2×2', batt: 'Малый · 2×1', net: 'Малый · 2×1', disk: 'Малый · 2×1' };
     const galWave = { id: 'wave', name: 'Аудиоволна', size: 'Во всю ширину · снизу', on: waveOnEff, label: waveOnEff ? 'Убрать' : 'Добавить', toggle: () => setWave(!waveOnEff) };
     const gal0 = Object.keys(WS).map((id) => {
       const on = !!st.wOn[id];
@@ -2138,8 +2176,27 @@ class Component extends DCLogic {
         const tr = TR[st.trk || 0], art = TR[st.artIdx || 0], prevArt = TR[st.artPrev === undefined || st.artPrev === null ? (st.artIdx || 0) : st.artPrev];
         const ready = !st.artLoad;
         const X = st.ext; const mmss = (v) => `${String(Math.floor(v / 60)).padStart(2, '0')}:${String(Math.floor(v % 60)).padStart(2, '0')}`;
-        return { trkT: X ? X.title : tr.t, trkA: X ? X.artist : tr.a, trkLen: X ? mmss(X.dur) : tr.len, trkAt: X ? mmss(X.pos) : tr.at, trkPrev: this.trkPrevH, trkNext: this.trkNextH,
-          bigVinyl: vinyl('78px', art.c), dockVinyl: vinyl('78%', art.c),
+        const coverCss = (c, i) => [
+          `radial-gradient(70% 55% at 62% 40%,${c} 0%,rgba(0,0,0,0) 62%),radial-gradient(60% 60% at 20% 85%,#ff8a3d 0%,rgba(0,0,0,0) 60%),radial-gradient(80% 70% at 90% 0%,#3a2a5c 0%,rgba(0,0,0,0) 70%),linear-gradient(160deg,#2a2b33,#0e0e11)`,
+          `radial-gradient(45% 45% at 50% 45%,#f2f2f4 0 18%,rgba(0,0,0,0) 19%),repeating-radial-gradient(circle at 50% 45%,rgba(255,255,255,.08) 0 2px,rgba(0,0,0,0) 2px 7px),radial-gradient(70% 70% at 50% 45%,${c} 0%,#0c1a33 75%)`,
+          `linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(20,10,8,.8)),repeating-linear-gradient(100deg,rgba(255,255,255,.06) 0 3px,rgba(0,0,0,0) 3px 11px),radial-gradient(90% 70% at 30% 20%,${c},#3d1e15 70%)`
+        ][i % 3];
+        const tsec = (s) => { const [m, x] = String(s).split(':').map(Number); return m * 60 + x; };
+        const leftS = Math.max(0, (X ? X.dur - X.pos : tsec(tr.len) - tsec(tr.at)));
+        const cv = {
+          art: `position:absolute;inset:0;background:${coverCss(art.c, st.artIdx || 0)};${st.artN ? `animation:${st.artN % 2 ? 'cvA' : 'cvB'} .45s ease both;` : ''}${st.playing ? 'filter:saturate(1.1)' : 'filter:saturate(.8) brightness(.9)'};transition:filter .5s`,
+          artOld: st.artN ? `position:absolute;inset:0;background:${coverCss(prevArt.c, st.artPrev || 0)}` : 'display:none',
+          avatar: `width:34px;height:34px;border-radius:50%;flex:none;background:${coverCss(art.c, st.artIdx || 0)};box-shadow:0 0 0 1.5px rgba(255,255,255,.35)`,
+          left: '-' + mmss(leftS).replace(/^0/, ''),
+          fill: `display:block;height:100%;width:${X ? Math.round(X.pos / X.dur * 100) : tr.p}%;background:#ffffff;border-radius:2px;transition:width .3s`,
+          playIcon: (X ? X.playing : st.playing) ? 'M6.5 5h4v14h-4zM13.5 5h4v14h-4z' : 'M7 4.5v15l13-7.5z',
+          liked: !!(st.liked || {})[tr.t], likeLabel: (st.liked || {})[tr.t] ? 'Убрать из любимых' : 'В любимые',
+          heart: `fill:${(st.liked || {})[tr.t] ? '#ff4d6d' : '#ffffff'};${(st.liked || {})[tr.t] ? 'animation:cvBeat .45s ease' : ''}`,
+          like: () => this.setState({ liked: { ...(this.state.liked || {}), [tr.t]: !(this.state.liked || {})[tr.t] } }),
+          share: () => { try { navigator.clipboard.writeText(`${X ? X.title : tr.t} — ${X ? X.artist : tr.a}`); } catch (e) {} this.setState({ shared: Date.now() }); }
+        };
+        return { cv, trkT: X ? X.title : tr.t, trkA: X ? X.artist : tr.a, trkLen: X ? mmss(X.dur) : tr.len, trkAt: X ? mmss(X.pos) : tr.at, trkPrev: this.trkPrevH, trkNext: this.trkNextH,
+          bigVinyl: vinyl('78px', art.c), dockVinyl: vinyl('78%', art.c), dockSleeveV: vinyl('70%', art.c) + ';position:absolute;left:15%;top:5%',
           artOld: st.artN ? 'position:absolute;left:25px;top:25px;' + vinyl('78px', prevArt.c) : 'display:none',
           artFade: `position:absolute;left:25px;top:25px;width:78px;height:78px;${st.artN ? `animation:${st.artN % 2 ? 'artA' : 'artB'} .2s linear both` : ''}`,
           busy: st.artLoad ? `position:absolute;left:50px;top:50px;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.18);border-top-color:#f2f2f4;z-index:2;animation:busyIn .01s .2s both,spin .8s linear infinite` : 'display:none',
