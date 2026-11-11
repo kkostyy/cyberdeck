@@ -41,6 +41,9 @@
 
 - [Что готово](docs/STATUS.md) — что есть в прототипе, что уже в образе, что проверено на железе
 - [Проверка на железе](docs/HARDWARE-CHECKLIST.md) — чек-лист первого запуска на Raspberry Pi
+- **Динамический остров** — `airootfs/usr/share/ashenos/island/shell.qml` (Quickshell), запускается вместе с Plasma.
+  Показывает музыку, громкость, батарею и таймер; на него можно перетащить файл из Dolphin и потом
+  вытащить обратно. Из терминала: `quickshell ipc -p /usr/share/ashenos/island/shell.qml call island timer 25`
 - Тема значков **Ashen** — `airootfs/usr/share/icons/ashen`, включена по умолчанию в `kdeglobals`;
   исходные картинки в `design/icons`
 

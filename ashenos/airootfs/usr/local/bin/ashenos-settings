@@ -77,7 +77,7 @@ apply_theme() {
   else
     kw --file kdeglobals --group General --key ColorScheme "$name"
   fi
-  kw --file kdeglobals --group Icons --key Theme breeze-dark
+  kw --file kdeglobals --group Icons --key Theme "$(val ICONS ashen)"
   say "тема $th, оттенок $acc, окраска фона $tint"
 }
 
@@ -225,7 +225,7 @@ apply_all() {
 
 apply_key() { # применить только то, что связано с ключом
   case "$1" in
-    THEME|ACCENT|TINT) apply_theme ;;
+    THEME|ACCENT|TINT|ICONS) apply_theme ;;
     WALLPAPER) apply_wallpaper ;;
     FONT|FONT_SIZE|FONT_MONO) apply_fonts ;;
     KEYBOARD|KEYBOARD_SWITCH|NUMLOCK|VIRTUAL_KEYBOARD) apply_keyboard ;;

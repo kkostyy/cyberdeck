@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Ashen Island
+Name[ru]=Динамический остров
+Comment=Dynamic Island AshenOS: музыка, громкость, таймер, полка для файлов
+Exec=quickshell -p /usr/share/ashenos/island/shell.qml
+Icon=ashenos-island-test
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2
+NoDisplay=true
