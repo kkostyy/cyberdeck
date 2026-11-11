@@ -1096,6 +1096,7 @@ class Component extends DCLogic {
     window.addEventListener('dragend', this.onDragDone, true);
     window.addEventListener('drop', this.onDragDone, true);
     window.addEventListener('dragleave', this.onDragLeaveWin, true);
+    window.addEventListener('mousemove', this.onMoveAfterDrag, true);
   }
   /* ---------- on-screen keyboard ---------- */
   onFocusIn = (e) => {
@@ -1413,10 +1414,12 @@ class Component extends DCLogic {
     if (this.fromShelf) return;
     const t = e.dataTransfer ? Array.from(e.dataTransfer.types || []) : [];
     if (e.type === 'dragstart' || t.includes('Files') || t.includes('application/x-arch-file')) {
-      clearTimeout(this.dragT);
+      clearTimeout(this.dragT); this.dragAt = Date.now();
       if (!this.state.dragging) this.setState({ dragging: true });
     }
   };
+  /* во время перетаскивания mousemove не приходит — если он пришёл, перетаскивание уже закончилось (на случай, если dragend потерялся) */
+  onMoveAfterDrag = () => { if ((this.state.dragging || this.state.shDrag) && Date.now() - (this.dragAt || 0) > 400) { clearTimeout(this.dragT); this.fromShelf = null; this.setState({ dragging: false, shDrag: false }); } };
   onDragLeaveWin = (e) => { if (!e.relatedTarget && !this.fromShelf) this.onDragDone(); };
   onDragDone = () => { clearTimeout(this.dragT); this.dragT = setTimeout(() => this.setState({ dragging: false, shDrag: false }), 250); };
   componentWillUnmount() {
@@ -1427,6 +1430,7 @@ class Component extends DCLogic {
     window.removeEventListener('mouseup', this.onCurUp, true);
     ['dragstart', 'dragenter'].forEach((ev) => window.removeEventListener(ev, this.onAnyDrag, true));
     ['dragend', 'drop'].forEach((ev) => window.removeEventListener(ev, this.onDragDone, true));
+    window.removeEventListener('mousemove', this.onMoveAfterDrag, true);
     window.removeEventListener('mousemove', this.onDragMove);
     window.removeEventListener('mouseup', this.onDragUp);
   }
@@ -1788,7 +1792,7 @@ class Component extends DCLogic {
     const ISL = `background:${THV.islBg};${game ? '' : 'backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);'}border:1px solid #2e2e33;box-shadow:0 10px 30px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);`;
     /* идёт звонок, запись, таймер и т.п. — остров не прячем даже во весь экран */
     const liveAct = !!(st.call || st.rec || st.timer || st.sw || st.prog || st.navInfo);
-    const hide = this.autohide() && !st.barShown && !st.menu && !st.right && !liveAct;
+    const hide = this.autohide() && !st.barShown && !st.menu && !st.right && !liveAct && !st.dragging;
     const unlocked = st.lock === 'off';
 
     /* ---- windows ---- */
@@ -2397,7 +2401,7 @@ class Component extends DCLogic {
       shelfHint: st.shelf.length && !dragHot ? 'display:none' : `position:absolute;left:0;right:0;${st.shelf.length ? 'bottom:4px;font-size:11px;' : 'top:50%;margin-top:-9px;font-size:12.5px;'}text-align:center;font-weight:600;color:${dragHot ? '#f2f2f4' : '#8b8b93'};pointer-events:none`,
       shelfHintText: dragHot ? 'Отпустите, чтобы положить на полку' : 'Перетащите файл на остров',
       shDragIn: (e) => { if (this.fromShelf) return; e.preventDefault(); clearTimeout(this.pillT); clearTimeout(this.shT); if (!this.state.shDrag) this.setState({ shDrag: true, hoverPill: 'isl' }); },
-      shDragOver: (e) => { if (this.fromShelf) return; e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; clearTimeout(this.shT); if (!this.state.shDrag) this.setState({ shDrag: true, hoverPill: 'isl' }); },
+      shDragOver: (e) => { this.dragAt = Date.now(); if (this.fromShelf) return; e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy'; clearTimeout(this.shT); if (!this.state.shDrag) this.setState({ shDrag: true, hoverPill: 'isl' }); },
       shDragOut: () => { clearTimeout(this.shT); this.shT = setTimeout(() => this.setState({ shDrag: false, hoverPill: null }), 160); },
       shDrop: (e) => {
         if (this.fromShelf) return;
